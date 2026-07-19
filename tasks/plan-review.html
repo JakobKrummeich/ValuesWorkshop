@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en" data-theme="luxury">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ValuesWorkshop — Implementation Plan Review</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, blockquote, figcaption, td, th, .badge, .label) {
+    overflow-wrap: anywhere;
+  }
+  :where(img, svg, video, canvas, iframe) { max-width: 100%; height: auto; }
+  .vw-task { padding: 0.25rem 0.5rem; border-radius: 0.375rem; }
+  .vw-task + .vw-task { margin-top: 0.25rem; }
+  .vw-task:hover { background: var(--color-base-300); }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+<main class="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-8">
+
+<header>
+  <h1 class="text-3xl font-bold">ValuesWorkshop — Implementation Plan Review <span class="badge badge-primary badge-soft align-middle">rev 3</span></h1>
+  <div role="alert" class="alert alert-success alert-soft mt-3">
+    <span><strong>Locked in:</strong> <code>@react-pdf/renderer</code> · sizing rule · gate tooling + thresholds · Prettier + CSharpier.</span>
+  </div>
+  <div role="alert" class="alert alert-info alert-soft mt-2">
+    <span><strong>Changed per your round-2 feedback:</strong>
+    ① Phase 0 is now pure DDD domain modeling — protocol/persistence/architecture/CP-SAT docs deferred just-in-time into their implementing tasks.
+    ② FE split into facilitator/participant/presenter screen groups, each with own React context for DI.
+    ③ BE: one test project per prod project; prod solution excludes tests.
+    ④ E2e is extended immediately after every workshop phase — never written at the end.
+    ⑤ Agent-verifiable smoke-start gate (<code>scripts/smoke.sh</code>).
+    ⑥ Formatting: <em>applied</em> locally (scripts + pre-commit); CI runs <code>--check</code> only, because CI must fail loudly, not silently rewrite your commits.
+    ⑦ Phase batches C–E kept as review checkpoints only — actual work is one vertical slice per workshop phase (answers "why group?").</span>
+  </div>
+</header>
+
+<section class="card card-border bg-base-200">
+  <div class="card-body">
+    <h2 class="card-title">Goal &amp; current state</h2>
+    <p><strong>Goal:</strong> Real-time 9-phase workshop platform — ~30 participants on phones, facilitator laptop,
+    projector. Quiz → value selection → CP-SAT grouping → group work on actions → anonymous voting with tiebreaks → PDF.
+    Full restart recovery. Local docker compose only.</p>
+    <p><strong>Stack (fixed):</strong> Next.js + Jest · ASP.NET Core + xUnit · SQLite · SignalR · OR-Tools CP-SAT ·
+    OIDC · Playwright · plain CSS tokens · de+en.</p>
+  </div>
+</section>
+
+<section>
+  <h2 class="text-2xl font-bold mb-1">Phases</h2>
+  <p class="mb-4 opacity-80">Order: 0 → A → B → (C ∥ Task 17) → D → E → F. <strong>Checkpoint 0 gates all code.</strong></p>
+
+  <div class="flex flex-col gap-4">
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="card-title">Phase 0 · Domain modeling (DDD) <span class="badge badge-warning badge-soft">no code before approval</span></h3>
+        <p class="text-sm opacity-80">Domain language is the core; all technical detail stripped — like a DDD workshop.</p>
+        <ul class="text-sm">
+          <li class="vw-task"><strong>0.1 Domain model</strong> — ubiquitous language glossary (de/en), domain events per phase (event-storming style: ParticipantJoined, QuizAnswerCast, ValuesSelected, GroupsFormed, ActionsSubmitted, TiebreakStarted…), commands + their actors, aggregates with boundaries (Session root; Group; anonymous vote tallies as read models), invariants each owned by exactly one aggregate (exactly-10 selection, 1–5 actions, 5 votes, one scribe, anonymity, forward-only phases). Zero technical vocabulary — no SQL/SignalR/HTTP/React words.</li>
+          <li class="vw-task"><strong>0.2 Phase state machine</strong> — 9 phases + sub-states, guards, allowed actor per transition; expressed in the ubiquitous language, transitions consume commands / emit events from 0.1</li>
+          <li class="vw-task"><strong>0.3 Screen flows</strong> — 3 screens × 9 phases matrix, low-fi wireframes, portrait-mobile-first, i18n states</li>
+        </ul>
+        <p class="text-sm opacity-70">Deferred just-in-time (inside implementing tasks): <code>architecture.md</code> → Task 4 · <code>persistence.md</code> → Task 7 · <code>protocol.md</code> → Task 9 · <code>cpsat-model.md</code> → Task 17.</p>
+        <p class="text-sm opacity-70">Checkpoint 0: DDD depth is the review focus; your approval unlocks Task 1.</p>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="card-title">Phase A · Scaffold + all gates</h3>
+        <ul class="text-sm">
+          <li class="vw-task"><strong>1 Scaffold monorepo</strong>:
+            <ul class="mt-1 ml-5 list-disc">
+              <li><code>frontend/</code>: Next.js (TS strict), Jest; hexagonal <code>src/{domain,ports,adapters,app}</code>; <code>app/</code> split into <strong>facilitator/ participant/ presenter/</strong> — each screen group wrapped in its own React context doing DI of port implementations; screens never import each other or concrete adapters (arch-tested)</li>
+              <li><code>backend/</code>: prod solution with Domain / Application / Adapters / Host; <strong>one xUnit test project per prod project</strong> (Domain.Tests … Host.Tests) in a separate solution filter — prod solution builds without tests</li>
+              <li><code>config/</code> value+quiz JSON stubs · <code>devtools/oidc/</code> dev OIDC server · root configs</li>
+            </ul>
+          </li>
+          <li class="vw-task"><strong>2 Design tokens + stylelint</strong> — raw hex/px outside <code>tokens.css</code> fails lint</li>
+          <li class="vw-task"><strong>3 docker compose + smoke gate</strong> — one command up, seeded demo, OR-Tools spike; plus <code>scripts/smoke.sh</code>: starts FE + BE with one simple command each, polls health endpoints, exit 0/1 — verifiable by an agent and run in CI</li>
+          <li class="vw-task"><strong>4 Architecture tests</strong> — writes <code>design/architecture.md</code> first, then ArchUnitNET + dependency-cruiser rules derived 1:1 (incl. screen-group isolation)</li>
+          <li class="vw-task"><strong>5 Complexity + duplication + formatting</strong> — eslint complexity 10 · CA1502 10 · jscpd ≤ 2 % · Prettier/CSharpier: apply locally (write scripts + pre-commit hook), <code>--check</code> in CI</li>
+          <li class="vw-task"><strong>6 CI/CD + branch protection + no-mistakes</strong> — Actions on PR → main: build, tests, lint, format-check, arch, complexity, duplication, smoke-start (= runs <code>scripts/smoke.sh</code> from Task 3: boots FE + BE, waits for HTTP 200 health responses, fails the pipeline if either app cannot start — catches “compiles but crashes on boot” errors that unit tests miss), e2e; merge only green; identical scripts locally</li>
+        </ul>
+        <p class="text-sm opacity-70">Checkpoint A: every gate proven red by deliberate violation then green; smoke gate proven both ways; red PR unmergeable.</p>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="card-title">Phase B · Session core</h3>
+        <ul class="text-sm">
+          <li class="vw-task"><strong>7 SQLite persistence</strong> — writes <code>design/persistence.md</code> first (schema, write-before-broadcast, recovery, schema-level anonymity); then store implementation</li>
+          <li class="vw-task"><strong>8 OIDC auth</strong> — BE validation, FE login, presenter unauthenticated</li>
+          <li class="vw-task"><strong>9 SignalR hub + resync</strong> — writes <code>design/protocol.md</code> first (intent/event catalog, per-role snapshots, error model, sequence diagrams = FE/BE contract); then hub + snapshot resync</li>
+          <li class="vw-task"><strong>10 Session lifecycle + reconnect</strong> — PW-gated creation, join, membership survives restart + tab close</li>
+          <li class="vw-task"><strong>11 Phase state machine</strong> — pure Domain implementation of doc 0.2</li>
+        </ul>
+        <p class="text-sm opacity-70">Checkpoint B: e2e smoke incl. kill+restart recovery.</p>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="card-title">Phase C · Workshop phases 1–4 <span class="badge badge-ghost">checkpoint batch, ∥ Task 17</span></h3>
+        <p class="text-sm opacity-80">One vertical slice per workshop phase; <strong>multi-client e2e extended right after each phase completes</strong> — regression net from the start.</p>
+        <ul class="text-sm">
+          <li class="vw-task"><strong>12 Join</strong> — QR, lobby, live list</li>
+          <li class="vw-task"><strong>13+14 Quiz</strong> (BE then FE) — votes, live bars, reveal, learning texts → <em>e2e covers phases 1–2</em></li>
+          <li class="vw-task"><strong>15 Value selection</strong> — exactly 10, server-enforced → <em>e2e through 3</em></li>
+          <li class="vw-task"><strong>16 Selection results</strong> — top-10 + ties → <em>e2e through 4</em></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="card-title">Phase D · Grouping + group work <span class="badge badge-ghost">checkpoint batch</span></h3>
+        <ul class="text-sm">
+          <li class="vw-task"><strong>17 CP-SAT wrapper</strong> — writes <code>design/cpsat-model.md</code> first (variables, constraints, objective, symmetry breaking, hand-worked N=8/V=6); 3 s cap, wall-clock test N=30; parallel to Phase C</li>
+          <li class="vw-task"><strong>18 Group selection</strong> — solver on entry, animal labels, persisted → <em>e2e through 5</em></li>
+          <li class="vw-task"><strong>19+20 Group work</strong> (BE then FE) — scribe rights, 1–5 actions, submit/un-submit, reassignment → <em>e2e through 6</em></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="card-title">Phase E · Presentation, voting, PDF <span class="badge badge-ghost">checkpoint batch</span></h3>
+        <ul class="text-sm">
+          <li class="vw-task"><strong>21 Value presentation</strong> — facilitator switches groups → <em>e2e through 7</em></li>
+          <li class="vw-task"><strong>22+23 Final voting</strong> (BE then FE) — 5 votes, anonymous by schema, tiebreak rounds → <em>e2e through 8 incl. forced tiebreak</em></li>
+          <li class="vw-task"><strong>24 Final presentation + PDF</strong> — winners, <code>@react-pdf/renderer</code> download → <em>e2e covers all 9 phases</em></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card card-border bg-base-200">
+      <div class="card-body">
+        <h3 class="card-title">Phase F · Hardening + polish</h3>
+        <ul class="text-sm">
+          <li class="vw-task"><strong>25 Restart + reconnect e2e</strong> — kill backend mid-quiz/group-work/voting; tab reopen both roles</li>
+          <li class="vw-task"><strong>26 i18n completeness</strong> — key-parity guard in CI</li>
+          <li class="vw-task"><strong>27 9-phase e2e stability</strong> — e2e already exists from C–E; this only deflakes: 3× consecutive green</li>
+          <li class="vw-task"><strong>28 README + demo polish</strong> — fresh-clone-to-demo, GIFs</li>
+        </ul>
+        <p class="text-sm opacity-70">Checkpoint F: every SPEC.md success criterion checked.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="card card-border bg-base-200">
+  <div class="card-body">
+    <h2 class="card-title">Remaining decisions</h2>
+
+    <form data-lavish-question="pkg-manager"
+      onsubmit="event.preventDefault(); const v = new FormData(event.currentTarget).get('pm'); if (v) window.lavish.queuePrompt('Package manager decision: ' + v, { tag: 'decision', text: 'PkgMgr: ' + v, element: event.currentTarget, data: { question: 'pkg-manager', answer: v } });">
+      <h3 class="font-bold">1 · Package manager: what pnpm is</h3>
+      <p class="text-sm opacity-80">pnpm is a drop-in replacement for npm — same <code>package.json</code>, same registry, same commands (<code>pnpm install</code>, <code>pnpm run dev</code>). It differs in how it lays out <code>node_modules</code>:</p>
+      <div class="overflow-x-auto my-2">
+        <table class="table table-sm table-zebra">
+          <thead><tr><th></th><th>npm</th><th>pnpm</th></tr></thead>
+          <tbody>
+            <tr><td>node_modules layout</td><td>flat — all transitive deps hoisted to top level</td><td>nested via symlinks into a global content-addressed store</td></tr>
+            <tr><td>Phantom dependencies</td><td>possible: code can <code>import</code> packages you never declared (they were hoisted by some dependency) — breaks randomly on updates</td><td>impossible: only declared deps are resolvable; undeclared import fails instantly</td></tr>
+            <tr><td>Monorepo workspaces</td><td>supported, weaker filtering</td><td>first-class (<code>pnpm --filter</code>), fits frontend + devtools/oidc</td></tr>
+            <tr><td>Install speed / disk</td><td>copies every package per project</td><td>hardlinks from shared store — faster CI, less disk</td></tr>
+            <tr><td>Maturity</td><td>default, ubiquitous</td><td>mainstream since years (Vue, Vite, Next.js repo itself use it)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-sm opacity-80">Why proposed here: the phantom-dependency strictness is a deterministic gate by construction — same philosophy as the rest of the pipeline. Cost: contributors need <code>corepack enable</code> / <code>npm i -g pnpm</code> once. npm is fine too if you prefer zero extra tooling.</p>
+      <div class="flex flex-col gap-1 my-2">
+        <label class="label cursor-pointer justify-start gap-2"><input type="radio" name="pm" value="pnpm" class="radio radio-sm" checked> pnpm</label>
+        <label class="label cursor-pointer justify-start gap-2"><input type="radio" name="pm" value="npm" class="radio radio-sm"> npm</label>
+        <label class="label cursor-pointer justify-start gap-2"><input type="radio" name="pm" value="other - see chat" class="radio radio-sm"> Other (chat)</label>
+      </div>
+      <button type="submit" class="btn btn-sm btn-primary">Queue answer</button>
+    </form>
+
+    <div class="divider my-1"></div>
+
+    <form data-lavish-question="plan-approval"
+      onsubmit="event.preventDefault(); const v = new FormData(event.currentTarget).get('plan'); if (v) window.lavish.queuePrompt('Overall plan decision: ' + v, { tag: 'decision', text: 'Plan: ' + v, element: event.currentTarget, data: { question: 'plan-approval', answer: v } });">
+      <h3 class="font-bold">2 · Overall plan</h3>
+      <div class="flex flex-col gap-1 my-2">
+        <label class="label cursor-pointer justify-start gap-2"><input type="radio" name="plan" value="approved - start Phase 0 (DDD domain modeling)" class="radio radio-sm"> Approve — start Phase 0 (DDD domain modeling)</label>
+        <label class="label cursor-pointer justify-start gap-2"><input type="radio" name="plan" value="changes needed - see annotations" class="radio radio-sm"> Changes needed (annotate above)</label>
+      </div>
+      <button type="submit" class="btn btn-sm btn-primary">Queue answer</button>
+    </form>
+  </div>
+</section>
+
+<footer class="text-sm opacity-60">
+  <p>Full detail: <code>tasks/plan.md</code> + <code>tasks/todo.md</code> (updated with all round-2 changes). Annotate any line.</p>
+</footer>
+
+</main>
+</body>
+</html>

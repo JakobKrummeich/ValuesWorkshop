@@ -30,12 +30,15 @@ verified by a multi-client Playwright e2e test.
 | Real-time | SignalR (WebSockets), server-authoritative state |
 | Auth | OIDC. Prod: Azure AD. Dev/e2e: local `oidc-provider` (npm) instance |
 | Optimization | Google OR-Tools CP-SAT (C# bindings) for group/value assignment |
-| PDF | Client-side React PDF library (e.g. `@react-pdf/renderer`) |
+| PDF | Client-side: `@react-pdf/renderer` |
 | Unit tests FE | Jest |
 | Unit tests BE | xUnit |
 | E2E | Playwright, multi-browser-context (facilitator + presenter + N participants) |
 | Styling | Plain CSS with design tokens, token usage enforced by stylelint |
 | i18n | de + en |
+| Architecture | Hexagonal (ports & adapters) in FE and BE, enforced by arch tests: ArchUnitNET (BE), dependency-cruiser (FE) |
+| Quality gates | Cyclomatic complexity: eslint `complexity` (FE), CA1502 as error (BE). Duplication: jscpd threshold over FE+BE. Formatting: Prettier check (TS/CSS), CSharpier check (C#). All deterministic. |
+| CI/CD | GitHub Actions on PRs to `main`: build, unit tests, lint, arch tests, complexity, duplication, e2e. `main` protected — merge only on green pipeline. |
 | Deploy | Local only: one-command `docker compose up` with seeded demo session. No public deploy. README gets GIF/screenshots of all three screens. |
 
 ## Domain Model
@@ -67,7 +70,9 @@ verified by a multi-client Playwright e2e test.
 4. **Selection results** — bar chart of the top-10 most-selected values;
    more than 10 shown if tied at 10th place.
 5. **Group selection** — participants split into groups of ≥4 (group
-   count/sizes via round-robin sizing). Surviving values distributed evenly
+   count/sizes via round-robin sizing: `G = max(1, floor(N/4))` groups,
+   sizes `floor(N/G)` with first `N mod G` groups getting +1; same deal-out
+   rule sizes the value partition). Surviving values distributed evenly
    across groups. CP-SAT assigns participants and values to groups,
    maximizing Σ over participants of |own 10 selections ∩ group's values|.
    Solver time-boxed to 3 s; best incumbent taken. Solver setup exploits
@@ -122,12 +127,20 @@ frontend/          → Next.js app (3 screens), Jest unit tests, Playwright e2e
 backend/           → ASP.NET Core solution, xUnit tests
 config/            → values catalog + quiz content JSON
 devtools/oidc/     → local oidc-provider server for dev + e2e
+design/            → design models. DDD domain core (domain model, state
+                     machine, screen flows) written and user-approved before
+                     any implementation code; technical docs (architecture,
+                     persistence, protocol, CP-SAT) written just-in-time in
+                     their implementing task
 tasks/             → plan.md, todo.md (spec-driven workflow)
 ```
 
 ## Code Style
 
 - TypeScript strict; C# nullable-enabled, warnings as errors.
+- Hexagonal architecture both sides: pure domain core, ports in application
+  layer, adapters (SignalR, SQLite, OR-Tools, OIDC, UI) at the edge;
+  dependencies point inward only. Violations fail arch tests.
 - Server-authoritative: clients send intents, server validates against phase
   rules and broadcasts state. Clients never compute authoritative results.
 - Zod (or equivalent) validation of every inbound client message.
@@ -162,9 +175,10 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
 - [ ] PDF downloads in final phase with votes, actions, winners.
 - [ ] stylelint fails on raw color/spacing values outside tokens file.
 - [ ] de + en locales complete.
+- [ ] PR pipeline runs all deterministic gates (build, tests, lint, format,
+      arch, complexity, duplication, e2e); `main` merge blocked unless green.
 
 ## Open Questions
 
-- Exact PDF library (decide at implementation).
-- Round-robin group sizing details (e.g. 30 participants → 7 groups? exact
-  rule to fix in /plan).
+- None. PDF library (`@react-pdf/renderer`) and round-robin sizing rule
+  decided in `tasks/plan.md`.
