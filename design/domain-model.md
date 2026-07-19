@@ -115,3 +115,117 @@ documents (`architecture.md`, `persistence.md`, `protocol.md`,
 | PDF, download, rendering | File-format concern — `screens.md` / implementing task. The domain term is **Workshop record**. |
 | Screens, charts, bars, animations | Presentation — `screens.md`. Domain knows tallies; how they are drawn is not domain. |
 | Config / JSON / catalog file | Storage form of the **Values catalog** and quiz content. |
+
+---
+
+## 2. Domain Events
+
+Facts that have happened in a session, named in past tense, event-storming
+style. Ordered by the phase in which they typically occur. Every event
+belongs to the session it happened in.
+
+### Session lifecycle (spans all phases)
+
+| Event | Meaning |
+|---|---|
+| **SessionOpened** | A facilitator opened a new session using the facilitator passphrase. |
+| **PhaseAdvanced** | The facilitator moved the session forward to the next phase. Never backward. |
+| **ParticipantReturned** | A facilitator or participant came back after an interruption and resumed their exact place (any phase). |
+
+### Phase 1 — Join
+
+| Event | Meaning |
+|---|---|
+| **ParticipantJoined** | A person entered the session's roster and now waits in the lobby. |
+
+### Phase 2 — Quiz
+
+| Event | Meaning |
+|---|---|
+| **QuestionPosed** | The next quiz question became the current one (first question: on entering the phase). |
+| **QuizAnswerCast** | A participant picked one answer option for the current question — their only pick for it. The answer tally grew. |
+| **AnswerRevealed** | The correct option of the current question was disclosed. |
+| **LearningTextShown** | The current question's learning text was made visible. |
+
+### Phase 3 — Value selection
+
+| Event | Meaning |
+|---|---|
+| **ValuesSelected** | A participant submitted their selection of exactly ten distinct values; it is now locked. The selection tally grew. |
+
+### Phase 4 — Selection results
+
+| Event | Meaning |
+|---|---|
+| **TopValuesDetermined** | The top values were fixed from the selection tally — ten, or more if tied at tenth place. |
+
+### Phase 5 — Group formation
+
+| Event | Meaning |
+|---|---|
+| **GroupsFormed** | All present participants were partitioned into animal-named groups per the sizing rule, and the top values were dealt out across them — each top value to exactly one group. Fixed from now on. |
+
+### Phase 6 — Group work
+
+| Event | Meaning |
+|---|---|
+| **ScribeAppointed** | One member of a group was made its scribe — at random when group work began. |
+| **ScribeReassigned** | The facilitator handed a group's scribe role to a different member; the previous scribe lost it at once. |
+| **ActionAdded** | The scribe added an action under one of the group's assigned values (within the 1–5 bound). |
+| **ActionEdited** | The scribe changed the wording of an existing action. |
+| **ActionRemoved** | The scribe removed an action (respecting the 1-per-value minimum once work is submitted). |
+| **GroupWorkSubmitted** | The scribe declared the group's result finished; editing stopped. |
+| **GroupWorkReopened** | The scribe took the submission back; editing resumed. |
+
+### Phase 7 — Value presentation
+
+| Event | Meaning |
+|---|---|
+| **PresentingGroupChanged** | The facilitator put a (different) group's submitted result on presentation. |
+
+### Phase 8 — Final voting
+
+| Event | Meaning |
+|---|---|
+| **FinalVotesCast** | A participant spent their full vote allotment (five in the main round; the number of tied values in a tiebreak) across the eligible values. The anonymous vote tally grew; only the fact *that* they voted was remembered. |
+| **VotingClosed** | The facilitator ended the current voting round; the tally is final for this round. |
+| **TiebreakStarted** | A tie at fifth place being unresolved, the facilitator started a further round among the tied values only. |
+| **WinnersDetermined** | Exactly five values emerged with the most votes; they are the winning values. |
+
+### Phase 9 — Final presentation
+
+| Event | Meaning |
+|---|---|
+| **WorkshopConcluded** | The session reached its final phase; winning values and their actions stand, and the workshop record became available to every participant. |
+
+---
+
+## 3. Commands
+
+Requests to change a session, named in imperative, each with the one actor
+allowed to issue it. **System** marks commands the session performs itself
+when a phase begins or a condition is met — no person issues them.
+
+| Command | Actor | Effect / resulting event(s) |
+|---|---|---|
+| **OpenSession** | Facilitator | Requires the facilitator passphrase. → SessionOpened |
+| **AdvancePhase** | Facilitator | Move to the next of the nine phases; allowed forward only. → PhaseAdvanced (entering some phases triggers System commands below) |
+| **JoinSession** | Participant | Enter the roster of a named session. → ParticipantJoined |
+| **PoseNextQuestion** | Facilitator | Make the next quiz question current. → QuestionPosed |
+| **CastQuizAnswer** | Participant | Pick one answer option for the current question; second picks are refused. → QuizAnswerCast |
+| **RevealAnswer** | Facilitator | Disclose the correct option. → AnswerRevealed |
+| **ShowLearningText** | Facilitator | Show the current question's learning text. → LearningTextShown |
+| **SubmitValueSelection** | Participant | Hand in exactly ten distinct values; fewer, more, or duplicates are refused; resubmission is refused. → ValuesSelected |
+| **DetermineTopValues** | System (entering Selection results) | Fix the top values from the selection tally, widening on a tenth-place tie. → TopValuesDetermined |
+| **FormGroups** | System (entering Group formation) | Partition participants and deal out top values per the sizing rule and the formation aim. → GroupsFormed |
+| **AppointScribes** | System (entering Group work) | Pick one member per group at random. → ScribeAppointed (per group) |
+| **ReassignScribe** | Facilitator | Hand a group's scribe role to another of its members. → ScribeReassigned |
+| **AddAction** | Scribe | Add an action under an assigned value of the own group; refused beyond five per value, refused while submitted, refused for non-scribes. → ActionAdded |
+| **EditAction** | Scribe | Change an action's wording; same refusals as AddAction. → ActionEdited |
+| **RemoveAction** | Scribe | Remove an action; same refusals as AddAction. → ActionRemoved |
+| **SubmitGroupWork** | Scribe | Declare the group result finished; requires 1–5 actions for every assigned value. → GroupWorkSubmitted |
+| **ReopenGroupWork** | Scribe | Take the submission back. → GroupWorkReopened |
+| **ChangePresentingGroup** | Facilitator | Put another group's submitted result on presentation. → PresentingGroupChanged |
+| **CastFinalVotes** | Participant | Spend the full allotment across eligible values, multi-votes allowed; wrong totals, votes outside the eligible values, or a second cast in the same round are refused. → FinalVotesCast |
+| **CloseVoting** | Facilitator | End the current voting round. → VotingClosed, then either WinnersDetermined (no fifth-place tie) or a pending tie |
+| **StartTiebreakRound** | Facilitator | Begin a further round among the tied values only. → TiebreakStarted |
