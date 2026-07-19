@@ -229,3 +229,103 @@ when a phase begins or a condition is met — no person issues them.
 | **CastFinalVotes** | Participant | Spend the full allotment across eligible values, multi-votes allowed; wrong totals, votes outside the eligible values, or a second cast in the same round are refused. → FinalVotesCast |
 | **CloseVoting** | Facilitator | End the current voting round. → VotingClosed, then either WinnersDetermined (no fifth-place tie) or a pending tie |
 | **StartTiebreakRound** | Facilitator | Begin a further round among the tied values only. → TiebreakStarted |
+
+---
+
+## 4. Aggregates
+
+Consistency boundaries: every command is handled by exactly one aggregate,
+which enforces its invariants atomically. Nothing outside an aggregate may
+change its inner state.
+
+### Session (root)
+
+The workshop run itself. Owns everything that concerns the session as a
+whole; every other model element is reached through it.
+
+**Owns:** session identity · roster (participants and the facilitator, with
+return/resume) · phase progression (current phase + within-phase state:
+current question, reveal/learning-text shown, presenting group, voting round)
+· quiz answer tallies and who-answered-which-question · value selections and
+who-has-submitted · top values · final-vote allotments, who-has-voted flags,
+tie state, winning values.
+
+**Handles:** OpenSession, AdvancePhase, JoinSession, PoseNextQuestion,
+CastQuizAnswer, RevealAnswer, ShowLearningText, SubmitValueSelection,
+DetermineTopValues, FormGroups, AppointScribes, ChangePresentingGroup,
+CastFinalVotes, CloseVoting, StartTiebreakRound.
+
+### Group
+
+One group within a session, created by GroupsFormed and fixed in membership
+and assigned values from then on. Owns its own working state so that groups
+work independently — one group's edits never contend with another's.
+
+**Owns:** group name (animal) · members · assigned values · scribe ·
+actions per assigned value · submitted state.
+
+**Handles:** ReassignScribe, AddAction, EditAction, RemoveAction,
+SubmitGroupWork, ReopenGroupWork.
+
+### Read models (not aggregates)
+
+Derived, purely-for-viewing projections; they enforce nothing and are
+recomputable from events at any time:
+
+- **Answer tally** — counts per answer option per quiz question.
+- **Selection tally** — counts per value; submission progress count.
+- **Vote tally** — anonymous counts per value per voting round. By
+  construction it contains counts only; no voter is ever part of it.
+- **Presentation view** — presenting group's submitted result; winners.
+
+## 5. Invariants
+
+Each invariant is enforced by exactly one aggregate — the only place that
+can refuse a command violating it.
+
+| # | Invariant | Enforced by |
+|---|---|---|
+| I1 | Phases move forward only, in the fixed order 1→9; no skipping, no going back. | Session |
+| I2 | Only the facilitator advances phases and operates sub-controls (question, reveal, learning text, presenting group, close voting, tiebreak). | Session |
+| I3 | Opening a session requires the facilitator passphrase. | Session |
+| I4 | A participant belongs to the roster before acting; a returning person resumes their existing place, never a second one. | Session |
+| I5 | One quiz answer per participant per question; unchangeable once cast. | Session |
+| I6 | A value selection has exactly ten distinct catalog values and is submitted at most once. | Session |
+| I7 | Top values = the ten most-selected, widened to include all values tied at tenth place. | Session |
+| I8 | Groups are formed exactly once, per the sizing rule; each top value is assigned to exactly one group; membership and assignment never change afterwards. | Session |
+| I9 | A group has exactly one scribe at any time, and the scribe is a member of that group. | Group |
+| I10 | Only the scribe creates, edits, removes actions and submits or reopens; a reassigned-away scribe is refused immediately. | Group |
+| I11 | Every assigned value carries between one and five actions when group work is submitted; no edits while submitted. | Group |
+| I12 | Only submitted group results are presented. | Session |
+| I13 | A final-votes cast spends exactly the round's allotment (five in the main round; the number of tied values in a tiebreak), only on the round's eligible values; one cast per participant per round. | Session |
+| I14 | Final votes are anonymous: the session remembers *that* a participant voted, never *what* — no connection between voter and votes exists anywhere in the model. | Session |
+| I15 | Exactly five winning values; while a fifth-place tie persists, tiebreak rounds over the tied values repeat until it is resolved. | Session |
+| I16 | A session never forgets: every fact above survives any interruption, and a return resumes the exact prior state. | Session |
+
+## 6. SPEC.md noun coverage
+
+Every noun of SPEC.md's domain sections maps to a glossary term or is
+explicitly excluded (section 1, last table):
+
+| SPEC noun | Term |
+|---|---|
+| workshop, session, sessionId | Session, Session identity |
+| facilitator, facilitator password | Facilitator, Facilitator passphrase |
+| participant, lobby, reconnect/membership | Participant, Lobby, Return, Roster |
+| projector / presenter screen | Presenter view |
+| phase (9, forward-only) | Phase, Phase progression |
+| quiz, question, answers (correct/wrong/funny-wrong), learning text | Quiz question, Answer option, Quiz answer, Learning text |
+| live bar charts / tallies | Answer/Selection/Vote tally (drawing → excluded) |
+| values catalog, value | Values catalog, Value |
+| selection of exactly 10 | Value selection |
+| top-10, tie at 10th place | Top values |
+| groups, group sizes, animal names | Group, Group sizing rule, Group name |
+| solver / assignment | Group formation (computation → excluded) |
+| scribe, reassignment | Scribe, ReassignScribe |
+| actions (1–5 per value), submit/un-submit | Action, Group work result, Submit / reopen |
+| presentation, switching groups | Presenting group |
+| 5 votes, multi-votes, secret/anonymous | Final votes, Vote tally |
+| tie at 5th place, tiebreaker round | Tiebreak round |
+| winners | Winning values |
+| PDF / download | Workshop record (format → excluded) |
+| QR code, OIDC, SQLite, SignalR, restart, docker, CI … | Excluded (see section 1) |
