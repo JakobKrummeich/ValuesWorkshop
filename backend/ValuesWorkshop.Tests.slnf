@@ -1,0 +1,11 @@
+{
+  "solution": {
+    "path": "ValuesWorkshop.All.sln",
+    "projects": [
+      "Domain.Tests\\ValuesWorkshop.Domain.Tests.csproj",
+      "Application.Tests\\ValuesWorkshop.Application.Tests.csproj",
+      "Adapters.Tests\\ValuesWorkshop.Adapters.Tests.csproj",
+      "Host.Tests\\ValuesWorkshop.Host.Tests.csproj"
+    ]
+  }
+}
