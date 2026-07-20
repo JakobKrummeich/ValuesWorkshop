@@ -21,7 +21,7 @@ just-in-time inside the task that implements them — not here. All artifacts:
 markdown + Mermaid in `design/`, living documents (deviation → update doc in
 same PR, Ask-first).
 
-### Task 0.1: Domain model — DDD-workshop style
+### Task 0.1: Domain model — DDD-workshop style ✅
 **Description:** `design/domain-model.md`: ubiquitous language glossary
 (de/en terms the facilitator would use), domain events per workshop phase
 (event-storming style: ParticipantJoined, QuizAnswerCast, ValuesSelected,
@@ -32,43 +32,44 @@ selection, 1–5 actions per value, 5 final votes, one scribe per group,
 vote anonymity, forward-only phases). No table names, no transport, no
 framework words.
 **Acceptance criteria:**
-- [ ] Every SPEC.md noun mapped to a term in the glossary or explicitly
+- [x] Every SPEC.md noun mapped to a term in the glossary or explicitly
       excluded
-- [ ] Every invariant assigned to exactly one aggregate that enforces it
-- [ ] Domain events cover all 9 phases; commands name their actor
-- [ ] Zero technical vocabulary (no SQL/SignalR/HTTP/React terms)
+- [x] Every invariant assigned to exactly one aggregate that enforces it
+- [x] Domain events cover all 9 phases; commands name their actor
+- [x] Zero technical vocabulary (no SQL/SignalR/HTTP/React terms)
 **Verification:** cross-read against SPEC.md; a domain expert could review
 this without knowing the stack.
 **Dependencies:** None. **Size:** M
 
-### Task 0.2: Phase state machine (domain level)
+### Task 0.2: Phase state machine (domain level) ✅
 **Description:** `design/state-machine.md`: Mermaid stateDiagram of 9 phases
 (forward-only) + per-phase sub-states (quiz question index / revealed /
 learning-text, presenting group, tiebreak round), guards, and allowed actor
 per transition (facilitator/participant/system). Expressed in ubiquitous
 language from 0.1.
 **Acceptance criteria:**
-- [ ] Every facilitator sub-control from SPEC.md appears as a transition
-- [ ] No transition lacks an actor + guard
-- [ ] Transitions consume commands / emit events from 0.1
+- [x] Every facilitator sub-control from SPEC.md appears as a transition
+- [x] No transition lacks an actor + guard
+- [x] Transitions consume commands / emit events from 0.1
 **Verification:** walk all 9 phases against SPEC.md; no dead ends.
 **Dependencies:** 0.1. **Size:** S
 
-### Task 0.3: Screen flows
+### Task 0.3: Screen flows ✅
 **Description:** `design/screens.md`: 3 screens × 9 phases matrix (what each
 role sees/can do per phase), low-fi wireframes (ASCII/Mermaid) for key
 screens (join QR, quiz bars, selection grid, group work editor, voting,
 final + PDF button), portrait-mobile-first notes, i18n-visible states.
 **Acceptance criteria:**
-- [ ] All 27 matrix cells filled (or marked intentionally empty)
-- [ ] Every command from 0.1 reachable from some wireframe element
+- [x] All 27 matrix cells filled (or marked intentionally empty)
+- [x] Every command from 0.1 reachable from some wireframe element
 **Verification:** cross-check matrix against SPEC.md screens table + 0.1.
 **Dependencies:** 0.1, 0.2. **Size:** M
 
-### Checkpoint 0 — gate for ALL code
-- [ ] Domain model, state machine, screen flows complete and consistent
-- [ ] User reviewed and approved (DDD depth is the review focus)
-- [ ] Merged to main; Task 1 may start
+### Checkpoint 0 — gate for ALL code ✅
+- [x] Domain model, state machine, screen flows complete and consistent
+- [x] User reviewed and approved (DDD depth is the review focus — approved
+      via Lavish review of `tasks/checkpoint0-review.html`)
+- [x] Merged to main; Task 1 may start
 
 Deferred technical design docs (written inside their implementing task):
 `design/architecture.md` → Task 4 · `design/persistence.md` → Task 7 ·
@@ -90,8 +91,14 @@ per prod project** (`Domain.Tests`, `Application.Tests`, `Adapters.Tests`,
 `Host.Tests`); prod solution contains only prod projects, tests live in a
 separate solution/filter (`ValuesWorkshop.sln` prod-only,
 `ValuesWorkshop.Tests.slnf` adds tests). `config/` (values catalog + quiz
-JSON stubs); `devtools/oidc/` (local `oidc-provider` server package).
-Package manager per plan decision (pnpm, pending user confirmation).
+JSON stubs — de+en fields per Phase 0 i18n note: value names, questions,
+answers, learning texts, animal names); `devtools/oidc/` (local
+`oidc-provider` server package). Package manager: pnpm (user-approved).
+BE `Domain` skeleton mirrors `design/domain-model.md`: Session root that
+guards + routes only; building blocks (Roster, Workshop state, Quiz
+progress, Selection round, Formation record, Presentation walk, Voting
+rounds) and Group aggregate as separate types — anti-god-class guardrail
+from the first commit.
 **Acceptance criteria:**
 - [ ] FE `dev|test|lint` scripts all run
 - [ ] `dotnet build` (prod sln, no test projects) and `dotnet test`

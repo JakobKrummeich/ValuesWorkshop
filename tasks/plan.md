@@ -119,17 +119,18 @@ Task details (acceptance criteria, verification, files) live in
 
 ### Phase 0: Domain Modeling / DDD (Tasks 0.1–0.3) — no code before Checkpoint 0
 
-- [ ] 0.1 Domain model, DDD-workshop style: ubiquitous language, domain
+- [x] 0.1 Domain model, DDD-workshop style: ubiquitous language, domain
       events, commands + actors, aggregates, invariants — zero technical
       vocabulary (`design/domain-model.md`)
-- [ ] 0.2 Phase state machine (domain level): states, sub-states, guards,
+- [x] 0.2 Phase state machine (domain level): states, sub-states, guards,
       allowed actors, in ubiquitous language (`design/state-machine.md`)
-- [ ] 0.3 Screen flows: 3 screens × 9 phases matrix, low-fi wireframes,
+- [x] 0.3 Screen flows: 3 screens × 9 phases matrix, low-fi wireframes,
       i18n-relevant states (`design/screens.md`)
 
 ### Checkpoint 0
-- [ ] Domain model + state machine + screen flows complete and consistent,
+- [x] Domain model + state machine + screen flows complete and consistent,
       reviewed and approved by user; merged to main. Only then Task 1.
+      *(Approved via Lavish review of `tasks/checkpoint0-review.html`.)*
 
 Technical design docs deferred just-in-time: `architecture.md` → Task 4,
 `persistence.md` → Task 7, `protocol.md` → Task 9, `cpsat-model.md` → Task 17.

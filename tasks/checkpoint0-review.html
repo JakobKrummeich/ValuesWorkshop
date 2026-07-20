@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-theme="luxury">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ValuesWorkshop — Checkpoint 0 Review (Phase 0 gate)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, blockquote, figcaption, td, th, .badge, .label) {
+    overflow-wrap: anywhere;
+  }
+  table.vw td:first-child, table.vw th:first-child { white-space: nowrap; }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+<main class="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-6">
+
+<header>
+  <h1 class="text-3xl font-bold">Checkpoint 0 — Phase 0 Gate <span class="badge badge-primary badge-soft align-middle">gate for ALL code</span></h1>
+  <div role="alert" class="alert alert-info alert-soft mt-3">
+    <span>Each of the three design docs was already individually Lavish-reviewed and approved.
+    This checkpoint reviews them <b>together</b>: completeness, cross-document consistency,
+    and DDD depth. Passing this gate unlocks Task&nbsp;1 (scaffold monorepo).</span>
+  </div>
+</header>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">The three artifacts</h2>
+    <table class="table table-sm vw">
+      <thead><tr><th>Doc</th><th>Task</th><th>Contents</th><th>Individual review</th></tr></thead>
+      <tbody>
+        <tr><td><code>design/domain-model.md</code></td><td>0.1</td>
+          <td>Ubiquitous language glossary (de/en) · 24 domain events · 22 commands with actors · Session root + Group aggregates, 7 internal building blocks · 16 invariants (I1–I16) · SPEC noun coverage table · explicit exclusions of technical vocabulary</td>
+          <td><span class="badge badge-success badge-soft">approved</span></td></tr>
+        <tr><td><code>design/state-machine.md</code></td><td>0.2</td>
+          <td>Top-level 9-phase diagram (forward-only) · per-phase sub-state diagrams (quiz walk, group work, presentation walk, voting rounds, winner reveal) · complete transition table T1–T23 + T17a with actor + guard each · walk-through no-dead-ends check</td>
+          <td><span class="badge badge-success badge-soft">approved</span></td></tr>
+        <tr><td><code>design/screens.md</code></td><td>0.3</td>
+          <td>3×9 matrix (27 cells; 1 intentionally empty) · 22/22 command traceability · full ASCII wireframe set for all phases · cross-cutting notes (reconnect, anonymity, i18n, portrait-first) · consistency walk</td>
+          <td><span class="badge badge-success badge-soft">approved</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Cross-document consistency walk (agent-verified)</h2>
+    <table class="table table-sm vw">
+      <thead><tr><th>Check</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>Commands ↔ transitions</td><td>All 22 domain-model commands appear in the state machine; no transition invents a command. ✓</td></tr>
+        <tr><td>Commands ↔ screens</td><td>22/22 reachable: 18 visible elements, 3 System (fire on phase entry), 1 implicit (JoinSession on QR arrival). ✓</td></tr>
+        <tr><td>Transitions ↔ screens</td><td>Every ◆ facilitator sub-control (9 of them) has a button; every participant command an element; System transitions noted in the matrix. ✓</td></tr>
+        <tr><td>Exit guards ↔ disable states</td><td>T2a (6→7: every group submitted), T2b (8→9: winners stand), T2c (2→3 / 7→8: walk complete) each mirrored as an Advance-button disable note in screens. ✓</td></tr>
+        <tr><td>Invariants ↔ enforcement</td><td>I1–I16 each assigned to exactly one aggregate; guards in the state machine cite them; screens never contradict them (e.g. no un-vote UI, I14). ✓</td></tr>
+        <tr><td>The one domain deviation</td><td>Facilitator EditAction during Value presentation (typo fixes, from Task 0.3 review) codified in <b>all three</b>: domain-model (EditAction actor + I10), state-machine (T17a + phase-7 diagram), screens (✎ affordance). ✓</td></tr>
+        <tr><td>Language drift</td><td>Screens + state machine use glossary terms verbatim; no synonyms invented (checked: roster, scribe, tally, allotment, workshop record, presenting group). ✓</td></tr>
+        <tr><td>Anonymity model</td><td>Consistent everywhere: only FINAL votes anonymous (I14, no voter↔vote link); quiz answers + value selections per-participant inside the session (feeds formation aim) but never shown per-person on any screen. ✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">DDD depth — the review focus of this gate</h2>
+    <ul class="list-disc pl-5 flex flex-col gap-1">
+      <li><b>Ubiquitous language:</b> de-first glossary; every SPEC noun mapped or explicitly excluded; zero technical vocabulary in any Phase-0 doc.</li>
+      <li><b>Aggregates as consistency boundaries:</b> Session root guards + routes only; 7 internal building blocks each own one state slice + its invariants (anti-god-class guardrail written into the doc). Group is a separate aggregate so groups edit without contention.</li>
+      <li><b>Read models, not aggregates:</b> answer/selection/vote tallies + presentation view are recomputable projections enforcing nothing.</li>
+      <li><b>Events past-tense, commands imperative,</b> each command names exactly one actor (Facilitator / Participant / Scribe / System).</li>
+      <li><b>Invariant ownership:</b> each of I1–I16 enforced by exactly one aggregate — the only place that can refuse the violating command.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Locked decisions carried into implementation</h2>
+    <ul class="list-disc pl-5 flex flex-col gap-1">
+      <li>No join form: QR → sign-in → lobby; JoinSession implicit.</li>
+      <li>Facilitator quiz control = one morphing button (Reveal → Learning text → Next question).</li>
+      <li>Presenter groups: paginated 3×2 cards, 7&nbsp;s cycle (phases 5+6).</li>
+      <li>Group work: value tabs; member view read-only, 0.5&nbsp;s sync.</li>
+      <li>Presenter during voting: “Voting ongoing…”, no tallies.</li>
+      <li>Phase 9: one full screen per winner (with actions), least → most voted; participant PDF button only after conclusion.</li>
+      <li>Facilitator may typo-fix presented actions in phase 7 (T17a) — wording only.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Checkpoint 0 checklist (ticks on your approval)</h2>
+    <ul class="list-none pl-0 flex flex-col gap-1">
+      <li>☐ Domain model, state machine, screen flows complete and consistent</li>
+      <li>☐ User reviewed and approved (DDD depth is the review focus)</li>
+      <li>☐ Merged to main; Task 1 may start</li>
+    </ul>
+    <p class="text-sm opacity-70">All three docs are already merged to main; approving this
+    checkpoint ticks the boxes in <code>tasks/todo.md</code> + <code>tasks/plan.md</code>,
+    triggers Phase A re-grooming, and unlocks Task 1 (scaffold: pnpm, Next.js, ASP.NET Core
+    hexagonal — full skill chain incl. TDD/no-mistakes applies again from there).</p>
+  </div>
+</section>
+
+</main>
+</body>
+</html>
