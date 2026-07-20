@@ -72,12 +72,52 @@ keeps dependency-cruiser rules trivial. Documented again in
 - [ ] `curl` on oidc discovery endpoint returns valid JSON
 
 ## Slices
-1. `backend/`: prod projects + sln + slnf + test projects, empty-but-typed
-   Domain building blocks, green build+test.
-2. `frontend/`: Next.js init, layer folders, screen groups + DI contexts,
-   green dev/test/lint.
-3. `config/` stubs + `devtools/oidc/` + top-level README pointers; full
-   acceptance run.
+
+Each slice lands as its own commit(s) on the feature branch and leaves the
+repo green. Order follows dependencies: BE has none, FE has none (parallel
+in principle, sequential in practice), slice 3 needs both for the full
+acceptance run.
+
+### Slice 1a: Backend solution structure (S)
+4 prod projects (`Domain`, `Application`, `Adapters`, `Host`) + 4 xUnit
+test projects; `ValuesWorkshop.sln` prod-only, `ValuesWorkshop.Tests.slnf`
+adds tests; nullable + warnings-as-errors in `Directory.Build.props`;
+project refs Domain ← Application ← Adapters ← Host only; 1 placeholder
+test per test project.
+- [ ] `dotnet build backend/ValuesWorkshop.sln` green, builds no test project
+- [ ] `dotnet test backend/ValuesWorkshop.Tests.slnf` runs 4 projects green
+- [ ] `Domain.csproj` has zero `ProjectReference`s; direction verified
+
+### Slice 1b: Typed Domain building blocks (S)
+Session root (guards + routes only) + separate types: `Roster`,
+`WorkshopState`, `QuizProgress`, `SelectionRound`, `FormationRecord`,
+`PresentationWalk`, `VotingRounds`, `Group` aggregate. Skeleton bodies
+(types + minimal state), no phase rules. `Application/Ports/` folders:
+`Facilitator/`, `Participant/`, `Presenter/`, `Driven/` (skeleton only).
+TDD applies: each type gets ≥1 real test (construction/initial state).
+- [ ] Every domain-model.md building block exists as its own type
+- [ ] Session contains no building-block rules (spot-check = god-class Never)
+- [ ] Build + tests green
+
+### Slice 2a: Frontend init + layers (S)
+Next.js (pnpm, TS strict), Jest, eslint; `src/{domain,ports,adapters,app}`;
+≥1 real test per layer stub.
+- [ ] `pnpm --dir frontend dev|test|lint` all green
+- [ ] No npm/yarn lockfile
+
+### Slice 2b: Screen groups + DI contexts (S)
+`app/{facilitator,participant,presenter}/` each with `phases/` placeholder
+folder and own React context doing DI of a stub port + stub adapter
+(pattern concrete per group).
+- [ ] 3 contexts exist, each wires stub port impl; test per group
+- [ ] No cross-screen-group imports; no concrete adapter imports in screens
+
+### Slice 3: config + devtools/oidc + acceptance (S)
+`config/values.json` (sample values), `quiz.json` (1 sample Q),
+`animals.json` — all de+en fields; `devtools/oidc/` serving discovery doc;
+top-level README pointers.
+- [ ] `curl localhost:<port>/.well-known/openid-configuration` valid JSON
+- [ ] Full Success-criteria list above runs green (final acceptance)
 
 ## Boundaries
 - **Always:** pnpm only (no npm/yarn lockfiles) · TS strict · nullable +
