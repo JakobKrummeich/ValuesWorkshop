@@ -142,10 +142,15 @@ run `scripts/smoke.sh` twice (healthy → 0; with sabotaged start → 1).
 named ports, adapters, dependency directions, per-screen DI contexts), then
 derive rules 1:1. BE: ArchUnitNET rules in xUnit — Domain depends on
 nothing, Application only on Domain, Adapters only on Application/Domain,
-no adapter→adapter references across concerns. FE: dependency-cruiser —
+no adapter→adapter references across concerns; custom class-size rule —
+no class > 12 methods (anti-god-class, user-approved via Task 1 Lavish
+review; threshold changes Ask-first). FE: dependency-cruiser —
 `domain/` imports nothing app-internal, `ports/` only domain, `adapters/`
 only ports/domain, `app/*` screen groups import via ports/contexts only and
-never each other; no circular deps anywhere.
+never each other; no circular deps anywhere; eslint `max-lines`/
+`max-statements` as FE class-size counterpart.
+**Acceptance criteria (added from Task 1 review):**
+- [ ] Deliberate 13-method class fails `dotnet test backend` (then revert)
 **Acceptance criteria:**
 - [ ] Deliberate Domain→Adapters reference fails `dotnet test backend`
 - [ ] Deliberate `domain/`→`adapters/` import fails `pnpm --dir frontend lint`

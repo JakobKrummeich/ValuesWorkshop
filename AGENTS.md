@@ -18,4 +18,10 @@ at the old repo).
 At every checkpoint: re-groom the next phase's tasks in `tasks/todo.md`
 against learnings; update `SPEC.md` in the same PR if a decision changed.
 
-User review of design artifacts: HTML artifact + `lavish-axi` (see handoffs).
+## User review — always Lavish
+
+Everything needing user review/approval (mini-specs, design docs, checkpoint
+gates) goes through an HTML artifact + `npx lavish-axi <file>` — never "read
+the file in the repo". Reason (non-discoverable): agent runs on a VPS; the
+user has no easy access to repo files. Print the session URL immediately.
+Never reopen a user-ended session without `--reopen` + invite.
