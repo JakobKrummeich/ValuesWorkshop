@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-theme="luxury">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ValuesWorkshop — Task 0.1 Domain Model Review</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, blockquote, figcaption, td, th, .badge, .label) {
+    overflow-wrap: anywhere;
+  }
+  :where(img, svg, video, canvas, iframe) { max-width: 100%; height: auto; }
+  table.vw td:first-child, table.vw th:first-child { white-space: nowrap; }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+<main class="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-8">
+
+<header>
+  <h1 class="text-3xl font-bold">Task 0.1 — Domain Model <span class="badge badge-primary badge-soft align-middle">design/domain-model.md · rev 3</span></h1>
+  <div role="alert" class="alert alert-info alert-soft mt-3">
+    <span><strong>Review focus:</strong> DDD depth. Pure domain — zero technical vocabulary by design. Full doc on branch <code>task-0.1-domain-model</code> (3 commits). Checkpoint 0 gates all code.</span>
+  </div>
+  <div role="alert" class="alert alert-warning alert-soft mt-2">
+    <span><strong>Shape:</strong> §1 ubiquitous language (de/en) + explicit exclusions · §2 25 events, all 9 phases · §3 22 commands, each with one actor · §4 aggregates: <b>Session</b> (root) + <b>Group</b>, tallies as read models · §5 16 invariants, each owned by exactly one aggregate · §6 SPEC noun coverage map.</span>
+  </div>
+</header>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§1 Ubiquitous language — key modeling decisions</h2>
+    <ul class="list-disc ml-5 space-y-1 text-sm">
+      <li><b>Presenter view</b> is not an actor — a shared observing view; it never issues commands.</li>
+      <li><b>Scribe</b> is a role within a Group, not a separate person kind; rights move instantly on reassignment.</li>
+      <li><b>Reconnect</b> (Wiederverbindung) — per your feedback, called what it is: come back, resume exact prior place. Delivery mechanics still excluded → <code>protocol.md</code>.</li>
+      <li><b>Workshop record</b> (Workshop-Protokoll) is the domain term for the take-home output; PDF/download excluded as format concern.</li>
+      <li><b>Group sizing rule</b> stated in prose (≥1 group, N÷4 rounded down, round-robin deal-out, sizes differ ≤1); CP-SAT math excluded → <code>cpsat-model.md</code>.</li>
+      <li>Explicitly excluded nouns table: QR code/join URL, login/identity provider, server/client/broadcast, restart/persistence, solver/time-box, PDF, charts/animations, config files — each with a pointer to where it lives instead.</li>
+    </ul>
+    <h3 class="font-semibold mt-3">Glossary extract (de → en)</h3>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <thead><tr><th>Deutsch</th><th>English</th><th>Essence</th></tr></thead>
+      <tbody>
+        <tr><td>Moderator:in</td><td><b>Facilitator</b></td><td>Sole controller: opens session, advances phases, all sub-controls, scribe reassignment. Exactly one.</td></tr>
+        <tr><td>Teilnehmer:in</td><td><b>Participant</b></td><td>Joins, quizzes, selects 10 values, group work, final votes. ~30 max.</td></tr>
+        <tr><td>Schreiber:in</td><td><b>Scribe</b></td><td>One per group; only writer; random at group-work start; facilitator may reassign.</td></tr>
+        <tr><td>Moderationskennwort</td><td><b>Facilitator passphrase</b></td><td>Required to open a session; participants never hold it.</td></tr>
+        <tr><td>Workshop-Zustand</td><td><b>Workshop state</b></td><td>Current phase + within-phase state (question, reveal, presented value, tiebreak round, revealed winners).</td></tr>
+        <tr><td>Werteauswahl</td><td><b>Value selection</b></td><td>Exactly 10 distinct catalog values, submitted once, then locked.</td></tr>
+        <tr><td>Top-Werte</td><td><b>Top values</b></td><td>10 most-selected; tie at 10th widens the set.</td></tr>
+        <tr><td>Gruppengrößenregel</td><td><b>Group sizing rule</b></td><td>Groups = max(1, ⌊N/4⌋); round-robin deal-out for participants and values.</td></tr>
+        <tr><td>Verhaltensweise</td><td><b>Action</b></td><td>Work-related, everyday, pragmatic; 1–5 per assigned value.</td></tr>
+        <tr><td>Finale Stimmen</td><td><b>Final votes</b></td><td>5 votes, multi-vote allowed, anonymous &amp; secret; only <i>that</i> someone voted is remembered — hence no un-voting, ever.</td></tr>
+        <tr><td>Stichwahl</td><td><b>Tiebreak round</b></td><td>Tied values only; allotment = number of tied values; repeat until 5 survive.</td></tr>
+        <tr><td>Workshop-Protokoll</td><td><b>Workshop record</b></td><td>All anonymous tallies, all actions, winners. No names.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§2 Domain events (25) · §3 Commands (22)</h2>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <thead><tr><th>Phase</th><th>Commands (actor)</th><th>Events</th></tr></thead>
+      <tbody>
+        <tr><td>Lifecycle</td><td>OpenSession (Facilitator, passphrase) · AdvancePhase (Facilitator)</td><td>SessionOpened · PhaseAdvanced · ParticipantRejoined</td></tr>
+        <tr><td>1 Join</td><td>JoinSession (Participant)</td><td>ParticipantJoined</td></tr>
+        <tr><td>2 Quiz</td><td>PoseNextQuestion, RevealAnswer, ShowLearningText (Facilitator) · ChooseQuizAnswer (Participant)</td><td>QuestionPosed · QuizAnswerChosen · AnswerRevealed · LearningTextShown</td></tr>
+        <tr><td>3 Selection</td><td>SubmitValueSelection (Participant)</td><td>ValuesSelected</td></tr>
+        <tr><td>4 Results</td><td>DetermineTopValues (<b>System</b>, on phase entry)</td><td>TopValuesDetermined</td></tr>
+        <tr><td>5 Formation</td><td>FormGroups (<b>System</b>, on phase entry)</td><td>GroupsFormed</td></tr>
+        <tr><td>6 Group work</td><td>AppointScribes (<b>System</b>) · ReassignScribe (Facilitator) · AddAction, EditAction, RemoveAction, SubmitGroupWork, ReopenGroupWork (Scribe)</td><td>ScribeAppointed · ScribeReassigned · ActionAdded · ActionEdited · ActionRemoved · GroupWorkSubmitted · GroupWorkReopened</td></tr>
+        <tr><td>7 Presentation</td><td>GoToNextValue (Facilitator) — iterates value by value through each group's submitted values, group by group</td><td>NextValueShown</td></tr>
+        <tr><td>8 Final voting</td><td>SubmitFinalVotes (Participant) · CloseVoting, StartTiebreakRound (Facilitator)</td><td>FinalVotesSubmitted · VotingClosed · TiebreakStarted · WinnersDetermined</td></tr>
+        <tr><td>9 Final</td><td>RevealNextValue (Facilitator) — reveals winners one by one, ascending vote order (least-voted first, most-voted last)</td><td>NextWinnerRevealed · WorkshopConcluded</td></tr>
+      </tbody>
+    </table></div>
+    <p class="text-sm mt-2"><b>System</b> = the session acts itself on phase entry / condition; no person issues these. Every human command names exactly one allowed actor; refusal rules are spelled out per command in the doc (e.g. SubmitFinalVotes: wrong total, ineligible value, or second submission in same round → refused; no un-voting).</p>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§4 Aggregates</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="card bg-base-100"><div class="card-body p-4">
+        <h3 class="font-bold">Session <span class="badge badge-soft badge-primary">root</span></h3>
+        <p class="text-sm">One consistency boundary — but composed of small internal <b>building blocks</b> (pure domain objects, no storage connotation), each owning one slice + its invariants: <b>Roster</b> (I4) · <b>Workshop state</b> (I1, I2) · <b>Quiz progress</b> (I5) · <b>Selection round</b> (I6, I7) · <b>Formation record</b> (I8) · <b>Presentation walk</b> (I12) · <b>Voting rounds</b> (I13–I15).</p>
+        <p class="text-sm">Root does two things only: guard boundary (phase + actor) and route each of its 16 commands to exactly one block. Doc now carries an explicit <b>implementation guardrail</b>: root implementing block rules itself = god class = violates the model; complexity gate 10 + review catch it.</p>
+      </div></div>
+      <div class="card bg-base-100"><div class="card-body p-4">
+        <h3 class="font-bold">Group <span class="badge badge-soft badge-secondary">per group</span></h3>
+        <p class="text-sm">Created by GroupsFormed; membership + assigned values fixed thereafter. Owns: animal name · members · assigned values · scribe · actions · submitted state.</p>
+        <p class="text-sm">Handles 6 commands: ReassignScribe + all scribe editing/submit commands. Separate aggregate so groups edit concurrently without contention.</p>
+      </div></div>
+    </div>
+    <p class="text-sm mt-3"><b>Read models (not aggregates):</b> Answer tally, Selection tally, Vote tally (counts only — anonymity by construction), Presentation view. Enforce nothing; recomputable from events.</p>
+    <div role="alert" class="alert alert-success alert-soft mt-2"><span><b>Resolved:</b> aggregate = consistency/transaction boundary, not responsibility module; SRP lives one level below. Per your naming concern, the doc says “internal building blocks” (pure domain objects) — never “entities”, to avoid persistence-layer association — and carries an anti-god-class guardrail aimed at implementer agents.</span></div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§5 Invariants — 16, each owned by exactly one aggregate</h2>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <thead><tr><th>#</th><th>Invariant</th><th>Owner</th></tr></thead>
+      <tbody>
+        <tr><td>I1</td><td>Phases forward only, fixed order 1→9, no skipping/backing.</td><td>Session</td></tr>
+        <tr><td>I2</td><td>Only the facilitator advances phases and operates sub-controls.</td><td>Session</td></tr>
+        <tr><td>I3</td><td>Opening a session requires the facilitator passphrase.</td><td>Session</td></tr>
+        <tr><td>I4</td><td>Roster membership precedes acting; a return resumes the existing place, never a second one.</td><td>Session</td></tr>
+        <tr><td>I5</td><td>One quiz answer per participant per question, unchangeable.</td><td>Session</td></tr>
+        <tr><td>I6</td><td>Value selection = exactly 10 distinct values, submitted at most once.</td><td>Session</td></tr>
+        <tr><td>I7</td><td>Top values = 10 most-selected, widened on 10th-place tie.</td><td>Session</td></tr>
+        <tr><td>I8</td><td>Groups formed exactly once per sizing rule; each top value to exactly one group; fixed afterwards.</td><td>Session</td></tr>
+        <tr><td>I9</td><td>Exactly one scribe per group, and the scribe is a member.</td><td>Group</td></tr>
+        <tr><td>I10</td><td>Only the scribe writes/submits/reopens; reassigned-away scribe refused immediately.</td><td>Group</td></tr>
+        <tr><td>I11</td><td>1–5 actions per assigned value at submit; no edits while submitted.</td><td>Group</td></tr>
+        <tr><td>I12</td><td>Only submitted group results are presented.</td><td>Session</td></tr>
+        <tr><td>I13</td><td>Final-vote cast spends exactly the round's allotment on eligible values; one cast per round.</td><td>Session</td></tr>
+        <tr><td>I14</td><td>Vote anonymity: <i>that</i> someone voted is remembered, never <i>what</i> — no voter↔vote link anywhere in the model.</td><td>Session</td></tr>
+        <tr><td>I15</td><td>Exactly 5 winners; tiebreak rounds repeat while a 5th-place tie persists.</td><td>Session</td></tr>
+        <tr><td>I16</td><td>A session never forgets: every fact survives interruption; return resumes exact state.</td><td>Session</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§6 Coverage & self-check against acceptance criteria</h2>
+    <ul class="list-disc ml-5 space-y-1 text-sm">
+      <li>✅ Every SPEC.md noun mapped (§6 table) or explicitly excluded with pointer (§1 exclusions).</li>
+      <li>✅ Every invariant assigned to exactly one aggregate (I1–I16 owner column).</li>
+      <li>✅ Events cover all 9 phases + lifecycle; every command names its actor.</li>
+      <li>✅ Zero technical vocabulary — grep-verified; tech words appear only inside the exclusions table itself.</li>
+    </ul>
+    <h3 class="font-semibold mt-3">Deliberate modeling calls (challenge these)</h3>
+    <ul class="list-disc ml-5 space-y-1 text-sm">
+      <li><b>Quiz/selection state lives in Session, not own aggregates</b> — tallies are session-wide, single writer path per participant action; splitting bought nothing.</li>
+      <li><b>Group is a separate aggregate</b> — independent concurrent editing per group; scribe/action invariants (I9–I11) live wholly inside it.</li>
+      <li><b>Quiz answers are per-participant tracked (dedup) but not secret; final votes are anonymous &amp; secret by I14.</b> Confirmed by you — and consequence now explicit in I14/FinalVotesSubmitted: no un-voting possible.</li>
+      <li><b>System commands</b> (DetermineTopValues, FormGroups, AppointScribes) model phase-entry effects as first-class commands with actor "System" — keeps the state machine (0.2) purely command→event.</li>
+      <li><b>WinnersDetermined fires on CloseVoting without tie</b> — tie state is Session sub-state, not an aggregate.</li>
+      <li><b>New per feedback:</b> Presenting group → value-by-value stepping (<b>GoToNextValue</b>/NextValueShown) · Phase 9 staged reveal (<b>RevealNextValue</b>/NextWinnerRevealed, least→most voted) · renames: Reconnect, Workshop state, Schreiber:in, Verhaltensweise, Finale Stimmen, ParticipantRejoined, ChooseQuizAnswer/QuizAnswerChosen, SubmitFinalVotes/FinalVotesSubmitted.</li>
+    </ul>
+  </div>
+</section>
+
+<footer class="text-sm opacity-70">
+  Next after approval: Task 0.2 state machine (consumes these commands/events) · Task 0.3 screen flows. Checkpoint 0 review gates all code.
+</footer>
+
+</main>
+</body>
+</html>
