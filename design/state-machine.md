@@ -173,6 +173,7 @@ stateDiagram-v2
 
     [*] --> Shown : phase entry - first value of the first group · guard - submitted results only (I12)
     Shown --> Shown : GoToNextValue [Facilitator] / NextValueShown · next value of the presenting group, or first value of the next group
+    Shown --> Shown : EditAction [Facilitator] / ActionEdited · guard - wording correction only (I10)
     Shown --> [*] : all groups' values shown · awaits AdvancePhase
 ```
 
@@ -180,6 +181,9 @@ Guards in words:
 
 - **GoToNextValue** — refused when every group's every value has been
   shown (nothing left to present).
+- **EditAction** — facilitator only in this phase; corrects the wording of
+  a presented action (e.g. typos); adding or removing actions is refused
+  (I10). (Actor extension decided in the Task 0.3 screen-flow review.)
 - **AdvancePhase** out of Value presentation — allowed once all values
   have been shown.
 
@@ -268,6 +272,7 @@ facilitator sub-controls are marked ◆.
 | T15 | 6 | Submit group work | Scribe | one to five actions per assigned value (I11) | GroupWorkSubmitted |
 | T16 | 6 | Reopen group work | Scribe | currently Submitted | GroupWorkReopened |
 | T17 | 7 | Go to next value ◆ | Facilitator | values remain to show (I12) | NextValueShown |
+| T17a | 7 | Edit action (typo fix) | Facilitator | wording correction of a presented action only (I10) | ActionEdited |
 | T18 | 8 | Submit final votes | Participant | full allotment; eligible values; once per round (I13, I14) | FinalVotesSubmitted |
 | T19 | 8 | Close voting ◆ | Facilitator | round open | VotingClosed |
 | T20 | 8 | Winners determined | System | round closed; no fifth-place tie (I15) | WinnersDetermined |

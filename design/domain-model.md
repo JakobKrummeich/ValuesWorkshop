@@ -223,7 +223,7 @@ when a phase begins or a condition is met — no person issues them.
 | **AppointScribes** | System (entering Group work) | Pick one member per group at random. → ScribeAppointed (per group) |
 | **ReassignScribe** | Facilitator | Hand a group's scribe role to another of its members. → ScribeReassigned |
 | **AddAction** | Scribe | Add an action under an assigned value of the own group; refused beyond five per value, refused while submitted, refused for non-scribes. → ActionAdded |
-| **EditAction** | Scribe | Change an action's wording; same refusals as AddAction. → ActionEdited |
+| **EditAction** | Scribe; Facilitator during Value presentation | Change an action's wording; same refusals as AddAction. During Value presentation the facilitator may correct a presented action's wording (e.g. typos) — wording only, never adding or removing actions. → ActionEdited |
 | **RemoveAction** | Scribe | Remove an action; same refusals as AddAction. → ActionRemoved |
 | **SubmitGroupWork** | Scribe | Declare the group result finished; requires 1–5 actions for every assigned value. → GroupWorkSubmitted |
 | **ReopenGroupWork** | Scribe | Take the submission back. → GroupWorkReopened |
@@ -316,7 +316,7 @@ can refuse a command violating it.
 | I7 | Top values = the ten most-selected, widened to include all values tied at tenth place. | Session |
 | I8 | Groups are formed exactly once, per the sizing rule; each top value is assigned to exactly one group; membership and assignment never change afterwards. | Session |
 | I9 | A group has exactly one scribe at any time, and the scribe is a member of that group. | Group |
-| I10 | Only the scribe creates, edits, removes actions and submits or reopens; a reassigned-away scribe is refused immediately. | Group |
+| I10 | During Group work, only the scribe creates, edits, removes actions and submits or reopens; a reassigned-away scribe is refused immediately. During Value presentation, only the facilitator may correct an action's wording (typo fixes); nothing may be added or removed. | Group |
 | I11 | Every assigned value carries between one and five actions when group work is submitted; no edits while submitted. | Group |
 | I12 | Only submitted group results are presented. | Session |
 | I13 | A final-votes submission spends exactly the round's allotment (five in the main round; the number of tied values in a tiebreak), only on the round's eligible values; one submission per participant per round. | Session |

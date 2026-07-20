@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en" data-theme="luxury">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ValuesWorkshop — Task 0.3 Mini-Spec Review</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, blockquote, figcaption, td, th, .badge, .label) {
+    overflow-wrap: anywhere;
+  }
+  table.vw td:first-child, table.vw th:first-child { white-space: nowrap; }
+  pre.wf {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.72rem; line-height: 1.25;
+    background: var(--color-base-300); border-radius: 0.5rem;
+    padding: 0.75rem; overflow-x: auto;
+  }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+<main class="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-6">
+
+<header>
+  <h1 class="text-3xl font-bold">Task 0.3 — Mini-Spec <span class="badge badge-primary badge-soft align-middle">tasks/specs/03-screens.md</span> <span class="badge badge-secondary badge-soft align-middle">rev 2</span></h1>
+  <div role="alert" class="alert alert-info alert-soft mt-3">
+    <span><strong>Gate:</strong> Approve this mini-spec before doc work starts. Task size M; produces <code>design/screens.md</code> only (doc, no code). Lavish review of the resulting doc follows separately. This is the last Phase 0 task before Checkpoint 0.</span>
+  </div>
+</header>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Rev 2 — your feedback applied</h2>
+    <ul class="list-disc ml-5 space-y-1 text-sm">
+      <li>Join form screen <b>removed</b> — QR scan → sign-in (if needed) → lands directly in lobby; JoinSession happens implicitly on arrival.</li>
+      <li>Presenter QR shows <b>live names</b> of joined participants.</li>
+      <li>Presenter quiz: answer <b>texts on cards</b>, 2-row layout (2 top, 1 centered bottom), normalized bars under each card; learning text on centered card.</li>
+      <li>Facilitator quiz: <b>one morphing button</b> (Reveal → Learning text → Next question); Advance disabled until Q5 learning text shown.</li>
+      <li>Top values: <b>two columns of 10</b>, ordered by selections (left col then right, top→bottom); top 10 (or more on tie) color-highlighted.</li>
+      <li>Own group: members top-left, values bottom-right, distinct colors — no labels.</li>
+      <li>Groups overview: <b>3×2 card grid, paginated</b>, cycles every 7 s; reused in phase 6 with working/submitted indicator.</li>
+      <li>Group work (scribe + member): <b>value tabs</b> (flex button row); member view synced every 0.5 s.</li>
+      <li>Phase 7: presenter drops "value 2 of 3"; facilitator Advance disabled until all values presented; facilitator can <b>edit actions</b> (typo fixes).</li>
+      <li>Phase 8: voting cards show <b>value + its actions</b>; presenter shows plain "Voting ongoing…" — no tallies.</li>
+      <li>Phase 9: <b>one full screen per winning value with actions</b>, least → most voted; participant sees only "final values are being presented", record download after conclusion.</li>
+    </ul>
+    <div role="alert" class="alert alert-warning alert-soft mt-2 text-sm">
+      <span><b>Two domain-doc updates needed (Ask-first, same PR as screens.md):</b> 1) <b>EditAction by Facilitator during Value presentation</b> — 0.1 has EditAction as scribe-only in Group work; needs actor extension in <code>domain-model.md</code> + new transition in <code>state-machine.md</code>. 2) <b>Guard "all values presented" on Advance 7→8</b> — addition to the 0.2 transition table. Confirm both?</span>
+    </div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Objective</h2>
+    <p class="text-sm"><code>design/screens.md</code> — what each of the three screens (<b>Facilitator</b> · <b>Presenter view</b> · <b>Participant</b>) shows and allows in each of the nine phases, plus low-fi wireframes. Ubiquitous language from <code>domain-model.md</code>; per-phase behavior from <code>state-machine.md</code> (T1–T23). No visual design — colors/typography/spacing come with design tokens in Task 2.</p>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Content</h2>
+    <ul class="list-disc ml-5 space-y-1 text-sm">
+      <li><b>3×9 matrix</b> — 27 cells: per screen per phase, <i>sees</i> / <i>can do</i> (commands issued). Presenter column always "sees only". Cells with nothing new marked intentionally empty.</li>
+      <li><b>Command traceability table</b> — every 0.1 command (all 22) → screen + wireframe element that issues it; System commands marked as such (no element); implicit commands (JoinSession on QR arrival) marked implicit.</li>
+      <li><b>Low-fi ASCII wireframes</b> (portrait-mobile-first for participant) — full draft set below.</li>
+      <li><b>Cross-cutting notes:</b> reconnect/resume view per role · facilitator control bar (AdvancePhase + phase sub-controls, high density, laptop) · presenter fullscreen, zero interactivity, unauthenticated · participant portrait-first, usable on landscape laptop · i18n: every visible string de+en, i18n-relevant states flagged (learning texts, values, group names, labels).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Success criteria · Slices · Boundaries</h2>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <tbody>
+        <tr><td><b>Success</b></td><td>All 27 cells filled or intentionally empty · every 0.1 command reachable from a wireframe element (traceability complete) · consistent with SPEC.md screens table and every T1–T23 transition · ubiquitous language only.</td></tr>
+        <tr><td><b>Slices</b></td><td>1) 3×9 matrix + command traceability table · 2) wireframes phases 1–4 · 3) wireframes phases 5–9 + cross-cutting notes + consistency walk against SPEC.md and 0.2.</td></tr>
+        <tr><td><b>Boundaries</b></td><td>Doc-only, no code · low-fi only, no visual design · deviations from 0.1/0.2 discovered here → update those docs in same PR (Ask-first) — two already queued, see above.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Preview — 3×9 matrix (slice 1 draft, rev 2)</h2>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <thead><tr><th>Phase</th><th>Facilitator (laptop, dense)</th><th>Presenter view (beamer, passive)</th><th>Participant (portrait mobile)</th></tr></thead>
+      <tbody class="text-xs">
+        <tr><td><b>0 · before</b></td><td>Session open form (passphrase) <span class="badge badge-primary badge-soft badge-sm">OpenSession</span></td><td>— intentionally empty —</td><td>QR scan → sign-in (if needed) → lobby <span class="badge badge-primary badge-soft badge-sm">JoinSession</span> (implicit, no form)</td></tr>
+        <tr><td><b>1 Join</b></td><td>Live roster, count <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span></td><td>Large QR invitation + live names of joined participants</td><td>Lobby: "you're in", wait notice</td></tr>
+        <tr><td><b>2 Quiz</b></td><td>Current question, live answer tally, one morphing sub-control button <span class="badge badge-primary badge-soft badge-sm">RevealAnswer</span> <span class="badge badge-primary badge-soft badge-sm">ShowLearningText</span> <span class="badge badge-primary badge-soft badge-sm">PoseNextQuestion</span> <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> (disabled until Q5 learning text shown)</td><td>Question + answer cards (2 top, 1 centered below) with normalized live bars; correct highlighted after reveal; learning text on centered card</td><td>3 answer buttons <span class="badge badge-primary badge-soft badge-sm">ChooseQuizAnswer</span>; locked after answering</td></tr>
+        <tr><td><b>3 Value selection</b></td><td>Submission progress count <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span></td><td>Prompt + submission progress</td><td>Values grid, pick exactly 10 <span class="badge badge-primary badge-soft badge-sm">SubmitValueSelection</span>; locked after</td></tr>
+        <tr><td><b>4 Selection results</b></td><td>Top-values view <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> <span class="badge badge-neutral badge-sm">System: DetermineTopValues</span></td><td>Two columns of 10, ordered by selections; top 10 (or more on tie) highlighted</td><td>Top values (mirror, passive)</td></tr>
+        <tr><td><b>5 Group formation</b></td><td>All groups: names, members, assigned values <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> <span class="badge badge-neutral badge-sm">System: FormGroups</span></td><td>3×2 paginated group cards, cycles every 7 s</td><td>Own group: members top-left, values bottom-right (distinct colors)</td></tr>
+        <tr><td><b>6 Group work</b></td><td>Per-group submit status + scribe <span class="badge badge-primary badge-soft badge-sm">ReassignScribe</span> <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> (guard: every group submitted) <span class="badge badge-neutral badge-sm">System: AppointScribes</span></td><td>Same paginated cards + working/submitted indicator</td><td><b>Scribe:</b> value tabs + actions editor <span class="badge badge-primary badge-soft badge-sm">AddAction</span> <span class="badge badge-primary badge-soft badge-sm">EditAction</span> <span class="badge badge-primary badge-soft badge-sm">RemoveAction</span> <span class="badge badge-primary badge-soft badge-sm">SubmitGroupWork</span> <span class="badge badge-primary badge-soft badge-sm">ReopenGroupWork</span> · <b>Member:</b> value tabs, read-only, synced 0.5 s</td></tr>
+        <tr><td><b>7 Value presentation</b></td><td>Presenting position, action typo fixes <span class="badge badge-primary badge-soft badge-sm">GoToNextValue</span> <span class="badge badge-primary badge-soft badge-sm">EditAction</span> (actor extension — see alert) <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> (disabled until all values presented)</td><td>Presented value + its actions (no position counter)</td><td>Presented value (mirror, passive)</td></tr>
+        <tr><td><b>8 Final voting</b></td><td>Voted-count progress, tie indicator <span class="badge badge-primary badge-soft badge-sm">CloseVoting</span> <span class="badge badge-primary badge-soft badge-sm">StartTiebreakRound</span> <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span></td><td>"Voting ongoing…" screen — no tallies</td><td>One card per presented value (value + actions + vote stepper) <span class="badge badge-primary badge-soft badge-sm">SubmitFinalVotes</span>; tiebreak variant shows tied values only</td></tr>
+        <tr><td><b>9 Final presentation</b></td><td>Reveal position <span class="badge badge-primary badge-soft badge-sm">RevealNextValue</span></td><td>One full screen per winning value with its actions, least → most voted</td><td>During reveal: "final values are being presented"; after conclusion: workshop record download</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Preview — wireframes, full draft set (slices 2–3, rev 2)</h2>
+
+    <h3 class="font-semibold text-sm mt-2 mb-1 opacity-70">Before phase 1 · opening &amp; joining</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Open a session (laptop)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ ValuesWorkshop · Open a session         │
+├─────────────────────────────────────────┤
+│ Session name          [ Herbst 2024   ] │
+│ Facilitator passphrase[ ●●●●●●●●      ] │
+│                                         │
+│              [ Open session ]           │  → OpenSession
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · Join flow (no screen)</h4>
+<pre class="wf">
+ scan QR ──▶ sign-in (skipped if
+                already signed in)
+        │
+        ▼
+      Lobby
+
+ JoinSession fires implicitly on
+ arrival — no form, no button
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 1 · Join</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Join QR + live names (fullscreen)</h4>
+<pre class="wf">
+┌────────────────────────────────┐
+│        Workshop title          │
+│                                │
+│   ┌──────────┐   Join the      │
+│   │ ▓▓ QR ▓▓ │   workshop      │
+│   │ ▓▓▓▓▓▓▓▓ │   with your     │
+│   │ ▓▓ QR ▓▓ │   phone         │
+│   └──────────┘                 │
+│                                │
+│ 12 joined:                     │
+│ Anna · Ben · Cem · Dana · Edi  │
+│ Fia · Gus · … (updates live)   │
+└────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Roster (laptop)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 1 · Join            [ Advance ▸ ] │  → AdvancePhase
+├─────────────────────────────────────────┤
+│ 12 joined                               │
+│ Anna · Ben · Cem · Dana · Edi · Fia     │
+│ Gus · Hana · Ida · Jon · Kim · Lea      │
+│ (list grows live)                       │
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · Lobby (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Herbst 2024          │
+├──────────────────────┤
+│   ✓ You're in!       │
+│                      │
+│  Waiting for the     │
+│  facilitator to      │
+│  start the workshop… │
+│                      │
+│  12 participants     │
+└──────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 2 · Quiz</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · Answer buttons (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Quiz  ·  Question 2/5│
+├──────────────────────┤
+│ Which statement about│
+│ values at work is…?  │
+│                      │
+│ ┌──────────────────┐ │
+│ │ A  Answer text   │ │  → ChooseQuizAnswer
+│ └──────────────────┘ │
+│ ┌──────────────────┐ │
+│ │ B  Answer text   │ │
+│ └──────────────────┘ │
+│ ┌──────────────────┐ │
+│ │ C  Answer text   │ │
+│ └──────────────────┘ │
+│                      │
+│ (after pick: locked, │
+│  "answer received")  │
+└──────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Answer cards + normalized bars</h4>
+<pre class="wf">
+┌───────────────────────────────────────┐
+│ Question 2/5                          │
+│ Which statement about values…?        │
+│                                       │
+│ ┌───────────────┐  ┌───────────────┐  │
+│ │ A Answer text │  │ B Answer text │  │
+│ │ ▓▓▓▓▓▓▓ 47%   │  │ ▓▓▓ 21%       │  │
+│ └───────────────┘  └───────────────┘  │
+│        ┌───────────────┐              │
+│        │ C Answer text │              │
+│        │ ▓▓▓▓▓ 32%     │              │
+│        └───────────────┘              │
+│                                       │
+│ bars live, normalized to total votes  │
+│ reveal: correct card highlighted ✓    │
+│ learning text: centered card          │
+└───────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Quiz, one morphing button (laptop)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 2 · Quiz · Q2/5     [ Advance ▸ ] │  → AdvancePhase — disabled until
+├─────────────────────────────────────────┤    Q5 learning text shown
+│ Which statement about values…?          │
+│ A 9 (✓ correct) · B 4 · C 6             │
+│ answered: 19/30                         │
+├─────────────────────────────────────────┤
+│ [ ········ one button ········ ]        │
+│  label morphs with quiz state:          │
+│  question shown  → "Reveal answer"      │  → RevealAnswer
+│  answer revealed → "Show learning text" │  → ShowLearningText
+│  learning shown  → "Next question ▸"    │  → PoseNextQuestion
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 3 · Value selection &nbsp;/&nbsp; Phase 4 · Selection results</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · Selection grid (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Pick exactly 10      │
+│ Selected: 7/10       │
+├──────────────────────┤
+│ [Vertrauen✓][Mut   ] │
+│ [Respekt ✓][Fokus  ] │
+│ [Offenheit][Team  ✓] │
+│ [Klarheit ][Fairness]│
+│  … ~50 values,       │
+│    grid scrolls …    │
+├──────────────────────┤
+│ [ Submit selection ] │  → SubmitValueSelection
+│ (enabled at 10/10;   │   (locked after)
+│  duplicates refused) │
+└──────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Top values, two columns (phase 4)</h4>
+<pre class="wf">
+┌───────────────────────────────────────┐
+│ Your top values                       │
+│                                       │
+│ ▓ Vertrauen  21    Klarheit     8     │
+│ ▓ Respekt    18    Neugier      7     │
+│ ▓ Team       16    Offenheit    6     │
+│ ▓ Fairness   14    Geduld       5     │
+│ ▓ Ehrlich…   13    Loyalität    4     │
+│ ▓ Wertschä…  12    Kreativität  4     │
+│ ▓ Vielfalt   11    Struktur     3     │
+│ ▓ Zuverläs…  10    Humor        3     │
+│ ▓ Mut         9    Balance      2     │
+│ ▓ Fokus       9    Sinn         1     │
+│                                       │
+│ ordered by selections: left column    │
+│ top→bottom, then right column         │
+│ ▓ = top value, color-highlighted      │
+│ (tie at 10th → 11+ highlighted)       │
+└───────────────────────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 5 · Group formation</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · Own group (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Your group: Otter    │
+├──────────────────────┤
+│ Anna   Ben           │  ← members grouped
+│ you    Dana          │    top-left (color A)
+│                      │
+│                      │
+│          Vertrauen   │  ← values grouped
+│             Mut      │    bottom-right
+│           Respekt    │    (color B)
+└──────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Paginated group cards (3×2)</h4>
+<pre class="wf">
+┌───────────────────────────────────────┐
+│ Groups                                │
+│ ┌────────┐ ┌────────┐ ┌────────┐      │
+│ │ Otter  │ │ Fuchs  │ │ Igel   │      │
+│ │ Anna … │ │ Edi …  │ │ Ida …  │      │
+│ │ values │ │ values │ │ values │      │
+│ └────────┘ └────────┘ └────────┘      │
+│ ┌────────┐ ┌────────┐ ┌────────┐      │
+│ │ Hase   │ │ Luchs  │ │ Biber  │      │
+│ └────────┘ └────────┘ └────────┘      │
+│                                       │
+│      ● ○    6 cards per page,         │
+│             cycles every 7 s          │
+└───────────────────────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 6 · Group work</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant (scribe) · Value tabs + editor (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Group Otter · scribe │
+├──────────────────────┤
+│ [Vertrauen][Mut][Re…]│  ← value tabs (flex row)
+├──────────────────────┤
+│ Vertrauen (2/5)      │
+│ • Action text…  ✎ ✕  │  → EditAction / RemoveAction
+│ • Action text…  ✎ ✕  │
+│ [+ add action]       │  → AddAction
+├──────────────────────┤
+│ [ Submit group work ]│  → SubmitGroupWork
+│ (submitted: [Reopen])│  → ReopenGroupWork
+└──────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant (member) · Value tabs, read-only (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Group Otter          │
+│ Scribe: Anna         │
+├──────────────────────┤
+│ [Vertrauen][Mut][Re…]│  ← value tabs (flex row)
+├──────────────────────┤
+│ Vertrauen (2/5)      │
+│ • Action text…       │
+│ • Action text…       │
+│                      │
+│ read-only · synced   │
+│ with scribe status   │
+│ every 0.5 s          │
+└──────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Group-work overview (laptop)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 6 · Group work      [ Advance ▸ ] │  → AdvancePhase — disabled until
+├─────────────────────────────────────────┤    every group submitted
+│ Group   Scribe   Actions   Status       │
+│ Otter   Anna ▾   7        submitted     │  → ReassignScribe (▾)
+│ Fuchs   Ben  ▾   4        editing       │
+│ Igel    Cem  ▾   6        editing       │
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Paginated cards + status</h4>
+<pre class="wf">
+┌───────────────────────────────────────┐
+│ Group work                            │
+│ ┌────────┐ ┌────────┐ ┌────────┐      │
+│ │ Otter ✓│ │ Fuchs …│ │ Igel  …│      │
+│ │ submtd │ │ working│ │ working│      │
+│ └────────┘ └────────┘ └────────┘      │
+│ ┌────────┐ ┌────────┐ ┌────────┐      │
+│ │ Hase  …│ │ Luchs ✓│ │ Biber …│      │
+│ └────────┘ └────────┘ └────────┘      │
+│                                       │
+│ same 3×2 paginated cards as phase 5,  │
+│ + working/submitted indicator         │
+│      ● ○    cycles every 7 s          │
+└───────────────────────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 7 · Value presentation</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Presented value</h4>
+<pre class="wf">
+┌────────────────────────────────┐
+│ Group Otter                    │
+│                                │
+│        VERTRAUEN               │
+│                                │
+│ Actions                        │
+│ 1. We start meetings on time…  │
+│ 2. We share mistakes openly…   │
+│ 3. We ask before assuming…     │
+└────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Presentation walk + typo fixes (laptop)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 7 · Presentation    [ Advance ▸ ] │  → AdvancePhase — disabled until
+├─────────────────────────────────────────┤    all values presented
+│ Presenting: Otter (group 1/3)           │
+│ Value: Vertrauen (2/3)                  │
+│ 1. We start meetings on time…      ✎    │  → EditAction (facilitator,
+│ 2. We share mistakes openly…       ✎    │    typo fixes — actor
+│ 3. We ask before assuming…         ✎    │    extension, see alert)
+│                                         │
+│ [ Next value ▸ ]  → GoToNextValue       │
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 8 · Final voting</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · Value cards with actions + stepper (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Your votes: 3/5 used │
+├──────────────────────┤
+│ ┌──────────────────┐ │
+│ │ Vertrauen        │ │
+│ │ • action text…   │ │
+│ │ • action text…   │ │
+│ │      [−]  2  [+] │ │
+│ └──────────────────┘ │
+│ ┌──────────────────┐ │
+│ │ Mut              │ │
+│ │ • action text…   │ │
+│ │      [−]  1  [+] │ │
+│ └──────────────────┘ │
+│ … one card per       │
+│   presented value …  │
+├──────────────────────┤
+│ [ Submit 5 votes ]   │  → SubmitFinalVotes
+│ (enabled at 5/5;     │   (irrevocable)
+│  tiebreak: tied      │
+│  values only, allot= │
+│  number of tied)     │
+└──────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Voting controls (laptop)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 8 · Final voting    [ Advance ▸ ] │  → AdvancePhase
+├─────────────────────────────────────────┤
+│ Main round · voted: 24/30               │
+│ [ Close voting ]  → CloseVoting         │
+├─────────────────────────────────────────┤
+│ after close, if tie at 5th:             │
+│ Tie: Mut = Fokus (9 votes)              │
+│ [ Start tiebreak ]→ StartTiebreakRound  │
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Voting ongoing</h4>
+<pre class="wf">
+┌────────────────────────────────┐
+│                                │
+│                                │
+│        Voting ongoing…         │
+│                                │
+│   Cast your 5 votes on your    │
+│   phone — secret & anonymous   │
+│                                │
+│                                │
+│      (no tallies shown)        │
+└────────────────────────────────┘
+</pre>
+      </div>
+    </div>
+
+    <h3 class="font-semibold text-sm mt-4 mb-1 opacity-70">Phase 9 · Final presentation</h3>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · One full screen per winner</h4>
+<pre class="wf">
+┌────────────────────────────────┐
+│ Place 5 · 9 votes              │
+│                                │
+│           FOKUS                │
+│                                │
+│ Actions                        │
+│ 1. We block focus time daily…  │
+│ 2. We silence notifications…   │
+│                                │
+│ one entire screen per winning  │
+│ value *with* its actions —     │
+│ least → most voted             │
+└────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Reveal control (laptop)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 9 · Final presentation            │
+├─────────────────────────────────────────┤
+│ Revealed: 2 of 5                        │
+│ [ Reveal next value ▸ ]→ RevealNextValue│
+│                                         │
+│ (all revealed → workshop concluded)     │
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · During reveal (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Herbst 2024          │
+├──────────────────────┤
+│                      │
+│  The final values    │
+│  are being presented │
+│  — eyes up front!    │
+│                      │
+│ (nothing else shown  │
+│  — no distraction)   │
+│                      │
+└──────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · After conclusion — PDF download (portrait)</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Workshop concluded   │
+├──────────────────────┤
+│ Thanks for taking    │
+│ part!                │
+│                      │
+│ ┌──────────────────┐ │
+│ │ ⬇  Download PDF  │ │  ← workshop record:
+│ │ (workshop record)│ │    all tallies, all
+│ └──────────────────┘ │    actions, winners;
+│                      │    no names
+└──────────────────────┘
+</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card bg-base-300 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Your call</h2>
+    <p class="text-sm">1) Confirm the two domain-doc updates (facilitator EditAction in phase 7 · guard "all values presented" on Advance 7→8). 2) Approve rev 2 → I start <code>design/screens.md</code>.</p>
+  </div>
+</section>
+
+</main>
+</body>
+</html>
