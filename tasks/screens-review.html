@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en" data-theme="luxury">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ValuesWorkshop — Task 0.3 Screen Flows Doc Review</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, blockquote, figcaption, td, th, .badge, .label) {
+    overflow-wrap: anywhere;
+  }
+  table.vw td:first-child, table.vw th:first-child { white-space: nowrap; }
+  pre.wf {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.72rem; line-height: 1.25;
+    background: var(--color-base-300); border-radius: 0.5rem;
+    padding: 0.75rem; overflow-x: auto;
+  }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+<main class="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-6">
+
+<header>
+  <h1 class="text-3xl font-bold">Task 0.3 — Screen Flows <span class="badge badge-primary badge-soft align-middle">design/screens.md</span></h1>
+  <div role="alert" class="alert alert-info alert-soft mt-3">
+    <span><strong>Doc review — merge gate.</strong> Full doc on branch <code>task-0.3-screens</code> (commit <code>a6ccaeb</code>). Content = your approved rev-2 mini-spec, now as the real design doc, plus §2 command traceability, §4 cross-cutting notes, §5 consistency walk. Approving merges Task 0.3 → then <b>Checkpoint 0</b> (last gate before code).</span>
+  </div>
+  <div role="alert" class="alert alert-warning alert-soft mt-2">
+    <span><strong>Domain docs touched in same PR (as agreed):</strong> facilitator <b>EditAction during Value presentation</b> (typo fixes) → <code>domain-model.md</code> EditAction actor + I10 amended; <code>state-machine.md</code> new transition <b>T17a</b> + phase-7 diagram. Guard "all values presented" on Advance 7→8 already existed as T2c — no change needed.</span>
+  </div>
+</header>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§1 · 3×9 matrix</h2>
+    <p class="text-sm">All 27 cells filled; single intentionally-empty cell: presenter × phase 0. <span class="badge badge-primary badge-soft badge-sm">commands</span> · <span class="badge badge-neutral badge-sm">System</span></p>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <thead><tr><th>Phase</th><th>Facilitator (laptop, dense)</th><th>Presenter view (beamer, passive)</th><th>Participant (portrait mobile)</th></tr></thead>
+      <tbody class="text-xs">
+        <tr><td><b>0 · before</b></td><td>Session open form (passphrase) <span class="badge badge-primary badge-soft badge-sm">OpenSession</span></td><td>— intentionally empty —</td><td>QR scan → sign-in (if needed) → lobby <span class="badge badge-primary badge-soft badge-sm">JoinSession</span> (implicit, no form)</td></tr>
+        <tr><td><b>1 Join</b></td><td>Live roster, count <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span></td><td>Large QR invitation + live names of joined participants</td><td>Lobby: "you're in", wait notice</td></tr>
+        <tr><td><b>2 Quiz</b></td><td>Current question, live answer tally, one morphing sub-control button <span class="badge badge-primary badge-soft badge-sm">RevealAnswer</span> <span class="badge badge-primary badge-soft badge-sm">ShowLearningText</span> <span class="badge badge-primary badge-soft badge-sm">PoseNextQuestion</span> <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> (disabled until Q5 learning text shown)</td><td>Question + answer cards (2 top, 1 centered below) with normalized live bars; correct highlighted after reveal; learning text on centered card</td><td>3 answer buttons <span class="badge badge-primary badge-soft badge-sm">ChooseQuizAnswer</span>; locked after answering</td></tr>
+        <tr><td><b>3 Value selection</b></td><td>Submission progress count <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span></td><td>Prompt + submission progress</td><td>Values grid, pick exactly 10 <span class="badge badge-primary badge-soft badge-sm">SubmitValueSelection</span>; locked after</td></tr>
+        <tr><td><b>4 Selection results</b></td><td>Top-values view <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> <span class="badge badge-neutral badge-sm">System: DetermineTopValues</span></td><td>Two columns of 10, ordered by selections; top 10 (or more on tie) highlighted</td><td>Top values (mirror, passive)</td></tr>
+        <tr><td><b>5 Group formation</b></td><td>All groups: names, members, assigned values <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> <span class="badge badge-neutral badge-sm">System: FormGroups</span></td><td>3×2 paginated group cards, cycles every 7 s</td><td>Own group: members top-left, values bottom-right (distinct colors)</td></tr>
+        <tr><td><b>6 Group work</b></td><td>Per-group submit status + scribe <span class="badge badge-primary badge-soft badge-sm">ReassignScribe</span> <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> (guard: every group submitted) <span class="badge badge-neutral badge-sm">System: AppointScribes</span></td><td>Same paginated cards + working/submitted indicator</td><td><b>Scribe:</b> value tabs + actions editor <span class="badge badge-primary badge-soft badge-sm">AddAction</span> <span class="badge badge-primary badge-soft badge-sm">EditAction</span> <span class="badge badge-primary badge-soft badge-sm">RemoveAction</span> <span class="badge badge-primary badge-soft badge-sm">SubmitGroupWork</span> <span class="badge badge-primary badge-soft badge-sm">ReopenGroupWork</span> · <b>Member:</b> value tabs, read-only, synced 0.5 s</td></tr>
+        <tr><td><b>7 Value presentation</b></td><td>Presenting position, action typo fixes <span class="badge badge-primary badge-soft badge-sm">GoToNextValue</span> <span class="badge badge-primary badge-soft badge-sm">EditAction</span> (T17a) <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> (disabled until all values presented)</td><td>Presented value + its actions (no position counter)</td><td>Presented value (mirror, passive)</td></tr>
+        <tr><td><b>8 Final voting</b></td><td>Voted-count progress, tie indicator <span class="badge badge-primary badge-soft badge-sm">CloseVoting</span> <span class="badge badge-primary badge-soft badge-sm">StartTiebreakRound</span> <span class="badge badge-primary badge-soft badge-sm">AdvancePhase</span> (winners must stand)</td><td>"Voting ongoing…" screen — no tallies</td><td>One card per presented value (value + actions + vote stepper) <span class="badge badge-primary badge-soft badge-sm">SubmitFinalVotes</span>; tiebreak: tied values only</td></tr>
+        <tr><td><b>9 Final presentation</b></td><td>Reveal position <span class="badge badge-primary badge-soft badge-sm">RevealNextValue</span></td><td>One full screen per winning value with its actions, least → most voted</td><td>During reveal: "being presented" notice; after conclusion: Download-PDF button</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§2 · Command traceability — 22/22</h2>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <thead><tr><th>Command</th><th>Actor</th><th>Screen · element</th></tr></thead>
+      <tbody class="text-xs">
+        <tr><td>OpenSession</td><td>Facilitator</td><td>Session open form, "Open session" button</td></tr>
+        <tr><td>AdvancePhase</td><td>Facilitator</td><td>Control bar "Advance" button (per-phase disable guards)</td></tr>
+        <tr><td>JoinSession</td><td>Participant</td><td>Implicit on QR-scan arrival (no element)</td></tr>
+        <tr><td>PoseNextQuestion</td><td>Facilitator</td><td>Quiz morphing button, "Next question" state</td></tr>
+        <tr><td>ChooseQuizAnswer</td><td>Participant</td><td>Quiz answer button A/B/C</td></tr>
+        <tr><td>RevealAnswer</td><td>Facilitator</td><td>Quiz morphing button, "Reveal answer" state</td></tr>
+        <tr><td>ShowLearningText</td><td>Facilitator</td><td>Quiz morphing button, "Show learning text" state</td></tr>
+        <tr><td>SubmitValueSelection</td><td>Participant</td><td>Selection grid, "Submit selection" button</td></tr>
+        <tr><td>DetermineTopValues</td><td>System</td><td>— fires on entering Selection results</td></tr>
+        <tr><td>FormGroups</td><td>System</td><td>— fires on entering Group formation</td></tr>
+        <tr><td>AppointScribes</td><td>System</td><td>— fires on entering Group work</td></tr>
+        <tr><td>ReassignScribe</td><td>Facilitator</td><td>Group-work table, scribe dropdown per group</td></tr>
+        <tr><td>AddAction</td><td>Scribe</td><td>"+ add action" under active value tab</td></tr>
+        <tr><td>EditAction</td><td>Scribe / Facilitator (phase 7)</td><td>✎ per action (scribe editor) · ✎ per presented action (facilitator, typo fixes)</td></tr>
+        <tr><td>RemoveAction</td><td>Scribe</td><td>✕ per action</td></tr>
+        <tr><td>SubmitGroupWork</td><td>Scribe</td><td>"Submit group work" button</td></tr>
+        <tr><td>ReopenGroupWork</td><td>Scribe</td><td>"Reopen" button (submitted state)</td></tr>
+        <tr><td>GoToNextValue</td><td>Facilitator</td><td>Presentation "Next value" button</td></tr>
+        <tr><td>SubmitFinalVotes</td><td>Participant</td><td>Voting cards + "Submit votes" button</td></tr>
+        <tr><td>CloseVoting</td><td>Facilitator</td><td>Voting "Close voting" button</td></tr>
+        <tr><td>StartTiebreakRound</td><td>Facilitator</td><td>Voting "Start tiebreak" button (tie shown)</td></tr>
+        <tr><td>RevealNextValue</td><td>Facilitator</td><td>"Reveal next value" button</td></tr>
+      </tbody>
+    </table></div>
+    <p class="text-sm">18 visible elements · 3 System (no element) · 1 implicit (JoinSession).</p>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§3 · Wireframes (as reviewed, rev 2 + PDF-button fix)</h2>
+    <p class="text-sm">Identical to the set you approved in the mini-spec review — now in the doc. Spot-check below; full set in <code>design/screens.md</code>.</p>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Quiz, one morphing button</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 2 · Quiz · Q2/5     [ Advance ▸ ] │  → AdvancePhase — disabled until
+├─────────────────────────────────────────┤    Q5 learning text shown
+│ Which statement about values…?          │
+│ A 9 (✓ correct) · B 4 · C 6             │
+│ answered: 19/30                         │
+├─────────────────────────────────────────┤
+│ [ ········ one button ········ ]        │
+│  question shown  → "Reveal answer"      │  → RevealAnswer
+│  answer revealed → "Show learning text" │  → ShowLearningText
+│  learning shown  → "Next question ▸"    │  → PoseNextQuestion
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Presenter · Answer cards + normalized bars</h4>
+<pre class="wf">
+┌───────────────────────────────────────┐
+│ Question 2/5                          │
+│ Which statement about values…?        │
+│                                       │
+│ ┌───────────────┐  ┌───────────────┐  │
+│ │ A Answer text │  │ B Answer text │  │
+│ │ ▓▓▓▓▓▓▓ 9     │  │ ▓▓▓ 4         │  │
+│ └───────────────┘  └───────────────┘  │
+│        ┌───────────────┐              │
+│        │ C Answer text │              │
+│        │ ▓▓▓▓▓ 6       │              │
+│        └───────────────┘              │
+│ absolute counts · bar lengths         │
+│ normalized to total answers           │
+└───────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Facilitator · Phase 7 walk + typo fixes (T17a)</h4>
+<pre class="wf">
+┌─────────────────────────────────────────┐
+│ Phase 7 · Presentation    [ Advance ▸ ] │  → disabled until all
+├─────────────────────────────────────────┤    values presented (T2c)
+│ Presenting: Otter · Vertrauen           │
+│ 1. We start meetings on time…      ✎    │  → EditAction (wording
+│ 2. We share mistakes openly…       ✎    │    only, T17a)
+│                                         │
+│ [ Next value ▸ ]  → GoToNextValue       │
+└─────────────────────────────────────────┘
+</pre>
+      </div>
+      <div>
+        <h4 class="font-semibold text-sm mb-1">Participant · After conclusion — PDF download</h4>
+<pre class="wf">
+┌──────────────────────┐
+│ Workshop concluded   │
+├──────────────────────┤
+│ Thanks for taking    │
+│ part!                │
+│                      │
+│ ┌──────────────────┐ │
+│ │ ⬇  Download PDF  │ │  ← workshop record:
+│ │ (workshop record)│ │    tallies, actions,
+│ └──────────────────┘ │    winners; no names
+└──────────────────────┘
+</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">§4 · Cross-cutting notes &nbsp;·&nbsp; §5 · Consistency walk</h2>
+    <div class="overflow-x-auto"><table class="table table-sm table-zebra vw">
+      <tbody class="text-sm">
+        <tr><td><b>Reconnect</b></td><td>Any phase: returning facilitator/participant lands on current phase view with exact prior state (role, group, scribe, submissions, cast votes). No rejoin screen.</td></tr>
+        <tr><td><b>Control bar</b></td><td>Every facilitator screen: phase name + Advance; disable guards mirror state-machine exit guards T2a–T2c.</td></tr>
+        <tr><td><b>Presenter</b></td><td>Fullscreen, zero interactivity, no sign-in; never links a person to an answer/selection/vote.</td></tr>
+        <tr><td><b>Participant</b></td><td>Portrait-first, reflows to centered column on landscape laptop; one primary action per screen.</td></tr>
+        <tr><td><b>Anonymity</b></td><td>Only <b>final votes</b> are truly anonymous (I14 — no voter↔vote link ever). Quiz answers and value selections are known per participant inside the session — selections must be, to optimize group formation — but no screen ever shows who picked/selected what. Tallies displayed counts-only.</td></tr>
+        <tr><td><b>i18n</b></td><td>de+en for every visible string; language-carrying: values, quiz content, learning texts, labels, workshop record. Animal names localized. Participant action texts free text, untranslated.</td></tr>
+        <tr><td><b>Walk</b></td><td>Every T1–T23 + T17a covered by an element or matrix note · 22/22 commands reachable · SPEC.md screens table honored.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="card bg-base-300 shadow">
+  <div class="card-body">
+    <h2 class="card-title text-xl">Your call</h2>
+    <p class="text-sm">Approve → merge Task 0.3 to <code>main</code> and Checkpoint 0 review follows (all three Phase 0 docs together). Or annotate anything to fix first.</p>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

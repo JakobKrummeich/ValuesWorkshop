@@ -183,14 +183,15 @@ reflows to a centered single column on landscape laptop screens.
 │                                       │
 │ ┌───────────────┐  ┌───────────────┐  │
 │ │ A Answer text │  │ B Answer text │  │
-│ │ ▓▓▓▓▓▓▓ 47%   │  │ ▓▓▓ 21%       │  │
+│ │ ▓▓▓▓▓▓▓ 9     │  │ ▓▓▓ 4         │  │
 │ └───────────────┘  └───────────────┘  │
 │        ┌───────────────┐              │
 │        │ C Answer text │              │
-│        │ ▓▓▓▓▓ 32%     │              │
+│        │ ▓▓▓▓▓ 6       │              │
 │        └───────────────┘              │
 │                                       │
-│ bars live, normalized to total votes  │
+│ bars live · lengths normalized to     │
+│ total answers, labels absolute counts │
 │ reveal: correct card highlighted ✓    │
 │ learning text: centered card          │
 └───────────────────────────────────────┘
@@ -397,8 +398,7 @@ Facilitator phase 5: full list of groups with members and assigned values
 ┌─────────────────────────────────────────┐
 │ Phase 7 · Presentation    [ Advance ▸ ] │  → AdvancePhase — disabled until
 ├─────────────────────────────────────────┤    all values presented (T2c)
-│ Presenting: Otter (group 1/3)           │
-│ Value: Vertrauen (2/3)                  │
+│ Presenting: Otter · Vertrauen           │
 │ 1. We start meetings on time…      ✎    │  → EditAction (facilitator,
 │ 2. We share mistakes openly…       ✎    │    wording/typo fixes only,
 │ 3. We ask before assuming…         ✎    │    T17a)
@@ -553,9 +553,13 @@ Participant phase 7: mirror of the presented value, passive.
   a person to an answer, selection, or vote.
 - **Participant:** portrait mobile-first; all content reflows to a centered
   single column on landscape laptops. One primary action per screen.
-- **Anonymity on screen:** answer tallies, selection tallies, and vote
-  tallies show counts only. Names appear only where the domain has them:
-  roster, group membership, scribe assignment.
+- **Anonymity on screen:** all tallies are *displayed* counts-only. Final
+  votes are truly anonymous — the session never links voter to votes (I14).
+  Quiz answers and value selections are known per participant inside the
+  session (selections feed the group-formation aim: matching each
+  participant's own ten values against their group's values), but no screen
+  ever shows who picked or selected what. Names appear only where the
+  domain has them: roster, group membership, scribe assignment.
 - **i18n (de + en):** every visible string exists in both languages.
   Language-carrying content: value names, quiz questions, answer options,
   learning texts, all labels/buttons/notices, and the workshop record.
