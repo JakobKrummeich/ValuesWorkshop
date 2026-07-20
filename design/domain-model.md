@@ -24,7 +24,7 @@ workshop's native language), English term used in model and code.
 |---|---|---|
 | Moderator:in | **Facilitator** | Runs the workshop. Opens the session, advances phases, operates all sub-controls (next question, reveal, learning text, presenting group, close voting, tiebreak), may reassign a scribe. Exactly one per session. |
 | Teilnehmer:in | **Participant** | Joins a session, answers quiz questions, selects values, works in a group, casts final votes. Up to ~30 per session. |
-| Schriftführer:in | **Scribe** | The one participant per group who writes: creates, edits, removes actions and submits / reopens the group's work. Appointed at random when group work begins; the facilitator may reassign the role at any time (e.g. dead phone). |
+| Schreiber:in | **Scribe** | The one participant per group who writes: creates, edits, removes actions and submits / reopens the group's work. Appointed at random when group work begins; the facilitator may reassign the role at any time (e.g. dead phone). |
 | Präsentationsansicht | **Presenter view** | Not a person: the shared big-screen view of the session (projector). Shows the invitation to join, live charts, group presentations, final results. Purely observing — it never issues commands. |
 
 ### Session & flow
@@ -35,10 +35,10 @@ workshop's native language), English term used in model and code.
 | Sitzungskennung | **Session identity** | The name by which a session is found and joined. |
 | Moderationskennwort | **Facilitator passphrase** | Shared secret known only to facilitators; opening a session requires it. Participants never hold it. |
 | Phase | **Phase** | One of the nine named stages below. Phases advance forward only, and only the facilitator advances them. |
-| Phasenfortschritt | **Phase progression** | The session's current phase plus its within-phase state (e.g. current quiz question, presenting group, tiebreak round). |
+| Workshop-Zustand | **Workshop state** | The session's current phase plus its within-phase state (e.g. current quiz question, presented value, tiebreak round, revealed winners). |
 | Teilnehmerliste | **Roster** | Who has joined the session. Membership survives leaving and returning: a returning facilitator or participant resumes their exact place. |
 | Lobby | **Lobby** | Where a participant waits after joining, before the workshop proper begins. |
-| Wiedereintritt | **Return** | A facilitator or participant coming back after an interruption; they keep their role, membership, group, scribe status, and prior submissions. |
+| Wiederverbindung | **Reconnect** | A facilitator or participant coming back after an interruption; they keep their role, membership, group, scribe status, and prior submissions. |
 
 ### The nine phases
 
@@ -83,7 +83,7 @@ workshop's native language), English term used in model and code.
 | Gruppenname | **Group name** | Friendly animal name identifying a group (e.g. "Otter"). |
 | Gruppeneinteilung | **Group formation** | The one-time act of partitioning all present participants into groups and dealing the top values out across the groups — every top value to exactly one group. Formation aims to give each participant as many of their own ten selected values as possible; sizing follows the group sizing rule. |
 | Gruppengrößenregel | **Group sizing rule** | Number of groups = at least one, otherwise participants divided by four rounded down. Participants and values are dealt round-robin: sizes differ by at most one, earlier groups get the extra ones. |
-| Maßnahme | **Action** | A work-related, everyday, pragmatic action a group formulates for one of its assigned values. Between one and five per assigned value. |
+| Verhaltensweise | **Action** | A work-related, everyday, pragmatic action a group formulates for one of its assigned values. Between one and five per assigned value. |
 | Gruppenergebnis | **Group work result** | A group's actions for all its assigned values. |
 | Abgabe / Abgabe zurückziehen | **Submit / reopen** | The scribe declaring the group's work finished, or taking it back for further editing. Only submitted work is presented. |
 
@@ -91,8 +91,9 @@ workshop's native language), English term used in model and code.
 
 | Deutsch | English | Meaning |
 |---|---|---|
-| Präsentierende Gruppe | **Presenting group** | The one group whose submitted values and actions are currently shown; the facilitator switches between groups. |
-| Schlussstimmen | **Final votes** | Each participant's five votes, freely distributed across all presented values — several votes may go to one value, up to all five. Cast secretly and stored without any connection to the voter; only *that* someone has voted is remembered. |
+| Präsentierende Gruppe | **Presenting group** | The group whose submitted result is currently being walked through. |
+| Präsentierter Wert | **Presented value** | The single value (with its actions) currently shown. The facilitator steps value by value through the presenting group's assigned values; when they are exhausted, presentation moves to the next group's first value. |
+| Finale Stimmen | **Final votes** | Each participant's five votes, freely distributed across all presented values — several votes may go to one value, up to all five. Cast secretly and stored without any connection to the voter; only *that* someone has voted is remembered. |
 | Stimmenstand | **Vote tally** | Anonymous count of final votes per value. |
 | Siegerwerte | **Winning values** | The five values with the most final votes, together with their actions. |
 | Stichwahl | **Tiebreak round** | Held when a tie at fifth place prevents exactly five winners: a further vote among the tied values only, each participant receiving as many votes as there are tied values (multi-votes allowed). Repeated until exactly five values survive. Started by the facilitator. |
@@ -109,7 +110,7 @@ documents (`architecture.md`, `persistence.md`, `protocol.md`,
 |---|---|
 | QR code, join URL | Presentation detail of the Join phase — `screens.md`. The domain only knows "a participant joins a session". |
 | Login / authentication / identity provider | How a person proves who they are — technical concern. The domain only knows facilitator vs. participant. |
-| Server, client, real-time, broadcast, reconnect mechanics | Delivery concerns — `protocol.md`. The domain term is **Return** (see above). |
+| Server, client, real-time, broadcast, connection mechanics | Delivery concerns — `protocol.md`. The domain term is **Reconnect** (see above). |
 | Restart / recovery / persistence / stored on disk | Durability concern — `persistence.md`. Domain expectation is only: a session never forgets anything that happened. |
 | Solver, optimization, time-box, incumbent | How group formation is computed — `cpsat-model.md`. The domain term is **Group formation** with its sizing rule and its aim. |
 | PDF, download, rendering | File-format concern — `screens.md` / implementing task. The domain term is **Workshop record**. |
@@ -130,7 +131,7 @@ belongs to the session it happened in.
 |---|---|
 | **SessionOpened** | A facilitator opened a new session using the facilitator passphrase. |
 | **PhaseAdvanced** | The facilitator moved the session forward to the next phase. Never backward. |
-| **ParticipantReturned** | A facilitator or participant came back after an interruption and resumed their exact place (any phase). |
+| **ParticipantRejoined** | A facilitator or participant came back after an interruption and resumed their exact place (any phase). |
 
 ### Phase 1 — Join
 
@@ -143,7 +144,7 @@ belongs to the session it happened in.
 | Event | Meaning |
 |---|---|
 | **QuestionPosed** | The next quiz question became the current one (first question: on entering the phase). |
-| **QuizAnswerCast** | A participant picked one answer option for the current question — their only pick for it. The answer tally grew. |
+| **QuizAnswerChosen** | A participant picked one answer option for the current question — their only pick for it. The answer tally grew. |
 | **AnswerRevealed** | The correct option of the current question was disclosed. |
 | **LearningTextShown** | The current question's learning text was made visible. |
 
@@ -181,13 +182,13 @@ belongs to the session it happened in.
 
 | Event | Meaning |
 |---|---|
-| **PresentingGroupChanged** | The facilitator put a (different) group's submitted result on presentation. |
+| **NextValueShown** | The facilitator stepped presentation to the next value: the next of the presenting group's assigned values, or — once exhausted — the first value of the next group. Only submitted results are shown. |
 
 ### Phase 8 — Final voting
 
 | Event | Meaning |
 |---|---|
-| **FinalVotesCast** | A participant spent their full vote allotment (five in the main round; the number of tied values in a tiebreak) across the eligible values. The anonymous vote tally grew; only the fact *that* they voted was remembered. |
+| **FinalVotesSubmitted** | A participant spent their full vote allotment (five in the main round; the number of tied values in a tiebreak) across the eligible values. The anonymous vote tally grew; only the fact *that* they voted was remembered. Irrevocable: because no one knows whose votes they are, votes cannot be taken back. |
 | **VotingClosed** | The facilitator ended the current voting round; the tally is final for this round. |
 | **TiebreakStarted** | A tie at fifth place being unresolved, the facilitator started a further round among the tied values only. |
 | **WinnersDetermined** | Exactly five values emerged with the most votes; they are the winning values. |
@@ -196,6 +197,7 @@ belongs to the session it happened in.
 
 | Event | Meaning |
 |---|---|
+| **NextWinnerRevealed** | The facilitator revealed the next winning value with its actions — in ascending vote order: least-voted winner first, most-voted winner last. |
 | **WorkshopConcluded** | The session reached its final phase; winning values and their actions stand, and the workshop record became available to every participant. |
 
 ---
@@ -212,7 +214,7 @@ when a phase begins or a condition is met — no person issues them.
 | **AdvancePhase** | Facilitator | Move to the next of the nine phases; allowed forward only. → PhaseAdvanced (entering some phases triggers System commands below) |
 | **JoinSession** | Participant | Enter the roster of a named session. → ParticipantJoined |
 | **PoseNextQuestion** | Facilitator | Make the next quiz question current. → QuestionPosed |
-| **CastQuizAnswer** | Participant | Pick one answer option for the current question; second picks are refused. → QuizAnswerCast |
+| **ChooseQuizAnswer** | Participant | Pick one answer option for the current question; second picks are refused. → QuizAnswerChosen |
 | **RevealAnswer** | Facilitator | Disclose the correct option. → AnswerRevealed |
 | **ShowLearningText** | Facilitator | Show the current question's learning text. → LearningTextShown |
 | **SubmitValueSelection** | Participant | Hand in exactly ten distinct values; fewer, more, or duplicates are refused; resubmission is refused. → ValuesSelected |
@@ -225,10 +227,11 @@ when a phase begins or a condition is met — no person issues them.
 | **RemoveAction** | Scribe | Remove an action; same refusals as AddAction. → ActionRemoved |
 | **SubmitGroupWork** | Scribe | Declare the group result finished; requires 1–5 actions for every assigned value. → GroupWorkSubmitted |
 | **ReopenGroupWork** | Scribe | Take the submission back. → GroupWorkReopened |
-| **ChangePresentingGroup** | Facilitator | Put another group's submitted result on presentation. → PresentingGroupChanged |
-| **CastFinalVotes** | Participant | Spend the full allotment across eligible values, multi-votes allowed; wrong totals, votes outside the eligible values, or a second cast in the same round are refused. → FinalVotesCast |
+| **GoToNextValue** | Facilitator | Step presentation to the next value, iterating through each group's submitted values, group by group. → NextValueShown |
+| **SubmitFinalVotes** | Participant | Spend the full allotment across eligible values, multi-votes allowed; wrong totals, votes outside the eligible values, or a second submission in the same round are refused. No un-voting afterwards. → FinalVotesSubmitted |
 | **CloseVoting** | Facilitator | End the current voting round. → VotingClosed, then either WinnersDetermined (no fifth-place tie) or a pending tie |
 | **StartTiebreakRound** | Facilitator | Begin a further round among the tied values only. → TiebreakStarted |
+| **RevealNextValue** | Facilitator | Reveal the next winning value in final presentation, ascending vote order (least-voted first). → NextWinnerRevealed |
 
 ---
 
@@ -244,16 +247,17 @@ The workshop run itself. Owns everything that concerns the session as a
 whole; every other model element is reached through it.
 
 **Owns:** session identity · roster (participants and the facilitator, with
-return/resume) · phase progression (current phase + within-phase state:
-current question, reveal/learning-text shown, presenting group, voting round)
+return/resume) · workshop state (current phase + within-phase state:
+current question, reveal/learning-text shown, presented value, voting round,
+revealed winners)
 · quiz answer tallies and who-answered-which-question · value selections and
 who-has-submitted · top values · final-vote allotments, who-has-voted flags,
 tie state, winning values.
 
 **Handles:** OpenSession, AdvancePhase, JoinSession, PoseNextQuestion,
-CastQuizAnswer, RevealAnswer, ShowLearningText, SubmitValueSelection,
-DetermineTopValues, FormGroups, AppointScribes, ChangePresentingGroup,
-CastFinalVotes, CloseVoting, StartTiebreakRound.
+ChooseQuizAnswer, RevealAnswer, ShowLearningText, SubmitValueSelection,
+DetermineTopValues, FormGroups, AppointScribes, GoToNextValue,
+SubmitFinalVotes, CloseVoting, StartTiebreakRound, RevealNextValue.
 
 ### Group
 
@@ -276,7 +280,8 @@ recomputable from events at any time:
 - **Selection tally** — counts per value; submission progress count.
 - **Vote tally** — anonymous counts per value per voting round. By
   construction it contains counts only; no voter is ever part of it.
-- **Presentation view** — presenting group's submitted result; winners.
+- **Presentation view** — currently presented value with its actions;
+  revealed winners so far.
 
 ## 5. Invariants
 
@@ -297,8 +302,8 @@ can refuse a command violating it.
 | I10 | Only the scribe creates, edits, removes actions and submits or reopens; a reassigned-away scribe is refused immediately. | Group |
 | I11 | Every assigned value carries between one and five actions when group work is submitted; no edits while submitted. | Group |
 | I12 | Only submitted group results are presented. | Session |
-| I13 | A final-votes cast spends exactly the round's allotment (five in the main round; the number of tied values in a tiebreak), only on the round's eligible values; one cast per participant per round. | Session |
-| I14 | Final votes are anonymous: the session remembers *that* a participant voted, never *what* — no connection between voter and votes exists anywhere in the model. | Session |
+| I13 | A final-votes submission spends exactly the round's allotment (five in the main round; the number of tied values in a tiebreak), only on the round's eligible values; one submission per participant per round. | Session |
+| I14 | Final votes are anonymous and secret: the session remembers *that* a participant voted, never *what* — no connection between voter and votes exists anywhere in the model. As a consequence, votes can never be taken back. | Session |
 | I15 | Exactly five winning values; while a fifth-place tie persists, tiebreak rounds over the tied values repeat until it is resolved. | Session |
 | I16 | A session never forgets: every fact above survives any interruption, and a return resumes the exact prior state. | Session |
 
@@ -311,9 +316,9 @@ explicitly excluded (section 1, last table):
 |---|---|
 | workshop, session, sessionId | Session, Session identity |
 | facilitator, facilitator password | Facilitator, Facilitator passphrase |
-| participant, lobby, reconnect/membership | Participant, Lobby, Return, Roster |
+| participant, lobby, reconnect/membership | Participant, Lobby, Reconnect, Roster |
 | projector / presenter screen | Presenter view |
-| phase (9, forward-only) | Phase, Phase progression |
+| phase (9, forward-only) | Phase, Workshop state |
 | quiz, question, answers (correct/wrong/funny-wrong), learning text | Quiz question, Answer option, Quiz answer, Learning text |
 | live bar charts / tallies | Answer/Selection/Vote tally (drawing → excluded) |
 | values catalog, value | Values catalog, Value |
@@ -323,9 +328,9 @@ explicitly excluded (section 1, last table):
 | solver / assignment | Group formation (computation → excluded) |
 | scribe, reassignment | Scribe, ReassignScribe |
 | actions (1–5 per value), submit/un-submit | Action, Group work result, Submit / reopen |
-| presentation, switching groups | Presenting group |
+| presentation, switching groups | Presenting group, Presented value, GoToNextValue |
 | 5 votes, multi-votes, secret/anonymous | Final votes, Vote tally |
 | tie at 5th place, tiebreaker round | Tiebreak round |
-| winners | Winning values |
+| winners | Winning values, RevealNextValue |
 | PDF / download | Workshop record (format → excluded) |
 | QR code, OIDC, SQLite, SignalR, restart, docker, CI … | Excluded (see section 1) |
