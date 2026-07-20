@@ -21,7 +21,7 @@
 <main class="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-8">
 
 <header>
-  <h1 class="text-3xl font-bold">Task 0.1 — Domain Model <span class="badge badge-primary badge-soft align-middle">design/domain-model.md · rev 2</span></h1>
+  <h1 class="text-3xl font-bold">Task 0.1 — Domain Model <span class="badge badge-primary badge-soft align-middle">design/domain-model.md · rev 3</span></h1>
   <div role="alert" class="alert alert-info alert-soft mt-3">
     <span><strong>Review focus:</strong> DDD depth. Pure domain — zero technical vocabulary by design. Full doc on branch <code>task-0.1-domain-model</code> (3 commits). Checkpoint 0 gates all code.</span>
   </div>
@@ -90,8 +90,8 @@
     <div class="grid md:grid-cols-2 gap-4">
       <div class="card bg-base-100"><div class="card-body p-4">
         <h3 class="font-bold">Session <span class="badge badge-soft badge-primary">root</span></h3>
-        <p class="text-sm">Owns: identity · roster + reconnect · workshop state (incl. sub-state) · quiz tallies + who-answered · selections + who-submitted · top values · vote allotments, who-has-voted flags, tie state, winners.</p>
-        <p class="text-sm">Handles 16 commands: all lifecycle, quiz, selection, formation, presentation-stepping, voting, winner-reveal commands.</p>
+        <p class="text-sm">One consistency boundary — but composed of small internal <b>building blocks</b> (pure domain objects, no storage connotation), each owning one slice + its invariants: <b>Roster</b> (I4) · <b>Workshop state</b> (I1, I2) · <b>Quiz progress</b> (I5) · <b>Selection round</b> (I6, I7) · <b>Formation record</b> (I8) · <b>Presentation walk</b> (I12) · <b>Voting rounds</b> (I13–I15).</p>
+        <p class="text-sm">Root does two things only: guard boundary (phase + actor) and route each of its 16 commands to exactly one block. Doc now carries an explicit <b>implementation guardrail</b>: root implementing block rules itself = god class = violates the model; complexity gate 10 + review catch it.</p>
       </div></div>
       <div class="card bg-base-100"><div class="card-body p-4">
         <h3 class="font-bold">Group <span class="badge badge-soft badge-secondary">per group</span></h3>
@@ -100,7 +100,7 @@
       </div></div>
     </div>
     <p class="text-sm mt-3"><b>Read models (not aggregates):</b> Answer tally, Selection tally, Vote tally (counts only — anonymity by construction), Presentation view. Enforce nothing; recomputable from events.</p>
-    <div role="alert" class="alert alert-info alert-soft mt-2"><span><b>Your aggregate question (why only 2? overloaded Session?):</b> answered in chat — aggregates are consistency/transaction boundaries, not responsibility modules; SRP lives one level below, in entities inside the aggregate. Chat also offers an optional explicit-entities refinement for the doc.</span></div>
+    <div role="alert" class="alert alert-success alert-soft mt-2"><span><b>Resolved:</b> aggregate = consistency/transaction boundary, not responsibility module; SRP lives one level below. Per your naming concern, the doc says “internal building blocks” (pure domain objects) — never “entities”, to avoid persistence-layer association — and carries an anti-god-class guardrail aimed at implementer agents.</span></div>
   </div>
 </section>
 

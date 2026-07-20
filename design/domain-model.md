@@ -243,16 +243,33 @@ change its inner state.
 
 ### Session (root)
 
-The workshop run itself. Owns everything that concerns the session as a
-whole; every other model element is reached through it.
+The workshop run itself: one consistency boundary, because its invariants
+need roster, phase, and tallies in a single atomic view.
 
-**Owns:** session identity · roster (participants and the facilitator, with
-return/resume) · workshop state (current phase + within-phase state:
-current question, reveal/learning-text shown, presented value, voting round,
-revealed winners)
-· quiz answer tallies and who-answered-which-question · value selections and
-who-has-submitted · top values · final-vote allotments, who-has-voted flags,
-tie state, winning values.
+The boundary being one aggregate does **not** make the Session one big
+object. Inside the boundary the Session is composed of small internal
+building blocks — pure domain objects (nothing to do with storage), each
+owning exactly one slice of state and its invariants:
+
+| Building block | Owns | Enforces |
+|---|---|---|
+| **Roster** | participants + facilitator, membership, reconnect/resume | I4 |
+| **Workshop state** | current phase + within-phase state | I1, I2 |
+| **Quiz progress** | current question, reveal/learning-text shown, answer tallies, who-answered-which-question | I5 |
+| **Selection round** | value selections, who-has-submitted, top values | I6, I7 |
+| **Formation record** | the one-time group/value partition | I8 |
+| **Presentation walk** | presenting group + presented value position | I12 |
+| **Voting rounds** | allotment, who-has-voted flags, anonymous tallies, tie state, winning values, reveal position | I13, I14, I15 |
+
+The Session **root** itself does only two things: guard the boundary
+(check phase + actor — I2, I3) and route each command to exactly one
+building block. I16 spans the whole boundary.
+
+> **Implementation guardrail (for implementer agents):** a Session class
+> that implements the rules of these building blocks itself is a god class
+> and violates this model. The root guards and routes; every rule lives in
+> its building block. The complexity gate (threshold 10) and review are
+> expected to catch violations.
 
 **Handles:** OpenSession, AdvancePhase, JoinSession, PoseNextQuestion,
 ChooseQuizAnswer, RevealAnswer, ShowLearningText, SubmitValueSelection,
