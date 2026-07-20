@@ -1,5 +1,7 @@
 # ValuesWorkshop — Task List
 
+Per-task workflow: skill chain in `AGENTS.md` (root).
+
 Ordered per `tasks/plan.md`. Every task: TDD (test first), spec is
 `SPEC.md`, never consult the old repo (`CLEANROOM.md`). Merge gate:
 feature branch → `git push no-mistakes <branch>` → PR → protected `main`
