@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck",
+    "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && pnpm audit --audit-level=high",
     "test": "jest --coverage",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
