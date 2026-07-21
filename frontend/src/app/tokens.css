@@ -1,0 +1,97 @@
+:root {
+  --base-green-900: #052e16;
+  --base-green-700: #166534;
+  --base-green-500: #16a34a;
+  --base-green-300: #4ade80;
+  --base-green-100: #bbf7d0;
+
+  --base-amber-900: #78350f;
+  --base-amber-700: #b45309;
+  --base-amber-500: #f59e0b;
+  --base-amber-300: #fbbf24;
+  --base-amber-100: #fde68a;
+
+  --base-gray-900: #1c1917;
+  --base-gray-700: #44403c;
+  --base-gray-500: #78716c;
+  --base-gray-300: #d6d3d1;
+  --base-gray-100: #fafaf9;
+
+  --base-white: #fff;
+
+  --base-red-700: #b91c1c;
+  --base-red-100: #fee2e2;
+
+  --base-font-sans:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  --base-weight-regular: 400;
+  --base-weight-bold: 700;
+
+  --base-text-12: 0.75rem;
+  --base-text-14: 0.875rem;
+  --base-text-16: 1rem;
+  --base-text-20: 1.25rem;
+  --base-text-24: 1.5rem;
+  --base-text-32: 2rem;
+  --base-text-40: 2.5rem;
+
+  --base-leading-tight: 1.25;
+  --base-leading-normal: 1.5;
+
+  --base-space-4: 4px;
+  --base-space-8: 8px;
+  --base-space-12: 12px;
+  --base-space-16: 16px;
+  --base-space-24: 24px;
+  --base-space-32: 32px;
+  --base-space-48: 48px;
+  --base-space-64: 64px;
+  --base-space-96: 96px;
+
+  --base-radius-sm: 6px;
+  --base-radius-md: 10px;
+  --base-radius-full: 999px;
+
+  --base-shadow-sm: 0 1px 2px rgb(28 25 23 / 10%);
+  --base-shadow-md: 0 4px 12px rgb(28 25 23 / 15%);
+
+  --color-bg: var(--base-gray-100);
+  --color-surface: var(--base-white);
+  --color-border: var(--base-gray-300);
+  --color-text: var(--base-gray-900);
+  --color-text-muted: var(--base-gray-500);
+  --color-primary: var(--base-green-700);
+  --color-primary-strong: var(--base-green-900);
+  --color-primary-soft: var(--base-green-100);
+  --color-accent: var(--base-amber-700);
+  --color-accent-soft: var(--base-amber-100);
+  --color-danger: var(--base-red-700);
+  --color-danger-soft: var(--base-red-100);
+  --color-success: var(--base-green-500);
+  --color-on-primary: var(--base-white);
+
+  --font-sans: var(--base-font-sans);
+  --weight-regular: var(--base-weight-regular);
+  --weight-bold: var(--base-weight-bold);
+  --leading-tight: var(--base-leading-tight);
+  --leading-normal: var(--base-leading-normal);
+
+  --text-small: var(--base-text-14);
+  --text-body: var(--base-text-16);
+  --text-heading: var(--base-text-20);
+
+  --space-tight: var(--base-space-4);
+  --space-gap: var(--base-space-8);
+  --space-gutter: var(--base-space-16);
+
+  --control-height: 32px;
+
+  --radius-sm: var(--base-radius-sm);
+  --radius-md: var(--base-radius-md);
+  --radius-full: var(--base-radius-full);
+  --shadow-sm: var(--base-shadow-sm);
+  --shadow-md: var(--base-shadow-md);
+}

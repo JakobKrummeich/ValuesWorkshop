@@ -104,9 +104,12 @@ verified by a multi-client Playwright e2e test.
 ## Design System
 
 - Fresh palette and typography (deliberately different from any prior work).
-- Design tokens in one CSS file: color palette, typography hierarchy,
-  multiple-of-4 spacing scale.
-- stylelint enforces token usage (no raw hex/px outside the tokens file).
+- Two-layer CSS custom-property system: base primitives (`--base-*`) in
+  `tokens.css`, semantic aliases (`--color-*`, `--text-*`, `--space-*`, etc.)
+  scoped per screen in `tokens.{facilitator,participant,presenter}.css`.
+  Color palette, typography hierarchy, multiple-of-4 spacing scale.
+- stylelint enforces token usage (no raw hex/px outside token files,
+  no `--base-*` references outside token files).
 
 ## Commands
 
@@ -173,7 +176,7 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
 - [ ] CP-SAT assignment returns within 3 s for 30 participants / ~10 values.
 - [ ] Votes anonymous: no voter↔vote linkage in DB or PDF.
 - [ ] PDF downloads in final phase with votes, actions, winners.
-- [ ] stylelint fails on raw color/spacing values outside tokens file.
+- [ ] stylelint fails on raw color/spacing values outside token files.
 - [ ] de + en locales complete.
 - [ ] PR pipeline runs all deterministic gates (build, tests, lint, format,
       arch, complexity, duplication, coverage ≥ 80 % lines FE+BE, e2e);

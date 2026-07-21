@@ -10,6 +10,8 @@ NEVER commit secrets. NEVER commit PII. NEVER weaken quality guardrails.
 NEVER disable quality guardrails. RARELY use code comments.
 Naming: language defaults — FE/TS camelCase (hooks must be `use`-camelCase);
 C# PascalCase for types/properties/methods, camelCase for locals/params.
+CSS: co-locate `Component.module.css` next to its `Component.tsx` — one CSS
+module per component, no shared/global component stylesheets.
 C#: records by default, wherever possible — value objects, DTOs, messages,
 commands/events always records; a mutable class needs written justification.
 Mind record collection-property equality (reference-based; use immutable
