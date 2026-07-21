@@ -1,0 +1,13 @@
+.screenPresenter {
+  --text-small: clamp(var(--base-text-20), 2.5vh, var(--base-text-24));
+  --text-body: clamp(var(--base-text-24), 3.5vh, var(--base-text-32));
+  --text-heading: clamp(var(--base-text-32), 6vh, var(--base-text-40));
+
+  --space-tight: var(--base-space-16);
+  --space-gap: var(--base-space-24);
+  --space-gutter: var(--base-space-48);
+
+  --color-bg: var(--base-white);
+  --color-text: var(--base-gray-900);
+  --color-text-muted: var(--base-gray-700);
+}

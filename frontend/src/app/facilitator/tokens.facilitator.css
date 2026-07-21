@@ -1,0 +1,11 @@
+.screenFacilitator {
+  --text-small: var(--base-text-14);
+  --text-body: var(--base-text-16);
+  --text-heading: var(--base-text-20);
+
+  --space-tight: var(--base-space-4);
+  --space-gap: var(--base-space-8);
+  --space-gutter: var(--base-space-16);
+
+  --control-height: 32px;
+}

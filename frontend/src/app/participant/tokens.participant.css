@@ -1,0 +1,11 @@
+.screenParticipant {
+  --text-small: var(--base-text-16);
+  --text-body: var(--base-text-20);
+  --text-heading: var(--base-text-24);
+
+  --space-tight: var(--base-space-8);
+  --space-gap: var(--base-space-12);
+  --space-gutter: var(--base-space-16);
+
+  --control-height: 48px;
+}
