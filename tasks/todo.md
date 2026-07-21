@@ -253,6 +253,13 @@ envelope validated server-side; full-state snapshot on connect/reconnect.
 FE: SignalR client adapter constructed session-bound inside the screen-group
 dependency context (SPEC “Session binding at the edge”) — sessionId must not
 leak into domain, UI props, or port signatures.
+Port layout (locked): ports sliced per concern per role (participant ≈
+join/quiz/selection/groupWork/voting; facilitator ≈ lifecycle/quiz-control/
+formation/walk-control/tiebreak; presenter ≈ read-only stream), all slices
+implemented by ONE session-bound adapter per role, exposed via the role's
+dependency context; screens depend only on their slice. Exact slice list
+derives from the `design/protocol.md` intent catalog. This replaces the
+Task-1 placeholder `<Role>Gateway` interfaces (naming decided then).
 **Acceptance criteria:**
 - [ ] `design/protocol.md` covers every 0.2 transition; per-role snapshots
       specified
