@@ -5,9 +5,15 @@ import { stubParticipantGateway } from "../../adapters/stubParticipantGateway";
 import { ParticipantDependencyProvider } from "./dependencies";
 import "./tokens.participant.css";
 
-export default function ParticipantLayout({ children }: { children: ReactNode }) {
+export default function ParticipantLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
-    <ParticipantDependencyProvider dependencies={{ gateway: stubParticipantGateway }}>
+    <ParticipantDependencyProvider
+      dependencies={{ gateway: stubParticipantGateway }}
+    >
       <div className="screenParticipant">{children}</div>
     </ParticipantDependencyProvider>
   );

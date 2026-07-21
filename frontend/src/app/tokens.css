@@ -22,11 +22,7 @@
   --base-red-700: #b91c1c;
   --base-red-100: #fee2e2;
 
-  --base-font-sans:
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    sans-serif;
+  --base-font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
   --base-weight-regular: 400;
   --base-weight-bold: 700;
 

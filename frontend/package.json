@@ -6,8 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint && stylelint \"src/**/*.css\" && pnpm typecheck",
+    "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck",
     "test": "jest",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -23,6 +25,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "jest": "^30.4.2",
+    "prettier": "^3.9.5",
     "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-declaration-strict-value": "^1.11.1",

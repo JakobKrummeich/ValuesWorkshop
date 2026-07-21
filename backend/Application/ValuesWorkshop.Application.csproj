@@ -1,7 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <ProjectReference Include="..\Domain\ValuesWorkshop.Domain.csproj" />
   </ItemGroup>
-
 </Project>

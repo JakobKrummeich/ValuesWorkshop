@@ -7,7 +7,9 @@ import "./tokens.presenter.css";
 
 export default function PresenterLayout({ children }: { children: ReactNode }) {
   return (
-    <PresenterDependencyProvider dependencies={{ gateway: stubPresenterGateway }}>
+    <PresenterDependencyProvider
+      dependencies={{ gateway: stubPresenterGateway }}
+    >
       <div className="screenPresenter">{children}</div>
     </PresenterDependencyProvider>
   );

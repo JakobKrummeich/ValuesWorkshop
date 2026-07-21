@@ -5,9 +5,15 @@ import { stubFacilitatorGateway } from "../../adapters/stubFacilitatorGateway";
 import { FacilitatorDependencyProvider } from "./dependencies";
 import "./tokens.facilitator.css";
 
-export default function FacilitatorLayout({ children }: { children: ReactNode }) {
+export default function FacilitatorLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
-    <FacilitatorDependencyProvider dependencies={{ gateway: stubFacilitatorGateway }}>
+    <FacilitatorDependencyProvider
+      dependencies={{ gateway: stubFacilitatorGateway }}
+    >
       <div className="screenFacilitator">{children}</div>
     </FacilitatorDependencyProvider>
   );
