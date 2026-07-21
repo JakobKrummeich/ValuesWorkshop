@@ -5,7 +5,6 @@ import type { FacilitatorGateway } from "../../ports/facilitatorGateway";
 
 const FacilitatorGatewayContext = createContext<FacilitatorGateway | null>(null);
 
-/** DI context of the facilitator screen group: injects its port implementations. */
 export function FacilitatorPortsProvider({
   gateway,
   children,

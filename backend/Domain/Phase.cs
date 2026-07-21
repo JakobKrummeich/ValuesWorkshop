@@ -1,6 +1,5 @@
 namespace ValuesWorkshop.Domain;
 
-/// <summary>The nine workshop phases; forward-only, in this fixed order (I1).</summary>
 public enum Phase
 {
     Join = 1,

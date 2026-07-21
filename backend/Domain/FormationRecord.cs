@@ -1,6 +1,5 @@
 namespace ValuesWorkshop.Domain;
 
-/// <summary>The one-time group/value partition. Enforces I8.</summary>
 public sealed class FormationRecord
 {
     private readonly List<Group> _groups = [];

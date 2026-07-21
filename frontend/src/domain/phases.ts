@@ -1,4 +1,3 @@
-/** The nine workshop phases; forward-only, in this fixed order (I1). */
 export const PHASES = [
   "join",
   "quiz",

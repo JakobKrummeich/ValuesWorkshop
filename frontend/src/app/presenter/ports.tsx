@@ -5,7 +5,6 @@ import type { PresenterGateway } from "../../ports/presenterGateway";
 
 const PresenterGatewayContext = createContext<PresenterGateway | null>(null);
 
-/** DI context of the presenter screen group: injects its port implementations. */
 export function PresenterPortsProvider({
   gateway,
   children,

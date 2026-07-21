@@ -5,7 +5,6 @@ import type { ParticipantGateway } from "../../ports/participantGateway";
 
 const ParticipantGatewayContext = createContext<ParticipantGateway | null>(null);
 
-/** DI context of the participant screen group: injects its port implementations. */
 export function ParticipantPortsProvider({
   gateway,
   children,
