@@ -4,6 +4,6 @@
     "jscpd": "jscpd"
   },
   "devDependencies": {
-    "jscpd": "^4.1.0"
+    "jscpd": "^4.2.5"
   }
 }

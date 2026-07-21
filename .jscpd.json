@@ -10,7 +10,8 @@
     "**/obj/**",
     "**/*.csproj",
     "**/*.sln",
-    "**/*.slnf"
+    "**/*.slnf",
+    "**/tokens*.css"
   ],
   "absolute": true
 }
