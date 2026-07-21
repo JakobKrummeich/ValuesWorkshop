@@ -35,7 +35,10 @@ collections or custom equality where equality matters). Aggregate style
    on a feature branch
 4. **code-review-and-quality** → fix findings
 5. **code-simplification** → fix findings
-6. **no-mistakes** → validate, open PR (skip during Phase 0 / doc-only tasks)
+6. **no-mistakes** → validate, open PR (skip during Phase 0 / doc-only tasks).
+   The gate does NOT watch pushes to an open PR: any code follow-up pushed to
+   a PR branch must be re-validated (`no-mistakes rerun` or a fresh `axi run`);
+   only doc-only follow-ups may push directly.
 
 At every checkpoint: re-groom the next phase's tasks in `tasks/todo.md`
 against learnings; update `SPEC.md` in the same PR if a decision changed.
