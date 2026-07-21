@@ -10,7 +10,7 @@ const semanticValueProps = [
   "box-shadow",
 ];
 
-export default {
+const config = {
   extends: ["stylelint-config-standard"],
   plugins: ["stylelint-declaration-strict-value"],
   rules: {
@@ -64,3 +64,5 @@ export default {
     },
   ],
 };
+
+export default config;
