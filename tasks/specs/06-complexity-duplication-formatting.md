@@ -20,11 +20,11 @@ duplication, formatting, coverage, and dependency vulnerability scanning.
 | Side | Tool | Config | Threshold |
 |------|------|--------|-----------|
 | FE | eslint `complexity` rule | `eslint.config.mjs` | error at 10 |
-| BE | CA1502 (Microsoft.CodeAnalysis.NetAnalyzers) | `.editorconfig` severity=error | 10 via `dotnet_diagnostic.CA1502.severity = error` |
+| BE | S1541 (SonarAnalyzer.CSharp) | `.editorconfig` severity=error | 10 (default) |
 
-BE: add `Microsoft.CodeAnalysis.NetAnalyzers` package ref in
-`Directory.Build.props` so all prod projects get it. Set
-`EnforceCodeStyleInBuild=true` in `Directory.Build.props`.
+BE: add `SonarAnalyzer.CSharp` + `Microsoft.CodeAnalysis.NetAnalyzers` in
+`Directory.Build.props`. Set `EnforceCodeStyleInBuild=true`. CA1502 disabled
+(hardcoded threshold 25); S1541 used instead (default threshold 10).
 
 ### 2. Duplication
 
@@ -63,12 +63,11 @@ Install `jscpd` as a **root-level** devDependency (repo root `package.json`).
 `/p:Threshold=80` can be finicky (known issues with multi-project solutions,
 threshold enforcement across projects). Implementation plan:
 
-1. Try `coverlet.msbuild` in each test csproj with
-   `/p:CollectCoverage=true /p:Threshold=80 /p:ThresholdType=line /p:ThresholdStat=total`
-2. If per-project thresholds misbehave, fall back to `coverlet.collector` +
-   `reportgenerator` + a script that parses the merged report and fails on <80%
-3. Spike early — verify threshold enforcement actually fails before wiring
-   into CI
+**Implemented:** `coverlet.collector` + `dotnet-reportgenerator-globaltool`
+merges all test project reports → `scripts/check-backend-coverage.sh` parses
+aggregate line coverage and fails on <80%. `coverlet.msbuild` per-project
+threshold didn't work (each project sees all referenced assemblies, skewing
+results).
 
 ### 5. Dependency Vulnerability Scanning
 
