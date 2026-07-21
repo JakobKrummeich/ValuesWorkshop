@@ -113,9 +113,9 @@ from the first commit.
 **Dependencies:** None. **Size:** L (scaffold exception — generated code)
 
 ### Task 2: Design tokens + stylelint gate
-**Description:** One `tokens.css` with fresh palette, typography hierarchy,
-multiple-of-4 spacing scale. stylelint config rejects raw hex/px outside the
-tokens file.
+**Description:** Two-layer CSS token system (`tokens.css` base primitives +
+per-screen semantic token files). stylelint config rejects raw hex/px and
+`--base-*` references outside token files. See `tasks/specs/05-design-tokens.md`.
 **Acceptance criteria:**
 - [ ] All FE styles reference tokens only
 - [ ] Deliberate raw `#fff` in a component file fails `pnpm --dir frontend lint`

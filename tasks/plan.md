@@ -83,7 +83,8 @@ Standing decisions (from SPEC.md, restated for build-time reference):
   = reload session state, clients reconnect and resync.
 - Votes stored without voter identity (only "has voted" flags keyed by
   participant, tallies keyed by value).
-- Design tokens in one CSS file; stylelint forbids raw hex/px elsewhere.
+- Design tokens: two-layer CSS custom properties + stylelint gate (see
+  SPEC.md § Design System).
 
 ## Dependency Graph
 
@@ -150,8 +151,8 @@ Technical design docs deferred just-in-time: `architecture.md` → Task 4,
       DI context), `backend/` (prod solution Domain/Application/Adapters/
       Host + one test project per prod project in separate test solution
       filter), `config/` (values catalog + quiz JSON stubs), `devtools/oidc/`.
-- [ ] 2. Design tokens CSS file + stylelint enforcement (raw hex/px outside
-      tokens file fails lint).
+- [ ] 2. Design token files + stylelint enforcement (raw hex/px outside
+      token files fails lint).
 - [ ] 3. `docker compose up`: FE + BE + dev OIDC + seeded demo session;
       agent-verifiable smoke-start gate (`scripts/smoke.sh`: one command
       starts FE + BE, health-checked, exit 0/1).
