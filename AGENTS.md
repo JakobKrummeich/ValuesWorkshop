@@ -8,7 +8,14 @@ at the old repo).
 
 NEVER commit secrets. NEVER commit PII. NEVER weaken quality guardrails.
 NEVER disable quality guardrails. RARELY use code comments.
-ALWAYS use PascalCase for variable names.
+Naming: language defaults — FE/TS camelCase (hooks must be `use`-camelCase);
+C# PascalCase for types/properties/methods, camelCase for locals/params.
+C#: records by default, wherever possible — value objects, DTOs, messages,
+commands/events always records; a mutable class needs written justification.
+Mind record collection-property equality (reference-based; use immutable
+collections or custom equality where equality matters). Aggregate style
+(immutable record transitions vs. class) is decided in `design/architecture.md`
+(Task 4).
 
 - When making technical decisions, do not give much weight to development cost.
   Instead, prefer quality, simplicity, robustness, scalability, and long term maintainability.

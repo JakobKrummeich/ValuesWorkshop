@@ -140,7 +140,10 @@ run `scripts/smoke.sh` twice (healthy → 0; with sabotaged start → 1).
 
 ### Task 4: Architecture tests
 **Description:** First write `design/architecture.md` (hexagonal map FE+BE:
-named ports, adapters, dependency directions, per-screen DI contexts), then
+named ports, adapters, dependency directions, per-screen DI contexts,
+and the C# records-by-default decision: aggregate style — immutable record
+transitions vs. mutable class — chosen and justified here, per AGENTS.md
+hard rule), then
 derive rules 1:1. BE: ArchUnitNET rules in xUnit — Domain depends on
 nothing, Application only on Domain, Adapters only on Application/Domain,
 no adapter→adapter references across concerns; custom class-size rule —
