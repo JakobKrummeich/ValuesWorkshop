@@ -4,6 +4,11 @@ Key files: `SPEC.md` (product spec) · `tasks/plan.md` (macro plan, locked
 decisions) · `tasks/todo.md` (ordered backlog) · `CLEANROOM.md` (never look
 at the old repo).
 
+## Hard rules
+
+NEVER commit secrets. NEVER commit PII. NEVER weaken quality guardrails.
+NEVER disable quality guardrails. RARELY use code comments.
+
 ## Per-task skill chain (in this order)
 
 1. **spec-driven-development** → write `tasks/specs/NN-<name>.md` (mini-spec;
