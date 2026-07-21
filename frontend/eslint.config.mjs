@@ -7,7 +7,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
-      complexity: ["error", 10],
+      complexity: ["error", 7],
     },
   },
   {

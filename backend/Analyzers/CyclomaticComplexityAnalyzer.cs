@@ -10,7 +10,7 @@ namespace ValuesWorkshop.Analyzers;
 public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "VW1001";
-    private const int Threshold = 10;
+    private const int Threshold = 7;
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,

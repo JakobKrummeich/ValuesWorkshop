@@ -19,12 +19,16 @@ duplication, formatting, coverage, and dependency vulnerability scanning.
 
 | Side | Tool | Config | Threshold |
 |------|------|--------|-----------|
-| FE | eslint `complexity` rule | `eslint.config.mjs` | error at 10 |
-| BE | VW1001 (custom Roslyn analyzer) | `ValuesWorkshop.Analyzers` | 10 |
+| FE | eslint `complexity` rule | `eslint.config.mjs` | error at 7 |
+| BE | VW1001 (custom Roslyn analyzer) | `ValuesWorkshop.Analyzers` | 7 |
+
+Threshold 7 per Seemann ("Code That Fits in Your Head": working-memory
+limit) and agent-maintainability skill. Applies to tests too — DAMP makes
+tests longer, not branchier.
 
 BE: custom Roslyn analyzer `ValuesWorkshop.Analyzers` (netstandard2.0,
 wired as ProjectReference analyzer in `Directory.Build.props`). VW1001
-enforces cyclomatic complexity ≤ 10. CA1502 disabled (.editorconfig).
+enforces cyclomatic complexity ≤ 7. CA1502 disabled (.editorconfig).
 SonarAnalyzer.CSharp removed (non-free license).
 
 ### 1b. File Length
