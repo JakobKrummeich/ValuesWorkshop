@@ -1,13 +1,3 @@
 [*.cs]
-# Disable CA1502 (non-configurable threshold of 25) in favor of S1541
+# CA1502 disabled — custom analyzer VW1001 enforces complexity at threshold 10
 dotnet_diagnostic.CA1502.severity = none
-
-# SonarAnalyzer S1541: cyclomatic complexity (default threshold = 10)
-dotnet_diagnostic.S1541.severity = error
-
-# S2094: allow empty static marker classes (used for arch-test assembly refs)
-dotnet_diagnostic.S2094.severity = none
-
-# S1144: allow unused private setters in skeleton domain types
-# (will be used when domain logic is implemented in later tasks)
-dotnet_diagnostic.S1144.severity = suggestion
