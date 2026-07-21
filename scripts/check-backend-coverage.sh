@@ -15,7 +15,7 @@ dotnet reportgenerator \
   -targetdir:"$RESULTS_DIR/merged" \
   -reporttypes:TextSummary
 
-LINE_COV=$(grep 'Line coverage:' "$RESULTS_DIR/merged/Summary.txt" | grep -oP '[\d.]+')
+LINE_COV=$(grep 'Line coverage:' "$RESULTS_DIR/merged/Summary.txt" | grep -oE '[0-9.]+')
 
 echo "Line coverage: ${LINE_COV}% (threshold: ${THRESHOLD}%)"
 

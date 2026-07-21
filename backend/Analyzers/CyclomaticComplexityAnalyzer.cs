@@ -67,7 +67,6 @@ public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
             switch (node.Kind())
             {
                 case SyntaxKind.IfStatement:
-                case SyntaxKind.ElseClause:
                 case SyntaxKind.CaseSwitchLabel:
                 case SyntaxKind.CasePatternSwitchLabel:
                 case SyntaxKind.ForStatement:
