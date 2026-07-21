@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "jscpd": "jscpd"
+  },
+  "devDependencies": {
+    "jscpd": "^4.1.0"
+  }
+}
