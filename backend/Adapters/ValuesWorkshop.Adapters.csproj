@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\ValuesWorkshop.Application.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+{
+  "animals": [
+    { "id": "otter", "translation": { "de": "Otter", "en": "Otter" } },
+    { "id": "fuchs", "translation": { "de": "Fuchs", "en": "Fox" } },
+    { "id": "eule", "translation": { "de": "Eule", "en": "Owl" } },
+    { "id": "igel", "translation": { "de": "Igel", "en": "Hedgehog" } },
+    { "id": "dachs", "translation": { "de": "Dachs", "en": "Badger" } },
+    { "id": "luchs", "translation": { "de": "Luchs", "en": "Lynx" } },
+    { "id": "biber", "translation": { "de": "Biber", "en": "Beaver" } },
+    { "id": "marder", "translation": { "de": "Marder", "en": "Marten" } }
+  ]
+}

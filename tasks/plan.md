@@ -39,6 +39,8 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    `complexity` rule (FE), CA1502 as error with `.editorconfig` threshold
    (BE). Duplication: jscpd over FE+BE sources with hard threshold.
    Formatting: Prettier `--check` (TS/CSS/MD), CSharpier `--check` (C#).
+   Unit coverage: ≥ 80 % lines as hard gate, enforced per side — FE Jest
+   `coverageThreshold`, BE coverlet line threshold.
    No heuristic/LLM gates in CI.
 5. **Domain modeling before code (DDD).** Phase 0 produces the domain core
    only — ubiquitous language, domain events, commands, aggregates,
@@ -48,13 +50,17 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    `persistence.md` (Task 7), `protocol.md` (Task 9), `cpsat-model.md`
    (Task 17). No implementation code until the user approves Checkpoint 0.
    Design docs are living: deviations update the doc in the same PR.
-6. **Frontend screen groups with context DI.** `app/` splits into
+6. **Frontend screen groups with dependency contexts.** `app/` splits into
    `facilitator/`, `participant/`, `presenter/`; each screen group wraps its
-   tree in its own React context that injects port implementations. Screens
-   never import each other or concrete adapters (arch-tested).
+   tree in its own `<Role>DependencyContext` whose dependency graph is built
+   once on screen-group entry. Session binding happens there: adapters are
+   constructed already bound to the session, so no sessionId is threaded
+   through domain, UI, or port signatures. Screens never import each other
+   or concrete adapters (arch-tested).
 7. **Backend test layout.** One xUnit test project per prod project
    (Domain/Application/Adapters/Host); prod solution contains prod projects
-   only, tests live in a separate solution filter.
+   only, tests live in a separate solution filter. Assertions use
+   FluentAssertions (free v7 line), not bare xUnit `Assert.*` (from Task 4).
 8. **E2e grows with the product.** The multi-client Playwright e2e is
    extended immediately after each workshop phase is implemented (regression
    protection from the start) — not written at the end. Phase F only
@@ -63,8 +69,9 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    pre-commit hook apply Prettier/CSharpier locally; CI runs `--check` and
    fails loudly — CI never rewrites commits.
 6. **CI/CD.** GitHub Actions workflow on PRs to `main` runs every
-   deterministic gate (build, unit tests, lint incl. stylelint, arch tests,
-   complexity, duplication, Playwright e2e). Branch protection on `main`
+   deterministic gate (build, unit tests incl. ≥ 80 % line coverage
+   thresholds, lint incl. stylelint, arch tests, complexity, duplication,
+   Playwright e2e). Branch protection on `main`
    requires the pipeline check — no green, no merge. no-mistakes remains the
    local pre-PR gate.
 

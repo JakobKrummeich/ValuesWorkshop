@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en" data-theme="luxury">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ValuesWorkshop — Task 1 Mini-Spec Review (Scaffold Monorepo)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, h5, h6, li, dd, blockquote, figcaption, td, th, .badge, .label) {
+    overflow-wrap: anywhere;
+  }
+  table.vw td:first-child, table.vw th:first-child { white-space: nowrap; }
+  pre.tree { line-height: 1.35; }
+</style>
+</head>
+<body class="bg-base-100 text-base-content">
+<main class="mx-auto max-w-5xl px-4 py-8 flex flex-col gap-6">
+
+<header>
+  <h1 class="text-3xl font-bold">Task 1 — Scaffold Monorepo <span class="badge badge-primary badge-soft align-middle">mini-spec approval gate</span></h1>
+  <div role="alert" class="alert alert-info alert-soft mt-3">
+    <span>First code task after Checkpoint&nbsp;0. This reviews the mini-spec
+    <code>tasks/specs/04-scaffold.md</code> — <b>no code exists yet</b>. On approval:
+    feature branch → TDD/incremental implementation → review/simplify → no-mistakes PR.
+    Size&nbsp;L (scaffold exception: mostly generated code).</span>
+  </div>
+</header>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Objective</h2>
+    <p>Runnable, gate-ready skeletons for all four top-level parts — <code>frontend/</code>,
+    <code>backend/</code>, <code>config/</code>, <code>devtools/oidc/</code> — with the hexagonal
+    layout and the anti-god-class Domain structure locked in from the first commit.
+    <b>No feature logic.</b> Every later task builds inside this shape.</p>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Resulting repository shape</h2>
+<pre class="tree bg-base-300 rounded-lg p-4 text-sm overflow-x-auto"><code>frontend/                     Next.js · TS strict · Jest · pnpm
+  src/
+    domain/                   pure state logic (stub + 1 test)  ┐ hexagon
+    ports/                    interfaces (stub port)            ┘ core
+    adapters/                 stub adapter implementing the port
+    app/                      Next.js App Router = composition root
+      facilitator/phases/     ┐ each screen group: own React DI context,
+      participant/phases/     ├ never imports siblings or concrete adapters;
+      presenter/phases/       ┘ phases/ = one folder per workshop phase
+                                (placeholder now, filled by Tasks 12+)
+
+backend/
+  ValuesWorkshop.sln          prod-only: Domain, Application, Adapters, Host
+  ValuesWorkshop.Tests.slnf   + Domain.Tests, Application.Tests,
+                                Adapters.Tests, Host.Tests   (xUnit, ≥1 test each)
+  src/Domain/                 Session root (guards + routes ONLY) +
+                              Roster · WorkshopState · QuizProgress ·
+                              SelectionRound · FormationRecord ·
+                              PresentationWalk · VotingRounds · Group
+  src/Application/ → Domain    Ports/{Facilitator,Participant,Presenter}/
+                               (driving, per role) + Ports/Driven/
+                               (persistence, solver, clock … role-agnostic)
+  src/Adapters/    → Application, Domain
+  src/Host/        → Adapters, Application, Domain
+
+config/                       de+en fields throughout
+  values.json                 few samples (full ~50 catalog → Task 15)
+  quiz.json                   1 sample question (full set → Task 13)
+  animals.json                group names
+
+devtools/oidc/                local oidc-provider package
+                              `node devtools/oidc` serves discovery doc</code></pre>
+    <p class="text-sm opacity-80">Reference direction is the whole point:
+    Domain ← Application ← Adapters ← Host. Nullable + warnings-as-errors on
+    every C# project. Arch <i>rules</i> that police this arrive in Task 4;
+    the structure they police is laid here.</p>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Key design points</h2>
+    <table class="table table-sm vw">
+      <thead><tr><th>Point</th><th>What / why</th></tr></thead>
+      <tbody>
+        <tr><td>Anti-god-class Domain</td>
+          <td><code>Session</code> root guards + routes only; each building block from
+          <code>design/domain-model.md</code> is its own type owning one state slice.
+          Skeleton bodies only (types + minimal state), no phase rules yet.
+          <b>Deterministic class-size gate (Task 4):</b> custom ArchUnitNET rule
+          “no class &gt; 12 methods” fails <code>dotnet test</code>; eslint
+          <code>max-lines</code>/<code>max-statements</code> FE-side. Threshold Ask-first.</td></tr>
+        <tr><td>Prod sln vs Tests.slnf</td>
+          <td><code>dotnet build backend/ValuesWorkshop.sln</code> builds zero test projects;
+          <code>dotnet test backend/ValuesWorkshop.Tests.slnf</code> runs all four.
+          Keeps prod build fast + deployable artifact clean.</td></tr>
+        <tr><td>Per-screen DI contexts</td>
+          <td>Each of facilitator/participant/presenter wraps its tree in its own React
+          context injecting port implementations. Concrete stub port + adapter + context
+          per group so the pattern is code, not a comment.</td></tr>
+        <tr><td>i18n from stub one</td>
+          <td>Every config JSON field that reaches a screen carries <code>de</code> +
+          <code>en</code>: value names, questions, answers, learning texts, animal names.</td></tr>
+        <tr><td>OIDC devtool</td>
+          <td><code>oidc-provider</code> package serving
+          <code>/.well-known/openid-configuration</code>; client/user config deferred to Task 8.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Success criteria (all must pass before PR)</h2>
+    <ul class="list-disc pl-5 flex flex-col gap-1">
+      <li><code>pnpm --dir frontend dev|test|lint</code> all run green (Jest: ≥1 real test per layer stub)</li>
+      <li><code>dotnet build backend/ValuesWorkshop.sln</code> green, no test projects built</li>
+      <li><code>dotnet test backend/ValuesWorkshop.Tests.slnf</code> runs all 4 test projects green</li>
+      <li>Project references encode dependency direction (no Domain→Adapters edge exists)</li>
+      <li>Each FE screen group has its own DI context; no cross-screen imports</li>
+      <li><code>curl</code> on the oidc discovery endpoint returns valid JSON</li>
+    </ul>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Slices &amp; boundaries</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <h3 class="font-semibold mb-1">Implementation slices</h3>
+        <ol class="list-decimal pl-5 flex flex-col gap-1">
+          <li><b>backend/</b> — prod projects + sln + slnf + test projects, typed Domain building blocks, green build+test</li>
+          <li><b>frontend/</b> — Next.js init, layer folders, screen groups + DI contexts, green dev/test/lint</li>
+          <li><b>config/ + devtools/oidc/</b> — stubs, discovery endpoint, full acceptance run</li>
+        </ol>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-1">Boundaries</h3>
+        <ul class="pl-1 flex flex-col gap-1">
+          <li><span class="badge badge-success badge-soft">Always</span> pnpm only · TS strict · nullable + warnings-as-errors · test-first where logic exists</li>
+          <li><span class="badge badge-warning badge-soft">Ask first</span> any runtime dep beyond Next.js/Jest/eslint, ASP.NET Core/xUnit, oidc-provider · layout deviations</li>
+          <li><span class="badge badge-error badge-soft">Never</span> feature/phase logic · old repo (CLEANROOM.md) · Session root containing building-block rules</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="card bg-base-200 shadow">
+  <div class="card-body">
+    <h2 class="card-title">Approval</h2>
+    <p>Round-1 feedback folded in (all user-approved in chat): ports = core (kept as
+    separate FE folder for lint simplicity) · <code>app/&lt;role&gt;/phases/</code> convention ·
+    idiomatic names + mapping table instead of forced symmetry · class-size guardrail
+    (ArchUnitNET ≤12 methods, Task 4) · BE driving ports split per role.</p>
+    <p>Reply in the Lavish session:</p>
+    <ul class="list-disc pl-5">
+      <li><b>“approved”</b> → feature branch + slice 1 starts</li>
+      <li>or name changes to the spec (updated + re-presented)</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+</body>
+</html>

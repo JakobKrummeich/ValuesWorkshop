@@ -8,8 +8,9 @@ feature branch → `git push no-mistakes <branch>` → PR → protected `main`
 (CI pipeline must be green to merge).
 
 Definition of Done (every task): tests pass, lint clean, arch tests green,
-complexity + duplication gates green, builds green, SPEC.md updated if a
-decision changed, no secrets committed.
+complexity + duplication gates green, unit line coverage ≥ 80 % (FE and BE
+each), builds green, SPEC.md updated if a decision changed, no secrets
+committed.
 
 ---
 
@@ -139,13 +140,33 @@ run `scripts/smoke.sh` twice (healthy → 0; with sabotaged start → 1).
 
 ### Task 4: Architecture tests
 **Description:** First write `design/architecture.md` (hexagonal map FE+BE:
-named ports, adapters, dependency directions, per-screen DI contexts), then
+named ports, adapters, dependency directions, per-screen DI contexts,
+and the C# records-by-default decision: aggregate style — immutable record
+transitions vs. mutable class — chosen and justified here, per AGENTS.md
+hard rule), then
 derive rules 1:1. BE: ArchUnitNET rules in xUnit — Domain depends on
 nothing, Application only on Domain, Adapters only on Application/Domain,
-no adapter→adapter references across concerns. FE: dependency-cruiser —
+no adapter→adapter references across concerns; custom class-size rule —
+no class > 12 methods (anti-god-class, user-approved via Task 1 Lavish
+review; threshold changes Ask-first). FE: dependency-cruiser —
 `domain/` imports nothing app-internal, `ports/` only domain, `adapters/`
 only ports/domain, `app/*` screen groups import via ports/contexts only and
-never each other; no circular deps anywhere.
+never each other; no circular deps anywhere; eslint `max-lines`/
+`max-statements` as FE class-size counterpart.
+BE assertion style (user feedback on Task 1 PR): adopt FluentAssertions
+(`result.Should().BeNull()` style) — add package, convert all existing
+`Assert.*` xUnit tests, convention for every future BE test. Pin a
+free-license version line (v7.x Apache-2.0; v8+ needs paid commercial
+license — version bump is Ask-first).
+**Acceptance criteria (added from Task 1 review):**
+- [ ] Deliberate 13-method class fails `dotnet test backend` (then revert)
+- [ ] No `Assert.*` calls remain in BE test projects; FluentAssertions
+      used throughout
+- [ ] Task-1 skeleton `sealed class` building blocks (Session, Roster,
+      WorkshopState, QuizProgress, SelectionRound, FormationRecord,
+      PresentationWalk, VotingRounds, Group) converted to the decided
+      aggregate style; any remaining `class` has written justification in
+      `design/architecture.md`
 **Acceptance criteria:**
 - [ ] Deliberate Domain→Adapters reference fails `dotnet test backend`
 - [ ] Deliberate `domain/`→`adapters/` import fails `pnpm --dir frontend lint`
@@ -161,19 +182,25 @@ BE: CA1502 severity=error, threshold via `.editorconfig`
 Formatting: Prettier + CSharpier — local workflow *applies* formatting
 (write-mode scripts + pre-commit hook), CI runs `--check` only (CI must fail
 loudly, never silently rewrite commits).
-Initial thresholds: complexity 10 (both sides), jscpd ≤ 2 % / min-tokens 50.
+Coverage: ≥ 80 % line unit coverage as hard gate on each side — FE: Jest
+`coverageThreshold` (lines: 80) in test command; BE: coverlet
+(`coverlet.msbuild`, `/p:Threshold=80 /p:ThresholdType=line`) in test command.
+Initial thresholds: complexity 10 (both sides), jscpd ≤ 2 % / min-tokens 50,
+coverage 80 % lines.
 **Acceptance criteria:**
 - [ ] Deliberately complex function fails FE lint and BE build respectively
 - [ ] Deliberate copy-pasted block fails jscpd gate
 - [ ] Deliberately misformatted TS and C# file each fail lint command
+- [ ] Deliberately uncovered code below 80 % lines fails FE and BE test
+      commands respectively
 - [ ] Thresholds documented in this file + config; changes are Ask-first
 **Verification:** green run + one deliberate violation per gate (then revert).
 **Dependencies:** 1. **Size:** S
 
 ### Task 6: CI/CD pipeline + branch protection + no-mistakes wiring
 **Description:** GitHub Actions workflow triggered on PRs to `main`: FE+BE
-build, unit tests, eslint+stylelint, arch tests, CA1502 (via build), jscpd,
-Playwright e2e (compose-based). Branch protection on `main`: required status
+build, unit tests (incl. ≥ 80 % line coverage thresholds), eslint+stylelint,
+arch tests, CA1502 (via build), jscpd, Playwright e2e (compose-based). Branch protection on `main`: required status
 check = pipeline, no direct pushes. Set no-mistakes `commands.test` /
 `commands.lint` to the same commands CI runs.
 **Acceptance criteria:**
@@ -186,8 +213,8 @@ check = pipeline, no direct pushes. Set no-mistakes `commands.test` /
 
 ### Checkpoint A
 - [ ] compose up serves all apps; every gate proven by deliberate violation
-      (test, lint, arch, complexity, duplication); red PR blocked, green PR
-      merges; PR merged to main
+      (test, lint, arch, complexity, duplication, coverage); red PR blocked,
+      green PR merges; PR merged to main
 
 ---
 
@@ -223,6 +250,16 @@ payload schemas, per-role snapshots — no anonymity leaks by schema —, error
 model, sequence diagrams for join/vote/reconnect/restart/tiebreak; the FE/BE
 contract). Then implement: hub (adapter) with session groups; client intent
 envelope validated server-side; full-state snapshot on connect/reconnect.
+FE: SignalR client adapter constructed session-bound inside the screen-group
+dependency context (SPEC “Session binding at the edge”) — sessionId must not
+leak into domain, UI props, or port signatures.
+Port layout (locked): ports sliced per concern per role (participant ≈
+join/quiz/selection/groupWork/voting; facilitator ≈ lifecycle/quiz-control/
+formation/walk-control/tiebreak; presenter ≈ read-only stream), all slices
+implemented by ONE session-bound adapter per role, exposed via the role's
+dependency context; screens depend only on their slice. Exact slice list
+derives from the `design/protocol.md` intent catalog. This replaces the
+Task-1 placeholder `<Role>Gateway` interfaces (naming decided then).
 **Acceptance criteria:**
 - [ ] `design/protocol.md` covers every 0.2 transition; per-role snapshots
       specified
