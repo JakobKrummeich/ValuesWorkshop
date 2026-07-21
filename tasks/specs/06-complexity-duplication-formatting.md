@@ -27,6 +27,19 @@ wired as ProjectReference analyzer in `Directory.Build.props`). VW1001
 enforces cyclomatic complexity ≤ 10. CA1502 disabled (.editorconfig).
 SonarAnalyzer.CSharp removed (non-free license).
 
+### 1b. File Length
+
+| Side | Tool | Prod max | Test max |
+|------|------|----------|----------|
+| FE | eslint `max-lines` (`src/**` only, skips blanks/comments) | 300 | 600 (`*.test.*`) |
+| BE | VW1002 (custom Roslyn analyzer) | 300 | 600 (`*.Tests` assemblies) |
+
+Rationale: Seemann limits are method-level (≤24 lines, complexity ≤7);
+file budget sized for agent context loads. Tests get 2× budget — DAMP
+over DRY (self-contained tests beat shared helpers). jscpd already
+excludes tests for the same reason. Config files exempt (FE rule scoped
+to `src/**`).
+
 ### 2. Duplication
 
 | Tool | Scope | Threshold | Min Tokens |

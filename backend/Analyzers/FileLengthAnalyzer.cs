@@ -8,7 +8,8 @@ namespace ValuesWorkshop.Analyzers;
 public sealed class FileLengthAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "VW1002";
-    private const int MaxLines = 200;
+    private const int MaxLines = 300;
+    private const int MaxLinesTests = 600;
 
     private static readonly DiagnosticDescriptor Rule = new(
         DiagnosticId,
@@ -26,15 +27,26 @@ public sealed class FileLengthAnalyzer : DiagnosticAnalyzer
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterSyntaxTreeAction(AnalyzeTree);
+        context.RegisterCompilationStartAction(compilationContext =>
+        {
+            var isTestAssembly =
+                compilationContext.Compilation.AssemblyName?.EndsWith(
+                    ".Tests",
+                    System.StringComparison.Ordinal
+                ) == true;
+            var maxLines = isTestAssembly ? MaxLinesTests : MaxLines;
+            compilationContext.RegisterSyntaxTreeAction(treeContext =>
+                AnalyzeTree(treeContext, maxLines)
+            );
+        });
     }
 
-    private static void AnalyzeTree(SyntaxTreeAnalysisContext context)
+    private static void AnalyzeTree(SyntaxTreeAnalysisContext context, int maxLines)
     {
         var text = context.Tree.GetText();
         var lineCount = text.Lines.Count;
 
-        if (lineCount > MaxLines)
+        if (lineCount > maxLines)
         {
             var fileName = System.IO.Path.GetFileName(context.Tree.FilePath);
             var diagnostic = Diagnostic.Create(
@@ -42,7 +54,7 @@ public sealed class FileLengthAnalyzer : DiagnosticAnalyzer
                 Location.Create(context.Tree, text.Lines[0].Span),
                 fileName,
                 lineCount,
-                MaxLines
+                maxLines
             );
             context.ReportDiagnostic(diagnostic);
         }

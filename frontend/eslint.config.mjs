@@ -15,7 +15,16 @@ const eslintConfig = defineConfig([
     rules: {
       "max-lines": [
         "error",
-        { max: 200, skipBlankLines: true, skipComments: true },
+        { max: 300, skipBlankLines: true, skipComments: true },
+      ],
+    },
+  },
+  {
+    files: ["src/**/*.test.{ts,tsx}"],
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 600, skipBlankLines: true, skipComments: true },
       ],
     },
   },
