@@ -20,11 +20,12 @@ duplication, formatting, coverage, and dependency vulnerability scanning.
 | Side | Tool | Config | Threshold |
 |------|------|--------|-----------|
 | FE | eslint `complexity` rule | `eslint.config.mjs` | error at 10 |
-| BE | S1541 (SonarAnalyzer.CSharp) | `.editorconfig` severity=error | 10 (default) |
+| BE | VW1001 (custom Roslyn analyzer) | `ValuesWorkshop.Analyzers` | 10 |
 
-BE: add `SonarAnalyzer.CSharp` + `Microsoft.CodeAnalysis.NetAnalyzers` in
-`Directory.Build.props`. Set `EnforceCodeStyleInBuild=true`. CA1502 disabled
-(hardcoded threshold 25); S1541 used instead (default threshold 10).
+BE: custom Roslyn analyzer `ValuesWorkshop.Analyzers` (netstandard2.0,
+wired as ProjectReference analyzer in `Directory.Build.props`). VW1001
+enforces cyclomatic complexity ≤ 10. CA1502 disabled (.editorconfig).
+SonarAnalyzer.CSharp removed (non-free license).
 
 ### 2. Duplication
 
