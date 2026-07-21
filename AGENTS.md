@@ -8,6 +8,7 @@ at the old repo).
 
 NEVER commit secrets. NEVER commit PII. NEVER weaken quality guardrails.
 NEVER disable quality guardrails. RARELY use code comments.
+ALWAYS use PascalCase for variable names.
 
 - When making technical decisions, do not give much weight to development cost.
   Instead, prefer quality, simplicity, robustness, scalability, and long term maintainability.
