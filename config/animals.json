@@ -1,12 +1,12 @@
 {
   "animals": [
-    { "id": "otter", "name": { "de": "Otter", "en": "Otter" } },
-    { "id": "fuchs", "name": { "de": "Fuchs", "en": "Fox" } },
-    { "id": "eule", "name": { "de": "Eule", "en": "Owl" } },
-    { "id": "igel", "name": { "de": "Igel", "en": "Hedgehog" } },
-    { "id": "dachs", "name": { "de": "Dachs", "en": "Badger" } },
-    { "id": "luchs", "name": { "de": "Luchs", "en": "Lynx" } },
-    { "id": "biber", "name": { "de": "Biber", "en": "Beaver" } },
-    { "id": "marder", "name": { "de": "Marder", "en": "Marten" } }
+    { "id": "otter", "translation": { "de": "Otter", "en": "Otter" } },
+    { "id": "fuchs", "translation": { "de": "Fuchs", "en": "Fox" } },
+    { "id": "eule", "translation": { "de": "Eule", "en": "Owl" } },
+    { "id": "igel", "translation": { "de": "Igel", "en": "Hedgehog" } },
+    { "id": "dachs", "translation": { "de": "Dachs", "en": "Badger" } },
+    { "id": "luchs", "translation": { "de": "Luchs", "en": "Lynx" } },
+    { "id": "biber", "translation": { "de": "Biber", "en": "Beaver" } },
+    { "id": "marder", "translation": { "de": "Marder", "en": "Marten" } }
   ]
 }

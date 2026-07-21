@@ -1,9 +1,9 @@
 {
   "values": [
-    { "id": "vertrauen", "name": { "de": "Vertrauen", "en": "Trust" } },
-    { "id": "respekt", "name": { "de": "Respekt", "en": "Respect" } },
-    { "id": "verantwortung", "name": { "de": "Verantwortung", "en": "Responsibility" } },
-    { "id": "offenheit", "name": { "de": "Offenheit", "en": "Openness" } },
-    { "id": "mut", "name": { "de": "Mut", "en": "Courage" } }
+    { "id": "vertrauen", "translation": { "de": "Vertrauen", "en": "Trust" } },
+    { "id": "respekt", "translation": { "de": "Respekt", "en": "Respect" } },
+    { "id": "verantwortung", "translation": { "de": "Verantwortung", "en": "Responsibility" } },
+    { "id": "offenheit", "translation": { "de": "Offenheit", "en": "Openness" } },
+    { "id": "mut", "translation": { "de": "Mut", "en": "Courage" } }
   ]
 }
