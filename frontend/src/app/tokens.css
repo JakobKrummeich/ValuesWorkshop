@@ -79,6 +79,16 @@
   --leading-tight: var(--base-leading-tight);
   --leading-normal: var(--base-leading-normal);
 
+  --text-small: var(--base-text-14);
+  --text-body: var(--base-text-16);
+  --text-heading: var(--base-text-20);
+
+  --space-tight: var(--base-space-4);
+  --space-gap: var(--base-space-8);
+  --space-gutter: var(--base-space-16);
+
+  --control-height: 32px;
+
   --radius-sm: var(--base-radius-sm);
   --radius-md: var(--base-radius-md);
   --radius-full: var(--base-radius-full);

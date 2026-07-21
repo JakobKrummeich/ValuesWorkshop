@@ -1,4 +1,8 @@
 .screenFacilitator {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+
   --text-small: var(--base-text-14);
   --text-body: var(--base-text-16);
   --text-heading: var(--base-text-20);

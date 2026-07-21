@@ -1,4 +1,9 @@
 .screenPresenter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
   --text-small: clamp(var(--base-text-20), 2.5vh, var(--base-text-24));
   --text-body: clamp(var(--base-text-24), 3.5vh, var(--base-text-32));
   --text-heading: clamp(var(--base-text-32), 6vh, var(--base-text-40));

@@ -1,7 +1,5 @@
 const semanticValueProps = [
   "/color$/",
-  "fill",
-  "stroke",
   "font-family",
   "font-size",
   "font-weight",
