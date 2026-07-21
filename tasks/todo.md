@@ -150,8 +150,15 @@ review; threshold changes Ask-first). FE: dependency-cruiser —
 only ports/domain, `app/*` screen groups import via ports/contexts only and
 never each other; no circular deps anywhere; eslint `max-lines`/
 `max-statements` as FE class-size counterpart.
+BE assertion style (user feedback on Task 1 PR): adopt FluentAssertions
+(`result.Should().BeNull()` style) — add package, convert all existing
+`Assert.*` xUnit tests, convention for every future BE test. Pin a
+free-license version line (v7.x Apache-2.0; v8+ needs paid commercial
+license — version bump is Ask-first).
 **Acceptance criteria (added from Task 1 review):**
 - [ ] Deliberate 13-method class fails `dotnet test backend` (then revert)
+- [ ] No `Assert.*` calls remain in BE test projects; FluentAssertions
+      used throughout
 **Acceptance criteria:**
 - [ ] Deliberate Domain→Adapters reference fails `dotnet test backend`
 - [ ] Deliberate `domain/`→`adapters/` import fails `pnpm --dir frontend lint`

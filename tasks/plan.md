@@ -56,7 +56,8 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    never import each other or concrete adapters (arch-tested).
 7. **Backend test layout.** One xUnit test project per prod project
    (Domain/Application/Adapters/Host); prod solution contains prod projects
-   only, tests live in a separate solution filter.
+   only, tests live in a separate solution filter. Assertions use
+   FluentAssertions (free v7 line), not bare xUnit `Assert.*` (from Task 4).
 8. **E2e grows with the product.** The multi-client Playwright e2e is
    extended immediately after each workshop phase is implemented (regression
    protection from the start) — not written at the end. Phase F only
