@@ -39,6 +39,8 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    `complexity` rule (FE), CA1502 as error with `.editorconfig` threshold
    (BE). Duplication: jscpd over FE+BE sources with hard threshold.
    Formatting: Prettier `--check` (TS/CSS/MD), CSharpier `--check` (C#).
+   Unit coverage: ≥ 80 % lines as hard gate, enforced per side — FE Jest
+   `coverageThreshold`, BE coverlet line threshold.
    No heuristic/LLM gates in CI.
 5. **Domain modeling before code (DDD).** Phase 0 produces the domain core
    only — ubiquitous language, domain events, commands, aggregates,
@@ -63,8 +65,9 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    pre-commit hook apply Prettier/CSharpier locally; CI runs `--check` and
    fails loudly — CI never rewrites commits.
 6. **CI/CD.** GitHub Actions workflow on PRs to `main` runs every
-   deterministic gate (build, unit tests, lint incl. stylelint, arch tests,
-   complexity, duplication, Playwright e2e). Branch protection on `main`
+   deterministic gate (build, unit tests incl. ≥ 80 % line coverage
+   thresholds, lint incl. stylelint, arch tests, complexity, duplication,
+   Playwright e2e). Branch protection on `main`
    requires the pipeline check — no green, no merge. no-mistakes remains the
    local pre-PR gate.
 

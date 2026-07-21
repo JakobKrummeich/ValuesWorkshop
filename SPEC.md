@@ -37,8 +37,8 @@ verified by a multi-client Playwright e2e test.
 | Styling | Plain CSS with design tokens, token usage enforced by stylelint |
 | i18n | de + en |
 | Architecture | Hexagonal (ports & adapters) in FE and BE, enforced by arch tests: ArchUnitNET (BE), dependency-cruiser (FE) |
-| Quality gates | Cyclomatic complexity: eslint `complexity` (FE), CA1502 as error (BE). Duplication: jscpd threshold over FE+BE. Formatting: Prettier check (TS/CSS), CSharpier check (C#). All deterministic. |
-| CI/CD | GitHub Actions on PRs to `main`: build, unit tests, lint, arch tests, complexity, duplication, e2e. `main` protected — merge only on green pipeline. |
+| Quality gates | Cyclomatic complexity: eslint `complexity` (FE), CA1502 as error (BE). Duplication: jscpd threshold over FE+BE. Formatting: Prettier check (TS/CSS), CSharpier check (C#). Unit coverage: ≥ 80 % lines, FE (Jest `coverageThreshold`) and BE (coverlet threshold) each — hard gate. All deterministic. |
+| CI/CD | GitHub Actions on PRs to `main`: build, unit tests, lint, arch tests, complexity, duplication, coverage (≥ 80 % lines FE+BE), e2e. `main` protected — merge only on green pipeline. |
 | Deploy | Local only: one-command `docker compose up` with seeded demo session. No public deploy. README gets GIF/screenshots of all three screens. |
 
 ## Domain Model
@@ -143,6 +143,9 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
 
 - Unit: phase state machine, voting/tiebreak logic, CP-SAT wrapper (BE);
   components and reducers (FE).
+- Coverage guardrail: ≥ 80 % line unit coverage, enforced separately for FE
+  (Jest `coverageThreshold`) and BE (coverlet line threshold); below-threshold
+  fails test command locally and in CI.
 - E2E: Playwright with multiple browser contexts simulating facilitator,
   presenter, and several participants through all 9 phases, including
   restart-recovery and reconnect. Dev OIDC server makes login testable.
@@ -169,7 +172,8 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
 - [ ] stylelint fails on raw color/spacing values outside tokens file.
 - [ ] de + en locales complete.
 - [ ] PR pipeline runs all deterministic gates (build, tests, lint, format,
-      arch, complexity, duplication, e2e); `main` merge blocked unless green.
+      arch, complexity, duplication, coverage ≥ 80 % lines FE+BE, e2e);
+      `main` merge blocked unless green.
 
 ## Open Questions
 

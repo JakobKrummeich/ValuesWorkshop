@@ -8,8 +8,9 @@ feature branch → `git push no-mistakes <branch>` → PR → protected `main`
 (CI pipeline must be green to merge).
 
 Definition of Done (every task): tests pass, lint clean, arch tests green,
-complexity + duplication gates green, builds green, SPEC.md updated if a
-decision changed, no secrets committed.
+complexity + duplication gates green, unit line coverage ≥ 80 % (FE and BE
+each), builds green, SPEC.md updated if a decision changed, no secrets
+committed.
 
 ---
 
@@ -166,19 +167,25 @@ BE: CA1502 severity=error, threshold via `.editorconfig`
 Formatting: Prettier + CSharpier — local workflow *applies* formatting
 (write-mode scripts + pre-commit hook), CI runs `--check` only (CI must fail
 loudly, never silently rewrite commits).
-Initial thresholds: complexity 10 (both sides), jscpd ≤ 2 % / min-tokens 50.
+Coverage: ≥ 80 % line unit coverage as hard gate on each side — FE: Jest
+`coverageThreshold` (lines: 80) in test command; BE: coverlet
+(`coverlet.msbuild`, `/p:Threshold=80 /p:ThresholdType=line`) in test command.
+Initial thresholds: complexity 10 (both sides), jscpd ≤ 2 % / min-tokens 50,
+coverage 80 % lines.
 **Acceptance criteria:**
 - [ ] Deliberately complex function fails FE lint and BE build respectively
 - [ ] Deliberate copy-pasted block fails jscpd gate
 - [ ] Deliberately misformatted TS and C# file each fail lint command
+- [ ] Deliberately uncovered code below 80 % lines fails FE and BE test
+      commands respectively
 - [ ] Thresholds documented in this file + config; changes are Ask-first
 **Verification:** green run + one deliberate violation per gate (then revert).
 **Dependencies:** 1. **Size:** S
 
 ### Task 6: CI/CD pipeline + branch protection + no-mistakes wiring
 **Description:** GitHub Actions workflow triggered on PRs to `main`: FE+BE
-build, unit tests, eslint+stylelint, arch tests, CA1502 (via build), jscpd,
-Playwright e2e (compose-based). Branch protection on `main`: required status
+build, unit tests (incl. ≥ 80 % line coverage thresholds), eslint+stylelint,
+arch tests, CA1502 (via build), jscpd, Playwright e2e (compose-based). Branch protection on `main`: required status
 check = pipeline, no direct pushes. Set no-mistakes `commands.test` /
 `commands.lint` to the same commands CI runs.
 **Acceptance criteria:**
@@ -191,8 +198,8 @@ check = pipeline, no direct pushes. Set no-mistakes `commands.test` /
 
 ### Checkpoint A
 - [ ] compose up serves all apps; every gate proven by deliberate violation
-      (test, lint, arch, complexity, duplication); red PR blocked, green PR
-      merges; PR merged to main
+      (test, lint, arch, complexity, duplication, coverage); red PR blocked,
+      green PR merges; PR merged to main
 
 ---
 
