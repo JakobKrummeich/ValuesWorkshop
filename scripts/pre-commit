@@ -5,11 +5,11 @@ echo "=== Pre-commit: formatting + duplication check ==="
 
 echo "[1/3] Prettier (FE)..."
 pnpm --dir frontend fmt
-git add frontend/
+git add -u frontend/
 
 echo "[2/3] CSharpier (BE)..."
 dotnet csharpier format backend/
-git add backend/
+git add -u backend/
 
 echo "[3/3] jscpd (duplication)..."
 pnpm -w jscpd
