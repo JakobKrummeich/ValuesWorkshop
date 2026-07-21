@@ -162,6 +162,11 @@ license — version bump is Ask-first).
 - [ ] Deliberate 13-method class fails `dotnet test backend` (then revert)
 - [ ] No `Assert.*` calls remain in BE test projects; FluentAssertions
       used throughout
+- [ ] Task-1 skeleton `sealed class` building blocks (Session, Roster,
+      WorkshopState, QuizProgress, SelectionRound, FormationRecord,
+      PresentationWalk, VotingRounds, Group) converted to the decided
+      aggregate style; any remaining `class` has written justification in
+      `design/architecture.md`
 **Acceptance criteria:**
 - [ ] Deliberate Domain→Adapters reference fails `dotnet test backend`
 - [ ] Deliberate `domain/`→`adapters/` import fails `pnpm --dir frontend lint`
