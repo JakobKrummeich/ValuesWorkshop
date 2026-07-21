@@ -50,10 +50,13 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    `persistence.md` (Task 7), `protocol.md` (Task 9), `cpsat-model.md`
    (Task 17). No implementation code until the user approves Checkpoint 0.
    Design docs are living: deviations update the doc in the same PR.
-6. **Frontend screen groups with context DI.** `app/` splits into
+6. **Frontend screen groups with dependency contexts.** `app/` splits into
    `facilitator/`, `participant/`, `presenter/`; each screen group wraps its
-   tree in its own React context that injects port implementations. Screens
-   never import each other or concrete adapters (arch-tested).
+   tree in its own `<Role>DependencyContext` whose dependency graph is built
+   once on screen-group entry. Session binding happens there: adapters are
+   constructed already bound to the session, so no sessionId is threaded
+   through domain, UI, or port signatures. Screens never import each other
+   or concrete adapters (arch-tested).
 7. **Backend test layout.** One xUnit test project per prod project
    (Domain/Application/Adapters/Host); prod solution contains prod projects
    only, tests live in a separate solution filter. Assertions use

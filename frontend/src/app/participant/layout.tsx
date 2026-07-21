@@ -2,12 +2,12 @@
 
 import type { ReactNode } from "react";
 import { stubParticipantGateway } from "../../adapters/stubParticipantGateway";
-import { ParticipantPortsProvider } from "./ports";
+import { ParticipantDependencyProvider } from "./dependencies";
 
 export default function ParticipantLayout({ children }: { children: ReactNode }) {
   return (
-    <ParticipantPortsProvider gateway={stubParticipantGateway}>
+    <ParticipantDependencyProvider dependencies={{ gateway: stubParticipantGateway }}>
       {children}
-    </ParticipantPortsProvider>
+    </ParticipantDependencyProvider>
   );
 }

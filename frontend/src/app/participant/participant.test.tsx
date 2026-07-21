@@ -3,7 +3,7 @@ import ParticipantLayout from "./layout";
 import ParticipantHome from "./page";
 
 describe("participant screen group", () => {
-  it("receives its gateway through its own DI context", () => {
+  it("receives its gateway through its own dependency context", () => {
     const html = renderToString(
       <ParticipantLayout>
         <ParticipantHome />

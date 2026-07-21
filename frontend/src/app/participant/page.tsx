@@ -1,9 +1,9 @@
 "use client";
 
-import { useParticipantGateway } from "./ports";
+import { useParticipantDependencies } from "./dependencies";
 
 export default function ParticipantHome() {
-  const gateway = useParticipantGateway();
+  const { gateway } = useParticipantDependencies();
   return (
     <main>
       <h1>Participant</h1>

@@ -250,6 +250,9 @@ payload schemas, per-role snapshots — no anonymity leaks by schema —, error
 model, sequence diagrams for join/vote/reconnect/restart/tiebreak; the FE/BE
 contract). Then implement: hub (adapter) with session groups; client intent
 envelope validated server-side; full-state snapshot on connect/reconnect.
+FE: SignalR client adapter constructed session-bound inside the screen-group
+dependency context (SPEC “Session binding at the edge”) — sessionId must not
+leak into domain, UI props, or port signatures.
 **Acceptance criteria:**
 - [ ] `design/protocol.md` covers every 0.2 transition; per-role snapshots
       specified

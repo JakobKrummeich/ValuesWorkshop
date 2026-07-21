@@ -1,9 +1,9 @@
 "use client";
 
-import { useFacilitatorGateway } from "./ports";
+import { useFacilitatorDependencies } from "./dependencies";
 
 export default function FacilitatorHome() {
-  const gateway = useFacilitatorGateway();
+  const { gateway } = useFacilitatorDependencies();
   return (
     <main>
       <h1>Facilitator</h1>

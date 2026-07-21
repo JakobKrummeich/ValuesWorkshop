@@ -1,9 +1,9 @@
 "use client";
 
-import { usePresenterGateway } from "./ports";
+import { usePresenterDependencies } from "./dependencies";
 
 export default function PresenterHome() {
-  const gateway = usePresenterGateway();
+  const { gateway } = usePresenterDependencies();
   return (
     <main>
       <h1>Presenter</h1>

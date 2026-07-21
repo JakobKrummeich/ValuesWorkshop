@@ -136,6 +136,10 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
   dependencies point inward only. Violations fail arch tests.
 - Server-authoritative: clients send intents, server validates against phase
   rules and broadcasts state. Clients never compute authoritative results.
+- Session binding at the edge: the per-screen-group dependency context builds
+  its dependency graph on screen entry with adapters already bound to the
+  session; sessionId never appears in domain logic, UI props, or port
+  signatures (edge-only concern).
 - Zod (or equivalent) validation of every inbound client message.
 - Style examples added at scaffold time; kept minimal until then.
 

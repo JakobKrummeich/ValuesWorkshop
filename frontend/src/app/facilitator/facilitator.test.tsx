@@ -3,7 +3,7 @@ import FacilitatorLayout from "./layout";
 import FacilitatorHome from "./page";
 
 describe("facilitator screen group", () => {
-  it("receives its gateway through its own DI context", () => {
+  it("receives its gateway through its own dependency context", () => {
     const html = renderToString(
       <FacilitatorLayout>
         <FacilitatorHome />

@@ -2,12 +2,12 @@
 
 import type { ReactNode } from "react";
 import { stubFacilitatorGateway } from "../../adapters/stubFacilitatorGateway";
-import { FacilitatorPortsProvider } from "./ports";
+import { FacilitatorDependencyProvider } from "./dependencies";
 
 export default function FacilitatorLayout({ children }: { children: ReactNode }) {
   return (
-    <FacilitatorPortsProvider gateway={stubFacilitatorGateway}>
+    <FacilitatorDependencyProvider dependencies={{ gateway: stubFacilitatorGateway }}>
       {children}
-    </FacilitatorPortsProvider>
+    </FacilitatorDependencyProvider>
   );
 }
