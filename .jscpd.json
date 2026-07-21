@@ -11,7 +11,8 @@
     "**/*.csproj",
     "**/*.sln",
     "**/*.slnf",
-    "**/tokens*.css"
+    "**/tokens*.css",
+    "**/Analyzers/**"
   ],
   "absolute": true
 }
