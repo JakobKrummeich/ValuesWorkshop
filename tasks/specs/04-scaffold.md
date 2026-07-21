@@ -62,14 +62,14 @@ keeps dependency-cruiser rules trivial. Documented again in
   (`/.well-known/openid-configuration`). Client/user config comes Task 8.
 
 ## Success criteria
-- [ ] `pnpm --dir frontend dev|test|lint` all run green
-- [ ] `dotnet build backend/ValuesWorkshop.sln` green with **no** test
+- [x] `pnpm --dir frontend dev|test|lint` all run green
+- [x] `dotnet build backend/ValuesWorkshop.sln` green with **no** test
       projects built; `dotnet test backend/ValuesWorkshop.Tests.slnf` runs
       all 4 test projects green
-- [ ] Project references encode dependency direction (verified by attempting
+- [x] Project references encode dependency direction (verified by attempting
       a Domain→Adapters reference: build must not already have it)
-- [ ] Each FE screen group has its own DI context; no cross-screen imports
-- [ ] `curl` on oidc discovery endpoint returns valid JSON
+- [x] Each FE screen group has its own DI context; no cross-screen imports
+- [x] `curl` on oidc discovery endpoint returns valid JSON
 
 ## Slices
 
@@ -84,9 +84,9 @@ test projects; `ValuesWorkshop.sln` prod-only, `ValuesWorkshop.Tests.slnf`
 adds tests; nullable + warnings-as-errors in `Directory.Build.props`;
 project refs Domain ← Application ← Adapters ← Host only; 1 placeholder
 test per test project.
-- [ ] `dotnet build backend/ValuesWorkshop.sln` green, builds no test project
-- [ ] `dotnet test backend/ValuesWorkshop.Tests.slnf` runs 4 projects green
-- [ ] `Domain.csproj` has zero `ProjectReference`s; direction verified
+- [x] `dotnet build backend/ValuesWorkshop.sln` green, builds no test project
+- [x] `dotnet test backend/ValuesWorkshop.Tests.slnf` runs 4 projects green
+- [x] `Domain.csproj` has zero `ProjectReference`s; direction verified
 
 ### Slice 1b: Typed Domain building blocks (S)
 Session root (guards + routes only) + separate types: `Roster`,
@@ -95,29 +95,29 @@ Session root (guards + routes only) + separate types: `Roster`,
 (types + minimal state), no phase rules. `Application/Ports/` folders:
 `Facilitator/`, `Participant/`, `Presenter/`, `Driven/` (skeleton only).
 TDD applies: each type gets ≥1 real test (construction/initial state).
-- [ ] Every domain-model.md building block exists as its own type
-- [ ] Session contains no building-block rules (spot-check = god-class Never)
-- [ ] Build + tests green
+- [x] Every domain-model.md building block exists as its own type
+- [x] Session contains no building-block rules (spot-check = god-class Never)
+- [x] Build + tests green
 
 ### Slice 2a: Frontend init + layers (S)
 Next.js (pnpm, TS strict), Jest, eslint; `src/{domain,ports,adapters,app}`;
 ≥1 real test per layer stub.
-- [ ] `pnpm --dir frontend dev|test|lint` all green
-- [ ] No npm/yarn lockfile
+- [x] `pnpm --dir frontend dev|test|lint` all green
+- [x] No npm/yarn lockfile
 
 ### Slice 2b: Screen groups + DI contexts (S)
 `app/{facilitator,participant,presenter}/` each with `phases/` placeholder
 folder and own React context doing DI of a stub port + stub adapter
 (pattern concrete per group).
-- [ ] 3 contexts exist, each wires stub port impl; test per group
-- [ ] No cross-screen-group imports; no concrete adapter imports in screens
+- [x] 3 contexts exist, each wires stub port impl; test per group
+- [x] No cross-screen-group imports; no concrete adapter imports in screens
 
 ### Slice 3: config + devtools/oidc + acceptance (S)
 `config/values.json` (sample values), `quiz.json` (1 sample Q),
 `animals.json` — all de+en fields; `devtools/oidc/` serving discovery doc;
 top-level README pointers.
-- [ ] `curl localhost:<port>/.well-known/openid-configuration` valid JSON
-- [ ] Full Success-criteria list above runs green (final acceptance)
+- [x] `curl localhost:<port>/.well-known/openid-configuration` valid JSON
+- [x] Full Success-criteria list above runs green (final acceptance)
 
 ## Boundaries
 - **Always:** pnpm only (no npm/yarn lockfiles) · TS strict · nullable +

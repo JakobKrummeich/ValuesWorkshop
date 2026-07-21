@@ -1,0 +1,41 @@
+{
+  "questions": [
+    {
+      "id": "q1",
+      "question": {
+        "de": "Was bewirken gelebte Unternehmenswerte im Arbeitsalltag?",
+        "en": "What do lived company values achieve in everyday work?"
+      },
+      "answers": [
+        {
+          "id": "q1-correct",
+          "kind": "correct",
+          "text": {
+            "de": "Sie geben Orientierung für Entscheidungen, wenn keine Regel greift.",
+            "en": "They give orientation for decisions when no rule applies."
+          }
+        },
+        {
+          "id": "q1-wrong",
+          "kind": "wrong",
+          "text": {
+            "de": "Sie ersetzen Arbeitsverträge und Prozessbeschreibungen.",
+            "en": "They replace employment contracts and process descriptions."
+          }
+        },
+        {
+          "id": "q1-funny",
+          "kind": "funnyWrong",
+          "text": {
+            "de": "Sie sorgen dafür, dass der Kaffee nie ausgeht.",
+            "en": "They make sure the coffee never runs out."
+          }
+        }
+      ],
+      "learningText": {
+        "de": "Werte wirken dort, wo Regeln enden: Sie helfen Teams, im Alltag konsistent zu entscheiden.",
+        "en": "Values work where rules end: they help teams decide consistently in everyday situations."
+      }
+    }
+  ]
+}
