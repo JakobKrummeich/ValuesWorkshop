@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck",
-    "test": "jest",
+    "test": "jest --coverage",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
     "typecheck": "tsc --noEmit"

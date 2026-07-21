@@ -1,0 +1,233 @@
+{
+  "ValuesWorkshop.Domain.dll": {
+    "/home/dev/ValuesWorkshop/backend/Domain/FormationRecord.cs": {
+      "ValuesWorkshop.Domain.FormationRecord": {
+        "System.Boolean ValuesWorkshop.Domain.FormationRecord::get_IsFormed()": {
+          "Lines": {
+            "7": 2
+          },
+          "Branches": []
+        },
+        "System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.Group> ValuesWorkshop.Domain.FormationRecord::get_Groups()": {
+          "Lines": {
+            "8": 1
+          },
+          "Branches": []
+        },
+        "System.Void ValuesWorkshop.Domain.FormationRecord::.ctor()": {
+          "Lines": {
+            "5": 2
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/Group.cs": {
+      "ValuesWorkshop.Domain.Group": {
+        "System.String ValuesWorkshop.Domain.Group::get_Name()": {
+          "Lines": {
+            "9": 2
+          },
+          "Branches": []
+        },
+        "System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ParticipantId> ValuesWorkshop.Domain.Group::get_Members()": {
+          "Lines": {
+            "10": 2
+          },
+          "Branches": []
+        },
+        "System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ValueId> ValuesWorkshop.Domain.Group::get_AssignedValues()": {
+          "Lines": {
+            "11": 2
+          },
+          "Branches": []
+        },
+        "System.Nullable`1<ValuesWorkshop.Domain.ParticipantId> ValuesWorkshop.Domain.Group::get_Scribe()": {
+          "Lines": {
+            "12": 1
+          },
+          "Branches": []
+        },
+        "System.Boolean ValuesWorkshop.Domain.Group::get_IsSubmitted()": {
+          "Lines": {
+            "13": 1
+          },
+          "Branches": []
+        },
+        "System.Void ValuesWorkshop.Domain.Group::.ctor(System.String,System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ParticipantId>,System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ValueId>)": {
+          "Lines": {
+            "3": 1,
+            "4": 1,
+            "5": 1,
+            "6": 1,
+            "7": 1
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/ParticipantId.cs": {
+      "ValuesWorkshop.Domain.ParticipantId": {
+        "System.Guid ValuesWorkshop.Domain.ParticipantId::get_Value()": {
+          "Lines": {
+            "3": 0
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/PresentationWalk.cs": {
+      "ValuesWorkshop.Domain.PresentationWalk": {
+        "System.String ValuesWorkshop.Domain.PresentationWalk::get_PresentingGroup()": {
+          "Lines": {
+            "5": 1
+          },
+          "Branches": []
+        },
+        "System.Nullable`1<ValuesWorkshop.Domain.ValueId> ValuesWorkshop.Domain.PresentationWalk::get_PresentedValue()": {
+          "Lines": {
+            "6": 2
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs": {
+      "ValuesWorkshop.Domain.QuizProgress": {
+        "System.Nullable`1<System.Int32> ValuesWorkshop.Domain.QuizProgress::get_CurrentQuestion()": {
+          "Lines": {
+            "5": 2
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/Roster.cs": {
+      "ValuesWorkshop.Domain.Roster": {
+        "System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ParticipantId> ValuesWorkshop.Domain.Roster::get_Participants()": {
+          "Lines": {
+            "7": 2
+          },
+          "Branches": []
+        },
+        "System.Void ValuesWorkshop.Domain.Roster::.ctor()": {
+          "Lines": {
+            "5": 2
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/SelectionRound.cs": {
+      "ValuesWorkshop.Domain.SelectionRound": {
+        "System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ParticipantId> ValuesWorkshop.Domain.SelectionRound::get_SubmittedBy()": {
+          "Lines": {
+            "8": 1
+          },
+          "Branches": []
+        },
+        "System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ValueId> ValuesWorkshop.Domain.SelectionRound::get_TopValues()": {
+          "Lines": {
+            "9": 2
+          },
+          "Branches": []
+        },
+        "System.Void ValuesWorkshop.Domain.SelectionRound::.ctor()": {
+          "Lines": {
+            "5": 2,
+            "6": 2
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/Session.cs": {
+      "ValuesWorkshop.Domain.Session": {
+        "ValuesWorkshop.Domain.Roster ValuesWorkshop.Domain.Session::get_Roster()": {
+          "Lines": {
+            "5": 2
+          },
+          "Branches": []
+        },
+        "ValuesWorkshop.Domain.WorkshopState ValuesWorkshop.Domain.Session::get_State()": {
+          "Lines": {
+            "6": 2
+          },
+          "Branches": []
+        },
+        "ValuesWorkshop.Domain.QuizProgress ValuesWorkshop.Domain.Session::get_Quiz()": {
+          "Lines": {
+            "7": 2
+          },
+          "Branches": []
+        },
+        "ValuesWorkshop.Domain.SelectionRound ValuesWorkshop.Domain.Session::get_Selection()": {
+          "Lines": {
+            "8": 2
+          },
+          "Branches": []
+        },
+        "ValuesWorkshop.Domain.FormationRecord ValuesWorkshop.Domain.Session::get_Formation()": {
+          "Lines": {
+            "9": 2
+          },
+          "Branches": []
+        },
+        "ValuesWorkshop.Domain.PresentationWalk ValuesWorkshop.Domain.Session::get_Presentation()": {
+          "Lines": {
+            "10": 2
+          },
+          "Branches": []
+        },
+        "ValuesWorkshop.Domain.VotingRounds ValuesWorkshop.Domain.Session::get_Voting()": {
+          "Lines": {
+            "11": 2
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/ValueId.cs": {
+      "ValuesWorkshop.Domain.ValueId": {
+        "System.String ValuesWorkshop.Domain.ValueId::get_Value()": {
+          "Lines": {
+            "3": 0
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/VotingRounds.cs": {
+      "ValuesWorkshop.Domain.VotingRounds": {
+        "System.Boolean ValuesWorkshop.Domain.VotingRounds::get_RoundOpen()": {
+          "Lines": {
+            "7": 1
+          },
+          "Branches": []
+        },
+        "System.Collections.Generic.IReadOnlyList`1<ValuesWorkshop.Domain.ValueId> ValuesWorkshop.Domain.VotingRounds::get_WinningValues()": {
+          "Lines": {
+            "8": 2
+          },
+          "Branches": []
+        },
+        "System.Void ValuesWorkshop.Domain.VotingRounds::.ctor()": {
+          "Lines": {
+            "5": 2
+          },
+          "Branches": []
+        }
+      }
+    },
+    "/home/dev/ValuesWorkshop/backend/Domain/WorkshopState.cs": {
+      "ValuesWorkshop.Domain.WorkshopState": {
+        "ValuesWorkshop.Domain.Phase ValuesWorkshop.Domain.WorkshopState::get_CurrentPhase()": {
+          "Lines": {
+            "5": 4
+          },
+          "Branches": []
+        }
+      }
+    }
+  }
+}
