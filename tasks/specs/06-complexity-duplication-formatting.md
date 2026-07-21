@@ -62,10 +62,10 @@ Install `jscpd` as a **root-level** devDependency (repo root `package.json`).
 | Side | Tool | Write mode | Check mode |
 |------|------|------------|------------|
 | FE (TS/CSS/JSON/MD) | Prettier | `pnpm fmt` | `pnpm fmt:check` (in `lint` script) |
-| BE (C#) | CSharpier | `dotnet csharpier .` | `dotnet csharpier --check .` (in BE build/lint) |
+| BE (C#) | CSharpier | `dotnet csharpier format .` | `dotnet csharpier check .` (in BE build/lint) |
 
 - `pnpm fmt` applies Prettier. `pnpm lint` includes `prettier --check`.
-- `dotnet csharpier --check backend/` runs in lint/CI.
+- `dotnet csharpier check backend/` runs in lint/CI.
 - **Pre-commit hook** (`scripts/pre-commit`) runs both formatters in write
   mode + jscpd check, stages changes. Documented manual setup — CI is the
   real gate.
@@ -74,7 +74,7 @@ Install `jscpd` as a **root-level** devDependency (repo root `package.json`).
 
 | Side | Tool | Threshold | Enforcement |
 |------|------|-----------|-------------|
-| FE | Jest `coverageThreshold` | 80 % lines | `jest.config.ts` global threshold; `pnpm test` runs with `--coverage` |
+| FE | Jest `coverageThreshold` | 80 % lines | `jest.config.mjs` global threshold; `pnpm test` runs with `--coverage` |
 | BE | coverlet | 80 % lines | See implementation note below |
 
 **BE coverage — implementation care needed.** `coverlet.msbuild` with
@@ -106,14 +106,14 @@ pnpm --dir frontend test       # jest --coverage (80% line gate)
 pnpm --dir frontend fmt        # prettier --write (local only)
 
 # BE
-dotnet build backend/ValuesWorkshop.sln   # CA1502 fires here (EnforceCodeStyleInBuild)
+dotnet build backend/ValuesWorkshop.sln   # VW1001/VW1002 fire here (EnforceCodeStyleInBuild)
 dotnet test backend/ValuesWorkshop.Tests.slnf  # coverlet 80% line gate
-dotnet csharpier --check backend/              # formatting check
+dotnet csharpier check backend/                # formatting check
 
 # Cross-cutting (repo root)
 pnpm -w jscpd                  # duplication check (both sides)
 
-# Pre-commit hook runs: prettier --write, csharpier, jscpd, audit
+# Pre-commit hook runs: prettier --write, csharpier format, jscpd
 ```
 
 ## Files touched
@@ -121,23 +121,23 @@ pnpm -w jscpd                  # duplication check (both sides)
 - `package.json` (repo root) — add jscpd devDep + script
 - `frontend/package.json` — add prettier devDep + fmt/fmt:check/audit scripts
 - `frontend/eslint.config.mjs` — add `complexity` rule
-- `frontend/jest.config.ts` — add `coverageThreshold`
+- `frontend/jest.config.mjs` — add `coverageThreshold`
 - `frontend/.prettierrc` — Prettier config (minimal)
 - `frontend/.prettierignore` — ignore .next, coverage, etc.
 - `.jscpd.json` — repo-root duplication config
 - `backend/Directory.Build.props` — add NetAnalyzers, EnforceCodeStyleInBuild
-- `backend/.editorconfig` — CA1502 severity
+- `backend/.editorconfig` — CA1502 disabled (VW1001 replaces it)
 - `backend/*.Tests/*.csproj` (4 files) — add coverlet package
 - `scripts/pre-commit` — formatting + jscpd hook script
 - Existing `.ts`/`.css`/`.cs` files — reformat to pass Prettier/CSharpier
 
 ## Acceptance Criteria
 
-- [ ] Deliberately complex function (cyclomatic > 10) fails FE eslint
-- [ ] Deliberately complex method fails BE build (CA1502)
+- [ ] Deliberately complex function (cyclomatic > 7) fails FE eslint
+- [ ] Deliberately complex method fails BE build (VW1001)
 - [ ] Deliberate copy-pasted block fails jscpd gate
 - [ ] Deliberately misformatted `.ts` fails `pnpm lint`
-- [ ] Deliberately misformatted `.cs` fails `dotnet csharpier --check`
+- [ ] Deliberately misformatted `.cs` fails `dotnet csharpier check`
 - [ ] Coverage below 80% lines fails FE `pnpm test` and BE `dotnet test`
 - [ ] `pnpm audit` fails on injected high-severity vulnerability (or verified with current deps)
 - [ ] All gates green on current codebase (no false positives)
@@ -146,7 +146,7 @@ pnpm -w jscpd                  # duplication check (both sides)
 ## Implementation Plan (subtasks)
 
 Order: formatting first (reformats existing files), then independent gates,
-then pre-commit hook that ties them together. High-risk items (CA1502,
+then pre-commit hook that ties them together. High-risk items (VW1001,
 coverlet) early so we fail fast.
 
 ### 5.1 Formatting — Prettier + CSharpier (M, do first)
@@ -156,23 +156,23 @@ coverlet) early so we fail fast.
 - Wire `prettier --check` into FE `lint` script
 - Reformat all existing `.ts`/`.tsx`/`.css`/`.json` files
 - Install CSharpier, reformat all `.cs` files
-- Verify: `pnpm --dir frontend lint` green; `dotnet csharpier --check backend/` green
+- Verify: `pnpm --dir frontend lint` green; `dotnet csharpier check backend/` green
 - Verify: deliberately misformat one `.ts` → lint fails; one `.cs` → csharpier fails
 - Files: `frontend/package.json`, `frontend/.prettierrc`, `frontend/.prettierignore`,
   all existing source files (reformat)
 
 ### 5.2 FE complexity — eslint `complexity` rule (XS)
-- Add `complexity: ["error", 10]` to `frontend/eslint.config.mjs`
+- Add `complexity: ["error", 7]` to `frontend/eslint.config.mjs`
 - Verify: `pnpm --dir frontend lint` green
-- Verify: add 11-branch function → lint fails; revert
+- Verify: add 8+-branch function → lint fails; revert
 - Files: `frontend/eslint.config.mjs`
 
-### 5.3 BE complexity — CA1502 via NetAnalyzers (S, high-risk spike)
-- Add `Microsoft.CodeAnalysis.NetAnalyzers` to `backend/Directory.Build.props`
-- Set `EnforceCodeStyleInBuild=true` in `Directory.Build.props`
-- Create `backend/.editorconfig` with `dotnet_diagnostic.CA1502.severity = error`
+### 5.3 BE complexity — VW1001 custom Roslyn analyzer (S, high-risk spike)
+- Add custom `ValuesWorkshop.Analyzers` project with VW1001 (cyclomatic ≤ 7)
+- Wire as ProjectReference analyzer in `Directory.Build.props`
+- Disable CA1502 in `backend/.editorconfig` (threshold not configurable)
 - Verify: `dotnet build backend/ValuesWorkshop.sln` green
-- Verify: add 11+ cyclomatic complexity method → build fails; revert
+- Verify: add 8+-branch method → build fails; revert
 - Files: `backend/Directory.Build.props`, `backend/.editorconfig`
 
 ### 5.4 Duplication — jscpd (S)
@@ -184,7 +184,7 @@ coverlet) early so we fail fast.
 - Files: `package.json` (root, new), `.jscpd.json` (new), `pnpm-lock.yaml` (root)
 
 ### 5.5 Coverage gates — Jest + coverlet (S, high-risk spike for BE)
-- FE: add `coverageThreshold` to `frontend/jest.config.ts` (80% lines);
+- FE: add `coverageThreshold` to `frontend/jest.config.mjs` (80% lines);
   update `test` script to include `--coverage`
 - BE: add `coverlet.msbuild` to each of 4 test csproj files;
   verify `/p:CollectCoverage=true /p:Threshold=80 /p:ThresholdType=line
@@ -192,7 +192,7 @@ coverlet) early so we fail fast.
 - Verify: both `pnpm --dir frontend test` and `dotnet test` green
   (current code must meet 80% — skeleton has near 100%)
 - Verify: comment out enough test code to drop below 80% → fails; revert
-- Files: `frontend/jest.config.ts`, `backend/*.Tests/*.csproj` (4 files)
+- Files: `frontend/jest.config.mjs`, `backend/*.Tests/*.csproj` (4 files)
 
 ### 5.6 Dependency vulnerability scanning (XS)
 - Add `audit` script to FE `package.json`: `pnpm audit --audit-level=high`
