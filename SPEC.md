@@ -110,17 +110,10 @@ verified by a multi-client Playwright e2e test.
 
 ## Commands
 
-To be finalized at scaffold time (then wired into no-mistakes
-`commands.test` / `commands.lint`). Intended shape:
+See `README.md` (root) for current dev/build/test/lint commands.
+CI wiring: `commands.test` / `commands.lint` (Task 6).
 
-```
-Dev:    docker compose up            # backend + frontend + dev OIDC + seed
-FE:     pnpm --dir frontend dev | test | lint
-BE:     dotnet run --project backend/src/... ; dotnet test backend
-E2E:    pnpm --dir frontend e2e      # Playwright, multi-client
-```
-
-## Project Structure (intended)
+## Project Structure
 
 ```
 frontend/          → Next.js app (3 screens), Jest unit tests, Playwright e2e
