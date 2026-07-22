@@ -1,0 +1,38 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      DATA_DIR: /data
+      OIDC_AUTHORITY: http://oidc:9000
+    volumes:
+      - vw-data:/data
+    depends_on:
+      oidc:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "cat < /dev/tcp/localhost/8080 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      BACKEND_URL: http://backend:8080
+
+  oidc:
+    build:
+      context: ./devtools/oidc
+    ports:
+      - "9000:9000"
+
+volumes:
+  vw-data:
