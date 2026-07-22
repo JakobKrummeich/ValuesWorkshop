@@ -197,10 +197,10 @@ coverlet) early so we fail fast.
 ### 5.6 Dependency vulnerability scanning (XS)
 - Add `audit` script to FE `package.json`: `pnpm audit --audit-level=high`
 - Wire into FE `lint` script
-- BE: add `scripts/check-vulnerable-packages.sh` that runs
+- BE: add `scripts/check-backend-vulnerabilities.sh` that runs
   `dotnet list package --vulnerable` and fails on High/Critical
 - Verify: both pass on current deps
-- Files: `frontend/package.json`, `scripts/check-vulnerable-packages.sh` (new)
+- Files: `frontend/package.json`, `scripts/check-backend-vulnerabilities.sh` (new)
 
 ### 5.7 Pre-commit hook (XS, last)
 - Create `scripts/pre-commit`: runs Prettier write, CSharpier write,
