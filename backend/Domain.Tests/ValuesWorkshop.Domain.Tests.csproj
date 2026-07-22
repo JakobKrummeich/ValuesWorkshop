@@ -19,5 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\ValuesWorkshop.Domain.csproj" />
+    <ProjectReference Include="..\Application\ValuesWorkshop.Application.csproj" />
+    <ProjectReference Include="..\Adapters\ValuesWorkshop.Adapters.csproj" />
+    <ProjectReference Include="..\Host\ValuesWorkshop.Host.csproj" />
   </ItemGroup>
 </Project>
