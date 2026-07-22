@@ -80,137 +80,20 @@ Deferred technical design docs (written inside their implementing task):
 
 ## Phase A: Foundation
 
-### Task 1: Scaffold monorepo (hexagonal skeletons)
-**Description:** Create `frontend/` (Next.js, TypeScript strict, Jest) with
-hexagonal layout `src/{domain,ports,adapters,app}` where `app/` splits into
-the three screen groups `facilitator/`, `participant/`, `presenter/` — each
-wrapped in its own React context that performs dependency injection of port
-implementations (screens never import each other or concrete adapters).
-`backend/` ASP.NET Core with `Domain`, `Application`, `Adapters`, `Host`
-prod projects (nullable, warnings as errors) and **one xUnit test project
-per prod project** (`Domain.Tests`, `Application.Tests`, `Adapters.Tests`,
-`Host.Tests`); prod solution contains only prod projects, tests live in a
-separate solution/filter (`ValuesWorkshop.sln` prod-only,
-`ValuesWorkshop.Tests.slnf` adds tests). `config/` (values catalog + quiz
-JSON stubs — de+en fields per Phase 0 i18n note: value names, questions,
-answers, learning texts, animal names); `devtools/oidc/` (local
-`oidc-provider` server package). Package manager: pnpm (user-approved).
-BE `Domain` skeleton mirrors `design/domain-model.md`: Session root that
-guards + routes only; building blocks (Roster, Workshop state, Quiz
-progress, Selection round, Formation record, Presentation walk, Voting
-rounds) and Group aggregate as separate types — anti-god-class guardrail
-from the first commit.
-**Acceptance criteria:**
-- [ ] FE `dev|test|lint` scripts all run
-- [ ] `dotnet build` (prod sln, no test projects) and `dotnet test`
-      (test filter, all 4 test projects) both green
-- [ ] Project references encode direction: Domain ← Application ← Adapters ← Host
-- [ ] Each screen group has its own DI context; cross-screen import fails
-      arch rules (Task 4)
-- [ ] `node devtools/oidc` serves OIDC discovery document
-**Verification:** run the commands above; hit
-`/.well-known/openid-configuration`.
-**Dependencies:** None. **Size:** L (scaffold exception — generated code)
+### Task 1: Scaffold monorepo (hexagonal skeletons) ✅
 
-### Task 2: Design tokens + stylelint gate
-**Description:** Two-layer CSS token system (`tokens.css` base primitives +
-per-screen semantic token files). stylelint config rejects raw hex/px and
-`--base-*` references outside token files. See `tasks/specs/05-design-tokens.md`.
-**Acceptance criteria:**
-- [ ] All FE styles reference tokens only
-- [ ] Deliberate raw `#fff` in a component file fails `pnpm --dir frontend lint`
-**Verification:** lint pass + deliberate-violation fail (then revert).
-**Dependencies:** 1. **Size:** S
+### Task 2: Design tokens + stylelint gate ✅
 
-### Task 3: docker compose
-**Description:** `docker compose up` starts backend, frontend, dev OIDC;
-seeds one demo session.
-Additionally an agent-verifiable startup gate: `scripts/verify-startup.sh`
-starts frontend and backend each with one simple command, polls their
-health/root endpoints until HTTP 200 (bounded timeout), exits 0/1 — runnable
-by an agent and by CI.
-**Acceptance criteria:**
-- [ ] One command, all three reachable from host
-- [ ] Seeded demo session exists in SQLite volume
-- [ ] OR-Tools native libs load inside backend image (early spike for Task 17)
-- [ ] `scripts/verify-startup.sh` exits 0 when both apps start, non-zero when broken
-**Verification:** fresh `docker compose up`, curl each service, check seed,
-run `scripts/verify-startup.sh` twice (healthy → 0; with sabotaged start → 1).
-**Dependencies:** 1. **Size:** M
+### Task 3: docker compose ✅
 
-### Task 4: Architecture tests
-**Description:** First write `design/architecture.md` (hexagonal map FE+BE:
-named ports, adapters, dependency directions, per-screen DI contexts,
-and the C# records-by-default decision: aggregate style — immutable record
-transitions vs. mutable class — chosen and justified here, per AGENTS.md
-hard rule), then
-derive rules 1:1. BE: ArchUnitNET rules in xUnit — Domain depends on
-nothing, Application only on Domain, Adapters only on Application/Domain,
-no adapter→adapter references across concerns; custom class-size rule —
-no class > 12 methods (anti-god-class, user-approved via Task 1 Lavish
-review; threshold changes Ask-first). FE: dependency-cruiser —
-`domain/` imports nothing app-internal, `adapters/`
-only domain, `app/*` screen groups import via DI contexts only and
-never each other; no circular deps anywhere; eslint `max-lines`/
-`max-statements` as FE class-size counterpart.
-BE assertion style (user feedback on Task 1 PR): adopt Shouldly
-(MIT, fully free) — add package, convert all existing
-`Assert.*` xUnit tests, convention for every future BE test.
-**Acceptance criteria (added from Task 1 review):**
-- [ ] Deliberate 13-method class fails `dotnet test backend` (then revert)
-- [ ] No `Assert.*` calls remain in BE test projects; Shouldly
-      used throughout
-- [ ] Task-1 skeleton `sealed class` building blocks (Session, Roster,
-      WorkshopState, QuizProgress, SelectionRound, FormationRecord,
-      PresentationWalk, VotingRounds, Group) converted to the decided
-      aggregate style; any remaining `class` has written justification in
-      `design/architecture.md`
-**Acceptance criteria:**
-- [ ] Deliberate Domain→Adapters reference fails `dotnet test backend`
-- [ ] Deliberate `domain/`→`adapters/` import fails `pnpm --dir frontend lint`
-- [ ] Rules run in normal test/lint commands (no separate invocation)
-**Verification:** green run + one deliberate violation per side (then revert).
-**Dependencies:** 1. **Size:** S
+### Task 4: Architecture tests ✅
 
-### Task 5: Complexity + duplication + formatting gates
-**Description:** Deterministic gates. FE: eslint `complexity` rule (error).
-BE: CA1502 severity=error, threshold via `.editorconfig`
-(`Microsoft.CodeAnalysis.NetAnalyzers`). Duplication: `jscpd` over
-`frontend/src` + `backend/src` with hard threshold, wired into lint command.
-Formatting: Prettier + CSharpier — local workflow *applies* formatting
-(write-mode scripts + pre-commit hook), CI runs `--check` only (CI must fail
-loudly, never silently rewrite commits).
-Coverage: ≥ 80 % line unit coverage as hard gate on each side — FE: Jest
-`coverageThreshold` (lines: 80) in test command; BE: coverlet
-(`coverlet.msbuild`, `/p:Threshold=80 /p:ThresholdType=line`) in test command.
-Initial thresholds: complexity 10 (both sides), jscpd ≤ 2 % / min-tokens 50,
-coverage 80 % lines.
-**Acceptance criteria:**
-- [ ] Deliberately complex function fails FE lint and BE build respectively
-- [ ] Deliberate copy-pasted block fails jscpd gate
-- [ ] Deliberately misformatted TS and C# file each fail lint command
-- [ ] Deliberately uncovered code below 80 % lines fails FE and BE test
-      commands respectively
-- [ ] Thresholds documented in this file + config; changes are Ask-first
-**Verification:** green run + one deliberate violation per gate (then revert).
-**Dependencies:** 1. **Size:** S
+### Task 5: Complexity + duplication + formatting gates ✅
 
-### Task 6: CI/CD pipeline + branch protection + no-mistakes wiring
-**Description:** GitHub Actions workflow triggered on PRs to `main`: FE+BE
-build, unit tests (incl. ≥ 80 % line coverage thresholds), eslint+stylelint,
-arch tests, CA1502 (via build), jscpd, Playwright e2e (compose-based). Branch protection on `main`: required status
-check = pipeline, no direct pushes. Set no-mistakes `commands.test` /
-`commands.lint` to the same commands CI runs.
-**Acceptance criteria:**
-- [ ] PR with failing gate shows red check and cannot be merged
-- [ ] PR with all gates green can be merged; direct push to `main` rejected
-- [ ] `git push no-mistakes <branch>` runs same test/lint commands locally
-- [ ] CI and no-mistakes invoke identical scripts (single source of truth)
-**Verification:** two throwaway PRs (one red, one green); attempt direct push.
-**Dependencies:** 1–5. **Size:** M
+### Task 6: CI/CD pipeline + branch protection + no-mistakes wiring ✅
 
-### Checkpoint A
-- [ ] compose up serves all apps; every gate proven by deliberate violation
+### Checkpoint A ✅
+- [x] compose up serves all apps; every gate proven by deliberate violation
       (test, lint, arch, complexity, duplication, coverage); red PR blocked,
       green PR merges; PR merged to main
 
