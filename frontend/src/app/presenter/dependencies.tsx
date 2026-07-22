@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { PresenterGateway } from "../../ports/presenterGateway";
+import type { PresenterGateway } from "../../domain/ports/presenterGateway";
 
 export interface PresenterDependencies {
   gateway: PresenterGateway;

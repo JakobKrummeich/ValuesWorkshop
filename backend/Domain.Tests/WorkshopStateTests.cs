@@ -5,7 +5,7 @@ public class WorkshopStateTests
     [Fact]
     public void Initial_phase_is_Join()
     {
-        Assert.Equal(Phase.Join, new WorkshopState().CurrentPhase);
+        new WorkshopState().CurrentPhase.ShouldBe(Phase.Join);
     }
 
     [Fact]
@@ -24,8 +24,8 @@ public class WorkshopStateTests
             Phase.FinalPresentation,
         ];
 
-        Assert.Equal(expected, Enum.GetValues<Phase>());
-        Assert.Equal(1, (int)Phase.Join);
-        Assert.Equal(9, (int)Phase.FinalPresentation);
+        Enum.GetValues<Phase>().ShouldBe(expected);
+        ((int)Phase.Join).ShouldBe(1);
+        ((int)Phase.FinalPresentation).ShouldBe(9);
     }
 }

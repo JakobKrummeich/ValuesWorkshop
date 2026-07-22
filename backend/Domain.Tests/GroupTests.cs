@@ -10,10 +10,10 @@ public class GroupTests
 
         var group = new Group("Otter", members, values);
 
-        Assert.Equal("Otter", group.Name);
-        Assert.Equal(members, group.Members);
-        Assert.Equal(values, group.AssignedValues);
-        Assert.Null(group.Scribe);
-        Assert.False(group.IsSubmitted);
+        group.Name.ShouldBe("Otter");
+        group.Members.ShouldBe(members);
+        group.AssignedValues.ShouldBe(values);
+        group.Scribe.ShouldBeNull();
+        group.IsSubmitted.ShouldBeFalse();
     }
 }

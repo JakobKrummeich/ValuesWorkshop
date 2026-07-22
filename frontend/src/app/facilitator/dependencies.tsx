@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { FacilitatorGateway } from "../../ports/facilitatorGateway";
+import type { FacilitatorGateway } from "../../domain/ports/facilitatorGateway";
 
 export interface FacilitatorDependencies {
   gateway: FacilitatorGateway;

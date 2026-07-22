@@ -7,7 +7,7 @@ public class PresentationWalkTests
     {
         var walk = new PresentationWalk();
 
-        Assert.Null(walk.PresentingGroup);
-        Assert.Null(walk.PresentedValue);
+        walk.PresentingGroup.ShouldBeNull();
+        walk.PresentedValue.ShouldBeNull();
     }
 }

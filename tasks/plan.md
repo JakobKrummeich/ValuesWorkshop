@@ -31,9 +31,10 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    fixes the cardinalities.
 
 3. **Hexagonal architecture, arch-tested.** BE: `Domain` (pure) ←
-   `Application` (ports, use cases) ← `Adapters` (SignalR hub, SQLite/EF,
-   OR-Tools, OIDC, HTTP). FE: `domain/` (pure state logic, reducers) ←
-   `ports/` (interfaces) ← `adapters/` (SignalR client, API, PDF) ← `ui/`.
+   `Application` (use cases) ← `Adapters` (SignalR hub, SQLite/EF,
+   OR-Tools, OIDC, HTTP). Ports live in `Domain`. FE: `domain/` (pure state logic, reducers, port interfaces) ←
+   `adapters/` (SignalR client, API, PDF) ← `app/` (screens, DI wiring).
+   Port interfaces live inside `domain/`; adapters implement them.
    Enforced by ArchUnitNET (BE, runs in xUnit) and dependency-cruiser (FE).
 4. **Deterministic quality gates.** Cyclomatic complexity: eslint
    `complexity` rule (FE), CA1502 as error with `.editorconfig` threshold
@@ -60,7 +61,7 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
 7. **Backend test layout.** One xUnit test project per prod project
    (Domain/Application/Adapters/Host); prod solution contains prod projects
    only, tests live in a separate solution filter. Assertions use
-   FluentAssertions (free v7 line), not bare xUnit `Assert.*` (from Task 4).
+   Shouldly (MIT, fully free), not bare xUnit `Assert.*` (from Task 4).
 8. **E2e grows with the product.** The multi-client Playwright e2e is
    extended immediately after each workshop phase is implemented (regression
    protection from the start) — not written at the end. Phase F only
@@ -146,7 +147,7 @@ Technical design docs deferred just-in-time: `architecture.md` → Task 4,
 ### Phase A: Foundation (Tasks 1–6)
 
 - [ ] 1. Scaffold monorepo with hexagonal skeletons: `frontend/` (Next.js,
-      TS strict, Jest, `domain/ports/adapters/app` layout; `app/` split into
+      TS strict, Jest, `domain/adapters/app` layout; `app/` split into
       facilitator/participant/presenter screen groups, each with own React
       DI context), `backend/` (prod solution Domain/Application/Adapters/
       Host + one test project per prod project in separate test solution
@@ -157,8 +158,9 @@ Technical design docs deferred just-in-time: `architecture.md` → Task 4,
       agent-verifiable startup gate (`scripts/verify-startup.sh`: one command
       starts FE + BE, health-checked, exit 0/1).
 - [ ] 4. Architecture tests: write `design/architecture.md`, then
-      ArchUnitNET rules (BE layer deps inward-only) + dependency-cruiser
-      config (FE layers + screen-group isolation).
+      ArchUnitNET rules (BE layer deps inward-only, god-class, no-cycles) +
+      dependency-cruiser config (FE layers + screen-group isolation);
+      Shouldly migration (all Assert.* → Shouldly); ports moved into domain.
 - [ ] 5. Complexity + duplication + formatting gates: eslint `complexity`
       (FE), CA1502 as error (BE), jscpd threshold over FE+BE, Prettier
       check (TS/CSS), CSharpier check (C#).

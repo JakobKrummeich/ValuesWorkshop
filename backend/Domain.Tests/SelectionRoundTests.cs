@@ -7,7 +7,7 @@ public class SelectionRoundTests
     {
         var round = new SelectionRound();
 
-        Assert.Empty(round.SubmittedBy);
-        Assert.Empty(round.TopValues);
+        round.SubmittedBy.ShouldBeEmpty();
+        round.TopValues.ShouldBeEmpty();
     }
 }

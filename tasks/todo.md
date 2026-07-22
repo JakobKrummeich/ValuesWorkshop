@@ -149,18 +149,16 @@ nothing, Application only on Domain, Adapters only on Application/Domain,
 no adapter→adapter references across concerns; custom class-size rule —
 no class > 12 methods (anti-god-class, user-approved via Task 1 Lavish
 review; threshold changes Ask-first). FE: dependency-cruiser —
-`domain/` imports nothing app-internal, `ports/` only domain, `adapters/`
-only ports/domain, `app/*` screen groups import via ports/contexts only and
+`domain/` imports nothing app-internal, `adapters/`
+only domain, `app/*` screen groups import via DI contexts only and
 never each other; no circular deps anywhere; eslint `max-lines`/
 `max-statements` as FE class-size counterpart.
-BE assertion style (user feedback on Task 1 PR): adopt FluentAssertions
-(`result.Should().BeNull()` style) — add package, convert all existing
-`Assert.*` xUnit tests, convention for every future BE test. Pin a
-free-license version line (v7.x Apache-2.0; v8+ needs paid commercial
-license — version bump is Ask-first).
+BE assertion style (user feedback on Task 1 PR): adopt Shouldly
+(MIT, fully free) — add package, convert all existing
+`Assert.*` xUnit tests, convention for every future BE test.
 **Acceptance criteria (added from Task 1 review):**
 - [ ] Deliberate 13-method class fails `dotnet test backend` (then revert)
-- [ ] No `Assert.*` calls remain in BE test projects; FluentAssertions
+- [ ] No `Assert.*` calls remain in BE test projects; Shouldly
       used throughout
 - [ ] Task-1 skeleton `sealed class` building blocks (Session, Roster,
       WorkshopState, QuizProgress, SelectionRound, FormationRecord,

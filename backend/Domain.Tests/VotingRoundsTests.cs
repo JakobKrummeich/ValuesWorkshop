@@ -7,7 +7,7 @@ public class VotingRoundsTests
     {
         var voting = new VotingRounds();
 
-        Assert.False(voting.RoundOpen);
-        Assert.Empty(voting.WinningValues);
+        voting.RoundOpen.ShouldBeFalse();
+        voting.WinningValues.ShouldBeEmpty();
     }
 }
