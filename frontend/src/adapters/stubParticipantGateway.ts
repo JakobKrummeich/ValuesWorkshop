@@ -1,4 +1,4 @@
-import type { ParticipantGateway } from "../domain/participantGateway";
+import type { ParticipantGateway } from "../domain/ports/participantGateway";
 
 export const stubParticipantGateway: ParticipantGateway = {
   sessionIdentity: () => "stub-session",
