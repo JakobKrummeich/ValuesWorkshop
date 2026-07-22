@@ -60,7 +60,7 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
 7. **Backend test layout.** One xUnit test project per prod project
    (Domain/Application/Adapters/Host); prod solution contains prod projects
    only, tests live in a separate solution filter. Assertions use
-   FluentAssertions (free v7 line), not bare xUnit `Assert.*` (from Task 4).
+   Shouldly (MIT, fully free), not bare xUnit `Assert.*` (from Task 4).
 8. **E2e grows with the product.** The multi-client Playwright e2e is
    extended immediately after each workshop phase is implemented (regression
    protection from the start) — not written at the end. Phase F only
@@ -157,8 +157,9 @@ Technical design docs deferred just-in-time: `architecture.md` → Task 4,
       agent-verifiable startup gate (`scripts/verify-startup.sh`: one command
       starts FE + BE, health-checked, exit 0/1).
 - [ ] 4. Architecture tests: write `design/architecture.md`, then
-      ArchUnitNET rules (BE layer deps inward-only) + dependency-cruiser
-      config (FE layers + screen-group isolation).
+      ArchUnitNET rules (BE layer deps inward-only, god-class, no-cycles) +
+      dependency-cruiser config (FE layers + screen-group isolation);
+      Shouldly migration (all Assert.* → Shouldly); ports moved into domain.
 - [ ] 5. Complexity + duplication + formatting gates: eslint `complexity`
       (FE), CA1502 as error (BE), jscpd threshold over FE+BE, Prettier
       check (TS/CSS), CSharpier check (C#).
