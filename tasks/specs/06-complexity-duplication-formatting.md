@@ -82,7 +82,7 @@ Install `jscpd` as a **root-level** devDependency (repo root `package.json`).
 threshold enforcement across projects). Implementation plan:
 
 **Implemented:** `coverlet.collector` + `dotnet-reportgenerator-globaltool`
-merges all test project reports → `scripts/check-backend-coverage.sh` parses
+merges all test project reports → `scripts/test-backend-with-coverage.sh` parses
 aggregate line coverage and fails on <80%. `coverlet.msbuild` per-project
 threshold didn't work (each project sees all referenced assemblies, skewing
 results).

@@ -114,6 +114,8 @@ scripts/test-backend-with-coverage.sh
 set -euo pipefail
 echo "=== FE lint ==="
 pnpm --dir frontend lint
+echo "=== FE build ==="
+pnpm --dir frontend build
 echo "=== BE build (analyzers) ==="
 dotnet build backend/ValuesWorkshop.sln
 echo "=== BE format check ==="
@@ -142,7 +144,7 @@ Add section documenting wrapper scripts so agents know how to run gates:
 
 Run all quality gates locally using the same commands CI uses:
 
-- `./scripts/ci-lint.sh` — all lint gates (FE lint, BE build/analyzers,
+- `./scripts/ci-lint.sh` — all lint gates (FE lint, FE build, BE build/analyzers,
   CSharpier, vulnerability scan, jscpd duplication)
 - `./scripts/ci-test.sh` — all test gates (FE jest + coverage, BE dotnet
   test + coverage)
