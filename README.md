@@ -7,8 +7,8 @@ values and pragmatic everyday actions. See `SPEC.md` for the product spec.
 
 | Path | What |
 |---|---|
-| `frontend/` | Next.js app — `src/{domain,ports,adapters,app}`; screen groups `app/{facilitator,participant,presenter}/`, each with its own DI context |
-| `backend/` | ASP.NET Core — `Domain` ← `Application` ← `Adapters` ← `Host` (hexagonal; ports in `Application/Ports/`) |
+| `frontend/` | Next.js app — `src/{domain,adapters,app}`; screen groups `app/{facilitator,participant,presenter}/`, each with its own DI context |
+| `backend/` | ASP.NET Core — `Domain` ← `Application` ← `Adapters` ← `Host` (hexagonal; ports in `Domain`) |
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
 | `design/` | Domain model, state machine, screens |
@@ -27,5 +27,4 @@ scripts/ci-lint.sh                         # all lint gates
 scripts/ci-test.sh                         # all test gates
 ```
 
-Layer mapping FE ↔ BE and architecture rules: `tasks/specs/04-scaffold.md`
-(moves to `design/architecture.md` in Task 4).
+Layer mapping FE ↔ BE and architecture rules: `design/architecture.md`.

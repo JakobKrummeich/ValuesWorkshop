@@ -9,7 +9,7 @@ formatting (write-mode); CI checks only (never rewrites commits).
 
 ## Scope clarification: Task 4 vs Task 5
 
-Arch tests (ArchUnitNET, dependency-cruiser, FluentAssertions) belong to
+Arch tests (ArchUnitNET, dependency-cruiser, Shouldly) belong to
 **Task 4** — separate task, not duplicated here. Task 5 covers: complexity,
 duplication, formatting, coverage, and dependency vulnerability scanning.
 

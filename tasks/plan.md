@@ -31,9 +31,10 @@ Resolved here (were open in SPEC.md — SPEC.md updated alongside this plan):
    fixes the cardinalities.
 
 3. **Hexagonal architecture, arch-tested.** BE: `Domain` (pure) ←
-   `Application` (ports, use cases) ← `Adapters` (SignalR hub, SQLite/EF,
-   OR-Tools, OIDC, HTTP). FE: `domain/` (pure state logic, reducers) ←
-   `ports/` (interfaces) ← `adapters/` (SignalR client, API, PDF) ← `ui/`.
+   `Application` (use cases) ← `Adapters` (SignalR hub, SQLite/EF,
+   OR-Tools, OIDC, HTTP). Ports live in `Domain`. FE: `domain/` (pure state logic, reducers, port interfaces) ←
+   `adapters/` (SignalR client, API, PDF) ← `app/` (screens, DI wiring).
+   Port interfaces live inside `domain/`; adapters implement them.
    Enforced by ArchUnitNET (BE, runs in xUnit) and dependency-cruiser (FE).
 4. **Deterministic quality gates.** Cyclomatic complexity: eslint
    `complexity` rule (FE), CA1502 as error with `.editorconfig` threshold
@@ -146,7 +147,7 @@ Technical design docs deferred just-in-time: `architecture.md` → Task 4,
 ### Phase A: Foundation (Tasks 1–6)
 
 - [ ] 1. Scaffold monorepo with hexagonal skeletons: `frontend/` (Next.js,
-      TS strict, Jest, `domain/ports/adapters/app` layout; `app/` split into
+      TS strict, Jest, `domain/adapters/app` layout; `app/` split into
       facilitator/participant/presenter screen groups, each with own React
       DI context), `backend/` (prod solution Domain/Application/Adapters/
       Host + one test project per prod project in separate test solution
