@@ -7,12 +7,12 @@ public class SessionTests
     {
         var session = new Session();
 
-        Assert.Equal(Phase.Join, session.State.CurrentPhase);
-        Assert.Empty(session.Roster.Participants);
-        Assert.Null(session.Quiz.CurrentQuestion);
-        Assert.Empty(session.Selection.TopValues);
-        Assert.False(session.Formation.IsFormed);
-        Assert.Null(session.Presentation.PresentedValue);
-        Assert.Empty(session.Voting.WinningValues);
+        session.State.CurrentPhase.ShouldBe(Phase.Join);
+        session.Roster.Participants.ShouldBeEmpty();
+        session.Quiz.CurrentQuestion.ShouldBeNull();
+        session.Selection.TopValues.ShouldBeEmpty();
+        session.Formation.IsFormed.ShouldBeFalse();
+        session.Presentation.PresentedValue.ShouldBeNull();
+        session.Voting.WinningValues.ShouldBeEmpty();
     }
 }

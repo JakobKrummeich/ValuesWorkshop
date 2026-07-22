@@ -7,7 +7,7 @@ public class FormationRecordTests
     {
         var record = new FormationRecord();
 
-        Assert.False(record.IsFormed);
-        Assert.Empty(record.Groups);
+        record.IsFormed.ShouldBeFalse();
+        record.Groups.ShouldBeEmpty();
     }
 }
