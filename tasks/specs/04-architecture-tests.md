@@ -4,7 +4,7 @@
 
 Establish `design/architecture.md` as the hexagonal architecture reference for
 FE+BE, then enforce it with automated rules in the normal test/lint commands.
-Convert BE tests to FluentAssertions. Convert skeleton `sealed class` building
+Convert BE tests to Shouldly. Convert skeleton `sealed class` building
 blocks to the decided aggregate style.
 
 ## Deliverables
@@ -150,19 +150,19 @@ backend/Domain.Tests/ArchitectureTests.cs       — replace with ArchUnitNET
 backend/Application.Tests/ArchitectureTests.cs  — replace with ArchUnitNET
 backend/Adapters.Tests/ArchitectureTests.cs     — replace with ArchUnitNET
 backend/Host.Tests/ArchitectureTests.cs         — replace with ArchUnitNET
-backend/Domain.Tests/*.csproj                   — add FluentAssertions + ArchUnitNET
-backend/Application.Tests/*.csproj              — add FluentAssertions + ArchUnitNET
-backend/Adapters.Tests/*.csproj                 — add FluentAssertions + ArchUnitNET
-backend/Host.Tests/*.csproj                     — add FluentAssertions + ArchUnitNET
-backend/Domain.Tests/SessionTests.cs            — FluentAssertions conversion
-backend/Domain.Tests/WorkshopStateTests.cs      — FluentAssertions conversion
-backend/Domain.Tests/RosterTests.cs             — FluentAssertions conversion
-backend/Domain.Tests/GroupTests.cs              — FluentAssertions conversion
-backend/Domain.Tests/QuizProgressTests.cs       — FluentAssertions conversion
-backend/Domain.Tests/SelectionRoundTests.cs     — FluentAssertions conversion
-backend/Domain.Tests/FormationRecordTests.cs    — FluentAssertions conversion
-backend/Domain.Tests/PresentationWalkTests.cs   — FluentAssertions conversion
-backend/Domain.Tests/VotingRoundsTests.cs       — FluentAssertions conversion
+backend/Domain.Tests/*.csproj                   — add Shouldly + ArchUnitNET
+backend/Application.Tests/*.csproj              — add Shouldly + ArchUnitNET
+backend/Adapters.Tests/*.csproj                 — add Shouldly + ArchUnitNET
+backend/Host.Tests/*.csproj                     — add Shouldly + ArchUnitNET
+backend/Domain.Tests/SessionTests.cs            — Shouldly conversion
+backend/Domain.Tests/WorkshopStateTests.cs      — Shouldly conversion
+backend/Domain.Tests/RosterTests.cs             — Shouldly conversion
+backend/Domain.Tests/GroupTests.cs              — Shouldly conversion
+backend/Domain.Tests/QuizProgressTests.cs       — Shouldly conversion
+backend/Domain.Tests/SelectionRoundTests.cs     — Shouldly conversion
+backend/Domain.Tests/FormationRecordTests.cs    — Shouldly conversion
+backend/Domain.Tests/PresentationWalkTests.cs   — Shouldly conversion
+backend/Domain.Tests/VotingRoundsTests.cs       — Shouldly conversion
 ```
 
 ## Verification

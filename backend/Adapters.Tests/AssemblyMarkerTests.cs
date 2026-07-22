@@ -1,6 +1,6 @@
 namespace ValuesWorkshop.Adapters.Tests;
 
-public class ArchitectureTests
+public class AssemblyMarkerTests
 {
     [Fact]
     public void Adapters_assembly_marker_exists()
