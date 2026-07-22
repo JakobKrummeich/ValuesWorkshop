@@ -63,3 +63,8 @@ gates) goes through an HTML artifact + `npx lavish-axi <file>` — never "read
 the file in the repo". Reason (non-discoverable): agent runs on a VPS; the
 user has no easy access to repo files. Print the session URL immediately.
 Never reopen a user-ended session without `--reopen` + invite.
+
+When polling for Lavish feedback (`lavish-axi poll`), NEVER set a timer.
+The poll is a blocking foreground call — let it run until the user responds
+or the harness kills it. If it times out, immediately re-poll. Timers
+interrupt the poll and cause lost feedback.
