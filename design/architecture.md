@@ -60,12 +60,22 @@ layer** (not in a separate layer), and are implemented by adapters.
 
 ### 2.1 Backend Ports
 
-Port interfaces live in `ValuesWorkshop.Domain`. Adapters in
+Port interfaces live in `ValuesWorkshop.Domain/Ports/`. Adapters in
 `ValuesWorkshop.Adapters` implement them. Application layer references port
 interfaces from Domain to orchestrate use cases.
 
-Current ports: none yet (Task 7+ will add persistence port, Task 9+ will add
-messaging port).
+Current ports:
+
+| Interface | File | Implemented by |
+|---|---|---|
+| `ISessionRepository` | `Domain/Ports/ISessionRepository.cs` | `SqliteSessionRepository` (Adapters) |
+
+Application-layer ports (not Domain because they orchestrate cross-cutting
+concerns):
+
+| Interface | File | Implemented by |
+|---|---|---|
+| `IBroadcaster` | `Application/IBroadcaster.cs` | `NoOpBroadcaster` (Host; real impl in Task 9) |
 
 ### 2.2 Frontend Ports
 

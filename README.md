@@ -11,7 +11,7 @@ values and pragmatic everyday actions. See `SPEC.md` for the product spec.
 | `backend/` | ASP.NET Core — `Domain` ← `Application` ← `Adapters` ← `Host` (hexagonal; ports in `Domain`) |
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
-| `design/` | Domain model, state machine, screens |
+| `design/` | Architecture, domain model, persistence, state machine, screens |
 | `tasks/` | Plan, backlog, per-task mini-specs |
 
 ## Commands
