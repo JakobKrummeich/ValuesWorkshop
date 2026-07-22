@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+
+      - name: pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store/v10
+          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+          dotnet-quality: preview
+
+      - name: NuGet cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-
+
+      - run: dotnet restore backend/ValuesWorkshop.sln
+      - run: dotnet tool restore
+
+      - name: FE lint
+        run: pnpm --dir frontend lint
+
+      - name: FE build
+        run: pnpm --dir frontend build
+
+      - name: FE test + coverage
+        run: pnpm --dir frontend test
+
+      - name: BE build (analyzers)
+        run: dotnet build backend/ValuesWorkshop.sln --no-restore
+
+      - name: BE format check
+        run: dotnet csharpier check backend/
+
+      - name: BE test + coverage
+        run: scripts/test-backend-with-coverage.sh
+
+      - name: BE vulnerability check
+        run: scripts/check-backend-vulnerabilities.sh
+
+      - name: Duplication check (jscpd)
+        run: pnpm -w jscpd
