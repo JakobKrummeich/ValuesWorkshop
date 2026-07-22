@@ -4,6 +4,7 @@ public sealed class SessionEntity
 {
     public string Identity { get; set; } = "";
     public int CurrentPhase { get; set; }
+    public bool IsFormed { get; set; }
     public string CreatedAt { get; set; } = "";
 
     public QuizStateEntity QuizState { get; set; } = null!;

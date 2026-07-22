@@ -13,6 +13,8 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
 
         var newEntity = DomainEntityMapper.ToEntity(sessionIdentity, session);
 
+        await using var transaction = await database.Database.BeginTransactionAsync();
+
         if (existingEntity is not null)
         {
             newEntity.CreatedAt = existingEntity.CreatedAt;
@@ -23,6 +25,8 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
 
         database.Sessions.Add(newEntity);
         await database.SaveChangesAsync();
+
+        await transaction.CommitAsync();
     }
 
     public async Task<Session?> LoadAsync(string sessionIdentity)

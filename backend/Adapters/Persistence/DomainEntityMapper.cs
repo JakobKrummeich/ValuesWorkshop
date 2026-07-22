@@ -11,6 +11,7 @@ internal static class DomainEntityMapper
         {
             Identity = sessionIdentity,
             CurrentPhase = (int)session.State.CurrentPhase,
+            IsFormed = session.Formation.IsFormed,
             CreatedAt = DateTime.UtcNow.ToString("o"),
             QuizState = new QuizStateEntity
             {
@@ -110,7 +111,7 @@ internal static class DomainEntityMapper
             )
             .ToList();
 
-        var formation = FormationRecord.Restore(groups.Count > 0, groups);
+        var formation = FormationRecord.Restore(entity.IsFormed, groups);
 
         var presentation = PresentationWalk.Restore(
             entity.PresentationState.PresentingGroupName,
