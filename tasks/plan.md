@@ -146,31 +146,31 @@ Technical design docs deferred just-in-time: `architecture.md` → Task 4,
 
 ### Phase A: Foundation (Tasks 1–6)
 
-- [ ] 1. Scaffold monorepo with hexagonal skeletons: `frontend/` (Next.js,
+- [x] 1. Scaffold monorepo with hexagonal skeletons: `frontend/` (Next.js,
       TS strict, Jest, `domain/adapters/app` layout; `app/` split into
       facilitator/participant/presenter screen groups, each with own React
       DI context), `backend/` (prod solution Domain/Application/Adapters/
       Host + one test project per prod project in separate test solution
       filter), `config/` (values catalog + quiz JSON stubs), `devtools/oidc/`.
-- [ ] 2. Design token files + stylelint enforcement (raw hex/px outside
+- [x] 2. Design token files + stylelint enforcement (raw hex/px outside
       token files fails lint).
-- [ ] 3. `docker compose up`: FE + BE + dev OIDC + seeded demo session;
+- [x] 3. `docker compose up`: FE + BE + dev OIDC + seeded demo session;
       agent-verifiable startup gate (`scripts/verify-startup.sh`: one command
       starts FE + BE, health-checked, exit 0/1).
-- [ ] 4. Architecture tests: write `design/architecture.md`, then
+- [x] 4. Architecture tests: write `design/architecture.md`, then
       ArchUnitNET rules (BE layer deps inward-only, god-class, no-cycles) +
       dependency-cruiser config (FE layers + screen-group isolation);
       Shouldly migration (all Assert.* → Shouldly); ports moved into domain.
-- [ ] 5. Complexity + duplication + formatting gates: eslint `complexity`
+- [x] 5. Complexity + duplication + formatting gates: eslint `complexity`
       (FE), CA1502 as error (BE), jscpd threshold over FE+BE, Prettier
       check (TS/CSS), CSharpier check (C#).
-- [ ] 6. CI/CD: GitHub Actions on PRs to `main` running all deterministic
+- [x] 6. CI/CD: GitHub Actions on PRs to `main` running all deterministic
       gates (build, tests, lint, arch, complexity, duplication, e2e);
       branch protection requires green check. Wire no-mistakes
       `commands.test` / `commands.lint` to the same commands.
 
 ### Checkpoint A
-- [ ] `docker compose up` serves all three apps; every gate proven by a
+- [x] `docker compose up` serves all three apps; every gate proven by a
       deliberate violation (lint, arch, complexity, duplication, test);
       red PR cannot merge, green PR can.
 
