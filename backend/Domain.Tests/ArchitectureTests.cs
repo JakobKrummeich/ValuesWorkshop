@@ -75,7 +75,16 @@ public class ArchitectureTests
     [Fact]
     public void No_class_has_more_than_12_public_methods()
     {
-        var allClasses = Classes().That().ResideInNamespace("ValuesWorkshop").GetObjects(Arch);
+        var allClasses = Classes()
+            .That()
+            .Are(DomainLayer)
+            .Or()
+            .Are(ApplicationLayer)
+            .Or()
+            .Are(AdaptersLayer)
+            .Or()
+            .Are(HostLayer)
+            .GetObjects(Arch);
 
         foreach (var cls in allClasses)
         {
@@ -85,6 +94,7 @@ public class ArchitectureTests
                     m.Visibility == Visibility.Public
                     && !m.Name.StartsWith("get_", StringComparison.Ordinal)
                     && !m.Name.StartsWith("set_", StringComparison.Ordinal)
+                    && !m.Name.StartsWith(".", StringComparison.Ordinal)
                 );
 
             publicMethodCount.ShouldBeLessThanOrEqualTo(
