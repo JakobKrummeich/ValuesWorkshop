@@ -86,20 +86,20 @@ public class ArchitectureTests
             .Are(HostLayer)
             .GetObjects(Arch);
 
-        foreach (var cls in allClasses)
+        foreach (var @class in allClasses)
         {
-            var publicMethodCount = cls
+            var publicMethodCount = @class
                 .Members.OfType<ArchUnitNET.Domain.MethodMember>()
-                .Count(m =>
-                    m.Visibility == Visibility.Public
-                    && !m.Name.StartsWith("get_", StringComparison.Ordinal)
-                    && !m.Name.StartsWith("set_", StringComparison.Ordinal)
-                    && !m.Name.StartsWith(".", StringComparison.Ordinal)
+                .Count(method =>
+                    method.Visibility == Visibility.Public
+                    && !method.Name.StartsWith("get_", StringComparison.Ordinal)
+                    && !method.Name.StartsWith("set_", StringComparison.Ordinal)
+                    && !method.Name.StartsWith(".", StringComparison.Ordinal)
                 );
 
             publicMethodCount.ShouldBeLessThanOrEqualTo(
                 12,
-                $"{cls.FullName} has {publicMethodCount} public methods (max 12)"
+                $"{@class.FullName} has {publicMethodCount} public methods (max 12)"
             );
         }
     }
