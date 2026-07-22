@@ -154,7 +154,7 @@ Technical design docs deferred just-in-time: `architecture.md` → Task 4,
 - [ ] 2. Design token files + stylelint enforcement (raw hex/px outside
       token files fails lint).
 - [ ] 3. `docker compose up`: FE + BE + dev OIDC + seeded demo session;
-      agent-verifiable smoke-start gate (`scripts/smoke.sh`: one command
+      agent-verifiable startup gate (`scripts/verify-startup.sh`: one command
       starts FE + BE, health-checked, exit 0/1).
 - [ ] 4. Architecture tests: write `design/architecture.md`, then
       ArchUnitNET rules (BE layer deps inward-only) + dependency-cruiser

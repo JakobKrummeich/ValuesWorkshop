@@ -8,7 +8,8 @@ rm -rf "$RESULTS_DIR"
 
 dotnet test backend/ValuesWorkshop.Tests.slnf \
   --collect:"XPlat Code Coverage" \
-  --results-directory "$RESULTS_DIR"
+  --results-directory "$RESULTS_DIR" \
+  -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile="**/Program.cs"
 
 dotnet reportgenerator \
   -reports:"$RESULTS_DIR/*/coverage.cobertura.xml" \

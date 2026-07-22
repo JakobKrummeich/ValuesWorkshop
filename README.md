@@ -21,6 +21,10 @@ pnpm --dir frontend dev|test|lint          # frontend
 dotnet build backend/ValuesWorkshop.sln    # backend (prod + analyzers, no test projects)
 dotnet test backend/ValuesWorkshop.Tests.slnf
 node devtools/oidc                         # OIDC discovery on :9000
+docker compose up                          # all services (backend :5000, frontend :3000, oidc :9000)
+scripts/verify-startup.sh                  # native start + health check gate
+scripts/ci-lint.sh                         # all lint gates
+scripts/ci-test.sh                         # all test gates
 ```
 
 Layer mapping FE ↔ BE and architecture rules: `tasks/specs/04-scaffold.md`
