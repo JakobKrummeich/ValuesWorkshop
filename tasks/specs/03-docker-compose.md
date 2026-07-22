@@ -1,9 +1,9 @@
-# Spec: Task 3 — Docker Compose + Smoke Script
+# Spec: Task 3 — Docker Compose + Verify-Startup Script
 
 ## Objective
 
 One-command local dev stack (`docker compose up`) and an agent-verifiable
-non-Docker smoke script (`scripts/smoke.sh`). Proves OR-Tools native libs
+non-Docker startup gate (`scripts/verify-startup.sh`). Proves OR-Tools native libs
 load in the container image and SQLite persistence volume works — de-risking
 Tasks 7 and 17 early.
 
@@ -54,7 +54,7 @@ diagnostic confirming native solver loads:
 ```csharp
 // In Program.cs startup — temporary spike, removed when Task 17 builds real wrapper
 Google.OrTools.Sat.CpSolver solver = new();
-app.Logger.LogInformation("OR-Tools loaded: {Version}", Google.OrTools.OrToolsVersion.VersionString());
+app.Logger.LogInformation("OR-Tools loaded: {Version}", Google.OrTools.Init.OrToolsVersion.VersionString());
 ```
 
 Acceptance: container starts without native-lib crash.
