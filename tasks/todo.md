@@ -125,15 +125,15 @@ per-screen semantic token files). stylelint config rejects raw hex/px and
 ### Task 3: docker compose
 **Description:** `docker compose up` starts backend, frontend, dev OIDC;
 seeds one demo session.
-Additionally an agent-verifiable smoke-start gate: `scripts/smoke.sh` starts
-frontend and backend each with one simple command, polls their health/root
-endpoints until HTTP 200 (bounded timeout), exits 0/1 — runnable by an agent
-and by CI.
+Additionally an agent-verifiable startup gate: `scripts/verify-startup.sh`
+starts frontend and backend each with one simple command, polls their
+health/root endpoints until HTTP 200 (bounded timeout), exits 0/1 — runnable
+by an agent and by CI.
 **Acceptance criteria:**
 - [ ] One command, all three reachable from host
 - [ ] Seeded demo session exists in SQLite volume
 - [ ] OR-Tools native libs load inside backend image (early spike for Task 17)
-- [ ] `scripts/smoke.sh` exits 0 when both apps start, non-zero when broken
+- [ ] `scripts/verify-startup.sh` exits 0 when both apps start, non-zero when broken
 **Verification:** fresh `docker compose up`, curl each service, check seed,
 run `scripts/smoke.sh` twice (healthy → 0; with sabotaged start → 1).
 **Dependencies:** 1. **Size:** M
