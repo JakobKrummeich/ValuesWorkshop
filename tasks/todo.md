@@ -135,7 +135,7 @@ by an agent and by CI.
 - [ ] OR-Tools native libs load inside backend image (early spike for Task 17)
 - [ ] `scripts/verify-startup.sh` exits 0 when both apps start, non-zero when broken
 **Verification:** fresh `docker compose up`, curl each service, check seed,
-run `scripts/smoke.sh` twice (healthy → 0; with sabotaged start → 1).
+run `scripts/verify-startup.sh` twice (healthy → 0; with sabotaged start → 1).
 **Dependencies:** 1. **Size:** M
 
 ### Task 4: Architecture tests
