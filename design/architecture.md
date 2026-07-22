@@ -45,7 +45,7 @@ app/ (screens, DI wiring — per-role screen groups)
 
 | Layer | Directory | Depends on | Contains |
 |---|---|---|---|
-| **domain** | `src/domain/` | Nothing app-internal | Pure state logic, reducers, port interfaces (gateway types), value types |
+| **domain** | `src/domain/` | Nothing app-internal | Pure state logic, reducers, value types; `ports/` subdirectory holds port interfaces (gateway types) |
 | **adapters** | `src/adapters/` | domain | Port implementations (SignalR client, API client, stubs) |
 | **app** | `src/app/` | domain, adapters (via DI context only) | Screen components, DI context providers, routing |
 
@@ -73,9 +73,9 @@ Port interfaces live in `src/domain/`. Task 1 placeholders:
 
 | Interface | File | Purpose |
 |---|---|---|
-| `FacilitatorGateway` | `src/domain/facilitatorGateway.ts` | Facilitator session operations |
-| `ParticipantGateway` | `src/domain/participantGateway.ts` | Participant session operations |
-| `PresenterGateway` | `src/domain/presenterGateway.ts` | Presenter read-only stream |
+| `FacilitatorGateway` | `src/domain/ports/facilitatorGateway.ts` | Facilitator session operations |
+| `ParticipantGateway` | `src/domain/ports/participantGateway.ts` | Participant session operations |
+| `PresenterGateway` | `src/domain/ports/presenterGateway.ts` | Presenter read-only stream |
 
 Task 9 will slice these per concern (e.g., quiz control, formation control).
 
