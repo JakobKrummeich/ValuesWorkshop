@@ -134,9 +134,10 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
 ## Code Style
 
 - TypeScript strict; C# nullable-enabled, warnings as errors.
-- Hexagonal architecture both sides: pure domain core, ports in application
-  layer, adapters (SignalR, SQLite, OR-Tools, OIDC, UI) at the edge;
+- Hexagonal architecture both sides: pure domain core with port interfaces,
+  adapters (SignalR, SQLite, OR-Tools, OIDC, UI) at the edge;
   dependencies point inward only. Violations fail arch tests.
+  Layer details and decisions: `design/architecture.md`.
 - Server-authoritative: clients send intents, server validates against phase
   rules and broadcasts state. Clients never compute authoritative results.
 - Session binding at the edge: the per-screen-group dependency context builds
