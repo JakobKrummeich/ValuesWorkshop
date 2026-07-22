@@ -13,9 +13,15 @@ public class WorkshopStateTests
     {
         Phase[] expected =
         [
-            Phase.Join, Phase.Quiz, Phase.ValueSelection, Phase.SelectionResults,
-            Phase.GroupFormation, Phase.GroupWork, Phase.ValuePresentation,
-            Phase.FinalVoting, Phase.FinalPresentation,
+            Phase.Join,
+            Phase.Quiz,
+            Phase.ValueSelection,
+            Phase.SelectionResults,
+            Phase.GroupFormation,
+            Phase.GroupWork,
+            Phase.ValuePresentation,
+            Phase.FinalVoting,
+            Phase.FinalPresentation,
         ];
 
         Assert.Equal(expected, Enum.GetValues<Phase>());

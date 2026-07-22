@@ -7,7 +7,8 @@ export interface FacilitatorDependencies {
   gateway: FacilitatorGateway;
 }
 
-const FacilitatorDependencyContext = createContext<FacilitatorDependencies | null>(null);
+const FacilitatorDependencyContext =
+  createContext<FacilitatorDependencies | null>(null);
 
 export function FacilitatorDependencyProvider({
   dependencies,
@@ -26,7 +27,9 @@ export function FacilitatorDependencyProvider({
 export function useFacilitatorDependencies(): FacilitatorDependencies {
   const dependencies = useContext(FacilitatorDependencyContext);
   if (dependencies === null) {
-    throw new Error("useFacilitatorDependencies requires FacilitatorDependencyProvider");
+    throw new Error(
+      "useFacilitatorDependencies requires FacilitatorDependencyProvider",
+    );
   }
   return dependencies;
 }

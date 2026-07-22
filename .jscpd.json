@@ -1,0 +1,18 @@
+{
+  "threshold": 2,
+  "minTokens": 50,
+  "reporters": ["console"],
+  "path": ["frontend/src", "backend"],
+  "ignore": [
+    "**/*.test.*",
+    "**/*.Tests/**",
+    "**/bin/**",
+    "**/obj/**",
+    "**/*.csproj",
+    "**/*.sln",
+    "**/*.slnf",
+    "**/tokens*.css",
+    "**/Analyzers/**"
+  ],
+  "absolute": true
+}

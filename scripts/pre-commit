@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "=== Pre-commit: auto-format ==="
+
+echo "[1/2] Prettier (FE)..."
+pnpm --dir frontend fmt
+git add -u frontend/
+
+echo "[2/2] CSharpier (BE)..."
+dotnet csharpier format backend/
+git add -u backend/
+
+echo "=== Pre-commit formatting done ==="

@@ -4,7 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "ValuesWorkshop",
-  description: "Facilitated workshop producing company values and everyday actions",
+  description:
+    "Facilitated workshop producing company values and everyday actions",
 };
 
 export default function RootLayout({

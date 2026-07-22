@@ -7,7 +7,8 @@ export interface ParticipantDependencies {
   gateway: ParticipantGateway;
 }
 
-const ParticipantDependencyContext = createContext<ParticipantDependencies | null>(null);
+const ParticipantDependencyContext =
+  createContext<ParticipantDependencies | null>(null);
 
 export function ParticipantDependencyProvider({
   dependencies,
@@ -26,7 +27,9 @@ export function ParticipantDependencyProvider({
 export function useParticipantDependencies(): ParticipantDependencies {
   const dependencies = useContext(ParticipantDependencyContext);
   if (dependencies === null) {
-    throw new Error("useParticipantDependencies requires ParticipantDependencyProvider");
+    throw new Error(
+      "useParticipantDependencies requires ParticipantDependencyProvider",
+    );
   }
   return dependencies;
 }

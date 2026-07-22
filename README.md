@@ -18,7 +18,7 @@ values and pragmatic everyday actions. See `SPEC.md` for the product spec.
 
 ```sh
 pnpm --dir frontend dev|test|lint          # frontend
-dotnet build backend/ValuesWorkshop.sln    # backend, prod projects only
+dotnet build backend/ValuesWorkshop.sln    # backend (prod + analyzers, no test projects)
 dotnet test backend/ValuesWorkshop.Tests.slnf
 node devtools/oidc                         # OIDC discovery on :9000
 ```

@@ -7,7 +7,9 @@ export interface PresenterDependencies {
   gateway: PresenterGateway;
 }
 
-const PresenterDependencyContext = createContext<PresenterDependencies | null>(null);
+const PresenterDependencyContext = createContext<PresenterDependencies | null>(
+  null,
+);
 
 export function PresenterDependencyProvider({
   dependencies,
@@ -26,7 +28,9 @@ export function PresenterDependencyProvider({
 export function usePresenterDependencies(): PresenterDependencies {
   const dependencies = useContext(PresenterDependencyContext);
   if (dependencies === null) {
-    throw new Error("usePresenterDependencies requires PresenterDependencyProvider");
+    throw new Error(
+      "usePresenterDependencies requires PresenterDependencyProvider",
+    );
   }
   return dependencies;
 }
