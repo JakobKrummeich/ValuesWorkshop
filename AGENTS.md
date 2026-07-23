@@ -30,6 +30,12 @@ collections or custom equality where equality matters). Aggregate style
 - Apply that same high standard to engineering excellence: lint, test failures, and test flakiness.
   If you see one, even if it is not caused by what you are working on right now, still get it fixed.
 
+## Frontend
+
+**MUST read `frontend/FE-IMPLEMENTATION-RULES.md` before any frontend work.**
+It covers RxJS-first architecture, enum conventions, design token usage,
+CSS module rules, and testing patterns.
+
 ## Per-task skill chain (in this order)
 
 1. **spec-driven-development** → write `tasks/specs/NN-<name>.md` (mini-spec;

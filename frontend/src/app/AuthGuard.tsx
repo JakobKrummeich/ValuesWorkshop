@@ -4,10 +4,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import { getAuthenticatedUser, loginRedirect } from "../adapters/authAdapter";
 import styles from "./AuthGuard.module.css";
 
-type AuthState = "checking" | "authenticated" | "redirecting" | "error";
+enum AuthState {
+  Checking = "checking",
+  Authenticated = "authenticated",
+  Redirecting = "redirecting",
+  Error = "error",
+}
 
 export function AuthGuard({ children }: { children: ReactNode }) {
-  const [authState, setAuthState] = useState<AuthState>("checking");
+  const [authState, setAuthState] = useState<AuthState>(AuthState.Checking);
 
   useEffect(() => {
     let cancelled = false;
@@ -18,13 +23,13 @@ export function AuthGuard({ children }: { children: ReactNode }) {
       if (cancelled) return;
 
       if (user) {
-        setAuthState("authenticated");
+        setAuthState(AuthState.Authenticated);
       } else {
-        setAuthState("redirecting");
+        setAuthState(AuthState.Redirecting);
         try {
           await loginRedirect(window.location.pathname);
         } catch {
-          if (!cancelled) setAuthState("error");
+          if (!cancelled) setAuthState(AuthState.Error);
         }
       }
     }
@@ -36,18 +41,18 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  if (authState === "authenticated") {
+  if (authState === AuthState.Authenticated) {
     return <>{children}</>;
   }
 
   return (
     <div className={styles.container}>
       <p>
-        {authState === "error"
+        {authState === AuthState.Error
           ? "Unable to connect to the login provider. Please try again later."
-          : authState === "checking"
-            ? "Checking authentication…"
-            : "Redirecting to login…"}
+          : authState === AuthState.Checking
+            ? "Checking authentication\u2026"
+            : "Redirecting to login\u2026"}
       </p>
     </div>
   );
