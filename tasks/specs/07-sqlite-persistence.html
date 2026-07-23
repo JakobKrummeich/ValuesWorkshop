@@ -1,0 +1,252 @@
+<h1>Spec: Task 7 — SQLite Persistence Layer</h1>
+<h2>Objective</h2>
+<p>Persist full session state to SQLite using EF Core with proper relational
+tables. Every mutation survives backend restarts. No voter↔vote linkage
+possible anywhere in the database schema. Write-before-broadcast enforced
+structurally. On startup, all sessions reload to exact prior state.</p>
+<h2>Assumptions</h2>
+<ol>
+<li><strong>EF Core with SQLite provider</strong> — proper relational mapping, type-safe
+queries, conventional .NET persistence.</li>
+<li>Port interface (<code>ISessionRepository</code>) in <code>Domain/Ports/</code> (mirrors
+frontend convention: <code>src/domain/ports/</code>).</li>
+<li>Adapter (<code>SqliteSessionRepository</code>) + EF <code>DbContext</code> + entity classes
+in Adapters assembly — Domain stays pure, no EF Core references.</li>
+<li><strong>Proper SQL tables</strong> — one table per concern, no &quot;god tables&quot;. Session
+table holds only identity + phase + timestamps. Quiz state, presentation
+state, and voting state each get their own table.</li>
+<li>Anonymity enforced at table level: vote tallies table has no participant
+column; voted-participants table has no vote/value column. No possible
+join between voter and votes.</li>
+<li>&quot;Write-before-broadcast&quot; enforcement: Application-layer
+<code>SessionCommandHandler</code> wraps mutation → persist → broadcast as one
+atomic operation. Broadcast hook (no-op until Task 9/SignalR) runs only
+after successful persist. Lives in Application (not Domain) because it
+orchestrates domain mutation + persistence — a cross-cutting concern
+that Domain must not know about.</li>
+<li>Multiple sessions in parallel — each session is a single-writer
+aggregate; different sessions write independently.</li>
+<li><code>DATA_DIR</code> environment variable controls DB file location.</li>
+<li><strong>No migration framework.</strong> Schema created via <code>EnsureCreated()</code>. During
+development, drop and recreate DB on schema changes. Project is
+build-once, no post-launch schema evolution needed.</li>
+</ol>
+<h2>Table Schema</h2>
+<pre><code>sessions
+├── identity  TEXT PK
+├── current_phase  INTEGER NOT NULL
+└── created_at  TEXT NOT NULL
+
+quiz_state  (1:1 with session)
+├── session_identity  TEXT PK FK → sessions
+├── current_question_index  INTEGER NULL
+├── is_revealed  INTEGER NOT NULL DEFAULT 0
+└── is_learning_text_shown  INTEGER NOT NULL DEFAULT 0
+
+presentation_state  (1:1 with session)
+├── session_identity  TEXT PK FK → sessions
+├── presenting_group_name  TEXT NULL
+└── presented_value_id  TEXT NULL
+
+voting_state  (1:1 with session)
+├── session_identity  TEXT PK FK → sessions
+├── round_open  INTEGER NOT NULL DEFAULT 0
+└── round_number  INTEGER NOT NULL DEFAULT 0
+
+participants
+├── id  TEXT PK
+├── session_identity  TEXT FK → sessions
+└── (roster membership)
+
+quiz_answers
+├── session_identity  TEXT FK → sessions
+├── question_index  INTEGER
+├── participant_id  TEXT FK → participants
+├── answer_index  INTEGER NOT NULL
+└── PK(session_identity, question_index, participant_id)
+
+value_selections
+├── session_identity  TEXT FK → sessions
+├── participant_id  TEXT FK → participants
+├── value_id  TEXT
+└── PK(session_identity, participant_id, value_id)
+
+selection_submissions  (tracks who submitted, not what)
+├── session_identity  TEXT FK → sessions
+├── participant_id  TEXT FK → participants
+└── PK(session_identity, participant_id)
+
+top_values
+├── session_identity  TEXT FK → sessions
+├── value_id  TEXT
+└── PK(session_identity, value_id)
+
+groups
+├── id  INTEGER PK AUTOINCREMENT
+├── session_identity  TEXT FK → sessions
+├── name  TEXT NOT NULL
+├── scribe_participant_id  TEXT NULL FK → participants
+└── is_submitted  INTEGER NOT NULL DEFAULT 0
+
+group_members
+├── group_id  INTEGER FK → groups
+├── participant_id  TEXT FK → participants
+└── PK(group_id, participant_id)
+
+group_assigned_values
+├── group_id  INTEGER FK → groups
+├── value_id  TEXT
+└── PK(group_id, value_id)
+
+group_actions
+├── id  INTEGER PK AUTOINCREMENT
+├── group_id  INTEGER FK → groups
+├── value_id  TEXT NOT NULL
+├── text  TEXT NOT NULL
+└── sort_order  INTEGER NOT NULL
+
+vote_tallies  ← NO participant column (anonymity)
+├── session_identity  TEXT FK → sessions
+├── round_number  INTEGER
+├── value_id  TEXT
+├── vote_count  INTEGER NOT NULL DEFAULT 0
+└── PK(session_identity, round_number, value_id)
+
+voted_participants  ← NO vote/value column (anonymity)
+├── session_identity  TEXT FK → sessions
+├── round_number  INTEGER
+├── participant_id  TEXT FK → participants
+└── PK(session_identity, round_number, participant_id)
+
+winning_values
+├── session_identity  TEXT FK → sessions
+├── value_id  TEXT
+├── rank  INTEGER NOT NULL
+└── PK(session_identity, value_id)
+</code></pre>
+<p><strong>Anonymity argument:</strong> <code>vote_tallies</code> contains (session, round, value,
+count) — no participant. <code>voted_participants</code> contains (session, round,
+participant) — no value or count. No FK or column connects them. Even with
+full DB access, voter↔vote linkage is impossible.</p>
+<h2>Deliverables</h2>
+<h3>A. <code>design/persistence.md</code></h3>
+<p>Design document covering:</p>
+<ul>
+<li>Full table schema (above)</li>
+<li>Write-before-broadcast flow diagram</li>
+<li>Recovery procedure (startup load)</li>
+<li>Schema-level anonymity argument</li>
+<li>EF Core entity mapping approach</li>
+</ul>
+<h3>B. Domain port</h3>
+<p><code>ISessionRepository</code> in <code>ValuesWorkshop.Domain/Ports/</code>:</p>
+<ul>
+<li><code>SaveAsync(sessionIdentity, session)</code> — map domain → entities, persist</li>
+<li><code>LoadAsync(sessionIdentity)</code> → <code>Session?</code> — load entities, map → domain</li>
+<li><code>LoadAllAsync()</code> → all active sessions (needed for startup recovery:
+&quot;on startup, all sessions reload to exact prior state&quot;)</li>
+</ul>
+<h3>C. EF Core entities + DbContext (Adapters)</h3>
+<ul>
+<li>Entity classes in <code>Adapters/Persistence/Entities/</code> — EF-friendly POCOs,
+separate from domain types. Navigation properties, no domain logic.</li>
+<li><code>WorkshopDbContext</code> in <code>Adapters/Persistence/</code> — configures table
+mappings, keys, relationships via <code>OnModelCreating</code>.</li>
+</ul>
+<h3>D. SQLite adapter</h3>
+<ul>
+<li><code>SqliteSessionRepository</code> in <code>Adapters/Persistence/</code> — implements
+<code>ISessionRepository</code>. Maps between domain objects and EF entities.
+Uses <code>DbContext</code> for all DB operations.</li>
+</ul>
+<h3>E. Application command handler</h3>
+<ul>
+<li><code>SessionCommandHandler</code> in Application: mutate → persist → broadcast.
+Broadcast = no-op <code>IBroadcaster</code> interface until Task 9. Lives in
+Application because it orchestrates domain + persistence — Domain stays
+pure with no persistence knowledge.</li>
+</ul>
+<h3>F. Tests</h3>
+<ul>
+<li><strong>Adapter round-trip tests</strong> (Adapters.Tests): save session → dispose
+context → new context → load → assert identical state. Cover each
+building block with non-trivial state.</li>
+<li><strong>Anonymity schema test</strong>: inspect EF model metadata → assert
+<code>vote_tallies</code> has no participant column; <code>voted_participants</code> has no
+value/count column.</li>
+</ul>
+<h3>G. Host wiring</h3>
+<ul>
+<li>Register <code>DbContext</code>, <code>ISessionRepository</code> in DI.</li>
+<li>On startup: <code>EnsureCreated()</code> for schema, load sessions.</li>
+<li>Remove placeholder seed code from Program.cs.</li>
+</ul>
+<h2>Tech Stack</h2>
+<ul>
+<li><code>Microsoft.EntityFrameworkCore.Sqlite</code> (new dependency)</li>
+<li>xUnit + Shouldly (existing)</li>
+</ul>
+<h2>Commands</h2>
+<pre><code>Build:  dotnet build backend/ValuesWorkshop.All.sln
+Test:   dotnet test backend/ValuesWorkshop.Tests.slnf
+Lint:   ./scripts/ci-lint.sh
+</code></pre>
+<h2>Project Structure (new/changed files)</h2>
+<pre><code>backend/Domain/Ports/ISessionRepository.cs                  → port interface
+backend/Adapters/Persistence/WorkshopDbContext.cs            → EF DbContext
+backend/Adapters/Persistence/Entities/*.cs                   → EF entity classes
+backend/Adapters/Persistence/SqliteSessionRepository.cs      → adapter
+backend/Adapters/Persistence/DomainEntityMapper.cs           → domain ↔ entity mapping
+backend/Application/SessionCommandHandler.cs                 → mutation orchestrator
+backend/Application/IBroadcaster.cs                          → broadcast port (no-op)
+backend/Host/Program.cs                                      → DI wiring, startup
+backend/Adapters.Tests/SqliteSessionRepositoryTests.cs       → round-trip + anonymity
+design/persistence.md                                        → design doc
+</code></pre>
+<h2>Code Style</h2>
+<p>Records for value objects and DTOs. Sealed classes for entities (EF
+requires mutable properties). Full word names. C# PascalCase
+types/properties/methods, camelCase locals/params.</p>
+<h2>Testing Strategy</h2>
+<ul>
+<li><strong>Round-trip tests</strong> (Adapters.Tests): EF in-memory SQLite. Save domain
+session with various states → new DbContext → load → deep equality.</li>
+<li><strong>Anonymity test</strong> (Adapters.Tests): inspect EF model metadata to prove
+no voter↔vote join path exists in schema.</li>
+<li>Coverage: all persistence mapping code covered by round-trip tests.</li>
+</ul>
+<h2>Boundaries</h2>
+<ul>
+<li><strong>Always:</strong> persist before broadcast; run tests before push.</li>
+<li><strong>Ask first:</strong> schema changes, adding dependencies beyond EF Core.</li>
+<li><strong>Never:</strong> store voter↔vote links; add migration framework.</li>
+</ul>
+<h2>Success Criteria</h2>
+<ol>
+<li><code>design/persistence.md</code> complete with schema, flow, anonymity argument.</li>
+<li><code>dotnet test backend/ValuesWorkshop.Tests.slnf</code> — all round-trip and
+schema tests pass.</li>
+<li>No voter↔vote linkage in DB schema (test-asserted via EF metadata).</li>
+<li><code>SessionCommandHandler</code> enforces persist-before-broadcast.</li>
+<li><code>./scripts/ci-lint.sh</code> and <code>./scripts/ci-test.sh</code> pass.</li>
+</ol>
+<h2>Open Questions</h2>
+<p>None.</p>
+<hr>
+<h2>Implementation Steps</h2>
+<h3>Step 1: <code>design/persistence.md</code></h3>
+<p>Write design doc with schema, flow, anonymity argument. Commit.</p>
+<h3>Step 2: EF Core setup + entities + DbContext</h3>
+<p>Add EF Core SQLite package. Create entity classes and DbContext with full
+table configuration. Commit.</p>
+<h3>Step 3: Port interface + adapter</h3>
+<p>Add <code>ISessionRepository</code> to <code>Domain/Ports/</code>. Implement
+<code>SqliteSessionRepository</code> with domain ↔ entity mapping. Write round-trip +
+anonymity tests. Commit.</p>
+<h3>Step 4: Application command handler</h3>
+<p>Add <code>IBroadcaster</code> and <code>SessionCommandHandler</code>. Commit.</p>
+<h3>Step 5: Host wiring + cleanup</h3>
+<p>Wire DI. EnsureCreated on startup. Remove placeholder seed. Commit.</p>
+<h3>Step 6: Quality gates</h3>
+<p>Run <code>ci-lint.sh</code> + <code>ci-test.sh</code>. Fix any issues. Final commit.</p>
+
