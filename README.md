@@ -28,4 +28,3 @@ scripts/ci-test.sh                         # all test gates
 ```
 
 Layer mapping FE ↔ BE and architecture rules: `design/architecture.md`.
-# test
