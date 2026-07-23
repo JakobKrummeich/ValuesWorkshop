@@ -4,6 +4,7 @@
     "jscpd": "jscpd"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "jscpd": "^4.2.5"
   }
 }
