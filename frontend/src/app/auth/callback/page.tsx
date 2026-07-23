@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { handleCallback, navigateReplace } from "../../../adapters/authAdapter";
 
+const centeringStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minHeight: "100vh",
+};
+
 export default function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(null);
 
@@ -37,16 +44,7 @@ export default function AuthCallbackPage() {
 
   if (error) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-          flexDirection: "column",
-          gap: "1rem",
-        }}
-      >
+      <div style={{ ...centeringStyle, flexDirection: "column", gap: "1rem" }}>
         <p>Authentication error: {error}</p>
         <Link href="/">Return to home</Link>
       </div>
@@ -54,14 +52,7 @@ export default function AuthCallbackPage() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-      }}
-    >
+    <div style={centeringStyle}>
       <p>Completing login…</p>
     </div>
   );

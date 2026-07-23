@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ValuesWorkshop.Adapters.Persistence;
@@ -43,11 +44,7 @@ builder
     });
 builder
     .Services.AddAuthorizationBuilder()
-    .SetFallbackPolicy(
-        new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
-            .RequireAuthenticatedUser()
-            .Build()
-    );
+    .SetFallbackPolicy(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
 
 builder.Services.AddCors(options =>
 {

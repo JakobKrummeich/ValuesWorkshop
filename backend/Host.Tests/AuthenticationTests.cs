@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using AuthHeaderValue = System.Net.Http.Headers.AuthenticationHeaderValue;
 
 namespace ValuesWorkshop.Host.Tests;
 
@@ -47,8 +48,7 @@ public sealed class AuthenticationTests
     public async Task ValidToken_grants_access_to_protected_endpoint()
     {
         var token = GenerateTestToken("test-user");
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        client.DefaultRequestHeaders.Authorization = new AuthHeaderValue("Bearer", token);
 
         var response = await client.GetAsync("/api/protected-test");
 
@@ -59,8 +59,7 @@ public sealed class AuthenticationTests
     public async Task ExpiredToken_returns_401()
     {
         var token = GenerateTestToken("test-user", expired: true);
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        client.DefaultRequestHeaders.Authorization = new AuthHeaderValue("Bearer", token);
 
         var response = await client.GetAsync("/api/protected-test");
 
@@ -71,8 +70,7 @@ public sealed class AuthenticationTests
     public async Task TamperedToken_returns_401()
     {
         var token = GenerateTestToken("test-user") + "tampered";
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        client.DefaultRequestHeaders.Authorization = new AuthHeaderValue("Bearer", token);
 
         var response = await client.GetAsync("/api/protected-test");
 
