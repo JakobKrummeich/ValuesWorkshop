@@ -5,8 +5,10 @@ public class SessionTests
     [Fact]
     public void New_session_starts_with_all_building_blocks_in_initial_state()
     {
-        var session = new Session();
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var session = new Session(identity);
 
+        session.Identity.ShouldBe(identity);
         session.State.CurrentPhase.ShouldBe(Phase.Join);
         session.Roster.Participants.ShouldBeEmpty();
         session.Quiz.CurrentQuestion.ShouldBeNull();

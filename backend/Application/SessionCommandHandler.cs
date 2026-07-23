@@ -11,12 +11,12 @@ public sealed class SessionCommandHandler(ISessionRepository repository, IBroadc
         Session? session = null
     )
     {
-        session ??= await repository.LoadAsync(sessionIdentity) ?? new Session();
+        session ??= await repository.LoadAsync(sessionIdentity) ?? new Session(sessionIdentity);
 
         mutation(session);
 
-        await repository.SaveAsync(sessionIdentity, session);
+        await repository.SaveAsync(session);
 
-        await broadcaster.BroadcastSessionStateAsync(sessionIdentity, session);
+        await broadcaster.BroadcastSessionStateAsync(session);
     }
 }

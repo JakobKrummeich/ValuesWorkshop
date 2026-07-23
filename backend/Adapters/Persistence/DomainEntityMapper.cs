@@ -5,30 +5,32 @@ namespace ValuesWorkshop.Adapters.Persistence;
 
 internal static class DomainEntityMapper
 {
-    internal static SessionEntity ToEntity(string sessionIdentity, Session session)
+    internal static SessionEntity ToEntity(Session session)
     {
+        var identityString = session.Identity.Value.ToString();
+
         return new SessionEntity
         {
-            Identity = sessionIdentity,
+            Identity = identityString,
             CurrentPhase = (int)session.State.CurrentPhase,
             IsFormed = session.Formation.IsFormed,
             CreatedAt = DateTime.UtcNow.ToString("o"),
             QuizState = new QuizStateEntity
             {
-                SessionIdentity = sessionIdentity,
+                SessionIdentity = identityString,
                 CurrentQuestionIndex = session.Quiz.CurrentQuestion,
                 IsRevealed = session.Quiz.IsRevealed,
                 IsLearningTextShown = session.Quiz.IsLearningTextShown,
             },
             PresentationState = new PresentationStateEntity
             {
-                SessionIdentity = sessionIdentity,
+                SessionIdentity = identityString,
                 PresentingGroupName = session.Presentation.PresentingGroup,
                 PresentedValueId = session.Presentation.PresentedValue?.Value,
             },
             VotingState = new VotingStateEntity
             {
-                SessionIdentity = sessionIdentity,
+                SessionIdentity = identityString,
                 RoundOpen = session.Voting.RoundOpen,
                 RoundNumber = session.Voting.RoundNumber,
             },
@@ -36,32 +38,32 @@ internal static class DomainEntityMapper
                 .Roster.Participants.Select(participantId => new ParticipantEntity
                 {
                     Id = participantId.Value.ToString(),
-                    SessionIdentity = sessionIdentity,
+                    SessionIdentity = identityString,
                 })
                 .ToList(),
             SelectionSubmissions = session
                 .Selection.SubmittedBy.Select(participantId => new SelectionSubmissionEntity
                 {
-                    SessionIdentity = sessionIdentity,
+                    SessionIdentity = identityString,
                     ParticipantId = participantId.Value.ToString(),
                 })
                 .ToList(),
             TopValues = session
                 .Selection.TopValues.Select(valueId => new TopValueEntity
                 {
-                    SessionIdentity = sessionIdentity,
+                    SessionIdentity = identityString,
                     ValueId = valueId.Value,
                 })
                 .ToList(),
             Groups = session
-                .Formation.Groups.Select(group => ToGroupEntity(sessionIdentity, group))
+                .Formation.Groups.Select(group => ToGroupEntity(identityString, group))
                 .ToList(),
             WinningValues = session
                 .Voting.WinningValues.Select(
                     (valueId, index) =>
                         new WinningValueEntity
                         {
-                            SessionIdentity = sessionIdentity,
+                            SessionIdentity = identityString,
                             ValueId = valueId.Value,
                             Rank = index + 1,
                         }
@@ -128,7 +130,18 @@ internal static class DomainEntityMapper
                 .Select(winner => new ValueId(winner.ValueId))
         );
 
-        return Session.Restore(roster, state, quiz, selection, formation, presentation, voting);
+        var identity = new SessionIdentity(Guid.Parse(entity.Identity));
+
+        return Session.Restore(
+            identity,
+            roster,
+            state,
+            quiz,
+            selection,
+            formation,
+            presentation,
+            voting
+        );
     }
 
     private static GroupEntity ToGroupEntity(string sessionIdentity, Group group)

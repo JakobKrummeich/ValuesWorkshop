@@ -29,13 +29,14 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     [Fact]
     public async Task Round_trip_empty_session()
     {
-        var session = new Session();
-
         var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(identity, session);
+        var session = new Session(identity);
+
+        await SaveSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
+        loaded.Identity.ShouldBe(identity);
         loaded.State.CurrentPhase.ShouldBe(Phase.Join);
         loaded.Roster.Participants.ShouldBeEmpty();
         loaded.Quiz.CurrentQuestion.ShouldBeNull();
@@ -55,9 +56,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     [Fact]
     public async Task Round_trip_session_with_roster()
     {
+        var identity = new SessionIdentity(Guid.NewGuid());
         var participantOne = new ParticipantId(Guid.NewGuid());
         var participantTwo = new ParticipantId(Guid.NewGuid());
         var session = Session.Restore(
+            identity,
             Roster.Restore([participantOne, participantTwo]),
             WorkshopState.Restore(Phase.Quiz),
             QuizProgress.Restore(2, true, false),
@@ -67,11 +70,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             VotingRounds.Restore(false, 0, [])
         );
 
-        var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(identity, session);
+        await SaveSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
+        loaded.Identity.ShouldBe(identity);
         loaded.State.CurrentPhase.ShouldBe(Phase.Quiz);
         loaded.Roster.Participants.Count.ShouldBe(2);
         loaded.Roster.Participants.ShouldContain(participantOne);
@@ -84,10 +87,12 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     [Fact]
     public async Task Round_trip_session_with_selections_and_top_values()
     {
+        var identity = new SessionIdentity(Guid.NewGuid());
         var participant = new ParticipantId(Guid.NewGuid());
         var topValueOne = new ValueId("trust");
         var topValueTwo = new ValueId("respect");
         var session = Session.Restore(
+            identity,
             Roster.Restore([participant]),
             WorkshopState.Restore(Phase.SelectionResults),
             QuizProgress.Restore(4, true, true),
@@ -97,8 +102,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             VotingRounds.Restore(false, 0, [])
         );
 
-        var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(identity, session);
+        await SaveSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -112,12 +116,14 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     [Fact]
     public async Task Round_trip_session_with_groups()
     {
+        var identity = new SessionIdentity(Guid.NewGuid());
         var memberOne = new ParticipantId(Guid.NewGuid());
         var memberTwo = new ParticipantId(Guid.NewGuid());
         var value = new ValueId("honesty");
         var group = Group.Restore("Otter", [memberOne, memberTwo], [value], memberOne, true);
 
         var session = Session.Restore(
+            identity,
             Roster.Restore([memberOne, memberTwo]),
             WorkshopState.Restore(Phase.GroupWork),
             QuizProgress.Restore(null, false, false),
@@ -127,8 +133,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             VotingRounds.Restore(false, 0, [])
         );
 
-        var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(identity, session);
+        await SaveSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -149,9 +154,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     [Fact]
     public async Task Round_trip_session_with_presentation_and_voting()
     {
+        var identity = new SessionIdentity(Guid.NewGuid());
         var winnerOne = new ValueId("courage");
         var winnerTwo = new ValueId("integrity");
         var session = Session.Restore(
+            identity,
             Roster.Restore([]),
             WorkshopState.Restore(Phase.FinalPresentation),
             QuizProgress.Restore(null, false, false),
@@ -161,8 +168,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             VotingRounds.Restore(false, 2, [winnerOne, winnerTwo])
         );
 
-        var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(identity, session);
+        await SaveSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -179,10 +185,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     public async Task Save_overwrites_existing_session()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        var session = new Session();
-        await SaveSession(identity, session);
+        var session = new Session(identity);
+        await SaveSession(session);
 
         var updatedSession = Session.Restore(
+            identity,
             Roster.Restore([new ParticipantId(Guid.NewGuid())]),
             WorkshopState.Restore(Phase.Quiz),
             QuizProgress.Restore(1, false, false),
@@ -191,7 +198,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             PresentationWalk.Restore(null, null),
             VotingRounds.Restore(false, 0, [])
         );
-        await SaveSession(identity, updatedSession);
+        await SaveSession(updatedSession);
 
         var loaded = await LoadSession(identity);
 
@@ -212,10 +219,10 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     {
         var identityA = new SessionIdentity(Guid.NewGuid());
         var identityB = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(identityA, new Session());
+        await SaveSession(new Session(identityA));
         await SaveSession(
-            identityB,
             Session.Restore(
+                identityB,
                 Roster.Restore([new ParticipantId(Guid.NewGuid())]),
                 WorkshopState.Restore(Phase.ValueSelection),
                 QuizProgress.Restore(null, false, false),
@@ -231,8 +238,8 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var allSessions = await repository.LoadAllAsync();
 
         allSessions.Count.ShouldBe(2);
-        allSessions.ShouldContain(pair => pair.Identity == identityA);
-        allSessions.ShouldContain(pair => pair.Identity == identityB);
+        allSessions.ShouldContain(session => session.Identity == identityA);
+        allSessions.ShouldContain(session => session.Identity == identityB);
     }
 
     [Fact]
@@ -270,11 +277,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         columnNames.ShouldNotContain("vote_count");
     }
 
-    private async Task SaveSession(SessionIdentity identity, Session session)
+    private async Task SaveSession(Session session)
     {
         using var context = new WorkshopDbContext(_options);
         var repository = new SqliteSessionRepository(context);
-        await repository.SaveAsync(identity, session);
+        await repository.SaveAsync(session);
     }
 
     private async Task<Session?> LoadSession(SessionIdentity identity)

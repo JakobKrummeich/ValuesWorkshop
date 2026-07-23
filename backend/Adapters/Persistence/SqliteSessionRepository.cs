@@ -6,14 +6,14 @@ namespace ValuesWorkshop.Adapters.Persistence;
 
 public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessionRepository
 {
-    public async Task SaveAsync(SessionIdentity sessionIdentity, Session session)
+    public async Task SaveAsync(Session session)
     {
-        var identityString = sessionIdentity.Value.ToString();
+        var identityString = session.Identity.Value.ToString();
 
         var existingEntity = await QueryFullSession()
             .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
 
-        var newEntity = DomainEntityMapper.ToEntity(identityString, session);
+        var newEntity = DomainEntityMapper.ToEntity(session);
 
         await using var transaction = await database.Database.BeginTransactionAsync();
 
@@ -41,18 +41,11 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         return entity is null ? null : DomainEntityMapper.ToDomain(entity);
     }
 
-    public async Task<IReadOnlyList<(SessionIdentity Identity, Session Session)>> LoadAllAsync()
+    public async Task<IReadOnlyList<Session>> LoadAllAsync()
     {
         var entities = await QueryFullSession().ToListAsync();
 
-        return entities
-            .Select(entity =>
-                (
-                    new SessionIdentity(Guid.Parse(entity.Identity)),
-                    DomainEntityMapper.ToDomain(entity)
-                )
-            )
-            .ToList();
+        return entities.Select(DomainEntityMapper.ToDomain).ToList();
     }
 
     private IQueryable<Persistence.Entities.SessionEntity> QueryFullSession()
