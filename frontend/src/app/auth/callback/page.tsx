@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { handleCallback, navigateReplace } from "../../../adapters/authAdapter";
 
 export default function AuthCallbackPage() {
@@ -47,7 +48,7 @@ export default function AuthCallbackPage() {
         }}
       >
         <p>Authentication error: {error}</p>
-        <a href="/">Return to home</a>
+        <Link href="/">Return to home</Link>
       </div>
     );
   }

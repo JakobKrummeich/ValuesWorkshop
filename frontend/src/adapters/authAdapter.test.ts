@@ -32,7 +32,6 @@ describe("authAdapter", () => {
 
       const user = await getAuthenticatedUser();
 
-      user!.access_token.should_not_be_null;
       expect(user).toBe(mockUser);
     });
 
