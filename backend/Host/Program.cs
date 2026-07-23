@@ -29,7 +29,7 @@ builder
     .AddJwtBearer(options =>
     {
         options.Authority = oidcAuthority;
-        options.RequireHttpsMetadata = false;
+        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

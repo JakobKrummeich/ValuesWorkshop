@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { getAuthenticatedUser, loginRedirect } from "../adapters/authAdapter";
 
-type AuthState = "checking" | "authenticated" | "redirecting";
+type AuthState = "checking" | "authenticated" | "redirecting" | "error";
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>("checking");
@@ -20,7 +20,11 @@ export function AuthGuard({ children }: { children: ReactNode }) {
         setAuthState("authenticated");
       } else {
         setAuthState("redirecting");
-        await loginRedirect(window.location.pathname);
+        try {
+          await loginRedirect(window.location.pathname);
+        } catch {
+          if (!cancelled) setAuthState("error");
+        }
       }
     }
 
@@ -45,9 +49,11 @@ export function AuthGuard({ children }: { children: ReactNode }) {
       }}
     >
       <p>
-        {authState === "checking"
-          ? "Checking authentication…"
-          : "Redirecting to login…"}
+        {authState === "error"
+          ? "Unable to connect to the login provider. Please try again later."
+          : authState === "checking"
+            ? "Checking authentication…"
+            : "Redirecting to login…"}
       </p>
     </div>
   );

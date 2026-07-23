@@ -22,8 +22,10 @@ export default function AuthCallbackPage() {
         const user = await handleCallback();
         if (cancelled) return;
 
+        const stateUrl =
+          typeof user.state === "string" ? user.state : null;
         const returnUrl =
-          (typeof user.state === "string" ? user.state : null) ?? "/";
+          stateUrl && stateUrl.startsWith("/") ? stateUrl : "/";
         navigateReplace(returnUrl);
       } catch (callbackError) {
         if (cancelled) return;

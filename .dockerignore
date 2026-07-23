@@ -1,0 +1,6 @@
+.git/
+backend/
+devtools/
+node_modules/
+.next/
+coverage/
