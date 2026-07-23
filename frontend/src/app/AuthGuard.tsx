@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { getAuthenticatedUser, loginRedirect } from "../adapters/authAdapter";
+import styles from "./AuthGuard.module.css";
 
 type AuthState = "checking" | "authenticated" | "redirecting" | "error";
 
@@ -40,14 +41,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-      }}
-    >
+    <div className={styles.container}>
       <p>
         {authState === "error"
           ? "Unable to connect to the login provider. Please try again later."
