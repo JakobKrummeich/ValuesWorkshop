@@ -1,0 +1,220 @@
+<h1>Task 8 — OIDC Auth End-to-End</h1>
+<h2>Objective</h2>
+<p>Facilitator and participant screens require OIDC login; presenter stays
+unauthenticated. Backend rejects unauthenticated API/hub requests (except
+health + presenter endpoints). Config is environment-driven — swap
+authority/audience/clientId for Azure AD in prod, no code changes.</p>
+<h2>Architecture Fit</h2>
+<p>Auth is <strong>infrastructure</strong>, not domain. No domain ports needed.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Where auth lives</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>BE Host</td>
+<td>JWT Bearer middleware + CORS in <code>Program.cs</code></td>
+</tr>
+<tr>
+<td>FE adapters</td>
+<td><code>authAdapter.ts</code> wrapping <code>oidc-client-ts</code></td>
+</tr>
+<tr>
+<td>FE app</td>
+<td><code>AuthGuard</code> component used by facilitator + participant layouts; callback route</td>
+</tr>
+<tr>
+<td>Dev tooling</td>
+<td><code>devtools/oidc/</code> configured with clients, users, JWT access tokens</td>
+</tr>
+</tbody></table>
+<p>Dependency flow: <code>app/ → adapters/authAdapter → oidc-client-ts (npm)</code>.
+No domain dependency. No new dep-cruiser violations.</p>
+<h2>Dev OIDC Provider (<code>devtools/oidc/</code>)</h2>
+<p>Current state: bare <code>oidc-provider</code> with no clients/users configured.</p>
+<p>Configure:</p>
+<ul>
+<li><strong>Issuer:</strong> <code>http://localhost:9000</code> (browser-reachable; backend fetches
+discovery from <code>http://oidc:9000</code> via separate metadata URL)</li>
+<li><strong>Client:</strong> <code>valuesworkshop</code> — public client (<code>token_endpoint_auth_method: &quot;none&quot;</code>), authorization_code + PKCE, redirect URI
+<code>http://localhost:3000/auth/callback</code></li>
+<li><strong>JWT access tokens:</strong> configure <code>formats.AccessToken = &#39;jwt&#39;</code> so backend
+can validate without introspection</li>
+<li><strong>Refresh tokens:</strong> enable <code>features.revocation</code> and grant type
+<code>refresh_token</code> so <code>oidc-client-ts</code> can silently refresh before access
+token expiry. Access token TTL ~10 min, refresh token TTL ~3 hr
+(covers full workshop with margin). <code>automaticSilentRenew</code> in the
+FE adapter handles this transparently</li>
+<li><strong>Test accounts:</strong> <code>findAccount</code> returns claims for hardcoded users:
+<code>facilitator</code> (sub + name), <code>participant1</code>–<code>participant5</code> (sub + name)</li>
+<li><strong>Dev interactions:</strong> enable <code>features.devInteractions</code> for built-in
+login/consent UI (Playwright can drive it)</li>
+<li><strong>Allow HTTP:</strong> <code>features.allowOmittingSingleRegisteredRedirectUri</code>,
+disable HTTPS enforcement for dev</li>
+</ul>
+<h2>Backend Changes</h2>
+<h3>Host project (<code>ValuesWorkshop.Host</code>)</h3>
+<p>Add <code>Microsoft.AspNetCore.Authentication.JwtBearer</code> NuGet package.</p>
+<p><code>Program.cs</code> additions:</p>
+<pre><code>1. JWT Bearer authentication:
+   - Authority = env OIDC_AUTHORITY (issuer URL, e.g. http://localhost:9000)
+   - MetadataAddress = env OIDC_METADATA_URL (internal URL for key fetch,
+     e.g. http://oidc:9000/.well-known/openid-configuration)
+   - Audience = &quot;valuesworkshop-api&quot; (or skip audience validation for dev
+     simplicity — configurable)
+   - RequireHttpsMetadata = false (dev; prod overrides via config)
+   - TokenValidationParameters.ValidateAudience = false for now
+     (audience in dev oidc-provider is tricky; revisit when Azure AD added)
+
+2. CORS policy:
+   - Allow origin http://localhost:3000 (env-driven: CORS_ORIGINS)
+   - Allow Authorization header, credentials
+
+3. Authorization:
+   - app.UseAuthentication() + app.UseAuthorization()
+   - Default policy: require authenticated user
+   - Endpoints &quot;/&quot; and &quot;/health&quot; allow anonymous
+   - Future presenter endpoints will also allow anonymous
+</code></pre>
+<h3>No Adapters changes</h3>
+<p>OIDC validation is standard ASP.NET Core middleware — no custom adapter
+needed. The adapter split (Adapters.Persistence vs Adapters.Web) remains
+deferred to Task 9.</p>
+<h2>Frontend Changes</h2>
+<h3>New dependency: <code>oidc-client-ts</code></h3>
+<p>Client-side OIDC library. Handles authorization code + PKCE flow, token
+storage, silent renew. Clean adapter — no framework coupling.</p>
+<h3><code>src/adapters/authAdapter.ts</code></h3>
+<p>Exports a configured <code>UserManager</code> instance:</p>
+<ul>
+<li>Authority: <code>NEXT_PUBLIC_OIDC_AUTHORITY</code> (env)</li>
+<li>Client ID: <code>NEXT_PUBLIC_OIDC_CLIENT_ID</code> (env)</li>
+<li>Redirect URI: <code>NEXT_PUBLIC_OIDC_REDIRECT_URI</code> (env, default <code>/auth/callback</code>)</li>
+<li>Response type: <code>code</code></li>
+<li>Scope: <code>openid profile</code></li>
+<li><code>automaticSilentRenew: true</code> (uses refresh token to renew before expiry)</li>
+<li><code>includeIdTokenInSilentRenew: false</code></li>
+<li><code>userStore</code>: sessionStorage (survives refresh, clears on tab close —
+appropriate for 2-hour workshop)</li>
+</ul>
+<p>Also exports helper functions:</p>
+<ul>
+<li><code>getAuthenticatedUser()</code> — returns User or null</li>
+<li><code>loginRedirect(returnUrl)</code> — triggers OIDC redirect</li>
+<li><code>handleCallback()</code> — processes callback, returns User</li>
+<li><code>getAccessToken()</code> — returns current access token string or null</li>
+</ul>
+<h3><code>src/app/auth/callback/page.tsx</code></h3>
+<p>Client component. On mount: calls <code>handleCallback()</code>, then redirects to
+the stored return URL (or <code>/</code>). Shows loading indicator during processing.</p>
+<h3><code>src/app/AuthGuard.tsx</code></h3>
+<p>Client component wrapping children:</p>
+<ol>
+<li>On mount, check <code>getAuthenticatedUser()</code></li>
+<li>If authenticated → render children</li>
+<li>If not → call <code>loginRedirect(currentPath)</code> (saves return URL, redirects
+to OIDC provider)</li>
+<li>While checking → render loading state</li>
+</ol>
+<h3>Layout changes</h3>
+<ul>
+<li><code>facilitator/layout.tsx</code>: wrap content in <code>&lt;AuthGuard&gt;</code></li>
+<li><code>participant/layout.tsx</code>: wrap content in <code>&lt;AuthGuard&gt;</code></li>
+<li><code>presenter/layout.tsx</code>: <strong>no change</strong> (unauthenticated)</li>
+</ul>
+<h3>Environment variables</h3>
+<p>Added to <code>frontend/</code> <code>.env.local</code> (dev defaults) and docker-compose:</p>
+<pre><code>NEXT_PUBLIC_OIDC_AUTHORITY=http://localhost:9000
+NEXT_PUBLIC_OIDC_CLIENT_ID=valuesworkshop
+NEXT_PUBLIC_OIDC_REDIRECT_URI=http://localhost:3000/auth/callback
+</code></pre>
+<h2>Docker Compose Changes</h2>
+<pre><code class="language-yaml">backend:
+  environment:
+    OIDC_AUTHORITY: http://localhost:9000
+    OIDC_METADATA_URL: http://oidc:9000/.well-known/openid-configuration
+    CORS_ORIGINS: http://localhost:3000
+
+frontend:
+  environment:
+    NEXT_PUBLIC_OIDC_AUTHORITY: http://localhost:9000
+    NEXT_PUBLIC_OIDC_CLIENT_ID: valuesworkshop
+    NEXT_PUBLIC_OIDC_REDIRECT_URI: http://localhost:3000/auth/callback
+</code></pre>
+<p>The issuer split (browser-reachable <code>localhost:9000</code> vs docker-internal
+<code>oidc:9000</code>) is solved by separate <code>OIDC_AUTHORITY</code> (issuer validation) and
+<code>OIDC_METADATA_URL</code> (key/discovery fetch) on the backend.</p>
+<h2>Testing</h2>
+<h3>BE unit tests (<code>Host.Tests</code>)</h3>
+<ul>
+<li><strong>Auth rejection test:</strong> TestServer with JWT Bearer configured; request
+without token → 401. Request with valid token → 200. Health endpoint → 200
+without token.</li>
+<li>Use <code>WebApplicationFactory&lt;T&gt;</code> for integration tests.</li>
+<li>Mock OIDC discovery or use in-memory token generation for test isolation.</li>
+</ul>
+<h3>FE unit tests (Jest)</h3>
+<ul>
+<li><strong>AuthGuard test:</strong> mock <code>authAdapter</code>, verify redirect called when no user,
+verify children rendered when user present.</li>
+<li><strong>Callback page test:</strong> mock <code>handleCallback</code>, verify redirect after
+processing.</li>
+</ul>
+<h3>Playwright e2e</h3>
+<p>First Playwright setup in the project:</p>
+<ul>
+<li><code>e2e/</code> directory at repo root (shared across FE+BE)</li>
+<li><code>playwright.config.ts</code> pointing at <code>http://localhost:3000</code> (assumes
+docker compose running)</li>
+<li><strong>Login smoke test:</strong> navigate to <code>/facilitator</code> → redirected to OIDC
+login → fill account field → submit → consent → arrive at facilitator
+page</li>
+<li><strong>Presenter no-auth test:</strong> navigate to <code>/presenter</code> → page loads
+without redirect</li>
+<li><strong>API rejection test:</strong> fetch <code>/</code> with no token from Playwright → 200
+(anonymous-allowed); fetch a protected endpoint → 401</li>
+</ul>
+<h2>Task Breakdown</h2>
+<ol>
+<li><strong>Dev OIDC provider configuration</strong> — clients, users, JWT access tokens,
+dev interactions</li>
+<li><strong>Backend JWT Bearer + CORS</strong> — Host changes, env-driven config</li>
+<li><strong>Backend auth integration tests</strong> — Host.Tests with WebApplicationFactory</li>
+<li><strong>Frontend auth adapter + AuthGuard</strong> — oidc-client-ts, adapter, guard
+component, callback page, layout wiring</li>
+<li><strong>Frontend unit tests</strong> — AuthGuard + callback tests</li>
+<li><strong>Playwright setup + login smoke</strong> — e2e directory, config, login test</li>
+<li><strong>Docker compose env updates</strong> — wire all env vars, verify full flow</li>
+</ol>
+<h2>Decisions</h2>
+<ul>
+<li><strong>One OIDC client for both roles.</strong> Facilitator vs participant is a
+session-level distinction (password-gated creation), not an auth-level one.</li>
+<li><strong><code>oidc-client-ts</code> over <code>next-auth</code></strong> for FE. Direct access to JWT access
+token (needed for SignalR in Task 9). Clean adapter pattern. No server-side
+session layer.</li>
+<li><strong>Skip audience validation initially.</strong> Dev <code>oidc-provider</code> audience
+config is finicky. Backend <strong>does</strong> validate all other JWT properties:
+signature (not tampered), expiry (<code>exp</code>), not-before (<code>nbf</code>), and
+issuer (<code>iss</code>). Only <code>aud</code> (audience) validation is deferred because
+dev <code>oidc-provider</code> audience config requires resource indicators
+setup. Audience validation added when Azure AD is configured.</li>
+<li><strong><code>sessionStorage</code> for token persistence.</strong> Survives page refresh, clears
+on tab close. 2-hour workshop doesn&#39;t need long-lived sessions.</li>
+</ul>
+<h2>Success Criteria</h2>
+<ol>
+<li>Unauthenticated request to BE protected endpoint → 401</li>
+<li><code>/health</code> and <code>/</code> → 200 without token</li>
+<li>Facilitator page → OIDC login redirect when not authenticated</li>
+<li>Participant page → OIDC login redirect when not authenticated</li>
+<li>Presenter page → loads without any auth redirect</li>
+<li>After login against dev provider → user reaches their screen</li>
+<li>Authority/clientId are environment-driven (no code changes for Azure AD)</li>
+<li>Playwright login smoke passes</li>
+</ol>
+<h2>Open Questions</h2>
+<p>None — all decisions made above.</p>
+

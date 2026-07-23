@@ -1,3 +1,3 @@
 namespace ValuesWorkshop.Host;
 
-public static class AssemblyMarker;
+public sealed class AssemblyMarker;
