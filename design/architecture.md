@@ -123,6 +123,7 @@ Records are the default for all new C# types (AGENTS.md hard rule). A mutable
 
 | Type | Declaration | Rationale |
 |---|---|---|
+| `SessionIdentity` | `readonly record struct` | Value semantics, identity by value |
 | `ParticipantId` | `readonly record struct` | Value semantics, identity by value |
 | `ValueId` | `readonly record struct` | Value semantics, identity by value |
 
