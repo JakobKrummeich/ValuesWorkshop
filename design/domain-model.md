@@ -32,7 +32,7 @@ workshop's native language), English term used in model and code.
 | Deutsch | English | Meaning |
 |---|---|---|
 | Sitzung / Workshop-Sitzung | **Session** | One concrete run of the workshop with its own identity, roster, and results. Several sessions may exist independently; every participant belongs to exactly one. |
-| Sitzungskennung | **Session identity** | The name by which a session is found and joined. |
+| Sitzungskennung | **Session identity** | The unique identifier by which a session is found and joined. |
 | Moderationskennwort | **Facilitator passphrase** | Shared secret known only to facilitators; opening a session requires it. Participants never hold it. |
 | Phase | **Phase** | One of the nine named stages below. Phases advance forward only, and only the facilitator advances them. |
 | Workshop-Zustand | **Workshop state** | The session's current phase plus its within-phase state (e.g. current quiz question, presented value, tiebreak round, revealed winners). |

@@ -6,12 +6,14 @@ namespace ValuesWorkshop.Adapters.Persistence;
 
 public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessionRepository
 {
-    public async Task SaveAsync(string sessionIdentity, Session session)
+    public async Task SaveAsync(Session session)
     {
-        var existingEntity = await QueryFullSession()
-            .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == sessionIdentity);
+        var identityString = session.Identity.Value.ToString();
 
-        var newEntity = DomainEntityMapper.ToEntity(sessionIdentity, session);
+        var existingEntity = await QueryFullSession()
+            .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
+
+        var newEntity = DomainEntityMapper.ToEntity(session);
 
         await using var transaction = await database.Database.BeginTransactionAsync();
 
@@ -29,21 +31,21 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         await transaction.CommitAsync();
     }
 
-    public async Task<Session?> LoadAsync(string sessionIdentity)
+    public async Task<Session?> LoadAsync(SessionIdentity sessionIdentity)
     {
+        var identityString = sessionIdentity.Value.ToString();
+
         var entity = await QueryFullSession()
-            .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == sessionIdentity);
+            .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
 
         return entity is null ? null : DomainEntityMapper.ToDomain(entity);
     }
 
-    public async Task<IReadOnlyList<(string Identity, Session Session)>> LoadAllAsync()
+    public async Task<IReadOnlyList<Session>> LoadAllAsync()
     {
         var entities = await QueryFullSession().ToListAsync();
 
-        return entities
-            .Select(entity => (entity.Identity, DomainEntityMapper.ToDomain(entity)))
-            .ToList();
+        return entities.Select(DomainEntityMapper.ToDomain).ToList();
     }
 
     private IQueryable<Persistence.Entities.SessionEntity> QueryFullSession()

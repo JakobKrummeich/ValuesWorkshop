@@ -115,6 +115,14 @@ reload to exact prior state.
 **Verification:** `dotnet test backend` (persistence round-trip suite).
 **Dependencies:** 1. **Files:** `backend/src/Adapters/Persistence/*`. **Size:** M
 
+### Refactor note: split Adapters by concern
+**When:** Before adding the first non-persistence adapter (likely Task 9).
+**What:** Split `backend/Adapters` into `Adapters.Persistence` and
+`Adapters.Web` (SignalR, HTTP, OIDC) so each project owns only its
+dependencies. On FE side, similarly keep adapter modules separated by
+concern (e.g., SignalR adapter vs. API adapter) rather than one shared
+bucket.
+
 ### Task 8: OIDC auth end-to-end
 **Description:** BE validates tokens from dev `oidc-provider`; FE login
 redirect flow for facilitator + participant; presenter route unauthenticated.

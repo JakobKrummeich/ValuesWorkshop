@@ -4,5 +4,5 @@ namespace ValuesWorkshop.Application;
 
 public interface IBroadcaster
 {
-    Task BroadcastSessionStateAsync(string sessionIdentity, Session session);
+    Task BroadcastSessionStateAsync(Session session);
 }
