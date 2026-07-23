@@ -6,7 +6,7 @@ namespace ValuesWorkshop.Application;
 public sealed class SessionCommandHandler(ISessionRepository repository, IBroadcaster broadcaster)
 {
     public async Task HandleAsync(
-        string sessionIdentity,
+        SessionIdentity sessionIdentity,
         Action<Session> mutation,
         Session? session = null
     )

@@ -5,7 +5,7 @@ namespace ValuesWorkshop.Host;
 
 internal sealed class NoOpBroadcaster : IBroadcaster
 {
-    public Task BroadcastSessionStateAsync(string sessionIdentity, Session session)
+    public Task BroadcastSessionStateAsync(SessionIdentity sessionIdentity, Session session)
     {
         return Task.CompletedTask;
     }
