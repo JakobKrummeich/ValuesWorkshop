@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+const HTTP_OK = 200;
+const HTTP_UNAUTHORIZED = 401;
+
 test.describe("OIDC authentication", () => {
   test("facilitator page redirects to OIDC login", async ({ page }) => {
     await page.goto("/facilitator");
@@ -57,7 +60,7 @@ test.describe("OIDC authentication", () => {
   }) => {
     const response = await request.get("http://localhost:5000/health");
 
-    expect(response.status()).toBe(200);
+    expect(response.status()).toBe(HTTP_OK);
   });
 
   test("backend rejects unauthenticated request to API route", async ({
@@ -67,6 +70,6 @@ test.describe("OIDC authentication", () => {
       "http://localhost:5000/api/anything",
     );
 
-    expect(response.status()).toBe(401);
+    expect(response.status()).toBe(HTTP_UNAUTHORIZED);
   });
 });
