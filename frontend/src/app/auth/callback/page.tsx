@@ -11,6 +11,14 @@ const centeringStyle: React.CSSProperties = {
   minHeight: "100vh",
 };
 
+function extractReturnUrl(state: unknown): string {
+  return typeof state === "string" && state.startsWith("/") ? state : "/";
+}
+
+function extractErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Authentication failed";
+}
+
 export default function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(null);
 
@@ -21,19 +29,9 @@ export default function AuthCallbackPage() {
       try {
         const user = await handleCallback();
         if (cancelled) return;
-
-        const stateUrl =
-          typeof user.state === "string" ? user.state : null;
-        const returnUrl =
-          stateUrl && stateUrl.startsWith("/") ? stateUrl : "/";
-        navigateReplace(returnUrl);
+        navigateReplace(extractReturnUrl(user.state));
       } catch (callbackError) {
-        if (cancelled) return;
-        setError(
-          callbackError instanceof Error
-            ? callbackError.message
-            : "Authentication failed",
-        );
+        if (!cancelled) setError(extractErrorMessage(callbackError));
       }
     }
 

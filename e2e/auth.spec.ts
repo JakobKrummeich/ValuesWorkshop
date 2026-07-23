@@ -36,8 +36,16 @@ test.describe("OIDC authentication", () => {
     const consentButton = page.locator(
       'button[type="submit"][autofocus], button.login-submit',
     );
-    await consentButton.first().waitFor({ timeout: 5_000 }).catch(() => {});
-    if (await consentButton.first().isVisible().catch(() => false)) {
+    await consentButton
+      .first()
+      .waitFor({ timeout: 5_000 })
+      .catch(() => {});
+    if (
+      await consentButton
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
       await consentButton.first().click();
     }
 
