@@ -3,6 +3,7 @@ packages:
 
 overrides:
   sharp: ">=0.35.0"
+  postcss: ">=8.5.12"
 
 allowBuilds:
   sharp: true
