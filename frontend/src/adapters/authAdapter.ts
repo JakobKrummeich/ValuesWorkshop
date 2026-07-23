@@ -1,38 +1,5 @@
 import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
 
-const authority =
-  typeof window !== "undefined"
-    ? (process.env.NEXT_PUBLIC_OIDC_AUTHORITY ?? "http://localhost:9000")
-    : "";
-
-const clientId =
-  typeof window !== "undefined"
-    ? (process.env.NEXT_PUBLIC_OIDC_CLIENT_ID ?? "valuesworkshop")
-    : "";
-
-const redirectUri =
-  typeof window !== "undefined"
-    ? (process.env.NEXT_PUBLIC_OIDC_REDIRECT_URI ??
-      `${window.location.origin}/auth/callback`)
-    : "";
-
-function createUserManager(): UserManager | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  return new UserManager({
-    authority,
-    client_id: clientId,
-    redirect_uri: redirectUri,
-    response_type: "code",
-    scope: "openid profile offline_access",
-    automaticSilentRenew: true,
-    includeIdTokenInSilentRenew: false,
-    userStore: new WebStorageStateStore({ store: window.sessionStorage }),
-  });
-}
-
 let userManagerInstance: UserManager | null = null;
 
 function getUserManager(): UserManager {
@@ -40,9 +7,21 @@ function getUserManager(): UserManager {
     throw new Error("UserManager is only available in the browser");
   }
   if (!userManagerInstance) {
-    userManagerInstance = createUserManager();
+    userManagerInstance = new UserManager({
+      authority:
+        process.env.NEXT_PUBLIC_OIDC_AUTHORITY ?? "http://localhost:9000",
+      client_id: process.env.NEXT_PUBLIC_OIDC_CLIENT_ID ?? "valuesworkshop",
+      redirect_uri:
+        process.env.NEXT_PUBLIC_OIDC_REDIRECT_URI ??
+        `${window.location.origin}/auth/callback`,
+      response_type: "code",
+      scope: "openid profile offline_access",
+      automaticSilentRenew: true,
+      includeIdTokenInSilentRenew: false,
+      userStore: new WebStorageStateStore({ store: window.sessionStorage }),
+    });
   }
-  return userManagerInstance!;
+  return userManagerInstance;
 }
 
 export async function getAuthenticatedUser(): Promise<User | null> {
