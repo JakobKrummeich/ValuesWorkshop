@@ -37,22 +37,11 @@ public sealed class AuthenticationTests
     }
 
     [Fact]
-    public async Task FallbackPolicy_requires_auth_for_unprotected_endpoints()
+    public async Task FallbackPolicy_requires_auth_for_unmapped_api_route()
     {
-        var response = await client.GetAsync("/api/protected-test");
+        var response = await client.GetAsync("/api/anything");
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
-    }
-
-    [Fact]
-    public async Task ValidToken_grants_access_to_protected_endpoint()
-    {
-        var token = GenerateTestToken("test-user");
-        client.DefaultRequestHeaders.Authorization = new AuthHeaderValue("Bearer", token);
-
-        var response = await client.GetAsync("/api/protected-test");
-
-        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
@@ -61,7 +50,7 @@ public sealed class AuthenticationTests
         var token = GenerateTestToken("test-user", expired: true);
         client.DefaultRequestHeaders.Authorization = new AuthHeaderValue("Bearer", token);
 
-        var response = await client.GetAsync("/api/protected-test");
+        var response = await client.GetAsync("/api/anything");
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
@@ -72,7 +61,7 @@ public sealed class AuthenticationTests
         var token = GenerateTestToken("test-user") + "tampered";
         client.DefaultRequestHeaders.Authorization = new AuthHeaderValue("Bearer", token);
 
-        var response = await client.GetAsync("/api/protected-test");
+        var response = await client.GetAsync("/api/anything");
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }

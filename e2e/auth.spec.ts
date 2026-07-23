@@ -60,11 +60,11 @@ test.describe("OIDC authentication", () => {
     expect(response.status()).toBe(200);
   });
 
-  test("backend protected endpoint rejects unauthenticated request", async ({
+  test("backend rejects unauthenticated request to API route", async ({
     request,
   }) => {
     const response = await request.get(
-      "http://localhost:5000/api/protected-test",
+      "http://localhost:5000/api/anything",
     );
 
     expect(response.status()).toBe(401);

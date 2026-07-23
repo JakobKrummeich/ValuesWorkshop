@@ -74,7 +74,6 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "ValuesWorkshop API").AllowAnonymous();
 app.MapGet("/health", () => Results.Ok("ok")).AllowAnonymous();
-app.MapGet("/api/protected-test", () => Results.Ok("authenticated"));
 
 await app.RunAsync();
 
