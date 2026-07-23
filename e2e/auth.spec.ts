@@ -30,17 +30,18 @@ test.describe("OIDC authentication", () => {
     await expect(page).toHaveURL(/localhost:9000/, { timeout: 10_000 });
 
     await page.locator('input[name="login"]').fill("facilitator");
+    await page.locator('input[name="password"]').fill("any");
     await page.locator('button[type="submit"]').click();
 
-    await page.waitForURL(/localhost:9000/, { timeout: 5_000 });
-    const submitButton = page.locator(
-      'button[type="submit"], button[name="confirm"]',
+    const consentButton = page.locator(
+      'button[type="submit"][autofocus], button.login-submit',
     );
-    if (await submitButton.isVisible({ timeout: 3_000 }).catch(() => false)) {
-      await submitButton.click();
+    await consentButton.first().waitFor({ timeout: 5_000 }).catch(() => {});
+    if (await consentButton.first().isVisible().catch(() => false)) {
+      await consentButton.first().click();
     }
 
-    await expect(page).toHaveURL(/\/facilitator/, { timeout: 10_000 });
+    await expect(page).toHaveURL(/\/facilitator/, { timeout: 15_000 });
   });
 
   test("backend health endpoint accessible without auth", async ({

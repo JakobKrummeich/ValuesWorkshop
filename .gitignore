@@ -7,3 +7,4 @@ TestResults/
 coverage.json
 .lavish/
 **/data/*.db
+test-results/
