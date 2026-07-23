@@ -1,15 +1,25 @@
-import { renderToString } from "react-dom/server";
+import { render, screen, act } from "@testing-library/react";
 import ParticipantLayout from "./layout";
 import ParticipantHome from "./page";
 
-describe("participant screen group", () => {
-  it("receives its gateway through its own dependency context", () => {
-    const html = renderToString(
-      <ParticipantLayout>
-        <ParticipantHome />
-      </ParticipantLayout>,
-    );
+jest.mock("../../adapters/authAdapter", () => ({
+  getAuthenticatedUser: jest.fn().mockResolvedValue({
+    access_token: "test-token",
+    expired: false,
+  }),
+  loginRedirect: jest.fn(),
+}));
 
-    expect(html).toContain("stub-session");
+describe("participant screen group", () => {
+  it("receives its gateway through its own dependency context", async () => {
+    await act(async () => {
+      render(
+        <ParticipantLayout>
+          <ParticipantHome />
+        </ParticipantLayout>,
+      );
+    });
+
+    screen.getByText("stub-session", { exact: false });
   });
 });

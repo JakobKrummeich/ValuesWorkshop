@@ -14,10 +14,13 @@
   },
   "dependencies": {
     "next": "16.2.11",
+    "oidc-client-ts": "^3.5.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -26,6 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
     "prettier": "^3.9.5",
     "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",

@@ -1,0 +1,67 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { handleCallback, navigateReplace } from "../../../adapters/authAdapter";
+
+export default function AuthCallbackPage() {
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function processCallback() {
+      try {
+        const user = await handleCallback();
+        if (cancelled) return;
+
+        const returnUrl =
+          (typeof user.state === "string" ? user.state : null) ?? "/";
+        navigateReplace(returnUrl);
+      } catch (callbackError) {
+        if (cancelled) return;
+        setError(
+          callbackError instanceof Error
+            ? callbackError.message
+            : "Authentication failed",
+        );
+      }
+    }
+
+    processCallback();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (error) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          flexDirection: "column",
+          gap: "1rem",
+        }}
+      >
+        <p>Authentication error: {error}</p>
+        <a href="/">Return to home</a>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+      }}
+    >
+      <p>Completing login…</p>
+    </div>
+  );
+}
