@@ -16,10 +16,10 @@ jest.mock("oidc-client-ts", () => ({
 }));
 
 import {
-  getAuthenticatedUser$,
-  loginRedirect$,
-  handleCallback$,
-  getAccessToken$,
+  getAuthenticatedUser,
+  loginRedirect,
+  handleCallback,
+  getAccessToken,
 } from "../authAdapter";
 
 beforeEach(() => {
@@ -27,12 +27,12 @@ beforeEach(() => {
 });
 
 describe("authAdapter", () => {
-  describe("getAuthenticatedUser$", () => {
+  describe("getAuthenticatedUser", () => {
     it("emits user when authenticated and not expired", async () => {
       const mockUser = { access_token: "token", expired: false };
       mockGetUser.mockResolvedValue(mockUser);
 
-      const user = await firstValueFrom(getAuthenticatedUser$());
+      const user = await firstValueFrom(getAuthenticatedUser());
 
       expect(user).toBe(mockUser);
     });
@@ -40,7 +40,7 @@ describe("authAdapter", () => {
     it("emits null when user is expired", async () => {
       mockGetUser.mockResolvedValue({ access_token: "token", expired: true });
 
-      const user = await firstValueFrom(getAuthenticatedUser$());
+      const user = await firstValueFrom(getAuthenticatedUser());
 
       expect(user).toBeNull();
     });
@@ -48,17 +48,17 @@ describe("authAdapter", () => {
     it("emits null when no user exists", async () => {
       mockGetUser.mockResolvedValue(null);
 
-      const user = await firstValueFrom(getAuthenticatedUser$());
+      const user = await firstValueFrom(getAuthenticatedUser());
 
       expect(user).toBeNull();
     });
   });
 
-  describe("loginRedirect$", () => {
+  describe("loginRedirect", () => {
     it("calls signinRedirect with return URL as state", async () => {
       mockSigninRedirect.mockResolvedValue(undefined);
 
-      await firstValueFrom(loginRedirect$("/facilitator"));
+      await firstValueFrom(loginRedirect("/facilitator"));
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         state: "/facilitator",
@@ -68,7 +68,7 @@ describe("authAdapter", () => {
     it("uses current pathname when no return URL provided", async () => {
       mockSigninRedirect.mockResolvedValue(undefined);
 
-      await firstValueFrom(loginRedirect$());
+      await firstValueFrom(loginRedirect());
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         state: window.location.pathname,
@@ -76,26 +76,26 @@ describe("authAdapter", () => {
     });
   });
 
-  describe("handleCallback$", () => {
+  describe("handleCallback", () => {
     it("delegates to signinRedirectCallback", async () => {
       const mockUser = { access_token: "token" };
       mockSigninRedirectCallback.mockResolvedValue(mockUser);
 
-      const user = await firstValueFrom(handleCallback$());
+      const user = await firstValueFrom(handleCallback());
 
       expect(user).toBe(mockUser);
       expect(mockSigninRedirectCallback).toHaveBeenCalled();
     });
   });
 
-  describe("getAccessToken$", () => {
+  describe("getAccessToken", () => {
     it("emits access token when user is authenticated", async () => {
       mockGetUser.mockResolvedValue({
         access_token: "my-token",
         expired: false,
       });
 
-      const token = await firstValueFrom(getAccessToken$());
+      const token = await firstValueFrom(getAccessToken());
 
       expect(token).toBe("my-token");
     });
@@ -103,7 +103,7 @@ describe("authAdapter", () => {
     it("emits null when no user", async () => {
       mockGetUser.mockResolvedValue(null);
 
-      const token = await firstValueFrom(getAccessToken$());
+      const token = await firstValueFrom(getAccessToken());
 
       expect(token).toBeNull();
     });

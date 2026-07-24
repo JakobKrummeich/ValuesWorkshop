@@ -25,7 +25,7 @@ function getUserManager(): UserManager {
   return userManagerInstance;
 }
 
-export function getAuthenticatedUser$(): Observable<User | null> {
+export function getAuthenticatedUser(): Observable<User | null> {
   return defer(async () => {
     const manager = getUserManager();
     const user = await manager.getUser();
@@ -36,7 +36,7 @@ export function getAuthenticatedUser$(): Observable<User | null> {
   });
 }
 
-export function loginRedirect$(returnUrl?: string): Observable<void> {
+export function loginRedirect(returnUrl?: string): Observable<void> {
   return defer(async () => {
     const manager = getUserManager();
     await manager.signinRedirect({
@@ -45,14 +45,14 @@ export function loginRedirect$(returnUrl?: string): Observable<void> {
   });
 }
 
-export function handleCallback$(): Observable<User> {
+export function handleCallback(): Observable<User> {
   return defer(() => {
     const manager = getUserManager();
     return manager.signinRedirectCallback();
   });
 }
 
-export function getAccessToken$(): Observable<string | null> {
+export function getAccessToken(): Observable<string | null> {
   return defer(async () => {
     const manager = getUserManager();
     const user = await manager.getUser();
@@ -63,7 +63,7 @@ export function getAccessToken$(): Observable<string | null> {
   });
 }
 
-export function logout$(): Observable<void> {
+export function logout(): Observable<void> {
   return defer(() => {
     const manager = getUserManager();
     return manager.signoutRedirect();

@@ -10,6 +10,9 @@ internal code consumes and returns observables.
 - Wrappers live in `src/adapters/` and are the only place `defer()`
   converts promises to observables (`defer()` alone is sufficient — no
   `from()` wrapping needed).
+- **No `$` suffix on observable names.** Use plain descriptive names
+  (`getAuthenticatedUser`, not `getAuthenticatedUser$`). The type system
+  already distinguishes `Observable<T>` from `T`.
 - Components subscribe via domain-specific hooks (e.g. `useAuthGuard`,
   `useAuthCallback`).
 - **Test hooks** with `renderHook` and RxJS primitives (`Subject`, `NEVER`,

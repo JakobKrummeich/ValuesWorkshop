@@ -7,9 +7,9 @@ const mockGetAuthenticatedUser$ = jest.fn();
 const mockLoginRedirect$ = jest.fn();
 
 jest.mock("../../adapters/authAdapter", () => ({
-  getAuthenticatedUser$: (...args: unknown[]) =>
+  getAuthenticatedUser: (...args: unknown[]) =>
     mockGetAuthenticatedUser$(...args),
-  loginRedirect$: (...args: unknown[]) => mockLoginRedirect$(...args),
+  loginRedirect: (...args: unknown[]) => mockLoginRedirect$(...args),
 }));
 
 beforeEach(() => {
@@ -27,54 +27,54 @@ describe("useAuthGuard", () => {
   });
 
   it("transitions to authenticated when user exists", () => {
-    const user$ = new Subject<User | null>();
-    mockGetAuthenticatedUser$.mockReturnValue(user$);
+    const userSubject = new Subject<User | null>();
+    mockGetAuthenticatedUser$.mockReturnValue(userSubject);
 
     const { result } = renderHook(() => useAuthGuard());
     expect(result.current.state).toBe(AuthGuardState.Checking);
 
     act(() => {
-      user$.next({ access_token: "token", expired: false } as User);
-      user$.complete();
+      userSubject.next({ access_token: "token", expired: false } as User);
+      userSubject.complete();
     });
 
     expect(result.current.state).toBe(AuthGuardState.Authenticated);
   });
 
-  it("transitions to redirecting and calls loginRedirect$ when no user", () => {
-    const user$ = new Subject<User | null>();
+  it("transitions to redirecting and calls loginRedirect when no user", () => {
+    const userSubject = new Subject<User | null>();
     mockLoginRedirect$.mockReturnValue(of(undefined));
-    mockGetAuthenticatedUser$.mockReturnValue(user$);
+    mockGetAuthenticatedUser$.mockReturnValue(userSubject);
 
     const { result } = renderHook(() => useAuthGuard());
 
     act(() => {
-      user$.next(null);
-      user$.complete();
+      userSubject.next(null);
+      userSubject.complete();
     });
 
     expect(result.current.state).toBe(AuthGuardState.Redirecting);
     expect(mockLoginRedirect$).toHaveBeenCalledWith(window.location.pathname);
   });
 
-  it("transitions to error when loginRedirect$ errors", () => {
-    const user$ = new Subject<User | null>();
+  it("transitions to error when loginRedirect errors", () => {
+    const userSubject = new Subject<User | null>();
     mockLoginRedirect$.mockReturnValue(
       throwError(() => new Error("OIDC unavailable")),
     );
-    mockGetAuthenticatedUser$.mockReturnValue(user$);
+    mockGetAuthenticatedUser$.mockReturnValue(userSubject);
 
     const { result } = renderHook(() => useAuthGuard());
 
     act(() => {
-      user$.next(null);
-      user$.complete();
+      userSubject.next(null);
+      userSubject.complete();
     });
 
     expect(result.current.state).toBe(AuthGuardState.Error);
   });
 
-  it("transitions to error when getAuthenticatedUser$ errors", () => {
+  it("transitions to error when getAuthenticatedUser errors", () => {
     mockGetAuthenticatedUser$.mockReturnValue(
       throwError(() => new Error("Storage error")),
     );
@@ -85,13 +85,13 @@ describe("useAuthGuard", () => {
   });
 
   it("unsubscribes on unmount", () => {
-    const user$ = new Subject<User | null>();
-    mockGetAuthenticatedUser$.mockReturnValue(user$);
+    const userSubject = new Subject<User | null>();
+    mockGetAuthenticatedUser$.mockReturnValue(userSubject);
 
     const { unmount } = renderHook(() => useAuthGuard());
-    expect(user$.observed).toBe(true);
+    expect(userSubject.observed).toBe(true);
 
     unmount();
-    expect(user$.observed).toBe(false);
+    expect(userSubject.observed).toBe(false);
   });
 });

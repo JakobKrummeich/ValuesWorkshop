@@ -7,7 +7,7 @@ const mockHandleCallback$ = jest.fn();
 const mockNavigateReplace = jest.fn();
 
 jest.mock("../../../../adapters/authAdapter", () => ({
-  handleCallback$: (...args: unknown[]) => mockHandleCallback$(...args),
+  handleCallback: (...args: unknown[]) => mockHandleCallback$(...args),
   navigateReplace: (...args: unknown[]) => mockNavigateReplace(...args),
 }));
 
@@ -25,48 +25,48 @@ describe("useAuthCallback", () => {
   });
 
   it("navigates to return URL from user state on success", () => {
-    const callback$ = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callback$);
+    const callbackSubject = new Subject<User>();
+    mockHandleCallback$.mockReturnValue(callbackSubject);
 
     renderHook(() => useAuthCallback());
 
     act(() => {
-      callback$.next({
+      callbackSubject.next({
         state: "/facilitator",
         access_token: "token",
       } as unknown as User);
-      callback$.complete();
+      callbackSubject.complete();
     });
 
     expect(mockNavigateReplace).toHaveBeenCalledWith("/facilitator");
   });
 
   it("navigates to root when no return URL in state", () => {
-    const callback$ = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callback$);
+    const callbackSubject = new Subject<User>();
+    mockHandleCallback$.mockReturnValue(callbackSubject);
 
     renderHook(() => useAuthCallback());
 
     act(() => {
-      callback$.next({ access_token: "token" } as unknown as User);
-      callback$.complete();
+      callbackSubject.next({ access_token: "token" } as unknown as User);
+      callbackSubject.complete();
     });
 
     expect(mockNavigateReplace).toHaveBeenCalledWith("/");
   });
 
   it("rejects non-path return URLs and falls back to root", () => {
-    const callback$ = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callback$);
+    const callbackSubject = new Subject<User>();
+    mockHandleCallback$.mockReturnValue(callbackSubject);
 
     renderHook(() => useAuthCallback());
 
     act(() => {
-      callback$.next({
+      callbackSubject.next({
         state: "https://evil.com",
         access_token: "token",
       } as unknown as User);
-      callback$.complete();
+      callbackSubject.complete();
     });
 
     expect(mockNavigateReplace).toHaveBeenCalledWith("/");
@@ -91,13 +91,13 @@ describe("useAuthCallback", () => {
   });
 
   it("unsubscribes on unmount", () => {
-    const callback$ = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callback$);
+    const callbackSubject = new Subject<User>();
+    mockHandleCallback$.mockReturnValue(callbackSubject);
 
     const { unmount } = renderHook(() => useAuthCallback());
-    expect(callback$.observed).toBe(true);
+    expect(callbackSubject.observed).toBe(true);
 
     unmount();
-    expect(callback$.observed).toBe(false);
+    expect(callbackSubject.observed).toBe(false);
   });
 });

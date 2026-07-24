@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { switchMap, EMPTY, catchError } from "rxjs";
-import { getAuthenticatedUser$, loginRedirect$ } from "../adapters/authAdapter";
+import { getAuthenticatedUser, loginRedirect } from "../adapters/authAdapter";
 
 export enum AuthGuardState {
   Checking = "checking",
@@ -21,7 +21,7 @@ export function useAuthGuard(): AuthGuardResult {
   );
 
   useEffect(() => {
-    const subscription = getAuthenticatedUser$()
+    const subscription = getAuthenticatedUser()
       .pipe(
         switchMap((user) => {
           if (user) {
@@ -29,7 +29,7 @@ export function useAuthGuard(): AuthGuardResult {
             return EMPTY;
           }
           setAuthState(AuthGuardState.Redirecting);
-          return loginRedirect$(window.location.pathname);
+          return loginRedirect(window.location.pathname);
         }),
         catchError(() => {
           setAuthState(AuthGuardState.Error);
