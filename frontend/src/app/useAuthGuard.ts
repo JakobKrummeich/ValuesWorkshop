@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { concat, defer, EMPTY, take, tap, catchError } from "rxjs";
+import { concat, defer, take, tap } from "rxjs";
 import { getAuthenticatedUser, loginRedirect } from "../adapters/authAdapter";
 
 export enum AuthGuardState {
@@ -30,14 +30,12 @@ export function useAuthGuard(): AuthGuardResult {
         return loginRedirect(window.location.pathname);
       }),
     )
-      .pipe(
-        take(1),
-        catchError(() => {
+      .pipe(take(1))
+      .subscribe({
+        error() {
           setAuthState(AuthGuardState.Error);
-          return EMPTY;
-        }),
-      )
-      .subscribe();
+        },
+      });
 
     return () => {
       subscription.unsubscribe();

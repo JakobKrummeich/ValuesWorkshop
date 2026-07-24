@@ -32,6 +32,8 @@ internal code consumes and returns observables.
   }
   ```
 
+- **No `catchError` directly before `subscribe`** — use the `error`
+  callback in the `subscribe` block instead.
 - **No `$` suffix** — on any name (functions, variables, Subjects). Use
   plain descriptive names. The type system already distinguishes
   `Observable<T>` from `T`.
