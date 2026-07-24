@@ -5,7 +5,8 @@ COPY Directory.Build.props .editorconfig ./
 COPY Analyzers/ValuesWorkshop.Analyzers.csproj Analyzers/
 COPY Domain/ValuesWorkshop.Domain.csproj Domain/
 COPY Application/ValuesWorkshop.Application.csproj Application/
-COPY Adapters/ValuesWorkshop.Adapters.csproj Adapters/
+COPY Adapters.Persistence/ValuesWorkshop.Adapters.Persistence.csproj Adapters.Persistence/
+COPY Adapters.Web/ValuesWorkshop.Adapters.Web.csproj Adapters.Web/
 COPY Host/ValuesWorkshop.Host.csproj Host/
 COPY ValuesWorkshop.sln .
 RUN dotnet restore ValuesWorkshop.sln
