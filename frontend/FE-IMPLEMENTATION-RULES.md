@@ -33,6 +33,24 @@ enum AuthState {
 type AuthState = "checking" | "authenticated" | "redirecting" | "error";
 ```
 
+## Runtime Validation with Zod
+
+Use [Zod](https://zod.dev) to validate `unknown` data at program boundaries
+(API responses, OIDC state, URL params, external messages). Parse, don't
+assert:
+
+```typescript
+// YES — validated with fallback
+const returnUrl = z.string().startsWith("/").catch("/").parse(raw);
+
+// NO — manual type narrowing
+const returnUrl = typeof raw === "string" && raw.startsWith("/") ? raw : "/";
+```
+
+For `catch` blocks (which always yield `unknown`), use the shared
+`errorMessage()` utility from `src/shared/errorMessage.ts` instead of
+inline `instanceof` checks.
+
 ## Design Tokens
 
 Every visual property — color, spacing, font, radius, shadow — **must** use

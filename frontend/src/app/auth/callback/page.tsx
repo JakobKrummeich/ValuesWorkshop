@@ -2,16 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { z } from "zod";
 import { handleCallback, navigateReplace } from "../../../adapters/authAdapter";
+import { errorMessage } from "../../../shared/errorMessage";
 import styles from "./CallbackPage.module.css";
 
-function extractReturnUrl(state: unknown): string {
-  return typeof state === "string" && state.startsWith("/") ? state : "/";
-}
-
-function extractErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Authentication failed";
-}
+const returnUrlSchema = z.string().startsWith("/").catch("/");
 
 export default function AuthCallbackPage() {
   const [error, setError] = useState<string | null>(null);
@@ -23,9 +19,9 @@ export default function AuthCallbackPage() {
       try {
         const user = await handleCallback();
         if (cancelled) return;
-        navigateReplace(extractReturnUrl(user.state));
+        navigateReplace(returnUrlSchema.parse(user.state));
       } catch (callbackError) {
-        if (!cancelled) setError(extractErrorMessage(callbackError));
+        if (!cancelled) setError(errorMessage(callbackError));
       }
     }
 
