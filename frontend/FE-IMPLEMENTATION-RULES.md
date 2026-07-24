@@ -1,7 +1,5 @@
 # Frontend Implementation Rules
 
-**MUST be read before any frontend work.** Referenced from `AGENTS.md`.
-
 ## RxJS-First Reactive Architecture
 
 Use RxJS observables instead of raw Promises everywhere inside the application.
