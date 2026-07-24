@@ -3,11 +3,11 @@ import { Subject, NEVER, throwError } from "rxjs";
 import type { User } from "oidc-client-ts";
 import { useAuthCallback } from "../useAuthCallback";
 
-const mockHandleCallback$ = jest.fn();
+const mockHandleCallback = jest.fn();
 const mockNavigateReplace = jest.fn();
 
 jest.mock("../../../../adapters/authAdapter", () => ({
-  handleCallback: (...args: unknown[]) => mockHandleCallback$(...args),
+  handleCallback: (...args: unknown[]) => mockHandleCallback(...args),
   navigateReplace: (...args: unknown[]) => mockNavigateReplace(...args),
 }));
 
@@ -17,7 +17,7 @@ beforeEach(() => {
 
 describe("useAuthCallback", () => {
   it("starts with no error", () => {
-    mockHandleCallback$.mockReturnValue(NEVER);
+    mockHandleCallback.mockReturnValue(NEVER);
 
     const { result } = renderHook(() => useAuthCallback());
 
@@ -26,7 +26,7 @@ describe("useAuthCallback", () => {
 
   it("navigates to return URL from user state on success", () => {
     const callbackSubject = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callbackSubject);
+    mockHandleCallback.mockReturnValue(callbackSubject);
 
     renderHook(() => useAuthCallback());
 
@@ -43,7 +43,7 @@ describe("useAuthCallback", () => {
 
   it("navigates to root when no return URL in state", () => {
     const callbackSubject = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callbackSubject);
+    mockHandleCallback.mockReturnValue(callbackSubject);
 
     renderHook(() => useAuthCallback());
 
@@ -57,7 +57,7 @@ describe("useAuthCallback", () => {
 
   it("rejects non-path return URLs and falls back to root", () => {
     const callbackSubject = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callbackSubject);
+    mockHandleCallback.mockReturnValue(callbackSubject);
 
     renderHook(() => useAuthCallback());
 
@@ -73,7 +73,7 @@ describe("useAuthCallback", () => {
   });
 
   it("sets error on callback failure", () => {
-    mockHandleCallback$.mockReturnValue(
+    mockHandleCallback.mockReturnValue(
       throwError(() => new Error("Invalid state")),
     );
 
@@ -83,7 +83,7 @@ describe("useAuthCallback", () => {
   });
 
   it("sets generic error for non-Error throws", () => {
-    mockHandleCallback$.mockReturnValue(throwError(() => "string error"));
+    mockHandleCallback.mockReturnValue(throwError(() => "string error"));
 
     const { result } = renderHook(() => useAuthCallback());
 
@@ -92,7 +92,7 @@ describe("useAuthCallback", () => {
 
   it("unsubscribes on unmount", () => {
     const callbackSubject = new Subject<User>();
-    mockHandleCallback$.mockReturnValue(callbackSubject);
+    mockHandleCallback.mockReturnValue(callbackSubject);
 
     const { unmount } = renderHook(() => useAuthCallback());
     expect(callbackSubject.observed).toBe(true);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { switchMap, EMPTY, catchError } from "rxjs";
+import { concat, defer, EMPTY, take, tap, catchError } from "rxjs";
 import { getAuthenticatedUser, loginRedirect } from "../adapters/authAdapter";
 
 export enum AuthGuardState {
@@ -21,16 +21,17 @@ export function useAuthGuard(): AuthGuardResult {
   );
 
   useEffect(() => {
-    const subscription = getAuthenticatedUser()
+    const subscription = concat(
+      getAuthenticatedUser().pipe(
+        tap(() => setAuthState(AuthGuardState.Authenticated)),
+      ),
+      defer(() => {
+        setAuthState(AuthGuardState.Redirecting);
+        return loginRedirect(window.location.pathname);
+      }),
+    )
       .pipe(
-        switchMap((user) => {
-          if (user) {
-            setAuthState(AuthGuardState.Authenticated);
-            return EMPTY;
-          }
-          setAuthState(AuthGuardState.Redirecting);
-          return loginRedirect(window.location.pathname);
-        }),
+        take(1),
         catchError(() => {
           setAuthState(AuthGuardState.Error);
           return EMPTY;

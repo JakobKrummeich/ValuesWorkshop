@@ -1,5 +1,6 @@
 import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
-import { defer, type Observable } from "rxjs";
+import { defer, filter, ignoreElements } from "rxjs";
+import type { Completable, Maybe, Single } from "../shared/reactiveTypes";
 
 let userManagerInstance: UserManager | null = null;
 
@@ -25,7 +26,7 @@ function getUserManager(): UserManager {
   return userManagerInstance;
 }
 
-export function getAuthenticatedUser(): Observable<User | null> {
+export function getAuthenticatedUser(): Maybe<User> {
   return defer(async () => {
     const manager = getUserManager();
     const user = await manager.getUser();
@@ -33,26 +34,26 @@ export function getAuthenticatedUser(): Observable<User | null> {
       return user;
     }
     return null;
-  });
+  }).pipe(filter((user): user is User => user !== null));
 }
 
-export function loginRedirect(returnUrl?: string): Observable<void> {
+export function loginRedirect(returnUrl?: string): Completable {
   return defer(async () => {
     const manager = getUserManager();
     await manager.signinRedirect({
       state: returnUrl ?? window.location.pathname,
     });
-  });
+  }).pipe(ignoreElements());
 }
 
-export function handleCallback(): Observable<User> {
+export function handleCallback(): Single<User> {
   return defer(() => {
     const manager = getUserManager();
     return manager.signinRedirectCallback();
   });
 }
 
-export function getAccessToken(): Observable<string | null> {
+export function getAccessToken(): Maybe<string> {
   return defer(async () => {
     const manager = getUserManager();
     const user = await manager.getUser();
@@ -60,14 +61,14 @@ export function getAccessToken(): Observable<string | null> {
       return user.access_token;
     }
     return null;
-  });
+  }).pipe(filter((token): token is string => token !== null));
 }
 
-export function logout(): Observable<void> {
+export function logout(): Completable {
   return defer(() => {
     const manager = getUserManager();
     return manager.signoutRedirect();
-  });
+  }).pipe(ignoreElements());
 }
 
 export function navigateReplace(url: string): void {

@@ -10,9 +10,17 @@ internal code consumes and returns observables.
 - Wrappers live in `src/adapters/` and are the only place `defer()`
   converts promises to observables (`defer()` alone is sufficient — no
   `from()` wrapping needed).
-- **No `$` suffix on observable names.** Use plain descriptive names
-  (`getAuthenticatedUser`, not `getAuthenticatedUser$`). The type system
-  already distinguishes `Observable<T>` from `T`.
+- **No `$` suffix** — on any name (functions, variables, Subjects). Use
+  plain descriptive names. The type system already distinguishes
+  `Observable<T>` from `T`.
+- **Never use `Observable<void>`.** Use the type aliases from
+  `src/shared/reactiveTypes.ts`:
+  - `Completable` (`Observable<never>`) — emits nothing, just completes or
+    errors.
+  - `Single<T>` (`Observable<T>`) — emits exactly one value, then completes.
+  - `Maybe<T>` (`Observable<T>`) — emits zero or one value, then completes.
+    Use instead of `Single<T | null>` — the "absent" case is represented
+    by completing empty, not by emitting `null`.
 - Components subscribe via domain-specific hooks (e.g. `useAuthGuard`,
   `useAuthCallback`).
 - **Test hooks** with `renderHook` and RxJS primitives (`Subject`, `NEVER`,

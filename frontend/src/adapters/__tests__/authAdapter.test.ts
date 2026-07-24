@@ -1,4 +1,4 @@
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, lastValueFrom, toArray } from "rxjs";
 
 const mockGetUser = jest.fn();
 const mockSigninRedirect = jest.fn();
@@ -37,20 +37,24 @@ describe("authAdapter", () => {
       expect(user).toBe(mockUser);
     });
 
-    it("emits null when user is expired", async () => {
+    it("completes empty when user is expired", async () => {
       mockGetUser.mockResolvedValue({ access_token: "token", expired: true });
 
-      const user = await firstValueFrom(getAuthenticatedUser());
+      const users = await firstValueFrom(
+        getAuthenticatedUser().pipe(toArray()),
+      );
 
-      expect(user).toBeNull();
+      expect(users).toEqual([]);
     });
 
-    it("emits null when no user exists", async () => {
+    it("completes empty when no user exists", async () => {
       mockGetUser.mockResolvedValue(null);
 
-      const user = await firstValueFrom(getAuthenticatedUser());
+      const users = await firstValueFrom(
+        getAuthenticatedUser().pipe(toArray()),
+      );
 
-      expect(user).toBeNull();
+      expect(users).toEqual([]);
     });
   });
 
@@ -58,7 +62,9 @@ describe("authAdapter", () => {
     it("calls signinRedirect with return URL as state", async () => {
       mockSigninRedirect.mockResolvedValue(undefined);
 
-      await firstValueFrom(loginRedirect("/facilitator"));
+      await lastValueFrom(loginRedirect("/facilitator"), {
+        defaultValue: undefined,
+      });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         state: "/facilitator",
@@ -68,7 +74,7 @@ describe("authAdapter", () => {
     it("uses current pathname when no return URL provided", async () => {
       mockSigninRedirect.mockResolvedValue(undefined);
 
-      await firstValueFrom(loginRedirect());
+      await lastValueFrom(loginRedirect(), { defaultValue: undefined });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         state: window.location.pathname,
@@ -100,12 +106,12 @@ describe("authAdapter", () => {
       expect(token).toBe("my-token");
     });
 
-    it("emits null when no user", async () => {
+    it("completes empty when no user", async () => {
       mockGetUser.mockResolvedValue(null);
 
-      const token = await firstValueFrom(getAccessToken());
+      const tokens = await firstValueFrom(getAccessToken().pipe(toArray()));
 
-      expect(token).toBeNull();
+      expect(tokens).toEqual([]);
     });
   });
 });
