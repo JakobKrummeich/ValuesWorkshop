@@ -1,4 +1,4 @@
-import { PHASES } from "./phases";
+import { PHASES } from "../phases";
 
 describe("workshop phases", () => {
   it("lists the nine phases in fixed forward order", () => {

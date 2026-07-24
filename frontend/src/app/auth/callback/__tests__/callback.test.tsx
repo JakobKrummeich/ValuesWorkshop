@@ -1,10 +1,10 @@
 import { render, screen, act, waitFor } from "@testing-library/react";
-import AuthCallbackPage from "./page";
+import AuthCallbackPage from "../page";
 
 const mockHandleCallback = jest.fn();
 const mockNavigateReplace = jest.fn();
 
-jest.mock("../../../adapters/authAdapter", () => ({
+jest.mock("../../../../adapters/authAdapter", () => ({
   handleCallback: (...args: unknown[]) => mockHandleCallback(...args),
   navigateReplace: (...args: unknown[]) => mockNavigateReplace(...args),
 }));

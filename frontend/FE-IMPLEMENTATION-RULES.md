@@ -58,7 +58,8 @@ or global component stylesheets beyond `tokens.css` and `globals.css`.
 
 ## Testing
 
-- Co-locate test files: `Component.test.tsx` next to `Component.tsx`.
+- Test files live in a `__tests__/` directory at the same level as the file
+  under test: `Component.tsx` → `__tests__/Component.test.tsx`.
 - Use `@testing-library/react` for component tests.
 - Use RxJS marble tests (`TestScheduler`) for observable logic.
 - Run FE tests: `cd frontend && pnpm jest --passWithNoTests`.

@@ -18,7 +18,7 @@ import {
   loginRedirect,
   handleCallback,
   getAccessToken,
-} from "./authAdapter";
+} from "../authAdapter";
 
 beforeEach(() => {
   jest.clearAllMocks();

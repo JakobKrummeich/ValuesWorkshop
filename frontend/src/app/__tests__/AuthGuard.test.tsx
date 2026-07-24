@@ -1,10 +1,10 @@
 import { render, screen, act, waitFor } from "@testing-library/react";
-import { AuthGuard } from "./AuthGuard";
+import { AuthGuard } from "../AuthGuard";
 
 const mockGetAuthenticatedUser = jest.fn();
 const mockLoginRedirect = jest.fn();
 
-jest.mock("../adapters/authAdapter", () => ({
+jest.mock("../../adapters/authAdapter", () => ({
   getAuthenticatedUser: (...args: unknown[]) =>
     mockGetAuthenticatedUser(...args),
   loginRedirect: (...args: unknown[]) => mockLoginRedirect(...args),

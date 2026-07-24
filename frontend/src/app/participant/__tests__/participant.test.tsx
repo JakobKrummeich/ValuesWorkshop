@@ -1,8 +1,8 @@
 import { render, screen, act } from "@testing-library/react";
-import ParticipantLayout from "./layout";
-import ParticipantHome from "./page";
+import ParticipantLayout from "../layout";
+import ParticipantHome from "../page";
 
-jest.mock("../../adapters/authAdapter", () => ({
+jest.mock("../../../adapters/authAdapter", () => ({
   getAuthenticatedUser: jest.fn().mockResolvedValue({
     access_token: "test-token",
     expired: false,
