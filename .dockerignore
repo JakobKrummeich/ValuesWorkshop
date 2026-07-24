@@ -1,6 +1,8 @@
 .git/
-backend/
-devtools/
 node_modules/
-.next/
-coverage/
+**/node_modules/
+**/.next/
+**/coverage/
+**/bin/
+**/obj/
+**/TestResults/
