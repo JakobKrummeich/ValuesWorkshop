@@ -27,23 +27,19 @@ function getUserManager(): UserManager {
 }
 
 export function getAuthenticatedUser(): Maybe<User> {
-  return defer(async () => {
-    const manager = getUserManager();
-    const user = await manager.getUser();
-    if (user && !user.expired) {
-      return user;
-    }
-    return null;
-  }).pipe(filter((user): user is User => user !== null));
+  return defer(() =>
+    getUserManager()
+      .getUser()
+      .then((user) => (user && !user.expired ? user : null)),
+  ).pipe(filter((user): user is User => user !== null));
 }
 
 export function loginRedirect(returnUrl?: string): Completable {
-  return defer(async () => {
-    const manager = getUserManager();
-    await manager.signinRedirect({
+  return defer(() =>
+    getUserManager().signinRedirect({
       state: returnUrl ?? window.location.pathname,
-    });
-  }).pipe(ignoreElements());
+    }),
+  ).pipe(ignoreElements());
 }
 
 export function handleCallback(): Single<User> {
@@ -54,14 +50,11 @@ export function handleCallback(): Single<User> {
 }
 
 export function getAccessToken(): Maybe<string> {
-  return defer(async () => {
-    const manager = getUserManager();
-    const user = await manager.getUser();
-    if (user && !user.expired) {
-      return user.access_token;
-    }
-    return null;
-  }).pipe(filter((token): token is string => token !== null));
+  return defer(() =>
+    getUserManager()
+      .getUser()
+      .then((user) => (user && !user.expired ? user.access_token : null)),
+  ).pipe(filter((token): token is string => token !== null));
 }
 
 export function logout(): Completable {

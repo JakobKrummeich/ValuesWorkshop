@@ -10,6 +10,28 @@ internal code consumes and returns observables.
 - Wrappers live in `src/adapters/` and are the only place `defer()`
   converts promises to observables (`defer()` alone is sufficient — no
   `from()` wrapping needed).
+- **No `async`/`await` inside `defer()` callbacks.** Return the promise
+  chain directly with `.then()`/`.catch()`:
+
+  ```typescript
+  // YES — promise chain
+  export function getAuthenticatedUser(): Maybe<User> {
+    return defer(() =>
+      getUserManager()
+        .getUser()
+        .then((user) => (user && !user.expired ? user : null)),
+    ).pipe(filter((user): user is User => user !== null));
+  }
+
+  // NO — async/await
+  export function getAuthenticatedUser(): Maybe<User> {
+    return defer(async () => {
+      const user = await getUserManager().getUser();
+      return user && !user.expired ? user : null;
+    }).pipe(filter((user): user is User => user !== null));
+  }
+  ```
+
 - **No `$` suffix** — on any name (functions, variables, Subjects). Use
   plain descriptive names. The type system already distinguishes
   `Observable<T>` from `T`.
