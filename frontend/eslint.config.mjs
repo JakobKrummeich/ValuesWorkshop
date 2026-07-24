@@ -9,6 +9,7 @@ const eslintConfig = defineConfig([
   {
     rules: {
       complexity: ["error", 7],
+      "id-match": ["error", "^[^$]*$", { properties: true }],
     },
   },
   {
