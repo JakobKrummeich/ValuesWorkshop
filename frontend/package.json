@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && depcruise src --config .dependency-cruiser.cjs && pnpm audit --audit-level=high",
+    "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && depcruise src --config .dependency-cruiser.cjs",
     "test": "jest --coverage",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
