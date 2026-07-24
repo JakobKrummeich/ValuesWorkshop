@@ -113,15 +113,14 @@ reload to exact prior state.
 - [x] Write-before-broadcast enforced in one code path (no ad-hoc saves)
 - [x] Round-trip test: mutate → new store instance → identical state
 **Verification:** `dotnet test backend` (persistence round-trip suite).
-**Dependencies:** 1. **Files:** `backend/src/Adapters/Persistence/*`. **Size:** M
+**Dependencies:** 1. **Files:** `backend/Adapters.Persistence/*`. **Size:** M
 
-### Refactor note: split Adapters by concern
-**When:** Before adding the first non-persistence adapter (likely Task 9).
-**What:** Split `backend/Adapters` into `Adapters.Persistence` and
-`Adapters.Web` (SignalR, HTTP, OIDC) so each project owns only its
-dependencies. On FE side, similarly keep adapter modules separated by
-concern (e.g., SignalR adapter vs. API adapter) rather than one shared
-bucket.
+### Refactor note: split Adapters by concern ✅
+**Done.** `backend/Adapters` split into `Adapters.Persistence` (EF Core +
+SQLite) and `Adapters.Web` (SignalR shell). OR-Tools moved to Host.
+Architecture tests enforce cross-adapter isolation. On FE side, similarly
+keep adapter modules separated by concern (e.g., SignalR adapter vs. API
+adapter) rather than one shared bucket.
 
 ### Task 8a: RxJS migration + marble tests + component structure refactor ✅
 **Description (component refactor):** Refactor AuthGuard and AuthCallbackPage
