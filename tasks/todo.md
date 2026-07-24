@@ -123,6 +123,21 @@ dependencies. On FE side, similarly keep adapter modules separated by
 concern (e.g., SignalR adapter vs. API adapter) rather than one shared
 bucket.
 
+### Task 8a: RxJS migration + marble tests
+**Description:** Migrate existing FE code from Promise-based to RxJS-first
+architecture per `frontend/FE-IMPLEMENTATION-RULES.md`. Wrap `oidc-client-ts`
+promise APIs in thin `defer()`/`from()` adapters returning Observables.
+Convert AuthGuard and callback page to subscribe to observables. Add marble
+tests for all observable flows. Install `rxjs` as dependency.
+**Acceptance criteria:**
+- [ ] `authAdapter.ts` exports observables, not promises
+- [ ] Promise→Observable wrappers are the only place `from()`/`defer()` appear
+- [ ] All auth flows tested with `TestScheduler` marble diagrams
+- [ ] Zero raw `Promise`/`async`/`await` in non-adapter FE code
+- [ ] All existing tests pass (rewritten as marble tests where applicable)
+**Verification:** `cd frontend && pnpm jest --passWithNoTests` all green.
+**Dependencies:** 8. **Size:** S
+
 ### Task 8: OIDC auth end-to-end
 **Description:** BE validates tokens from dev `oidc-provider`; FE login
 redirect flow for facilitator + participant; presenter route unauthenticated.
