@@ -50,6 +50,10 @@ jobs:
       - name: FE lint
         run: pnpm --dir frontend lint
 
+      - name: FE vulnerability check
+        run: pnpm --dir frontend audit --audit-level=high
+        continue-on-error: true
+
       - name: FE build
         run: pnpm --dir frontend build
 

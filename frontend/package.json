@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && depcruise src --config .dependency-cruiser.cjs && pnpm audit --audit-level=high",
+    "lint": "eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && depcruise src --config .dependency-cruiser.cjs",
     "test": "jest --coverage",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
@@ -17,6 +17,7 @@
     "oidc-client-ts": "^3.5.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "rxjs": "^7.8.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {

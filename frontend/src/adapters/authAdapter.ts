@@ -1,4 +1,5 @@
 import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
+import { defer, type Observable } from "rxjs";
 
 let userManagerInstance: UserManager | null = null;
 
@@ -24,35 +25,49 @@ function getUserManager(): UserManager {
   return userManagerInstance;
 }
 
-export async function getAuthenticatedUser(): Promise<User | null> {
-  const manager = getUserManager();
-  const user = await manager.getUser();
-  if (user && !user.expired) {
-    return user;
-  }
-  return null;
-}
-
-export async function loginRedirect(returnUrl?: string): Promise<void> {
-  const manager = getUserManager();
-  await manager.signinRedirect({
-    state: returnUrl ?? window.location.pathname,
+export function getAuthenticatedUser$(): Observable<User | null> {
+  return defer(async () => {
+    const manager = getUserManager();
+    const user = await manager.getUser();
+    if (user && !user.expired) {
+      return user;
+    }
+    return null;
   });
 }
 
-export async function handleCallback(): Promise<User> {
-  const manager = getUserManager();
-  return manager.signinRedirectCallback();
+export function loginRedirect$(returnUrl?: string): Observable<void> {
+  return defer(async () => {
+    const manager = getUserManager();
+    await manager.signinRedirect({
+      state: returnUrl ?? window.location.pathname,
+    });
+  });
 }
 
-export async function getAccessToken(): Promise<string | null> {
-  const user = await getAuthenticatedUser();
-  return user?.access_token ?? null;
+export function handleCallback$(): Observable<User> {
+  return defer(() => {
+    const manager = getUserManager();
+    return manager.signinRedirectCallback();
+  });
 }
 
-export async function logout(): Promise<void> {
-  const manager = getUserManager();
-  await manager.signoutRedirect();
+export function getAccessToken$(): Observable<string | null> {
+  return defer(async () => {
+    const manager = getUserManager();
+    const user = await manager.getUser();
+    if (user && !user.expired) {
+      return user.access_token;
+    }
+    return null;
+  });
+}
+
+export function logout$(): Observable<void> {
+  return defer(() => {
+    const manager = getUserManager();
+    return manager.signoutRedirect();
+  });
 }
 
 export function navigateReplace(url: string): void {

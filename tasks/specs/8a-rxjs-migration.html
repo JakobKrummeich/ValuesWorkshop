@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Task 8a — RxJS Migration + Component Structure Refactor</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #1a1a1a; }
+  h1 { font-size: 1.5rem; border-bottom: 2px solid #333; padding-bottom: 0.5rem; }
+  h2 { font-size: 1.2rem; margin-top: 2rem; color: #444; }
+  h3 { font-size: 1rem; margin-top: 1.5rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #ccc; padding: 0.4rem 0.8rem; text-align: left; }
+  th { background: #f5f5f5; }
+  code { background: #f0f0f0; padding: 0.15rem 0.3rem; border-radius: 3px; font-size: 0.9em; }
+  pre { background: #f5f5f5; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+  ul { padding-left: 1.5rem; }
+  li { margin: 0.3rem 0; }
+  .check { color: #666; }
+</style>
+</head>
+<body>
+
+<h1>Spec: Task 8a — RxJS Migration + Component Structure Refactor</h1>
+
+<h2>Objective</h2>
+<p>Convert auth code from Promise-based to RxJS-first per <code>FE-IMPLEMENTATION-RULES.md</code>.
+Split components into hook/tsx/css pattern. Result: all auth flows are observable-based,
+tested with marble diagrams, and components are thin rendering shells.</p>
+
+<h2>Part 1: Component Structure Refactor</h2>
+<p>Extract hooks from AuthGuard and AuthCallbackPage:</p>
+
+<table>
+<tr><th>File</th><th>Role</th></tr>
+<tr><td><code>src/app/useAuthGuard.ts</code></td><td>Hook: all auth-check + redirect logic</td></tr>
+<tr><td><code>src/app/AuthGuard.tsx</code></td><td>Thin shell: call hook, render</td></tr>
+<tr><td><code>src/app/AuthGuard.module.css</code></td><td>(unchanged)</td></tr>
+<tr><td><code>src/app/auth/callback/useAuthCallback.ts</code></td><td>Hook: callback processing logic</td></tr>
+<tr><td><code>src/app/auth/callback/page.tsx</code></td><td>Thin shell: call hook, render</td></tr>
+<tr><td><code>src/app/auth/callback/CallbackPage.module.css</code></td><td>(unchanged)</td></tr>
+</table>
+
+<p>Hook returns state values needed for rendering. Component maps to JSX.</p>
+
+<h2>Part 2: RxJS Migration</h2>
+<ol>
+<li>Install <code>rxjs</code> as dependency</li>
+<li>Refactor <code>authAdapter.ts</code> — export observables instead of promises:
+  <ul>
+    <li><code>getAuthenticatedUser$()</code> → <code>Observable&lt;User | null&gt;</code></li>
+    <li><code>loginRedirect$(returnUrl?)</code> → <code>Observable&lt;void&gt;</code></li>
+    <li><code>handleCallback$()</code> → <code>Observable&lt;User&gt;</code></li>
+    <li><code>getAccessToken$()</code> → <code>Observable&lt;string | null&gt;</code></li>
+    <li><code>logout$()</code> → <code>Observable&lt;void&gt;</code></li>
+    <li><code>navigateReplace()</code> stays sync (not promise-based)</li>
+    <li>Use <code>defer(() =&gt; from(...))</code> pattern — lazy, cold observables</li>
+    <li>These are the ONLY place <code>from()</code>/<code>defer()</code> appear</li>
+  </ul>
+</li>
+<li>Hooks subscribe to observables (no raw <code>async</code>/<code>await</code> in non-adapter code)</li>
+<li>Adapter tests stay promise-based (testing the boundary)</li>
+<li>Hook tests use <code>TestScheduler</code> marble diagrams</li>
+<li>Component tests mock hooks (unchanged pattern)</li>
+</ol>
+
+<h2>Acceptance Criteria</h2>
+<ul class="check">
+<li>☐ AuthGuard split: <code>useAuthGuard.ts</code> + <code>AuthGuard.tsx</code> + <code>AuthGuard.module.css</code></li>
+<li>☐ AuthCallbackPage split: <code>useAuthCallback.ts</code> + <code>page.tsx</code> + <code>CallbackPage.module.css</code></li>
+<li>☐ Hook tests cover all logic branches (marble tests)</li>
+<li>☐ Component tests mock hooks, verify rendering only</li>
+<li>☐ <code>authAdapter.ts</code> exports observables, not promises</li>
+<li>☐ <code>from()</code>/<code>defer()</code> only in adapter layer</li>
+<li>☐ Zero raw <code>Promise</code>/<code>async</code>/<code>await</code> in non-adapter FE code</li>
+<li>☐ All tests green: <code>cd frontend && pnpm jest --passWithNoTests</code></li>
+<li>☐ All lint gates pass: <code>./scripts/ci-lint.sh</code></li>
+</ul>
+
+<h2>Task Breakdown</h2>
+<ol>
+<li>Install rxjs</li>
+<li>Refactor <code>authAdapter.ts</code> to export observables (keep promise internals, wrap with <code>defer</code>/<code>from</code>)</li>
+<li>Update adapter tests for observable API</li>
+<li>Extract <code>useAuthGuard.ts</code> hook (subscribes to observables)</li>
+<li>Thin out <code>AuthGuard.tsx</code></li>
+<li>Add <code>useAuthGuard</code> marble tests</li>
+<li>Simplify <code>AuthGuard.test.tsx</code> to mock hook</li>
+<li>Extract <code>useAuthCallback.ts</code> hook (subscribes to observables)</li>
+<li>Thin out callback <code>page.tsx</code></li>
+<li>Add <code>useAuthCallback</code> marble tests</li>
+<li>Simplify <code>callback.test.tsx</code> to mock hook</li>
+<li>Verify all gates pass</li>
+</ol>
+
+<h2>Verification</h2>
+<pre><code>cd frontend && pnpm jest --passWithNoTests
+./scripts/ci-lint.sh</code></pre>
+
+</body>
+</html>
