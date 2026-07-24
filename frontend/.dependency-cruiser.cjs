@@ -66,6 +66,27 @@ module.exports = {
       to: { path: "^src/app/participant/" },
     },
     {
+      name: "shared-must-not-import-adapters",
+      severity: "error",
+      comment: "shared/ is pure utilities — it must not import from adapters/",
+      from: { path: "^src/shared/" },
+      to: { path: "^src/adapters/" },
+    },
+    {
+      name: "shared-must-not-import-app",
+      severity: "error",
+      comment: "shared/ is pure utilities — it must not import from app/",
+      from: { path: "^src/shared/" },
+      to: { path: "^src/app/" },
+    },
+    {
+      name: "shared-must-not-import-domain",
+      severity: "error",
+      comment: "shared/ is pure utilities — it must not import from domain/",
+      from: { path: "^src/shared/" },
+      to: { path: "^src/domain/" },
+    },
+    {
       name: "no-circular",
       severity: "error",
       comment: "No circular dependencies anywhere",
