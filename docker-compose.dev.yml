@@ -5,9 +5,12 @@ services:
     ports:
       - "5000:8080"
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       DATA_DIR: /data
-      OIDC_AUTHORITY: http://oidc:9000
+      OIDC_AUTHORITY: http://localhost:9000
+      OIDC_METADATA_URL: http://oidc:9000/.well-known/openid-configuration
+      CORS_ORIGINS: http://localhost:3000
     volumes:
       - vw-data:/data
     depends_on:
@@ -22,11 +25,15 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: frontend/Dockerfile
     ports:
       - "3000:3000"
     environment:
       BACKEND_URL: http://backend:8080
+      NEXT_PUBLIC_OIDC_AUTHORITY: http://localhost:9000
+      NEXT_PUBLIC_OIDC_CLIENT_ID: valuesworkshop
+      NEXT_PUBLIC_OIDC_REDIRECT_URI: http://localhost:3000/auth/callback
 
   oidc:
     build:

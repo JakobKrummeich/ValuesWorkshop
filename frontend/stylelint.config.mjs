@@ -6,6 +6,19 @@ const semanticValueProps = [
   "line-height",
   "border-radius",
   "box-shadow",
+  "gap",
+  "row-gap",
+  "column-gap",
+  "padding",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "margin",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
 ];
 
 const config = {

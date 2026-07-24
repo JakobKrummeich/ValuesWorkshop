@@ -119,8 +119,9 @@ CI wiring: `commands.test` / `commands.lint` (Task 6).
 ## Project Structure
 
 ```
-frontend/          → Next.js app (3 screens), Jest unit tests, Playwright e2e
+frontend/          → Next.js app (3 screens), Jest unit tests
 backend/           → ASP.NET Core solution, xUnit tests
+e2e/               → Playwright end-to-end tests
 config/            → values catalog + quiz content JSON
 devtools/oidc/     → local oidc-provider server for dev + e2e
 design/            → design models. DDD domain core (domain model, state

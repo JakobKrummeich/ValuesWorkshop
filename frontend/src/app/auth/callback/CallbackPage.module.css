@@ -1,0 +1,26 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+}
+
+.errorContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  flex-direction: column;
+  gap: var(--space-gutter);
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+}
+
+.errorContainer a {
+  color: var(--color-primary);
+  font-size: var(--text-small);
+}

@@ -1,0 +1,10 @@
+.git/
+**/node_modules/
+**/.next/
+**/coverage/
+**/bin/
+**/obj/
+**/TestResults/
+backend/
+devtools/
+e2e/

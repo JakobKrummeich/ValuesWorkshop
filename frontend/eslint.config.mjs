@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -8,6 +9,14 @@ const eslintConfig = defineConfig([
   {
     rules: {
       complexity: ["error", 7],
+    },
+  },
+  {
+    plugins: { "react-hooks": reactHooksPlugin },
+    rules: {
+      "react-hooks/exhaustive-deps": "error",
+      "react-hooks/incompatible-library": "error",
+      "react-hooks/unsupported-syntax": "error",
     },
   },
   {
