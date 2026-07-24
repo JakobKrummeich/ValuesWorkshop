@@ -67,7 +67,27 @@ One co-located `Component.module.css` per component (restated from
 `AGENTS.md`). No inline `style={}` props — use CSS module classes. No shared
 or global component stylesheets beyond `tokens.css` and `globals.css`.
 
-## Component Files
+## Component Structure
+
+Every non-trivial React component is split into three files:
+
+1. **`Component.module.css`** — styling (CSS module)
+2. **`Component.tsx`** — markup, imports the CSS module and the hook
+3. **`useComponent.ts`** — hook containing all UI logic (state, effects,
+   derived values, callbacks)
+
+The `.tsx` file is a thin rendering shell — it calls the hook and maps
+the returned values to JSX. All logic lives in the hook.
+
+### Testing
+
+- **Hook test** (`__tests__/useComponent.test.ts`) — thorough: tests all
+  logic branches, edge cases, error paths. Uses `renderHook` or marble
+  tests.
+- **Component test** (`__tests__/Component.test.tsx`) — superficial: mocks
+  the hook, verifies the JSX renders the hook's return values correctly.
+
+### Other rules
 
 - `"use client"` only when the component uses hooks, browser APIs, or event
   handlers.
@@ -83,9 +103,3 @@ or global component stylesheets beyond `tokens.css` and `globals.css`.
 - Run FE tests: `cd frontend && pnpm jest --passWithNoTests`.
 - `window.location` can't be redefined in jsdom v30 — extract navigation
   helpers (like `navigateReplace`) into adapters for mocking.
-
-## Lint Rules
-
-All `react-hooks/*` rules are set to `error` severity. This includes
-`exhaustive-deps`, `rules-of-hooks`, `refs`, and all other React hooks
-rules. Never downgrade these.

@@ -33,8 +33,6 @@ collections or custom equality where equality matters). Aggregate style
 ## Frontend
 
 **MUST read `frontend/FE-IMPLEMENTATION-RULES.md` before any frontend work.**
-It covers RxJS-first architecture, enum conventions, design token usage,
-CSS module rules, and testing patterns.
 
 ## Per-task skill chain (in this order)
 

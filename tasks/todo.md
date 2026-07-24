@@ -123,7 +123,19 @@ dependencies. On FE side, similarly keep adapter modules separated by
 concern (e.g., SignalR adapter vs. API adapter) rather than one shared
 bucket.
 
-### Task 8a: RxJS migration + marble tests
+### Task 8a: RxJS migration + marble tests + component structure refactor
+**Description (component refactor):** Refactor AuthGuard and AuthCallbackPage
+to the hook-component-css split per `frontend/FE-IMPLEMENTATION-RULES.md`.
+Extract `useAuthGuard.ts` and `useAuthCallback.ts` hooks containing all
+logic. The `.tsx` files become thin shells that call the hook and render.
+Add thorough hook tests; simplify component tests to mock hooks.
+**Acceptance criteria:**
+- [ ] AuthGuard split: `useAuthGuard.ts` + `AuthGuard.tsx` + `AuthGuard.module.css`
+- [ ] AuthCallbackPage split: `useAuthCallback.ts` + `page.tsx` + `CallbackPage.module.css`
+- [ ] Hook tests cover all logic branches
+- [ ] Component tests mock hooks and verify rendering only
+
+**Description (RxJS migration):**
 **Description:** Migrate existing FE code from Promise-based to RxJS-first
 architecture per `frontend/FE-IMPLEMENTATION-RULES.md`. Wrap `oidc-client-ts`
 promise APIs in thin `defer()`/`from()` adapters returning Observables.
