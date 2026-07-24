@@ -33,12 +33,6 @@ enum AuthState {
 type AuthState = "checking" | "authenticated" | "redirecting" | "error";
 ```
 
-Enums provide:
-
-- A runtime object for iteration and reverse lookup.
-- A single source of truth importable as both type and value.
-- Better refactoring support (rename symbol vs. find-replace string).
-
 ## Design Tokens
 
 Every visual property — color, spacing, font, radius, shadow — **must** use
