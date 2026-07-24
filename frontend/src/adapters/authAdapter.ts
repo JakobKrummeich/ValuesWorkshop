@@ -1,4 +1,6 @@
 import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
+import { defer, filter, ignoreElements } from "rxjs";
+import type { Completable, Maybe, Single } from "../shared/reactiveTypes";
 
 let userManagerInstance: UserManager | null = null;
 
@@ -24,35 +26,42 @@ function getUserManager(): UserManager {
   return userManagerInstance;
 }
 
-export async function getAuthenticatedUser(): Promise<User | null> {
-  const manager = getUserManager();
-  const user = await manager.getUser();
-  if (user && !user.expired) {
-    return user;
-  }
-  return null;
+export function getAuthenticatedUser(): Maybe<User> {
+  return defer(() =>
+    getUserManager()
+      .getUser()
+      .then((user) => (user && !user.expired ? user : null)),
+  ).pipe(filter((user): user is User => user !== null));
 }
 
-export async function loginRedirect(returnUrl?: string): Promise<void> {
-  const manager = getUserManager();
-  await manager.signinRedirect({
-    state: returnUrl ?? window.location.pathname,
+export function loginRedirect(returnUrl?: string): Completable {
+  return defer(() =>
+    getUserManager().signinRedirect({
+      state: returnUrl ?? window.location.pathname,
+    }),
+  ).pipe(ignoreElements());
+}
+
+export function handleCallback(): Single<User> {
+  return defer(() => {
+    const manager = getUserManager();
+    return manager.signinRedirectCallback();
   });
 }
 
-export async function handleCallback(): Promise<User> {
-  const manager = getUserManager();
-  return manager.signinRedirectCallback();
+export function getAccessToken(): Maybe<string> {
+  return defer(() =>
+    getUserManager()
+      .getUser()
+      .then((user) => (user && !user.expired ? user.access_token : null)),
+  ).pipe(filter((token): token is string => token !== null));
 }
 
-export async function getAccessToken(): Promise<string | null> {
-  const user = await getAuthenticatedUser();
-  return user?.access_token ?? null;
-}
-
-export async function logout(): Promise<void> {
-  const manager = getUserManager();
-  await manager.signoutRedirect();
+export function logout(): Completable {
+  return defer(() => {
+    const manager = getUserManager();
+    return manager.signoutRedirect();
+  }).pipe(ignoreElements());
 }
 
 export function navigateReplace(url: string): void {

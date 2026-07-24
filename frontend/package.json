@@ -17,6 +17,7 @@
     "oidc-client-ts": "^3.5.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "rxjs": "^7.8.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {

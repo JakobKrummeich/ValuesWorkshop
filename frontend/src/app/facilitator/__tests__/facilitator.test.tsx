@@ -2,12 +2,14 @@ import { render, screen, act } from "@testing-library/react";
 import FacilitatorLayout from "../layout";
 import FacilitatorHome from "../page";
 
-jest.mock("../../../adapters/authAdapter", () => ({
-  getAuthenticatedUser: jest.fn().mockResolvedValue({
-    access_token: "test-token",
-    expired: false,
-  }),
-  loginRedirect: jest.fn(),
+jest.mock("../../useAuthGuard", () => ({
+  useAuthGuard: () => ({ state: "authenticated" }),
+  AuthGuardState: {
+    Checking: "checking",
+    Authenticated: "authenticated",
+    Redirecting: "redirecting",
+    Error: "error",
+  },
 }));
 
 describe("facilitator screen group", () => {

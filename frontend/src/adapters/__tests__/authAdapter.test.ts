@@ -1,3 +1,5 @@
+import { firstValueFrom, lastValueFrom, toArray } from "rxjs";
+
 const mockGetUser = jest.fn();
 const mockSigninRedirect = jest.fn();
 const mockSigninRedirectCallback = jest.fn();
@@ -26,29 +28,33 @@ beforeEach(() => {
 
 describe("authAdapter", () => {
   describe("getAuthenticatedUser", () => {
-    it("returns user when authenticated and not expired", async () => {
+    it("emits user when authenticated and not expired", async () => {
       const mockUser = { access_token: "token", expired: false };
       mockGetUser.mockResolvedValue(mockUser);
 
-      const user = await getAuthenticatedUser();
+      const user = await firstValueFrom(getAuthenticatedUser());
 
       expect(user).toBe(mockUser);
     });
 
-    it("returns null when user is expired", async () => {
+    it("completes empty when user is expired", async () => {
       mockGetUser.mockResolvedValue({ access_token: "token", expired: true });
 
-      const user = await getAuthenticatedUser();
+      const users = await firstValueFrom(
+        getAuthenticatedUser().pipe(toArray()),
+      );
 
-      expect(user).toBeNull();
+      expect(users).toEqual([]);
     });
 
-    it("returns null when no user exists", async () => {
+    it("completes empty when no user exists", async () => {
       mockGetUser.mockResolvedValue(null);
 
-      const user = await getAuthenticatedUser();
+      const users = await firstValueFrom(
+        getAuthenticatedUser().pipe(toArray()),
+      );
 
-      expect(user).toBeNull();
+      expect(users).toEqual([]);
     });
   });
 
@@ -56,7 +62,9 @@ describe("authAdapter", () => {
     it("calls signinRedirect with return URL as state", async () => {
       mockSigninRedirect.mockResolvedValue(undefined);
 
-      await loginRedirect("/facilitator");
+      await lastValueFrom(loginRedirect("/facilitator"), {
+        defaultValue: undefined,
+      });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         state: "/facilitator",
@@ -66,7 +74,7 @@ describe("authAdapter", () => {
     it("uses current pathname when no return URL provided", async () => {
       mockSigninRedirect.mockResolvedValue(undefined);
 
-      await loginRedirect();
+      await lastValueFrom(loginRedirect(), { defaultValue: undefined });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
         state: window.location.pathname,
@@ -79,7 +87,7 @@ describe("authAdapter", () => {
       const mockUser = { access_token: "token" };
       mockSigninRedirectCallback.mockResolvedValue(mockUser);
 
-      const user = await handleCallback();
+      const user = await firstValueFrom(handleCallback());
 
       expect(user).toBe(mockUser);
       expect(mockSigninRedirectCallback).toHaveBeenCalled();
@@ -87,23 +95,23 @@ describe("authAdapter", () => {
   });
 
   describe("getAccessToken", () => {
-    it("returns access token when user is authenticated", async () => {
+    it("emits access token when user is authenticated", async () => {
       mockGetUser.mockResolvedValue({
         access_token: "my-token",
         expired: false,
       });
 
-      const token = await getAccessToken();
+      const token = await firstValueFrom(getAccessToken());
 
       expect(token).toBe("my-token");
     });
 
-    it("returns null when no user", async () => {
+    it("completes empty when no user", async () => {
       mockGetUser.mockResolvedValue(null);
 
-      const token = await getAccessToken();
+      const tokens = await firstValueFrom(getAccessToken().pipe(toArray()));
 
-      expect(token).toBeNull();
+      expect(tokens).toEqual([]);
     });
   });
 });
