@@ -1,8 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
-    <ProjectReference Include="..\Adapters\ValuesWorkshop.Adapters.csproj" />
+    <ProjectReference Include="..\Adapters.Persistence\ValuesWorkshop.Adapters.Persistence.csproj" />
+    <ProjectReference Include="..\Adapters.Web\ValuesWorkshop.Adapters.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Google.OrTools" Version="9.15.6755" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
   </ItemGroup>
 </Project>

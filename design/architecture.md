@@ -19,17 +19,19 @@ Domain (pure logic + port interfaces)
   ↑
 Application (use cases, orchestration)
   ↑
-Adapters (implements ports: SignalR hub, SQLite/EF, OR-Tools, OIDC, HTTP)
+Adapters.Persistence (SQLite/EF)
+Adapters.Web (SignalR hub, OIDC, HTTP)
   ↑
-Host (composition root, DI wiring, startup)
+Host (composition root, DI wiring, startup, OR-Tools)
 ```
 
 | Layer | Assembly | Depends on | Contains |
 |---|---|---|---|
 | **Domain** | `ValuesWorkshop.Domain` | Nothing | Aggregates, value objects, domain events, port interfaces, invariants |
 | **Application** | `ValuesWorkshop.Application` | Domain | Use cases, command handlers, application services |
-| **Adapters** | `ValuesWorkshop.Adapters` | Application, Domain | Port implementations (persistence, messaging, external services) |
-| **Host** | `ValuesWorkshop.Host` | Adapters (transitive: Application, Domain) | Composition root, DI registration, middleware, startup |
+| **Adapters.Persistence** | `ValuesWorkshop.Adapters.Persistence` | Application, Domain | EF Core + SQLite persistence |
+| **Adapters.Web** | `ValuesWorkshop.Adapters.Web` | Application, Domain | SignalR hub, HTTP, OIDC adapters |
+| **Host** | `ValuesWorkshop.Host` | Adapters.Persistence, Adapters.Web (transitive: Application, Domain) | Composition root, DI registration, middleware, startup, OR-Tools |
 
 **Enforced by:** ArchUnitNET rules in xUnit tests (`dotnet test backend`).
 
@@ -60,15 +62,15 @@ layer** (not in a separate layer), and are implemented by adapters.
 
 ### 2.1 Backend Ports
 
-Port interfaces live in `ValuesWorkshop.Domain/Ports/`. Adapters in
-`ValuesWorkshop.Adapters` implement them. Application layer references port
-interfaces from Domain to orchestrate use cases.
+Port interfaces live in `ValuesWorkshop.Domain/Ports/`. Adapters implement
+them. Application layer references port interfaces from Domain to orchestrate
+use cases.
 
 Current ports:
 
 | Interface | File | Implemented by |
 |---|---|---|
-| `ISessionRepository` | `Domain/Ports/ISessionRepository.cs` | `SqliteSessionRepository` (Adapters) |
+| `ISessionRepository` | `Domain/Ports/ISessionRepository.cs` | `SqliteSessionRepository` (Adapters.Persistence) |
 
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):

@@ -8,7 +8,7 @@ values and pragmatic everyday actions. See `SPEC.md` for the product spec.
 | Path | What |
 |---|---|
 | `frontend/` | Next.js app — `src/{domain,adapters,app}`; screen groups `app/{facilitator,participant,presenter}/`, each with its own DI context |
-| `backend/` | ASP.NET Core — `Domain` ← `Application` ← `Adapters` ← `Host` (hexagonal; ports in `Domain`) |
+| `backend/` | ASP.NET Core — `Domain` ← `Application` ← `Adapters.Persistence` / `Adapters.Web` ← `Host` (hexagonal; ports in `Domain`) |
 | `e2e/` | Playwright end-to-end tests |
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |

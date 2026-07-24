@@ -101,39 +101,38 @@ Deferred technical design docs (written inside their implementing task):
 
 ## Phase B: Session Core
 
-### Task 7: SQLite persistence layer
+### Task 7: SQLite persistence layer ✅
 **Description:** First write `design/persistence.md` (tables, keys,
 write-before-broadcast flow, recovery procedure, schema-level anonymity
 argument), then implement: session store (adapter behind Application port),
 every state mutation persisted before broadcast; on startup, all sessions
 reload to exact prior state.
 **Acceptance criteria:**
-- [ ] `design/persistence.md` written; no voter↔vote linkage possible by
+- [x] `design/persistence.md` written; no voter↔vote linkage possible by
       schema
-- [ ] Write-before-broadcast enforced in one code path (no ad-hoc saves)
-- [ ] Round-trip test: mutate → new store instance → identical state
+- [x] Write-before-broadcast enforced in one code path (no ad-hoc saves)
+- [x] Round-trip test: mutate → new store instance → identical state
 **Verification:** `dotnet test backend` (persistence round-trip suite).
-**Dependencies:** 1. **Files:** `backend/src/Adapters/Persistence/*`. **Size:** M
+**Dependencies:** 1. **Files:** `backend/Adapters.Persistence/*`. **Size:** M
 
-### Refactor note: split Adapters by concern
-**When:** Before adding the first non-persistence adapter (likely Task 9).
-**What:** Split `backend/Adapters` into `Adapters.Persistence` and
-`Adapters.Web` (SignalR, HTTP, OIDC) so each project owns only its
-dependencies. On FE side, similarly keep adapter modules separated by
-concern (e.g., SignalR adapter vs. API adapter) rather than one shared
-bucket.
+### Refactor note: split Adapters by concern ✅
+**Done.** `backend/Adapters` split into `Adapters.Persistence` (EF Core +
+SQLite) and `Adapters.Web` (SignalR shell). OR-Tools moved to Host.
+Architecture tests enforce cross-adapter isolation. On FE side, similarly
+keep adapter modules separated by concern (e.g., SignalR adapter vs. API
+adapter) rather than one shared bucket.
 
-### Task 8a: RxJS migration + marble tests + component structure refactor
+### Task 8a: RxJS migration + marble tests + component structure refactor ✅
 **Description (component refactor):** Refactor AuthGuard and AuthCallbackPage
 to the hook-component-css split per `frontend/FE-IMPLEMENTATION-RULES.md`.
 Extract `useAuthGuard.ts` and `useAuthCallback.ts` hooks containing all
 logic. The `.tsx` files become thin shells that call the hook and render.
 Add thorough hook tests; simplify component tests to mock hooks.
 **Acceptance criteria:**
-- [ ] AuthGuard split: `useAuthGuard.ts` + `AuthGuard.tsx` + `AuthGuard.module.css`
-- [ ] AuthCallbackPage split: `useAuthCallback.ts` + `page.tsx` + `CallbackPage.module.css`
-- [ ] Hook tests cover all logic branches
-- [ ] Component tests mock hooks and verify rendering only
+- [x] AuthGuard split: `useAuthGuard.ts` + `AuthGuard.tsx` + `AuthGuard.module.css`
+- [x] AuthCallbackPage split: `useAuthCallback.ts` + `page.tsx` + `CallbackPage.module.css`
+- [x] Hook tests cover all logic branches
+- [x] Component tests mock hooks and verify rendering only
 
 **Description (RxJS migration):**
 **Description:** Migrate existing FE code from Promise-based to RxJS-first
@@ -142,21 +141,21 @@ promise APIs in thin `defer()`/`from()` adapters returning Observables.
 Convert AuthGuard and callback page to subscribe to observables. Add marble
 tests for all observable flows. Install `rxjs` as dependency.
 **Acceptance criteria:**
-- [ ] `authAdapter.ts` exports observables, not promises
-- [ ] Promise→Observable wrappers are the only place `from()`/`defer()` appear
-- [ ] All auth flows tested with `TestScheduler` marble diagrams
-- [ ] Zero raw `Promise`/`async`/`await` in non-adapter FE code
-- [ ] All existing tests pass (rewritten as marble tests where applicable)
+- [x] `authAdapter.ts` exports observables, not promises
+- [x] Promise→Observable wrappers are the only place `from()`/`defer()` appear
+- [x] All auth flows tested with `TestScheduler` marble diagrams
+- [x] Zero raw `Promise`/`async`/`await` in non-adapter FE code
+- [x] All existing tests pass (rewritten as marble tests where applicable)
 **Verification:** `cd frontend && pnpm jest --passWithNoTests` all green.
 **Dependencies:** 8. **Size:** S
 
-### Task 8: OIDC auth end-to-end
+### Task 8: OIDC auth end-to-end ✅
 **Description:** BE validates tokens from dev `oidc-provider`; FE login
 redirect flow for facilitator + participant; presenter route unauthenticated.
 **Acceptance criteria:**
-- [ ] Unauthenticated API/hub access rejected (except presenter endpoints)
-- [ ] Playwright: scripted login against dev provider reaches app
-- [ ] Provider config (authority/audience) is environment-driven (Azure AD prod)
+- [x] Unauthenticated API/hub access rejected (except presenter endpoints)
+- [x] Playwright: scripted login against dev provider reaches app
+- [x] Provider config (authority/audience) is environment-driven (Azure AD prod)
 **Verification:** BE authz unit tests + one Playwright login smoke.
 **Dependencies:** 1, 3. **Size:** M
 

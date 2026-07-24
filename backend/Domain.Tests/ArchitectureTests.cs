@@ -13,7 +13,8 @@ public class ArchitectureTests
         .LoadAssemblies(
             typeof(ValuesWorkshop.Domain.AssemblyMarker).Assembly,
             typeof(ValuesWorkshop.Application.AssemblyMarker).Assembly,
-            typeof(ValuesWorkshop.Adapters.AssemblyMarker).Assembly,
+            typeof(ValuesWorkshop.Adapters.Persistence.AssemblyMarker).Assembly,
+            typeof(ValuesWorkshop.Adapters.Web.AssemblyMarker).Assembly,
             typeof(ValuesWorkshop.Host.AssemblyMarker).Assembly
         )
         .Build();
@@ -28,10 +29,15 @@ public class ArchitectureTests
         .ResideInAssembly(typeof(ValuesWorkshop.Application.AssemblyMarker).Assembly)
         .As("Application");
 
-    private static readonly IObjectProvider<IType> AdaptersLayer = Types()
+    private static readonly IObjectProvider<IType> AdaptersPersistenceLayer = Types()
         .That()
-        .ResideInAssembly(typeof(ValuesWorkshop.Adapters.AssemblyMarker).Assembly)
-        .As("Adapters");
+        .ResideInAssembly(typeof(ValuesWorkshop.Adapters.Persistence.AssemblyMarker).Assembly)
+        .As("Adapters.Persistence");
+
+    private static readonly IObjectProvider<IType> AdaptersWebLayer = Types()
+        .That()
+        .ResideInAssembly(typeof(ValuesWorkshop.Adapters.Web.AssemblyMarker).Assembly)
+        .As("Adapters.Web");
 
     private static readonly IObjectProvider<IType> HostLayer = Types()
         .That()
@@ -47,7 +53,9 @@ public class ArchitectureTests
             .Should()
             .NotDependOnAny(ApplicationLayer)
             .AndShould()
-            .NotDependOnAny(AdaptersLayer)
+            .NotDependOnAny(AdaptersPersistenceLayer)
+            .AndShould()
+            .NotDependOnAny(AdaptersWebLayer)
             .AndShould()
             .NotDependOnAny(HostLayer)
             .Check(Arch);
@@ -60,16 +68,38 @@ public class ArchitectureTests
             .That()
             .Are(ApplicationLayer)
             .Should()
-            .NotDependOnAny(AdaptersLayer)
+            .NotDependOnAny(AdaptersPersistenceLayer)
+            .AndShould()
+            .NotDependOnAny(AdaptersWebLayer)
             .AndShould()
             .NotDependOnAny(HostLayer)
             .Check(Arch);
     }
 
     [Fact]
-    public void Adapters_depends_only_on_Application_and_Domain()
+    public void Adapters_Persistence_depends_only_on_Application_and_Domain()
     {
-        Types().That().Are(AdaptersLayer).Should().NotDependOnAny(HostLayer).Check(Arch);
+        Types()
+            .That()
+            .Are(AdaptersPersistenceLayer)
+            .Should()
+            .NotDependOnAny(AdaptersWebLayer)
+            .AndShould()
+            .NotDependOnAny(HostLayer)
+            .Check(Arch);
+    }
+
+    [Fact]
+    public void Adapters_Web_depends_only_on_Application_and_Domain()
+    {
+        Types()
+            .That()
+            .Are(AdaptersWebLayer)
+            .Should()
+            .NotDependOnAny(AdaptersPersistenceLayer)
+            .AndShould()
+            .NotDependOnAny(HostLayer)
+            .Check(Arch);
     }
 
     [Fact]
@@ -81,7 +111,9 @@ public class ArchitectureTests
             .Or()
             .Are(ApplicationLayer)
             .Or()
-            .Are(AdaptersLayer)
+            .Are(AdaptersPersistenceLayer)
+            .Or()
+            .Are(AdaptersWebLayer)
             .Or()
             .Are(HostLayer)
             .GetObjects(Arch);

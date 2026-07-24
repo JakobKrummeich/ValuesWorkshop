@@ -230,7 +230,7 @@ reconnecting clients receive current state via the normal snapshot mechanism
 
 ## 6. EF Core Entity Mapping
 
-Entity classes live in `Adapters/Persistence/Entities/` — EF-friendly POCOs,
+Entity classes live in `Adapters.Persistence/Entities/` — EF-friendly POCOs,
 separate from domain types. Domain stays pure with no EF references.
 
 ```
@@ -258,7 +258,7 @@ state through read-only properties but are constructed with mutable private
 fields. For persistence hydration:
 
 - Each building block exposes a static `Restore(...)` factory method
-  (internal, Adapters has `InternalsVisibleTo`) that sets all internal
+  (internal, Adapters.Persistence has `InternalsVisibleTo`) that sets all internal
   state without re-running validation — the data was already validated when
   originally created.
 - `Session` itself has a `Restore(...)` factory that composes all building
