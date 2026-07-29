@@ -62,6 +62,14 @@ Run all quality gates locally using the same commands CI uses:
 - `./scripts/test-backend-with-coverage.sh` — BE test + coverage gate standalone
 - `./scripts/check-backend-vulnerabilities.sh` — BE vulnerability scan standalone
 
+## Diff review — lightspeed
+
+Before asking for a merge, open a human review of the branch:
+`lightspeed start <branch> main --intent "<why this branch exists>"` (repeat
+`--intent` per reason), print the URL, then `lightspeed poll` and fix what comes
+back. Re-run `start` after each round; approved files carry over. Skill:
+`.pi/skills/lightspeed/SKILL.md`.
+
 ## User review — always Lavish
 
 Everything needing user review/approval (mini-specs, design docs, checkpoint
