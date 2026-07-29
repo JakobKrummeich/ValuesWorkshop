@@ -47,6 +47,13 @@ collections or custom equality where equality matters). Aggregate style
    The gate does NOT watch pushes to an open PR: any code follow-up pushed to
    a PR branch must be re-validated (`no-mistakes rerun` or a fresh `axi run`);
    only doc-only follow-ups may push directly.
+7. **lightspeed** → human review of the merged-ready diff, after the gate has
+   made its own changes: `lightspeed start <branch> main --intent "<why this
+   branch exists>"` (repeat `--intent` per reason), print the URL,
+   `lightspeed poll`, fix what comes back, re-run `start` per round — approved
+   files carry over. The user reviews here, not on GitHub. Code fixed from this
+   feedback goes back through step 6 before merge. Skill:
+   `.pi/skills/lightspeed/SKILL.md`.
 
 At every checkpoint: re-groom the next phase's tasks in `tasks/todo.md`
 against learnings; update `SPEC.md` in the same PR if a decision changed.
