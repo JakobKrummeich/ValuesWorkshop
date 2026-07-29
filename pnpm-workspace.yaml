@@ -4,12 +4,11 @@ packages:
 overrides:
   sharp: ">=0.35.0"
   postcss: ">=8.5.12"
-  brace-expansion@>=5: ">=5.0.8"
+  brace-expansion: "5.0.8"
 
 allowBuilds:
   sharp: true
   unrs-resolver: true
 
-auditConfig:
-  ignoreGhsas:
-    - GHSA-mh99-v99m-4gvg
+patchedDependencies:
+  brace-expansion@5.0.8: patches/brace-expansion@5.0.8.patch
