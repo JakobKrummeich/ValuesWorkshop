@@ -1,0 +1,17 @@
+diff --git a/dist/commonjs/index.js b/dist/commonjs/index.js
+index be9df86be09c7655787a65c55ae6da01858894c3..68bf717a7957573b69f2f1631c5f2f48f642e67b 100644
+--- a/dist/commonjs/index.js
++++ b/dist/commonjs/index.js
+@@ -260,4 +260,12 @@ function expand_(str, max, maxLength, isTop) {
+     }
+     return acc;
+ }
++// Backward-compat shim: minimatch@3 does `var expand = require('brace-expansion')`
++// and calls `expand(pattern)` directly. Make the module callable as a function
++// while keeping named exports for minimatch@10+ (`require('...').expand`).
++const _expand = expand;
++module.exports = function backcompatExpand(str, options) { return _expand(str, options); };
++module.exports.expand = _expand;
++module.exports.EXPANSION_MAX = exports.EXPANSION_MAX;
++module.exports.EXPANSION_MAX_LENGTH = exports.EXPANSION_MAX_LENGTH;
+ //# sourceMappingURL=index.js.map
