@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en" data-theme="emerald">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>design/protocol.md — Task 9 slice 1 review</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, li, td, th) { overflow-wrap: anywhere; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .mermaid { display: flex; justify-content: center; }
+  .mermaid svg { max-width: 100%; }
+  code { font-size: 0.9em; }
+  :not(pre) > code { background: var(--color-base-300); padding: 0.1em 0.35em; border-radius: 0.3em; }
+</style>
+</head>
+<body class="bg-base-200 text-base-content">
+<div class="mx-auto max-w-5xl px-4 py-10">
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <span class="badge badge-primary">Task 9 · slice 1</span>
+    <span class="badge badge-outline">design/protocol.md</span>
+    <span class="badge badge-warning">review gate before any code</span>
+  </div>
+  <div class="alert alert-info mb-6"><span>
+    This is the full FE/BE contract, written from your locked decisions. It covers
+    every transition T1–T23 + T17a of <code>design/state-machine.md</code> (coverage
+    check in § 4.5), the three role state shapes with the anonymity argument (§ 5),
+    the error model (§ 6), and the port-slice map (§ 7). Annotate anything you want
+    changed; approve below when it reads right.
+  </span></div>
+<h1 class="text-4xl font-bold mt-2 mb-4">Protocol — ValuesWorkshop</h1>
+<p class="my-3 leading-relaxed">Living document. The FE/BE contract for real-time communication. Deviations
+discovered during implementation update this file in the same PR (Ask-first).</p>
+<p class="my-3 leading-relaxed">Vocabulary is the ubiquitous language of <code>design/domain-model.md</code>; every
+transition referenced as <code>T*</code> is defined in <code>design/state-machine.md</code>.</p>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">1. Principles</h2>
+<ol class="list-decimal pl-6 space-y-1 my-3">
+<li><strong>Server-authoritative.</strong> Clients send <em>intents</em>. The server validates
+every intent against role, phase, and domain invariants, then mutates,
+persists, and broadcasts. A client never computes authoritative results
+and never enables a control from locally derived guard logic (§ 6.4).</li>
+<li><strong>Full state, never deltas.</strong> Every server→client message carries the
+complete state that role is allowed to see. There is no incremental
+update, no client-side merging, no ordering problem.</li>
+<li><strong>Immediate state on connect.</strong> A connection is pushed the full current
+state in <code>OnConnectedAsync</code>, before any broadcast can reach it. Reconnect
+is the same code path, so a returning client never waits for the next
+mutation (T3, I16).</li>
+<li><strong>Self-healing sync.</strong> The latest state is resent to every role group
+every 500 ms. A dropped message therefore corrects itself within one
+interval. A monotonic <code>revision</code> makes redundant resends free (§ 3.4).</li>
+<li><strong>One hub per role.</strong> A client can only receive the state shape of the
+hub it is connected to, so no role can be sent data it must not see
+(§ 5.5) — anonymity by construction, not by client-side filtering.</li>
+<li><strong>Session binding at the edge.</strong> <code>sessionIdentity</code> travels only in the
+connection's query string and lives only in the FE dependency context
+that constructs the adapters. It appears in no port signature, no UI
+prop, and no domain type (SPEC.md “Session binding at the edge”).</li>
+<li><strong>Content is not state.</strong> The wire carries identifiers (<code>valueId</code>,
+<code>questionId</code>, <code>answerId</code>, <code>animalId</code>); the localized texts live in
+<code>config/*.json</code>, are loaded by the frontend, and are resolved there
+(de/en). Group names are animal identifiers from <code>config/animals.json</code> and
+are localized the same way. The single exception is participant-written
+action text, which is free text and travels verbatim.</li>
+</ol>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">2. Endpoints</h2>
+<p class="my-3 leading-relaxed">| Endpoint | Kind | Auth | Purpose |
+|---|---|---|---|
+| <code>POST /api/sessions</code> | HTTP | facilitator passphrase in body | Open a session (T1) and receive its <code>sessionIdentity</code> |
+| <code>/hub/facilitator?sessionIdentity=…</code> | SignalR | Bearer (facilitator) | Facilitator intents + facilitator state |
+| <code>/hub/participant?sessionIdentity=…</code> | SignalR | Bearer (participant) | Participant intents + participant state |
+| <code>/hub/presenter?sessionIdentity=…</code> | SignalR | anonymous | Presenter state only, no intents |</p>
+<p class="my-3 leading-relaxed"><code>OpenSession</code> (T1) is the one intent that is <strong>not</strong> a hub method: no session
+exists yet, so there is nothing to bind a session-bound connection to. It is
+an HTTP request that returns the identity the three hubs are then bound to.</p>
+<p class="my-3 leading-relaxed">Groups: <code>facilitator:{sessionIdentity}</code>, <code>participant:{sessionIdentity}</code>,
+<code>presenter:{sessionIdentity}</code> — added in <code>OnConnectedAsync</code>, removed
+automatically on disconnect.</p>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">3. Connection lifecycle</h2>
+<h3 class="text-xl font-semibold mt-6 mb-2">3.1 Connect</h3>
+<pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
+  autonumber
+  participant F as Facilitator browser
+  participant API as POST /api/sessions
+  participant PH as ParticipantHub
+  participant P as Participant phone
+
+  F->>API: OpenSession { sessionName, passphrase }
+  API-->>F: { sessionIdentity }  %% 401 on wrong passphrase (I3)
+  Note over F: QR code + presenter URL derive from sessionIdentity
+
+  P->>PH: connect(sessionIdentity, bearer token)
+  PH->>PH: JoinSession or resume (T4 / T3, I4)
+  PH-->>P: ReceiveWorkshopState(full participant state)
+  PH-->>PH: broadcast to all three role groups (roster changed)
+</pre>
+<p class="my-3 leading-relaxed">Joining is <strong>implicit on connect</strong> (<code>design/screens.md</code>: “JoinSession fires
+implicitly on arrival; no form, no button”):</p>
+<ul class="list-disc pl-6 space-y-1 my-3">
+<li>not on the roster and phase is Join → join (T4), <code>membership = &quot;joined&quot;</code></li>
+<li>already on the roster → resume (T3), <code>membership = &quot;joined&quot;</code></li>
+<li>not on the roster and phase is past Join → no mutation,
+<code>membership = &quot;joiningClosed&quot;</code>; the connection stays open and the phone
+shows the closed-joining notice. The connection is never aborted, because
+an aborted connection cannot explain itself.</li>
+</ul>
+<h3 class="text-xl font-semibold mt-6 mb-2">3.2 Reconnect and backend restart</h3>
+<pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
+  autonumber
+  participant P as Participant phone
+  participant PH as ParticipantHub
+  participant DB as SQLite
+
+  Note over P,PH: socket dies (tunnel, phone sleep, backend restart)
+  P->>PH: automatic reconnect, exponential backoff + jitter
+  PH->>DB: load session (survived the restart — design/persistence.md)
+  PH-->>P: ReceiveWorkshopState(full current state, revision N)
+  Note over P: exact prior place restored: role, group, scribe status,<br/>submissions, cast votes (I16)
+</pre>
+<p class="my-3 leading-relaxed">No client-side resync request exists. Reconnect == connect.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">3.3 Periodic resend</h3>
+<p class="my-3 leading-relaxed">One hosted service ticks every <code>STATE_RESEND_INTERVAL_MS</code> (default <strong>500</strong>).
+Per session with at least one connected client, it resends the latest state to
+each of the three role groups. Between mutations this is pure serialization:
+the three mapped role states are cached and re-mapped only when <code>revision</code>
+changes; no repository read, no domain work, no SQLite traffic.</p>
+<pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
+  autonumber
+  participant S as Server
+  participant A as Phone A
+  participant B as Phone B
+
+  S-->>A: state revision 7
+  S--xB: state revision 7 (lost)
+  Note over B: still showing revision 6
+  S-->>A: resend revision 7 (tick)
+  S-->>B: resend revision 7 (tick)
+  Note over B: caught up ≤ 500 ms after the loss
+</pre>
+<h3 class="text-xl font-semibold mt-6 mb-2">3.4 <code>revision</code></h3>
+<p class="my-3 leading-relaxed">Every state record carries <code>revision</code>: a monotonic counter on the session,
+incremented once per persisted mutation. Client rule: <strong>apply the state only
+if <code>revision</code> is greater than the last applied revision</strong>; otherwise drop it.
+Consequences: unchanged resends cause no re-render and no flicker, and a late
+or duplicated message can never move a screen backwards.</p>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">4. Intent catalog</h2>
+<p class="my-3 leading-relaxed">Payload types are C# records on the server and Zod schemas on the client
+(§ 6.3). <code>ParticipantId</code> is never taken from a payload — it is derived from
+the caller's authenticated principal, so no client can act as another.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">4.1 Facilitator hub</h3>
+<p class="my-3 leading-relaxed">| # | Method | Payload | Guard (server-checked) | Rejection |
+|---|---|---|---|---|
+| T2 | <code>AdvancePhase</code> | — | forward only (I1); phase-exit guards T2a–T2c | <code>WrongPhase</code> |
+| T6 | <code>RevealAnswer</code> | — | phase Quiz; current question unrevealed | <code>WrongPhase</code> |
+| T7 | <code>ShowLearningText</code> | — | phase Quiz; answer revealed, text unshown | <code>WrongPhase</code> |
+| T8 | <code>PoseNextQuestion</code> | — | phase Quiz; learning text shown; questions remain | <code>WrongPhase</code> |
+| T13 | <code>ReassignScribe</code> | <code>{ groupName, participantId }</code> | phase Group work; target is a member of that group (I9) | <code>WrongPhase</code>, <code>UnknownGroup</code>, <code>UnknownParticipant</code> |
+| T17 | <code>GoToNextValue</code> | — | phase Value presentation; values remain (I12) | <code>WrongPhase</code> |
+| T17a | <code>CorrectActionWording</code> | <code>{ actionId, text }</code> | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | <code>WrongPhase</code>, <code>UnknownAction</code>, <code>MalformedPayload</code> |
+| T19 | <code>CloseVoting</code> | — | phase Final voting; round open | <code>WrongPhase</code> |
+| T21 | <code>StartTiebreakRound</code> | — | phase Final voting; last closed round left a fifth-place tie (I15) | <code>WrongPhase</code>, <code>InvariantViolated</code> |
+| T22 | <code>RevealNextValue</code> | — | phase Final presentation; winners remain | <code>WrongPhase</code> |</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">4.2 Participant hub</h3>
+<p class="my-3 leading-relaxed">| # | Method | Payload | Guard (server-checked) | Rejection |
+|---|---|---|---|---|
+| T4/T3 | <em>(implicit on connect)</em> | — | see § 3.1 | — |
+| T5 | <code>ChooseQuizAnswer</code> | <code>{ questionId, answerId }</code> | phase Quiz; <code>questionId</code> is the posed question; answer belongs to it; not yet answered (I5) | <code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code> |
+| T9 | <code>SubmitValueSelection</code> | <code>{ valueIds }</code> | phase Value selection; exactly ten distinct catalog values; not yet submitted (I6) | <code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code> |
+| T14 | <code>AddAction</code> | <code>{ valueId, text }</code> | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text non-empty ≤ 500 chars | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>InvariantViolated</code>, <code>MalformedPayload</code> |
+| T14 | <code>EditAction</code> | <code>{ actionId, text }</code> | as <code>AddAction</code>; action belongs to the caller's group | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>UnknownAction</code>, <code>MalformedPayload</code> |
+| T14 | <code>RemoveAction</code> | <code>{ actionId }</code> | as <code>EditAction</code> | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>UnknownAction</code> |
+| T15 | <code>SubmitGroupWork</code> | — | phase Group work; caller is scribe; one to five actions on every assigned value (I11) | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>InvariantViolated</code> |
+| T16 | <code>ReopenGroupWork</code> | — | phase Group work; caller is scribe; group Submitted | <code>WrongPhase</code>, <code>NotAuthorized</code> |
+| T18 | <code>SubmitFinalVotes</code> | <code>{ votes: [{ valueId, voteCount }] }</code> | phase Final voting; round open; totals equal the round allotment; only eligible values; not yet voted this round (I13) | <code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code> |</p>
+<p class="my-3 leading-relaxed"><code>SubmitFinalVotes</code> is irrevocable (I14): the server records <em>that</em> the caller
+voted and adds the counts to anonymous tallies. No un-vote intent exists.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">4.3 Presenter hub</h3>
+<p class="my-3 leading-relaxed">No intents. The hub exposes no mutating method at all, so an unauthenticated
+presenter connection has nothing to call (Decision 5).</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">4.4 System transitions</h3>
+<p class="my-3 leading-relaxed">T10 <code>DetermineTopValues</code>, T11 <code>FormGroups</code>, T12 <code>AppointScribes</code>, T20
+<code>WinnersDetermined</code>, T23 <code>WorkshopConcluded</code> have <strong>no wire representation</strong>.
+They fire inside the server as part of the transition that triggers them
+(phase entry, or voting close) and are visible only as changed state. This is
+deliberate: nothing a client sends can influence them.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">4.5 Coverage check</h3>
+<p class="my-3 leading-relaxed">T1 → § 2 (HTTP) · T2, T2a–T2c, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
+§ 4.1 · T3, T4 → § 3.1 · T5, T9, T14, T15, T16, T18 → § 4.2 · T10, T11, T12,
+T20, T23 → § 4.4. All 24 transitions of <code>design/state-machine.md</code> § 3 are
+accounted for.</p>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">5. Server→client state</h2>
+<p class="my-3 leading-relaxed">One client callback per hub, always the same shape for that role:
+<code>ReceiveWorkshopState(&lt;Role&gt;WorkshopState)</code>.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">5.1 Shared envelope</h3>
+<p class="my-3 leading-relaxed">| Field | Type | Meaning |
+|---|---|---|
+| <code>revision</code> | long | monotonic, see § 3.4 |
+| <code>phase</code> | 1–9 | current phase (I1) |</p>
+<p class="my-3 leading-relaxed">Every phase-specific block below is absent (null) until its phase is
+relevant, and stays present afterwards where the screen still shows it
+(e.g. selection tallies remain visible in phase 4).</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">5.2 <code>ParticipantWorkshopState</code></h3>
+<p class="my-3 leading-relaxed">| Block | Fields |
+|---|---|
+| membership | <code>membership</code> (<code>joined</code> | <code>joiningClosed</code>), <code>participantCount</code> |
+| quiz | <code>questionId</code>, <code>subState</code> (<code>answering</code> | <code>revealed</code> | <code>learningTextShown</code>), <code>ownAnswerId?</code>, <code>correctAnswerId?</code> (only once revealed) |
+| selection | <code>ownSelectedValueIds</code>, <code>isSubmitted</code>, <code>selectionTallies?</code>, <code>topValueIds?</code> |
+| ownGroup | <code>name</code> (animal identifier, localized by the client), <code>memberNames</code>, <code>assignedValueIds</code>, <code>isCallerScribe</code>, <code>scribeName</code>, <code>workStatus</code> (<code>editing</code> | <code>submitted</code>), <code>actions: [{ actionId, valueId, text, sortOrder }]</code> |
+| presentation | <code>presentingGroupName</code>, <code>presentedValueId</code>, <code>presentedActions: [{ actionId, text }]</code> |
+| voting | <code>roundNumber</code>, <code>allotment</code>, <code>eligibleValueIds</code>, <code>isRoundOpen</code>, <code>hasVotedThisRound</code> |
+| conclusion | <code>revealedWinners: [{ valueId, voteCount, actions }]</code>, <code>isConcluded</code> |</p>
+<p class="my-3 leading-relaxed">Deliberately absent: any other participant's answer, selection, or votes;
+any tally during an open voting round; any participant identifier other than
+group member display names.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">5.3 <code>FacilitatorWorkshopState</code></h3>
+<p class="my-3 leading-relaxed">| Block | Fields |
+|---|---|
+| roster | <code>participants: [{ participantId, displayName }]</code>, <code>participantCount</code> |
+| quiz | <code>questionId</code>, <code>subState</code>, <code>answerTallies</code>, <code>answeredCount</code> |
+| selection | <code>submittedCount</code>, <code>selectionTallies</code>, <code>topValueIds?</code> |
+| formation | <code>groups: [{ name, members: [{ participantId, displayName }], assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]</code> |
+| presentation | <code>presentingGroupName</code>, <code>presentedValueId</code>, <code>presentedActions: [{ actionId, text }]</code>, <code>remainingValueCount</code> |
+| voting | <code>roundNumber</code>, <code>allotment</code>, <code>eligibleValueIds</code>, <code>isRoundOpen</code>, <code>votedCount</code>, <code>closedRoundTallies?</code>, <code>tiedValueIds?</code> |
+| conclusion | <code>winners: [{ valueId, voteCount }]</code>, <code>revealedCount</code> |
+| controls | <code>enabledIntents: string[]</code> — see § 6.4 |</p>
+<p class="my-3 leading-relaxed"><code>participantId</code> appears only for scribe reassignment (T13) and roster
+display. It is never paired with an answer, a selection, or a vote.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">5.4 <code>PresenterWorkshopState</code></h3>
+<p class="my-3 leading-relaxed">| Block | Fields |
+|---|---|
+| roster | <code>participantNames</code>, <code>participantCount</code> |
+| quiz | <code>questionId</code>, <code>subState</code>, <code>answerTallies</code>, <code>correctAnswerId?</code> (once revealed) |
+| selection | <code>submittedCount</code>, <code>selectionTallies</code>, <code>topValueIds?</code> |
+| formation | <code>groups: [{ name, memberNames, assignedValueIds, workStatus }]</code> |
+| presentation | <code>presentedValueId</code>, <code>presentedActions: [{ text }]</code> |
+| voting | <code>isRoundOpen</code> only — no tallies while voting (<code>design/screens.md</code>) |
+| conclusion | <code>revealedWinners: [{ valueId, voteCount, actions }]</code>, <code>isConcluded</code> |</p>
+<p class="my-3 leading-relaxed">Deliberately absent: every participant identifier (display names only), every
+per-person fact, and all vote tallies before the winners are revealed.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">5.5 Anonymity argument</h3>
+<ol class="list-decimal pl-6 space-y-1 my-3">
+<li>The model itself has no voter↔vote link: the session records <em>that</em> a
+participant voted and keeps counts per value (I14), and the schema cannot
+express the pairing (<code>design/persistence.md</code>: <code>vote_tallies</code> has no
+participant column, <code>voted_participants</code> has no value column).</li>
+<li>No role state above contains a participant-to-answer, -selection, or
+-vote mapping. The only per-person facts on the wire are the caller's own
+(<code>ownAnswerId</code>, <code>ownSelectedValueIds</code>, <code>hasVotedThisRound</code>) inside that
+caller's own state.</li>
+<li>Because each hub can only send its own record type, a facilitator or
+presenter connection cannot be sent a participant's own block even by
+mistake — it is not part of the type it receives.</li>
+<li>Tests: each mapper is asserted against the full domain state, and a
+reflection test asserts that neither <code>FacilitatorWorkshopState</code> nor
+<code>PresenterWorkshopState</code> contains a field pairing a participant with an
+answer, selection, or vote.</li>
+</ol>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">6. Error model</h2>
+<h3 class="text-xl font-semibold mt-6 mb-2">6.1 <code>IntentResult</code></h3>
+<p class="my-3 leading-relaxed">Every hub method returns <code>IntentResult</code> to the <strong>caller only</strong>:</p>
+<ul class="list-disc pl-6 space-y-1 my-3">
+<li><code>Accepted</code></li>
+<li><code>Rejected(IntentRejectionCode code, string detail)</code></li>
+</ul>
+<p class="my-3 leading-relaxed">It is never broadcast, and it carries no state — state always arrives through
+<code>ReceiveWorkshopState</code>. A rejection is total: no mutation, no persist, no
+broadcast, no <code>revision</code> bump.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">6.2 <code>IntentRejectionCode</code></h3>
+<p class="my-3 leading-relaxed">| Code | Meaning |
+|---|---|
+| <code>WrongPhase</code> | the intent does not exist in the current phase or sub-state |
+| <code>NotAuthorized</code> | right role, wrong standing (e.g. not the scribe, I10) |
+| <code>UnknownSession</code> | no session with that identity |
+| <code>UnknownParticipant</code> | referenced participant is not on the roster |
+| <code>UnknownGroup</code> | referenced group does not exist |
+| <code>UnknownAction</code> | referenced action does not exist or belongs elsewhere |
+| <code>InvariantViolated</code> | a domain invariant refused the mutation (I5–I15) |
+| <code>MalformedPayload</code> | payload failed structural validation (§ 6.3) |</p>
+<p class="my-3 leading-relaxed">The set is closed. A new rejection reason is a protocol change and updates
+this document.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">6.3 Payload validation</h3>
+<p class="my-3 leading-relaxed">Server-side, in the pipeline, before any domain call: required fields
+present, identifiers non-empty, collections within bounds, free text
+non-empty and ≤ 500 characters, no unknown identifiers. Failure →
+<code>MalformedPayload</code>, nothing else happens.</p>
+<p class="my-3 leading-relaxed">Client-side, at the adapter boundary: every inbound state is parsed with a
+Zod schema before it enters the application. A parse failure is a bug, not a
+user-facing state: it is logged and the state is dropped (the next resend
+arrives within 500 ms).</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">6.4 <code>enabledIntents</code> — no guard logic on the client</h3>
+<p class="my-3 leading-relaxed">The facilitator screen must disable “Advance” exactly when the state machine
+would refuse it (T2a–T2c) and morph its quiz sub-control button (T6→T7→T8).
+Duplicating those guards in the frontend would mean two implementations of
+the same rules. Instead the server evaluates them once and ships the answer:
+<code>enabledIntents</code> lists the facilitator intents that would be accepted right
+now. Buttons render from that list.</p>
+<h3 class="text-xl font-semibold mt-6 mb-2">6.5 Rejection round-trip</h3>
+<pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
+  autonumber
+  participant P as Participant phone
+  participant PH as ParticipantHub
+  participant PIPE as IntentPipeline
+  participant D as Domain
+
+  P->>PH: SubmitFinalVotes { 5 votes }
+  PH->>PIPE: intent + caller principal
+  PIPE->>D: guard check
+  D--xPIPE: round already closed (T19)
+  PIPE-->>P: Rejected(WrongPhase, "voting round is closed")
+  Note over PIPE: no mutation · no persist · no broadcast · revision unchanged
+  Note over P: phone shows "the round was closed" and keeps<br/>rendering the state it already has
+</pre>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">7. Frontend port slices</h2>
+<p class="my-3 leading-relaxed">One slice per concern; each slice is implemented by its own small
+session-bound adapter, all sharing one connection per role (Decision 3).
+Screens depend only on their slice — never on a connection, never on
+<code>sessionIdentity</code>.</p>
+<p class="my-3 leading-relaxed">| Role | Slice | Intents / stream | Task |
+|---|---|---|---|
+| participant | <code>sessionStatePort</code> | state stream + connection state | <strong>9</strong> |
+| participant | <code>quizPort</code> | <code>ChooseQuizAnswer</code> | 12 |
+| participant | <code>selectionPort</code> | <code>SubmitValueSelection</code> | 13 |
+| participant | <code>groupWorkPort</code> | <code>AddAction</code>, <code>EditAction</code>, <code>RemoveAction</code>, <code>SubmitGroupWork</code>, <code>ReopenGroupWork</code> | 16 |
+| participant | <code>votingPort</code> | <code>SubmitFinalVotes</code> | 17 |
+| facilitator | <code>sessionStatePort</code> | state stream + connection state | <strong>9</strong> |
+| facilitator | <code>lifecyclePort</code> | <code>AdvancePhase</code> | <strong>9</strong> |
+| facilitator | <code>quizControlPort</code> | <code>RevealAnswer</code>, <code>ShowLearningText</code>, <code>PoseNextQuestion</code> | 12 |
+| facilitator | <code>formationPort</code> | <code>ReassignScribe</code> | 16 |
+| facilitator | <code>walkControlPort</code> | <code>GoToNextValue</code>, <code>CorrectActionWording</code>, <code>RevealNextValue</code> | 18 |
+| facilitator | <code>votingControlPort</code> | <code>CloseVoting</code>, <code>StartTiebreakRound</code> | 17 |
+| presenter | <code>sessionStatePort</code> | state stream + connection state | <strong>9</strong> |</p>
+<p class="my-3 leading-relaxed">Slices marked <strong>9</strong> are created in Task 9; the rest are created by the task
+that implements their domain logic (Decision 4) — no unused ports, no dead
+handlers. <code>POST /api/sessions</code> (T1) is a <code>sessionCreationPort</code> outside the
+hubs, created in Task 10.</p>
+<p class="my-3 leading-relaxed">Layering inside the frontend adapter (Decision 3, FE rules):</p>
+<pre class="rounded-box bg-base-300 p-4 overflow-x-auto text-sm my-4"><code>signalRConnection.ts   only maps @microsoft/signalr promises/callbacks to
+                       Single / Completable / Observable — no domain knowledge
+&lt;concern&gt;Adapter.ts    our logic: invoke an intent, map IntentResult, parse
+                       inbound state with Zod, expose replay-1 state stream
+&lt;Role&gt;SessionContext   creates the connection bound to sessionIdentity and
+                       builds every adapter for that role, once, on entry
+</code></pre>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">8. Voting and tiebreak walk-through</h2>
+<pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
+  autonumber
+  participant F as Facilitator
+  participant S as Server
+  participant P as Participants
+
+  Note over S: phase 8 entry — main round, allotment 5,<br/>eligible = all presented values
+  P->>S: SubmitFinalVotes (5 votes, once per person) — I13
+  S-->>P: state (hasVotedThisRound = true, no tallies)
+  S-->>F: state (votedCount grows, no tallies)
+  F->>S: CloseVoting (T19)
+  alt no fifth-place tie
+    S->>S: WinnersDetermined (T20, System)
+    S-->>F: state (winners stand, enabledIntents includes advancePhase)
+  else fifth-place tie
+    S-->>F: state (tiedValueIds set, closedRoundTallies visible)
+    F->>S: StartTiebreakRound (T21)
+    Note over S: new round — eligible = tied values,<br/>allotment = number of tied values
+    S-->>P: state (roundNumber+1, hasVotedThisRound = false)
+  end
+</pre>
+<hr />
+<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">9. Non-goals</h2>
+<ul class="list-disc pl-6 space-y-1 my-3">
+<li><strong>No protocol versioning.</strong> Frontend and backend ship together from one
+repository in one compose deployment; a mismatched pair is not a supported
+state.</li>
+<li><strong>No client-initiated resync.</strong> Connect and the 500 ms resend cover every
+case (§ 3).</li>
+<li><strong>No domain events on the wire.</strong> Events are a domain-modeling and
+persistence concern; clients see state (Decision 6).</li>
+</ul>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4 mt-10">
+    <div>
+      <div class="font-bold">Protocol approved?</div>
+      <div class="text-sm opacity-70">Next slice: backend role state records + per-role mappers, TDD.</div>
+    </div>
+    <span class="btn btn-primary" data-lavish-action
+      onclick="window.lavish.queuePrompt('design/protocol.md approved. Continue with slice 2 (backend role state records + per-role mappers, TDD).', { tag: 'approval', text: 'Approve protocol — continue with slice 2' })">
+      Approve protocol
+    </span>
+  </div>
+</div>
+<script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+
+      const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const paint = document.createElement("canvas").getContext("2d");
+      function toRgba(color) {
+        paint.clearRect(0, 0, 1, 1);
+        paint.fillStyle = "#000";
+        paint.fillStyle = color;
+        paint.fillRect(0, 0, 1, 1);
+        return paint.getImageData(0, 0, 1, 1).data;
+      }
+      function compositeRgba(foreground, background) {
+        const foregroundAlpha = foreground[3] / 255;
+        const backgroundAlpha = background[3] / 255;
+        const alpha = foregroundAlpha + backgroundAlpha * (1 - foregroundAlpha);
+        if (alpha === 0) return [0, 0, 0, 0];
+        return [
+          (foreground[0] * foregroundAlpha + background[0] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[1] * foregroundAlpha + background[1] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[2] * foregroundAlpha + background[2] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          alpha * 255,
+        ];
+      }
+      function pageIsDark() {
+        const root = document.documentElement;
+        const rootBackground = toRgba(getComputedStyle(root).backgroundColor);
+        const bodyBackground = document.body ? toRgba(getComputedStyle(document.body).backgroundColor) : [0, 0, 0, 0];
+        const [r, g, b, a] = compositeRgba(bodyBackground, rootBackground);
+        if (a > 0) return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.5;
+        return darkQuery.matches;
+      }
+
+      const diagrams = [...document.querySelectorAll(".mermaid")].map((el) => ({ el, src: el.textContent }));
+      let applied;
+      let rendering = false;
+      let queued = false;
+      function queueRender() {
+        queued = true;
+        if (rendering) return;
+        void render();
+      }
+      async function render() {
+        rendering = true;
+        try {
+          while (queued) {
+            queued = false;
+            const theme = pageIsDark() ? "dark" : "default";
+            if (theme === applied) continue;
+            mermaid.initialize({ startOnLoad: false, theme, securityLevel: "strict" });
+            for (const { el, src } of diagrams) {
+              el.removeAttribute("data-processed");
+              el.textContent = src;
+            }
+            try {
+              await mermaid.run({ nodes: diagrams.map((d) => d.el) });
+            } catch (error) {
+              console.error("Mermaid diagram render failed:", error);
+              return;
+            }
+            applied = theme;
+          }
+        } finally {
+          rendering = false;
+          if (queued) queueRender();
+        }
+      }
+      if (document.readyState === "complete") queueRender();
+      else window.addEventListener("load", queueRender, { once: true });
+      const themeObserver = new MutationObserver(queueRender);
+      for (const el of [document.documentElement, document.body]) {
+        if (!el) continue;
+        themeObserver.observe(el, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+      }
+      darkQuery.addEventListener("change", queueRender);
+    </script>
+</body>
+</html>

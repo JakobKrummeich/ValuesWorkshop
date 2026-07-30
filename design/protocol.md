@@ -1,0 +1,434 @@
+# Protocol — ValuesWorkshop
+
+Living document. The FE/BE contract for real-time communication. Deviations
+discovered during implementation update this file in the same PR (Ask-first).
+
+Vocabulary is the ubiquitous language of `design/domain-model.md`; every
+transition referenced as `T*` is defined in `design/state-machine.md`.
+
+---
+
+## 1. Principles
+
+1. **Server-authoritative.** Clients send *intents*. The server validates
+   every intent against role, phase, and domain invariants, then mutates,
+   persists, and broadcasts. A client never computes authoritative results
+   and never enables a control from locally derived guard logic (§ 6.4).
+2. **Full state, never deltas.** Every server→client message carries the
+   complete state that role is allowed to see. There is no incremental
+   update, no client-side merging, no ordering problem.
+3. **Immediate state on connect.** A connection is pushed the full current
+   state in `OnConnectedAsync`, before any broadcast can reach it. Reconnect
+   is the same code path, so a returning client never waits for the next
+   mutation (T3, I16).
+4. **Self-healing sync.** The latest state is resent to every role group
+   every 500 ms. A dropped message therefore corrects itself within one
+   interval. A monotonic `revision` makes redundant resends free (§ 3.4).
+5. **One hub per role.** A client can only receive the state shape of the
+   hub it is connected to, so no role can be sent data it must not see
+   (§ 5.5) — anonymity by construction, not by client-side filtering.
+6. **Session binding at the edge.** `sessionIdentity` travels only in the
+   connection's query string and lives only in the FE dependency context
+   that constructs the adapters. It appears in no port signature, no UI
+   prop, and no domain type (SPEC.md “Session binding at the edge”).
+7. **Content is not state.** The wire carries identifiers (`valueId`,
+   `questionId`, `answerId`, `animalId`); the localized texts live in
+   `config/*.json`, are loaded by the frontend, and are resolved there
+   (de/en). Group names are animal identifiers from `config/animals.json` and
+   are localized the same way. The single exception is participant-written
+   action text, which is free text and travels verbatim.
+
+---
+
+## 2. Endpoints
+
+| Endpoint | Kind | Auth | Purpose |
+|---|---|---|---|
+| `POST /api/sessions` | HTTP | facilitator passphrase in body | Open a session (T1) and receive its `sessionIdentity` |
+| `/hub/facilitator?sessionIdentity=…` | SignalR | Bearer (facilitator) | Facilitator intents + facilitator state |
+| `/hub/participant?sessionIdentity=…` | SignalR | Bearer (participant) | Participant intents + participant state |
+| `/hub/presenter?sessionIdentity=…` | SignalR | anonymous | Presenter state only, no intents |
+
+`OpenSession` (T1) is the one intent that is **not** a hub method: no session
+exists yet, so there is nothing to bind a session-bound connection to. It is
+an HTTP request that returns the identity the three hubs are then bound to.
+
+Groups: `facilitator:{sessionIdentity}`, `participant:{sessionIdentity}`,
+`presenter:{sessionIdentity}` — added in `OnConnectedAsync`, removed
+automatically on disconnect.
+
+---
+
+## 3. Connection lifecycle
+
+### 3.1 Connect
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant F as Facilitator browser
+  participant API as POST /api/sessions
+  participant PH as ParticipantHub
+  participant P as Participant phone
+
+  F->>API: OpenSession { sessionName, passphrase }
+  API-->>F: { sessionIdentity }  %% 401 on wrong passphrase (I3)
+  Note over F: QR code + presenter URL derive from sessionIdentity
+
+  P->>PH: connect(sessionIdentity, bearer token)
+  PH->>PH: JoinSession or resume (T4 / T3, I4)
+  PH-->>P: ReceiveWorkshopState(full participant state)
+  PH-->>PH: broadcast to all three role groups (roster changed)
+```
+
+Joining is **implicit on connect** (`design/screens.md`: “JoinSession fires
+implicitly on arrival; no form, no button”):
+
+- not on the roster and phase is Join → join (T4), `membership = "joined"`
+- already on the roster → resume (T3), `membership = "joined"`
+- not on the roster and phase is past Join → no mutation,
+  `membership = "joiningClosed"`; the connection stays open and the phone
+  shows the closed-joining notice. The connection is never aborted, because
+  an aborted connection cannot explain itself.
+
+### 3.2 Reconnect and backend restart
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant P as Participant phone
+  participant PH as ParticipantHub
+  participant DB as SQLite
+
+  Note over P,PH: socket dies (tunnel, phone sleep, backend restart)
+  P->>PH: automatic reconnect, exponential backoff + jitter
+  PH->>DB: load session (survived the restart — design/persistence.md)
+  PH-->>P: ReceiveWorkshopState(full current state, revision N)
+  Note over P: exact prior place restored: role, group, scribe status,<br/>submissions, cast votes (I16)
+```
+
+No client-side resync request exists. Reconnect == connect.
+
+### 3.3 Periodic resend
+
+One hosted service ticks every `STATE_RESEND_INTERVAL_MS` (default **500**).
+Per session with at least one connected client, it resends the latest state to
+each of the three role groups. Between mutations this is pure serialization:
+the three mapped role states are cached and re-mapped only when `revision`
+changes; no repository read, no domain work, no SQLite traffic.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant S as Server
+  participant A as Phone A
+  participant B as Phone B
+
+  S-->>A: state revision 7
+  S--xB: state revision 7 (lost)
+  Note over B: still showing revision 6
+  S-->>A: resend revision 7 (tick)
+  S-->>B: resend revision 7 (tick)
+  Note over B: caught up ≤ 500 ms after the loss
+```
+
+### 3.4 `revision`
+
+Every state record carries `revision`: a monotonic counter on the session,
+incremented once per persisted mutation. Client rule: **apply the state only
+if `revision` is greater than the last applied revision**; otherwise drop it.
+Consequences: unchanged resends cause no re-render and no flicker, and a late
+or duplicated message can never move a screen backwards.
+
+---
+
+## 4. Intent catalog
+
+Payload types are C# records on the server and Zod schemas on the client
+(§ 6.3). `ParticipantId` is never taken from a payload — it is derived from
+the caller's authenticated principal, so no client can act as another.
+
+### 4.1 Facilitator hub
+
+| # | Method | Payload | Guard (server-checked) | Rejection |
+|---|---|---|---|---|
+| T2 | `AdvancePhase` | — | forward only (I1); phase-exit guards T2a–T2c | `WrongPhase` |
+| T6 | `RevealAnswer` | — | phase Quiz; current question unrevealed | `WrongPhase` |
+| T7 | `ShowLearningText` | — | phase Quiz; answer revealed, text unshown | `WrongPhase` |
+| T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
+| T13 | `ReassignScribe` | `{ groupName, participantId }` | phase Group work; target is a member of that group (I9) | `WrongPhase`, `UnknownGroup`, `UnknownParticipant` |
+| T17 | `GoToNextValue` | — | phase Value presentation; values remain (I12) | `WrongPhase` |
+| T17a | `CorrectActionWording` | `{ actionId, text }` | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | `WrongPhase`, `UnknownAction`, `MalformedPayload` |
+| T19 | `CloseVoting` | — | phase Final voting; round open | `WrongPhase` |
+| T21 | `StartTiebreakRound` | — | phase Final voting; last closed round left a fifth-place tie (I15) | `WrongPhase`, `InvariantViolated` |
+| T22 | `RevealNextValue` | — | phase Final presentation; winners remain | `WrongPhase` |
+
+### 4.2 Participant hub
+
+| # | Method | Payload | Guard (server-checked) | Rejection |
+|---|---|---|---|---|
+| T4/T3 | *(implicit on connect)* | — | see § 3.1 | — |
+| T5 | `ChooseQuizAnswer` | `{ questionId, answerId }` | phase Quiz; `questionId` is the posed question; answer belongs to it; not yet answered (I5) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
+| T9 | `SubmitValueSelection` | `{ valueIds }` | phase Value selection; exactly ten distinct catalog values; not yet submitted (I6) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
+| T14 | `AddAction` | `{ valueId, text }` | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text non-empty ≤ 500 chars | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
+| T14 | `EditAction` | `{ actionId, text }` | as `AddAction`; action belongs to the caller's group | `WrongPhase`, `NotAuthorized`, `UnknownAction`, `MalformedPayload` |
+| T14 | `RemoveAction` | `{ actionId }` | as `EditAction` | `WrongPhase`, `NotAuthorized`, `UnknownAction` |
+| T15 | `SubmitGroupWork` | — | phase Group work; caller is scribe; one to five actions on every assigned value (I11) | `WrongPhase`, `NotAuthorized`, `InvariantViolated` |
+| T16 | `ReopenGroupWork` | — | phase Group work; caller is scribe; group Submitted | `WrongPhase`, `NotAuthorized` |
+| T18 | `SubmitFinalVotes` | `{ votes: [{ valueId, voteCount }] }` | phase Final voting; round open; totals equal the round allotment; only eligible values; not yet voted this round (I13) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
+
+`SubmitFinalVotes` is irrevocable (I14): the server records *that* the caller
+voted and adds the counts to anonymous tallies. No un-vote intent exists.
+
+### 4.3 Presenter hub
+
+No intents. The hub exposes no mutating method at all, so an unauthenticated
+presenter connection has nothing to call (Decision 5).
+
+### 4.4 System transitions
+
+T10 `DetermineTopValues`, T11 `FormGroups`, T12 `AppointScribes`, T20
+`WinnersDetermined`, T23 `WorkshopConcluded` have **no wire representation**.
+They fire inside the server as part of the transition that triggers them
+(phase entry, or voting close) and are visible only as changed state. This is
+deliberate: nothing a client sends can influence them.
+
+### 4.5 Coverage check
+
+T1 → § 2 (HTTP) · T2, T2a–T2c, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
+§ 4.1 · T3, T4 → § 3.1 · T5, T9, T14, T15, T16, T18 → § 4.2 · T10, T11, T12,
+T20, T23 → § 4.4. All 24 transitions of `design/state-machine.md` § 3 are
+accounted for.
+
+---
+
+## 5. Server→client state
+
+One client callback per hub, always the same shape for that role:
+`ReceiveWorkshopState(<Role>WorkshopState)`.
+
+### 5.1 Shared envelope
+
+| Field | Type | Meaning |
+|---|---|---|
+| `revision` | long | monotonic, see § 3.4 |
+| `phase` | 1–9 | current phase (I1) |
+
+Every phase-specific block below is absent (null) until its phase is
+relevant, and stays present afterwards where the screen still shows it
+(e.g. selection tallies remain visible in phase 4).
+
+### 5.2 `ParticipantWorkshopState`
+
+| Block | Fields |
+|---|---|
+| membership | `membership` (`joined` \| `joiningClosed`), `participantCount` |
+| quiz | `questionId`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `ownAnswerId?`, `correctAnswerId?` (only once revealed) |
+| selection | `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?`, `topValueIds?` |
+| ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
+| presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
+| voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
+| conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
+
+Deliberately absent: any other participant's answer, selection, or votes;
+any tally during an open voting round; any participant identifier other than
+group member display names.
+
+### 5.3 `FacilitatorWorkshopState`
+
+| Block | Fields |
+|---|---|
+| roster | `participants: [{ participantId, displayName }]`, `participantCount` |
+| quiz | `questionId`, `subState`, `answerTallies`, `answeredCount` |
+| selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
+| formation | `groups: [{ name, members: [{ participantId, displayName }], assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
+| presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
+| voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
+| conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
+| controls | `enabledIntents: string[]` — see § 6.4 |
+
+`participantId` appears only for scribe reassignment (T13) and roster
+display. It is never paired with an answer, a selection, or a vote.
+
+### 5.4 `PresenterWorkshopState`
+
+| Block | Fields |
+|---|---|
+| roster | `participantNames`, `participantCount` |
+| quiz | `questionId`, `subState`, `answerTallies`, `correctAnswerId?` (once revealed) |
+| selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
+| formation | `groups: [{ name, memberNames, assignedValueIds, workStatus }]` |
+| presentation | `presentedValueId`, `presentedActions: [{ text }]` |
+| voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
+| conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
+
+Deliberately absent: every participant identifier (display names only), every
+per-person fact, and all vote tallies before the winners are revealed.
+
+### 5.5 Anonymity argument
+
+1. The model itself has no voter↔vote link: the session records *that* a
+   participant voted and keeps counts per value (I14), and the schema cannot
+   express the pairing (`design/persistence.md`: `vote_tallies` has no
+   participant column, `voted_participants` has no value column).
+2. No role state above contains a participant-to-answer, -selection, or
+   -vote mapping. The only per-person facts on the wire are the caller's own
+   (`ownAnswerId`, `ownSelectedValueIds`, `hasVotedThisRound`) inside that
+   caller's own state.
+3. Because each hub can only send its own record type, a facilitator or
+   presenter connection cannot be sent a participant's own block even by
+   mistake — it is not part of the type it receives.
+4. Tests: each mapper is asserted against the full domain state, and a
+   reflection test asserts that neither `FacilitatorWorkshopState` nor
+   `PresenterWorkshopState` contains a field pairing a participant with an
+   answer, selection, or vote.
+
+---
+
+## 6. Error model
+
+### 6.1 `IntentResult`
+
+Every hub method returns `IntentResult` to the **caller only**:
+
+- `Accepted`
+- `Rejected(IntentRejectionCode code, string detail)`
+
+It is never broadcast, and it carries no state — state always arrives through
+`ReceiveWorkshopState`. A rejection is total: no mutation, no persist, no
+broadcast, no `revision` bump.
+
+### 6.2 `IntentRejectionCode`
+
+| Code | Meaning |
+|---|---|
+| `WrongPhase` | the intent does not exist in the current phase or sub-state |
+| `NotAuthorized` | right role, wrong standing (e.g. not the scribe, I10) |
+| `UnknownSession` | no session with that identity |
+| `UnknownParticipant` | referenced participant is not on the roster |
+| `UnknownGroup` | referenced group does not exist |
+| `UnknownAction` | referenced action does not exist or belongs elsewhere |
+| `InvariantViolated` | a domain invariant refused the mutation (I5–I15) |
+| `MalformedPayload` | payload failed structural validation (§ 6.3) |
+
+The set is closed. A new rejection reason is a protocol change and updates
+this document.
+
+### 6.3 Payload validation
+
+Server-side, in the pipeline, before any domain call: required fields
+present, identifiers non-empty, collections within bounds, free text
+non-empty and ≤ 500 characters, no unknown identifiers. Failure →
+`MalformedPayload`, nothing else happens.
+
+Client-side, at the adapter boundary: every inbound state is parsed with a
+Zod schema before it enters the application. A parse failure is a bug, not a
+user-facing state: it is logged and the state is dropped (the next resend
+arrives within 500 ms).
+
+### 6.4 `enabledIntents` — no guard logic on the client
+
+The facilitator screen must disable “Advance” exactly when the state machine
+would refuse it (T2a–T2c) and morph its quiz sub-control button (T6→T7→T8).
+Duplicating those guards in the frontend would mean two implementations of
+the same rules. Instead the server evaluates them once and ships the answer:
+`enabledIntents` lists the facilitator intents that would be accepted right
+now. Buttons render from that list.
+
+### 6.5 Rejection round-trip
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant P as Participant phone
+  participant PH as ParticipantHub
+  participant PIPE as IntentPipeline
+  participant D as Domain
+
+  P->>PH: SubmitFinalVotes { 5 votes }
+  PH->>PIPE: intent + caller principal
+  PIPE->>D: guard check
+  D--xPIPE: round already closed (T19)
+  PIPE-->>P: Rejected(WrongPhase, "voting round is closed")
+  Note over PIPE: no mutation · no persist · no broadcast · revision unchanged
+  Note over P: phone shows "the round was closed" and keeps<br/>rendering the state it already has
+```
+
+---
+
+## 7. Frontend port slices
+
+One slice per concern; each slice is implemented by its own small
+session-bound adapter, all sharing one connection per role (Decision 3).
+Screens depend only on their slice — never on a connection, never on
+`sessionIdentity`.
+
+| Role | Slice | Intents / stream | Task |
+|---|---|---|---|
+| participant | `sessionStatePort` | state stream + connection state | **9** |
+| participant | `quizPort` | `ChooseQuizAnswer` | 12 |
+| participant | `selectionPort` | `SubmitValueSelection` | 13 |
+| participant | `groupWorkPort` | `AddAction`, `EditAction`, `RemoveAction`, `SubmitGroupWork`, `ReopenGroupWork` | 16 |
+| participant | `votingPort` | `SubmitFinalVotes` | 17 |
+| facilitator | `sessionStatePort` | state stream + connection state | **9** |
+| facilitator | `lifecyclePort` | `AdvancePhase` | **9** |
+| facilitator | `quizControlPort` | `RevealAnswer`, `ShowLearningText`, `PoseNextQuestion` | 12 |
+| facilitator | `formationPort` | `ReassignScribe` | 16 |
+| facilitator | `walkControlPort` | `GoToNextValue`, `CorrectActionWording`, `RevealNextValue` | 18 |
+| facilitator | `votingControlPort` | `CloseVoting`, `StartTiebreakRound` | 17 |
+| presenter | `sessionStatePort` | state stream + connection state | **9** |
+
+Slices marked **9** are created in Task 9; the rest are created by the task
+that implements their domain logic (Decision 4) — no unused ports, no dead
+handlers. `POST /api/sessions` (T1) is a `sessionCreationPort` outside the
+hubs, created in Task 10.
+
+Layering inside the frontend adapter (Decision 3, FE rules):
+
+```
+signalRConnection.ts   only maps @microsoft/signalr promises/callbacks to
+                       Single / Completable / Observable — no domain knowledge
+<concern>Adapter.ts    our logic: invoke an intent, map IntentResult, parse
+                       inbound state with Zod, expose replay-1 state stream
+<Role>SessionContext   creates the connection bound to sessionIdentity and
+                       builds every adapter for that role, once, on entry
+```
+
+---
+
+## 8. Voting and tiebreak walk-through
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant F as Facilitator
+  participant S as Server
+  participant P as Participants
+
+  Note over S: phase 8 entry — main round, allotment 5,<br/>eligible = all presented values
+  P->>S: SubmitFinalVotes (5 votes, once per person) — I13
+  S-->>P: state (hasVotedThisRound = true, no tallies)
+  S-->>F: state (votedCount grows, no tallies)
+  F->>S: CloseVoting (T19)
+  alt no fifth-place tie
+    S->>S: WinnersDetermined (T20, System)
+    S-->>F: state (winners stand, enabledIntents includes advancePhase)
+  else fifth-place tie
+    S-->>F: state (tiedValueIds set, closedRoundTallies visible)
+    F->>S: StartTiebreakRound (T21)
+    Note over S: new round — eligible = tied values,<br/>allotment = number of tied values
+    S-->>P: state (roundNumber+1, hasVotedThisRound = false)
+  end
+```
+
+---
+
+## 9. Non-goals
+
+- **No protocol versioning.** Frontend and backend ship together from one
+  repository in one compose deployment; a mismatched pair is not a supported
+  state.
+- **No client-initiated resync.** Connect and the 500 ms resend cover every
+  case (§ 3).
+- **No domain events on the wire.** Events are a domain-modeling and
+  persistence concern; clients see state (Decision 6).

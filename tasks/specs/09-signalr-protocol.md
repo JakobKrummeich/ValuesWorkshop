@@ -84,6 +84,19 @@ Status: **approved by the user** (Lavish review, 3 rounds).
 11. **New dependency (ask):** `@microsoft/signalr` (FE). BE SignalR comes
     from the existing ASP.NET Core framework reference.
 
+## Detail decided while writing `design/protocol.md`
+
+- `OpenSession` (T1) is `POST /api/sessions`, not a hub method — no session
+  exists yet to bind a session-bound connection to.
+- `JoinSession` (T4) / resume (T3) are implicit on participant connect; a late
+  arrival gets `membership = "joiningClosed"` instead of a closed connection.
+- Facilitator state carries `enabledIntents` so guard logic exists only on the
+  server (no duplicated phase rules in the frontend).
+- `revision` is a persisted session column (`design/persistence.md` § 2) and is
+  bumped inside the single write-before-broadcast path.
+- Wire carries identifiers only; the frontend localizes from `config/*.json`.
+  Group names are animal identifiers. Action texts travel verbatim.
+
 ## Deliverables
 
 - `design/protocol.md` — intent catalog (per role, payload schema, guard,

@@ -26,6 +26,7 @@ phase, and timestamp. Per-phase state gets its own table.
 CREATE TABLE sessions (
     identity           TEXT    PRIMARY KEY,
     current_phase      INTEGER NOT NULL,
+    revision           INTEGER NOT NULL DEFAULT 0,
     created_at         TEXT    NOT NULL
 );
 ```
@@ -201,7 +202,9 @@ SessionCommandHandler.HandleAsync(sessionIdentity, mutation)
     │     │
     │     └─ Failure → exception propagates, no broadcast
     │
-    └─ 4. Broadcast via IBroadcaster (no-op until Task 9)
+    ├─ 4. Bump session revision (monotonic, one per persisted mutation)
+    │
+    └─ 5. Broadcast via IBroadcaster
           │
           └─ Only reached after successful persist
 ```
@@ -223,8 +226,8 @@ On startup:
    hub in Task 9)
 
 Sessions resume at their exact prior state. No client action needed —
-reconnecting clients receive current state via the normal snapshot mechanism
-(Task 9).
+reconnecting clients are pushed the full current state on connect
+(`design/protocol.md` § 3).
 
 ---
 
