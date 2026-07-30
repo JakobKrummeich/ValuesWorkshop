@@ -49,12 +49,35 @@
         to phase 5, I8).
       </p>
 
+      <div class="alert alert-success mb-2"><span>
+        <strong>Your idea beats both of mine.</strong> Auto-placing the late arrival into the
+        currently smallest group (option C below) needs no facilitator action, no new UI, and no
+        “you are in no group” dead end. It is now the recommendation. The only thing it gives up is
+        the formation <em>aim</em> — a late arrival has no value selection to optimise against
+        (they were not there in phase 3), so there is nothing to optimise, and the sizing rule
+        (sizes differ by at most one) is exactly what “smallest group” preserves.
+      </span></div>
+
+      <div class="rounded-box border-2 border-success bg-base-200 p-4 mb-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="badge badge-success badge-sm">C</span>
+          <span class="font-bold">Join in any phase; after formation, auto-placed into the smallest group</span>
+          <span class="badge badge-outline badge-sm">recommended</span>
+        </div>
+        <ul class="list-disc pl-5 space-y-1 text-sm">
+          <li>Everything in A, plus: if groups already exist, joining also emits <code>ParticipantAddedToGroup</code> (System, part of the same join) into the group with the fewest members — ties broken randomly.</li>
+          <li>Sizing rule survives: groups still differ by at most one member. No values are re-dealt — the value–group assignment stays frozen, so I12 and the presentation walk are untouched.</li>
+          <li>The new member is never the scribe (I9 appointed one at phase-6 entry); if the group already submitted, it stays submitted — an extra member changes nothing about I11.</li>
+          <li>Same rule in every phase from 5 on, so there is no special case to reason about: whenever groups exist, a joiner lands in one.</li>
+          <li>I8 changes from “membership never changes” to “the partition and the value assignment are formed once; a participant who joins later is placed into the smallest group”.</li>
+        </ul>
+      </div>
+
       <div class="grid md:grid-cols-2 gap-4">
-        <div class="rounded-box border-2 border-primary bg-base-200 p-4">
+        <div class="rounded-box border border-base-300 bg-base-200 p-4">
           <div class="flex items-center gap-2 mb-2">
-            <span class="badge badge-primary badge-sm">A</span>
+            <span class="badge badge-neutral badge-sm">A</span>
             <span class="font-bold">Join in any phase, no group after formation</span>
-            <span class="badge badge-outline badge-sm">recommended</span>
           </div>
           <ul class="list-disc pl-5 space-y-1 text-sm">
             <li>T4 guard drops the phase condition; <code>joiningClosed</code> disappears from the protocol.</li>
@@ -80,11 +103,15 @@
       </div>
 
       <div class="flex flex-wrap gap-2">
-        <span class="btn btn-primary" data-lavish-action
+        <span class="btn btn-success" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: option C. Allow JoinSession in any phase; if groups already exist, the joiner is automatically placed into the group with the fewest members (ties random), no values re-dealt, never scribe. Update state-machine T4 and phase 5/6, domain-model I4 and I8 plus a ParticipantAddedToGroup event, and protocol 3.1.', { tag: 'decision', text: 'Option C — auto-place late joiners into the smallest group' })">
+          Choose C
+        </span>
+        <span class="btn btn-outline" data-lavish-action
           onclick="window.lavish.queuePrompt('Late joining: option A. Allow JoinSession in any phase; a participant who arrives after group formation stays out of every group and mirrors presenter content in phases 5-7, and votes normally in phase 8. Update state-machine T4, domain-model I4, and protocol 3.1.', { tag: 'decision', text: 'Option A — join any phase, no late group placement' })">
           Choose A
         </span>
-        <span class="btn btn-neutral" data-lavish-action
+        <span class="btn btn-outline" data-lavish-action
           onclick="window.lavish.queuePrompt('Late joining: option B. Option A plus a facilitator command AddParticipantToGroup, allowed in phases 5-7, so a late arrival can be placed into an existing group. Update state-machine T4 and I8, domain-model I4 and I8, and protocol 3.1 plus the intent catalog.', { tag: 'decision', text: 'Option B — also let the facilitator place late joiners in a group' })">
           Choose B
         </span>

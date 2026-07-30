@@ -49,6 +49,16 @@ transition referenced as `T*` is defined in `design/state-machine.md`.
 | `/hub/participant?sessionIdentity=…` | SignalR | Bearer (participant) | Participant intents + participant state |
 | `/hub/presenter?sessionIdentity=…` | SignalR | anonymous | Presenter state only, no intents |
 
+**Bearer** is the OIDC JWT access token of Task 8 (`oidc-client-ts` in the
+browser, handed to SignalR through `accessTokenFactory`, silently renewed
+before expiry). Its `sub` claim is the stable person identity: it is what the
+roster stores, so a reconnecting phone resumes its existing place instead of
+becoming a second participant (T3, I4). The token proves *who* the person is,
+never *what role* they hold — role is session state, not a token claim:
+the facilitator is the `sub` recorded when `POST /api/sessions` accepted the
+facilitator passphrase (I3), and the facilitator hub refuses any other `sub`
+with `NotAuthorized`.
+
 `OpenSession` (T1) is the one intent that is **not** a hub method: no session
 exists yet, so there is nothing to bind a session-bound connection to. It is
 an HTTP request that returns the identity the three hubs are then bound to.
