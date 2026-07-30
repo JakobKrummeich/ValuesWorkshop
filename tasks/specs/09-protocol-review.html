@@ -32,14 +32,79 @@
     the error model (§ 6), and the port-slice map (§ 7). Annotate anything you want
     changed; approve below when it reads right.
   </span></div>
-<h1 class="text-4xl font-bold mt-2 mb-4">Protocol — ValuesWorkshop</h1>
-<p class="my-3 leading-relaxed">Living document. The FE/BE contract for real-time communication. Deviations
+
+  <div class="card bg-base-100 border-2 border-warning mb-8">
+    <div class="card-body gap-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="badge badge-warning">open decision</span>
+        <h2 class="card-title">Late joining — yes, it is possible. Pick the shape.</h2>
+      </div>
+      <p class="text-sm opacity-80">
+        Today the docs close the door after phase 1: a phone that arrives later is put on
+        <code>membership = "joiningClosed"</code>. Opening it up is a domain change — guard T4 in
+        <code>design/state-machine.md</code>, invariant I4 wording in <code>design/domain-model.md</code>,
+        and § 3.1 here. Nothing in the phase machine actually depends on a frozen roster;
+        the only thing a late arrival misses is what was already computed before they existed:
+        the selection tally (fixed on entry to phase 4) and the group partition (fixed on entry
+        to phase 5, I8).
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="rounded-box border-2 border-primary bg-base-200 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="badge badge-primary badge-sm">A</span>
+            <span class="font-bold">Join in any phase, no group after formation</span>
+            <span class="badge badge-outline badge-sm">recommended</span>
+          </div>
+          <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>T4 guard drops the phase condition; <code>joiningClosed</code> disappears from the protocol.</li>
+            <li>Phase 2: answers the currently posed question like everyone else. Phase 3: submits their ten values, counted in the tally.</li>
+            <li>Phases 4 and 7 and 9 are watch-only anyway — identical experience.</li>
+            <li>Arriving in phase 5+ means no group (I8 keeps the partition frozen): their phone mirrors the presenter content through phases 5–7.</li>
+            <li>Phase 8: votes with the full allotment of the open round — I13 is per participant, so this needs no change.</li>
+            <li>Cost: one guard, one wording change, one FE state ("you are not in a group"). No new command, no relaxed invariant.</li>
+          </ul>
+        </div>
+        <div class="rounded-box border border-base-300 bg-base-200 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="badge badge-neutral badge-sm">B</span>
+            <span class="font-bold">A, plus the facilitator can place them in a group</span>
+          </div>
+          <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>Everything in A, and a new facilitator command <code>AddParticipantToGroup</code> / event <code>ParticipantAddedToGroup</code>, allowed in phases 5–7.</li>
+            <li>I8 softens from "groups are fixed" to "the partition is fixed; the facilitator may add a late arrival to one group".</li>
+            <li>Needs a facilitator control (group picker), a new rejection path, and scribe rules stay untouched (the new member is a plain member).</li>
+            <li>Real benefit only if late arrivals are common enough that sitting out group work would hurt the workshop.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <span class="btn btn-primary" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: option A. Allow JoinSession in any phase; a participant who arrives after group formation stays out of every group and mirrors presenter content in phases 5-7, and votes normally in phase 8. Update state-machine T4, domain-model I4, and protocol 3.1.', { tag: 'decision', text: 'Option A — join any phase, no late group placement' })">
+          Choose A
+        </span>
+        <span class="btn btn-neutral" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: option B. Option A plus a facilitator command AddParticipantToGroup, allowed in phases 5-7, so a late arrival can be placed into an existing group. Update state-machine T4 and I8, domain-model I4 and I8, and protocol 3.1 plus the intent catalog.', { tag: 'decision', text: 'Option B — also let the facilitator place late joiners in a group' })">
+          Choose B
+        </span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: keep the current behaviour - joining closes when phase 1 ends.', { tag: 'decision', text: 'Keep joining closed after phase 1' })">
+          Keep it closed
+        </span>
+      </div>
+    </div>
+  </div>
+
+<!-- markdown-body:start -->
+<h1>Protocol — ValuesWorkshop</h1>
+<p>Living document. The FE/BE contract for real-time communication. Deviations
 discovered during implementation update this file in the same PR (Ask-first).</p>
-<p class="my-3 leading-relaxed">Vocabulary is the ubiquitous language of <code>design/domain-model.md</code>; every
+<p>Vocabulary is the ubiquitous language of <code>design/domain-model.md</code>; every
 transition referenced as <code>T*</code> is defined in <code>design/state-machine.md</code>.</p>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">1. Principles</h2>
-<ol class="list-decimal pl-6 space-y-1 my-3">
+<hr>
+<h2>1. Principles</h2>
+<ol>
 <li><strong>Server-authoritative.</strong> Clients send <em>intents</em>. The server validates
 every intent against role, phase, and domain invariants, then mutates,
 persists, and broadcasts. A client never computes authoritative results
@@ -60,7 +125,7 @@ hub it is connected to, so no role can be sent data it must not see
 <li><strong>Session binding at the edge.</strong> <code>sessionIdentity</code> travels only in the
 connection's query string and lives only in the FE dependency context
 that constructs the adapters. It appears in no port signature, no UI
-prop, and no domain type (SPEC.md “Session binding at the edge”).</li>
+prop, and no domain type (<a href="http://SPEC.md">SPEC.md</a> “Session binding at the edge”).</li>
 <li><strong>Content is not state.</strong> The wire carries identifiers (<code>valueId</code>,
 <code>questionId</code>, <code>answerId</code>, <code>animalId</code>); the localized texts live in
 <code>config/*.json</code>, are loaded by the frontend, and are resolved there
@@ -68,23 +133,53 @@ prop, and no domain type (SPEC.md “Session binding at the edge”).</li>
 are localized the same way. The single exception is participant-written
 action text, which is free text and travels verbatim.</li>
 </ol>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">2. Endpoints</h2>
-<p class="my-3 leading-relaxed">| Endpoint | Kind | Auth | Purpose |
-|---|---|---|---|
-| <code>POST /api/sessions</code> | HTTP | facilitator passphrase in body | Open a session (T1) and receive its <code>sessionIdentity</code> |
-| <code>/hub/facilitator?sessionIdentity=…</code> | SignalR | Bearer (facilitator) | Facilitator intents + facilitator state |
-| <code>/hub/participant?sessionIdentity=…</code> | SignalR | Bearer (participant) | Participant intents + participant state |
-| <code>/hub/presenter?sessionIdentity=…</code> | SignalR | anonymous | Presenter state only, no intents |</p>
-<p class="my-3 leading-relaxed"><code>OpenSession</code> (T1) is the one intent that is <strong>not</strong> a hub method: no session
+<hr>
+<h2>2. Endpoints</h2>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>Endpoint</th>
+<th>Kind</th>
+<th>Auth</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /api/sessions</code></td>
+<td>HTTP</td>
+<td>facilitator passphrase in body</td>
+<td>Open a session (T1) and receive its <code>sessionIdentity</code></td>
+</tr>
+<tr>
+<td><code>/hub/facilitator?sessionIdentity=…</code></td>
+<td>SignalR</td>
+<td>Bearer (facilitator)</td>
+<td>Facilitator intents + facilitator state</td>
+</tr>
+<tr>
+<td><code>/hub/participant?sessionIdentity=…</code></td>
+<td>SignalR</td>
+<td>Bearer (participant)</td>
+<td>Participant intents + participant state</td>
+</tr>
+<tr>
+<td><code>/hub/presenter?sessionIdentity=…</code></td>
+<td>SignalR</td>
+<td>anonymous</td>
+<td>Presenter state only, no intents</td>
+</tr>
+</tbody>
+</table>
+</div><p><code>OpenSession</code> (T1) is the one intent that is <strong>not</strong> a hub method: no session
 exists yet, so there is nothing to bind a session-bound connection to. It is
 an HTTP request that returns the identity the three hubs are then bound to.</p>
-<p class="my-3 leading-relaxed">Groups: <code>facilitator:{sessionIdentity}</code>, <code>participant:{sessionIdentity}</code>,
+<p>Groups: <code>facilitator:{sessionIdentity}</code>, <code>participant:{sessionIdentity}</code>,
 <code>presenter:{sessionIdentity}</code> — added in <code>OnConnectedAsync</code>, removed
 automatically on disconnect.</p>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">3. Connection lifecycle</h2>
-<h3 class="text-xl font-semibold mt-6 mb-2">3.1 Connect</h3>
+<hr>
+<h2>3. Connection lifecycle</h2>
+<h3>3.1 Connect</h3>
 <pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
   autonumber
   participant F as Facilitator browser
@@ -92,18 +187,18 @@ automatically on disconnect.</p>
   participant PH as ParticipantHub
   participant P as Participant phone
 
-  F->>API: OpenSession { sessionName, passphrase }
-  API-->>F: { sessionIdentity }  %% 401 on wrong passphrase (I3)
+  F-&gt;&gt;API: OpenSession { sessionName, passphrase }
+  API--&gt;&gt;F: { sessionIdentity }  %% 401 on wrong passphrase (I3)
   Note over F: QR code + presenter URL derive from sessionIdentity
 
-  P->>PH: connect(sessionIdentity, bearer token)
-  PH->>PH: JoinSession or resume (T4 / T3, I4)
-  PH-->>P: ReceiveWorkshopState(full participant state)
-  PH-->>PH: broadcast to all three role groups (roster changed)
+  P-&gt;&gt;PH: connect(sessionIdentity, bearer token)
+  PH-&gt;&gt;PH: JoinSession or resume (T4 / T3, I4)
+  PH--&gt;&gt;P: ReceiveWorkshopState(full participant state)
+  PH--&gt;&gt;PH: broadcast to all three role groups (roster changed)
 </pre>
-<p class="my-3 leading-relaxed">Joining is <strong>implicit on connect</strong> (<code>design/screens.md</code>: “JoinSession fires
+<p>Joining is <strong>implicit on connect</strong> (<code>design/screens.md</code>: “JoinSession fires
 implicitly on arrival; no form, no button”):</p>
-<ul class="list-disc pl-6 space-y-1 my-3">
+<ul>
 <li>not on the roster and phase is Join → join (T4), <code>membership = &quot;joined&quot;</code></li>
 <li>already on the roster → resume (T3), <code>membership = &quot;joined&quot;</code></li>
 <li>not on the roster and phase is past Join → no mutation,
@@ -111,7 +206,7 @@ implicitly on arrival; no form, no button”):</p>
 shows the closed-joining notice. The connection is never aborted, because
 an aborted connection cannot explain itself.</li>
 </ul>
-<h3 class="text-xl font-semibold mt-6 mb-2">3.2 Reconnect and backend restart</h3>
+<h3>3.2 Reconnect and backend restart</h3>
 <pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
   autonumber
   participant P as Participant phone
@@ -119,14 +214,14 @@ an aborted connection cannot explain itself.</li>
   participant DB as SQLite
 
   Note over P,PH: socket dies (tunnel, phone sleep, backend restart)
-  P->>PH: automatic reconnect, exponential backoff + jitter
-  PH->>DB: load session (survived the restart — design/persistence.md)
-  PH-->>P: ReceiveWorkshopState(full current state, revision N)
-  Note over P: exact prior place restored: role, group, scribe status,<br/>submissions, cast votes (I16)
+  P-&gt;&gt;PH: automatic reconnect, exponential backoff + jitter
+  PH-&gt;&gt;DB: load session (survived the restart — design/persistence.md)
+  PH--&gt;&gt;P: ReceiveWorkshopState(full current state, revision N)
+  Note over P: exact prior place restored: role, group, scribe status,&lt;br/&gt;submissions, cast votes (I16)
 </pre>
-<p class="my-3 leading-relaxed">No client-side resync request exists. Reconnect == connect.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">3.3 Periodic resend</h3>
-<p class="my-3 leading-relaxed">One hosted service ticks every <code>STATE_RESEND_INTERVAL_MS</code> (default <strong>500</strong>).
+<p>No client-side resync request exists. Reconnect == connect.</p>
+<h3>3.3 Periodic resend</h3>
+<p>One hosted service ticks every <code>STATE_RESEND_INTERVAL_MS</code> (default <strong>500</strong>).
 Per session with at least one connected client, it resends the latest state to
 each of the three role groups. Between mutations this is pure serialization:
 the three mapped role states are cached and re-mapped only when <code>revision</code>
@@ -137,117 +232,360 @@ changes; no repository read, no domain work, no SQLite traffic.</p>
   participant A as Phone A
   participant B as Phone B
 
-  S-->>A: state revision 7
+  S--&gt;&gt;A: state revision 7
   S--xB: state revision 7 (lost)
   Note over B: still showing revision 6
-  S-->>A: resend revision 7 (tick)
-  S-->>B: resend revision 7 (tick)
+  S--&gt;&gt;A: resend revision 7 (tick)
+  S--&gt;&gt;B: resend revision 7 (tick)
   Note over B: caught up ≤ 500 ms after the loss
 </pre>
-<h3 class="text-xl font-semibold mt-6 mb-2">3.4 <code>revision</code></h3>
-<p class="my-3 leading-relaxed">Every state record carries <code>revision</code>: a monotonic counter on the session,
+<h3>3.4 <code>revision</code></h3>
+<p>Every state record carries <code>revision</code>: a monotonic counter on the session,
 incremented once per persisted mutation. Client rule: <strong>apply the state only
 if <code>revision</code> is greater than the last applied revision</strong>; otherwise drop it.
 Consequences: unchanged resends cause no re-render and no flicker, and a late
 or duplicated message can never move a screen backwards.</p>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">4. Intent catalog</h2>
-<p class="my-3 leading-relaxed">Payload types are C# records on the server and Zod schemas on the client
+<hr>
+<h2>4. Intent catalog</h2>
+<p>Payload types are C# records on the server and Zod schemas on the client
 (§ 6.3). <code>ParticipantId</code> is never taken from a payload — it is derived from
 the caller's authenticated principal, so no client can act as another.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">4.1 Facilitator hub</h3>
-<p class="my-3 leading-relaxed">| # | Method | Payload | Guard (server-checked) | Rejection |
-|---|---|---|---|---|
-| T2 | <code>AdvancePhase</code> | — | forward only (I1); phase-exit guards T2a–T2c | <code>WrongPhase</code> |
-| T6 | <code>RevealAnswer</code> | — | phase Quiz; current question unrevealed | <code>WrongPhase</code> |
-| T7 | <code>ShowLearningText</code> | — | phase Quiz; answer revealed, text unshown | <code>WrongPhase</code> |
-| T8 | <code>PoseNextQuestion</code> | — | phase Quiz; learning text shown; questions remain | <code>WrongPhase</code> |
-| T13 | <code>ReassignScribe</code> | <code>{ groupName, participantId }</code> | phase Group work; target is a member of that group (I9) | <code>WrongPhase</code>, <code>UnknownGroup</code>, <code>UnknownParticipant</code> |
-| T17 | <code>GoToNextValue</code> | — | phase Value presentation; values remain (I12) | <code>WrongPhase</code> |
-| T17a | <code>CorrectActionWording</code> | <code>{ actionId, text }</code> | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | <code>WrongPhase</code>, <code>UnknownAction</code>, <code>MalformedPayload</code> |
-| T19 | <code>CloseVoting</code> | — | phase Final voting; round open | <code>WrongPhase</code> |
-| T21 | <code>StartTiebreakRound</code> | — | phase Final voting; last closed round left a fifth-place tie (I15) | <code>WrongPhase</code>, <code>InvariantViolated</code> |
-| T22 | <code>RevealNextValue</code> | — | phase Final presentation; winners remain | <code>WrongPhase</code> |</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">4.2 Participant hub</h3>
-<p class="my-3 leading-relaxed">| # | Method | Payload | Guard (server-checked) | Rejection |
-|---|---|---|---|---|
-| T4/T3 | <em>(implicit on connect)</em> | — | see § 3.1 | — |
-| T5 | <code>ChooseQuizAnswer</code> | <code>{ questionId, answerId }</code> | phase Quiz; <code>questionId</code> is the posed question; answer belongs to it; not yet answered (I5) | <code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code> |
-| T9 | <code>SubmitValueSelection</code> | <code>{ valueIds }</code> | phase Value selection; exactly ten distinct catalog values; not yet submitted (I6) | <code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code> |
-| T14 | <code>AddAction</code> | <code>{ valueId, text }</code> | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text non-empty ≤ 500 chars | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>InvariantViolated</code>, <code>MalformedPayload</code> |
-| T14 | <code>EditAction</code> | <code>{ actionId, text }</code> | as <code>AddAction</code>; action belongs to the caller's group | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>UnknownAction</code>, <code>MalformedPayload</code> |
-| T14 | <code>RemoveAction</code> | <code>{ actionId }</code> | as <code>EditAction</code> | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>UnknownAction</code> |
-| T15 | <code>SubmitGroupWork</code> | — | phase Group work; caller is scribe; one to five actions on every assigned value (I11) | <code>WrongPhase</code>, <code>NotAuthorized</code>, <code>InvariantViolated</code> |
-| T16 | <code>ReopenGroupWork</code> | — | phase Group work; caller is scribe; group Submitted | <code>WrongPhase</code>, <code>NotAuthorized</code> |
-| T18 | <code>SubmitFinalVotes</code> | <code>{ votes: [{ valueId, voteCount }] }</code> | phase Final voting; round open; totals equal the round allotment; only eligible values; not yet voted this round (I13) | <code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code> |</p>
-<p class="my-3 leading-relaxed"><code>SubmitFinalVotes</code> is irrevocable (I14): the server records <em>that</em> the caller
+<h3>4.1 Facilitator hub</h3>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>#</th>
+<th>Method</th>
+<th>Payload</th>
+<th>Guard (server-checked)</th>
+<th>Rejection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T2</td>
+<td><code>AdvancePhase</code></td>
+<td>—</td>
+<td>forward only (I1); phase-exit guards T2a–T2c</td>
+<td><code>WrongPhase</code></td>
+</tr>
+<tr>
+<td>T6</td>
+<td><code>RevealAnswer</code></td>
+<td>—</td>
+<td>phase Quiz; current question unrevealed</td>
+<td><code>WrongPhase</code></td>
+</tr>
+<tr>
+<td>T7</td>
+<td><code>ShowLearningText</code></td>
+<td>—</td>
+<td>phase Quiz; answer revealed, text unshown</td>
+<td><code>WrongPhase</code></td>
+</tr>
+<tr>
+<td>T8</td>
+<td><code>PoseNextQuestion</code></td>
+<td>—</td>
+<td>phase Quiz; learning text shown; questions remain</td>
+<td><code>WrongPhase</code></td>
+</tr>
+<tr>
+<td>T13</td>
+<td><code>ReassignScribe</code></td>
+<td><code>{ groupName, participantId }</code></td>
+<td>phase Group work; target is a member of that group (I9)</td>
+<td><code>WrongPhase</code>, <code>UnknownGroup</code>, <code>UnknownParticipant</code></td>
+</tr>
+<tr>
+<td>T17</td>
+<td><code>GoToNextValue</code></td>
+<td>—</td>
+<td>phase Value presentation; values remain (I12)</td>
+<td><code>WrongPhase</code></td>
+</tr>
+<tr>
+<td>T17a</td>
+<td><code>CorrectActionWording</code></td>
+<td><code>{ actionId, text }</code></td>
+<td>phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10)</td>
+<td><code>WrongPhase</code>, <code>UnknownAction</code>, <code>MalformedPayload</code></td>
+</tr>
+<tr>
+<td>T19</td>
+<td><code>CloseVoting</code></td>
+<td>—</td>
+<td>phase Final voting; round open</td>
+<td><code>WrongPhase</code></td>
+</tr>
+<tr>
+<td>T21</td>
+<td><code>StartTiebreakRound</code></td>
+<td>—</td>
+<td>phase Final voting; last closed round left a fifth-place tie (I15)</td>
+<td><code>WrongPhase</code>, <code>InvariantViolated</code></td>
+</tr>
+<tr>
+<td>T22</td>
+<td><code>RevealNextValue</code></td>
+<td>—</td>
+<td>phase Final presentation; winners remain</td>
+<td><code>WrongPhase</code></td>
+</tr>
+</tbody>
+</table>
+</div><h3>4.2 Participant hub</h3>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>#</th>
+<th>Method</th>
+<th>Payload</th>
+<th>Guard (server-checked)</th>
+<th>Rejection</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T4/T3</td>
+<td><em>(implicit on connect)</em></td>
+<td>—</td>
+<td>see § 3.1</td>
+<td>—</td>
+</tr>
+<tr>
+<td>T5</td>
+<td><code>ChooseQuizAnswer</code></td>
+<td><code>{ questionId, answerId }</code></td>
+<td>phase Quiz; <code>questionId</code> is the posed question; answer belongs to it; not yet answered (I5)</td>
+<td><code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code></td>
+</tr>
+<tr>
+<td>T9</td>
+<td><code>SubmitValueSelection</code></td>
+<td><code>{ valueIds }</code></td>
+<td>phase Value selection; exactly ten distinct catalog values; not yet submitted (I6)</td>
+<td><code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code></td>
+</tr>
+<tr>
+<td>T14</td>
+<td><code>AddAction</code></td>
+<td><code>{ valueId, text }</code></td>
+<td>phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text non-empty ≤ 500 chars</td>
+<td><code>WrongPhase</code>, <code>NotAuthorized</code>, <code>InvariantViolated</code>, <code>MalformedPayload</code></td>
+</tr>
+<tr>
+<td>T14</td>
+<td><code>EditAction</code></td>
+<td><code>{ actionId, text }</code></td>
+<td>as <code>AddAction</code>; action belongs to the caller's group</td>
+<td><code>WrongPhase</code>, <code>NotAuthorized</code>, <code>UnknownAction</code>, <code>MalformedPayload</code></td>
+</tr>
+<tr>
+<td>T14</td>
+<td><code>RemoveAction</code></td>
+<td><code>{ actionId }</code></td>
+<td>as <code>EditAction</code></td>
+<td><code>WrongPhase</code>, <code>NotAuthorized</code>, <code>UnknownAction</code></td>
+</tr>
+<tr>
+<td>T15</td>
+<td><code>SubmitGroupWork</code></td>
+<td>—</td>
+<td>phase Group work; caller is scribe; one to five actions on every assigned value (I11)</td>
+<td><code>WrongPhase</code>, <code>NotAuthorized</code>, <code>InvariantViolated</code></td>
+</tr>
+<tr>
+<td>T16</td>
+<td><code>ReopenGroupWork</code></td>
+<td>—</td>
+<td>phase Group work; caller is scribe; group Submitted</td>
+<td><code>WrongPhase</code>, <code>NotAuthorized</code></td>
+</tr>
+<tr>
+<td>T18</td>
+<td><code>SubmitFinalVotes</code></td>
+<td><code>{ votes: [{ valueId, voteCount }] }</code></td>
+<td>phase Final voting; round open; totals equal the round allotment; only eligible values; not yet voted this round (I13)</td>
+<td><code>WrongPhase</code>, <code>MalformedPayload</code>, <code>InvariantViolated</code></td>
+</tr>
+</tbody>
+</table>
+</div><p><code>SubmitFinalVotes</code> is irrevocable (I14): the server records <em>that</em> the caller
 voted and adds the counts to anonymous tallies. No un-vote intent exists.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">4.3 Presenter hub</h3>
-<p class="my-3 leading-relaxed">No intents. The hub exposes no mutating method at all, so an unauthenticated
+<h3>4.3 Presenter hub</h3>
+<p>No intents. The hub exposes no mutating method at all, so an unauthenticated
 presenter connection has nothing to call (Decision 5).</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">4.4 System transitions</h3>
-<p class="my-3 leading-relaxed">T10 <code>DetermineTopValues</code>, T11 <code>FormGroups</code>, T12 <code>AppointScribes</code>, T20
+<h3>4.4 System transitions</h3>
+<p>T10 <code>DetermineTopValues</code>, T11 <code>FormGroups</code>, T12 <code>AppointScribes</code>, T20
 <code>WinnersDetermined</code>, T23 <code>WorkshopConcluded</code> have <strong>no wire representation</strong>.
 They fire inside the server as part of the transition that triggers them
 (phase entry, or voting close) and are visible only as changed state. This is
 deliberate: nothing a client sends can influence them.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">4.5 Coverage check</h3>
-<p class="my-3 leading-relaxed">T1 → § 2 (HTTP) · T2, T2a–T2c, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
+<h3>4.5 Coverage check</h3>
+<p>T1 → § 2 (HTTP) · T2, T2a–T2c, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
 § 4.1 · T3, T4 → § 3.1 · T5, T9, T14, T15, T16, T18 → § 4.2 · T10, T11, T12,
 T20, T23 → § 4.4. All 24 transitions of <code>design/state-machine.md</code> § 3 are
 accounted for.</p>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">5. Server→client state</h2>
-<p class="my-3 leading-relaxed">One client callback per hub, always the same shape for that role:
+<hr>
+<h2>5. Server→client state</h2>
+<p>One client callback per hub, always the same shape for that role:
 <code>ReceiveWorkshopState(&lt;Role&gt;WorkshopState)</code>.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">5.1 Shared envelope</h3>
-<p class="my-3 leading-relaxed">| Field | Type | Meaning |
-|---|---|---|
-| <code>revision</code> | long | monotonic, see § 3.4 |
-| <code>phase</code> | 1–9 | current phase (I1) |</p>
-<p class="my-3 leading-relaxed">Every phase-specific block below is absent (null) until its phase is
+<h3>5.1 Shared envelope</h3>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>revision</code></td>
+<td>long</td>
+<td>monotonic, see § 3.4</td>
+</tr>
+<tr>
+<td><code>phase</code></td>
+<td>1–9</td>
+<td>current phase (I1)</td>
+</tr>
+</tbody>
+</table>
+</div><p>Every phase-specific block below is absent (null) until its phase is
 relevant, and stays present afterwards where the screen still shows it
 (e.g. selection tallies remain visible in phase 4).</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">5.2 <code>ParticipantWorkshopState</code></h3>
-<p class="my-3 leading-relaxed">| Block | Fields |
-|---|---|
-| membership | <code>membership</code> (<code>joined</code> | <code>joiningClosed</code>), <code>participantCount</code> |
-| quiz | <code>questionId</code>, <code>subState</code> (<code>answering</code> | <code>revealed</code> | <code>learningTextShown</code>), <code>ownAnswerId?</code>, <code>correctAnswerId?</code> (only once revealed) |
-| selection | <code>ownSelectedValueIds</code>, <code>isSubmitted</code>, <code>selectionTallies?</code>, <code>topValueIds?</code> |
-| ownGroup | <code>name</code> (animal identifier, localized by the client), <code>memberNames</code>, <code>assignedValueIds</code>, <code>isCallerScribe</code>, <code>scribeName</code>, <code>workStatus</code> (<code>editing</code> | <code>submitted</code>), <code>actions: [{ actionId, valueId, text, sortOrder }]</code> |
-| presentation | <code>presentingGroupName</code>, <code>presentedValueId</code>, <code>presentedActions: [{ actionId, text }]</code> |
-| voting | <code>roundNumber</code>, <code>allotment</code>, <code>eligibleValueIds</code>, <code>isRoundOpen</code>, <code>hasVotedThisRound</code> |
-| conclusion | <code>revealedWinners: [{ valueId, voteCount, actions }]</code>, <code>isConcluded</code> |</p>
-<p class="my-3 leading-relaxed">Deliberately absent: any other participant's answer, selection, or votes;
+<h3>5.2 <code>ParticipantWorkshopState</code></h3>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>Block</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>membership</td>
+<td><code>membership</code> (<code>joined</code> | <code>joiningClosed</code>), <code>participantCount</code></td>
+</tr>
+<tr>
+<td>quiz</td>
+<td><code>questionId</code>, <code>subState</code> (<code>answering</code> | <code>revealed</code> | <code>learningTextShown</code>), <code>ownAnswerId?</code>, <code>correctAnswerId?</code> (only once revealed)</td>
+</tr>
+<tr>
+<td>selection</td>
+<td><code>ownSelectedValueIds</code>, <code>isSubmitted</code>, <code>selectionTallies?</code>, <code>topValueIds?</code></td>
+</tr>
+<tr>
+<td>ownGroup</td>
+<td><code>name</code> (animal identifier, localized by the client), <code>memberNames</code>, <code>assignedValueIds</code>, <code>isCallerScribe</code>, <code>scribeName</code>, <code>workStatus</code> (<code>editing</code> | <code>submitted</code>), <code>actions: [{ actionId, valueId, text, sortOrder }]</code></td>
+</tr>
+<tr>
+<td>presentation</td>
+<td><code>presentingGroupName</code>, <code>presentedValueId</code>, <code>presentedActions: [{ actionId, text }]</code></td>
+</tr>
+<tr>
+<td>voting</td>
+<td><code>roundNumber</code>, <code>allotment</code>, <code>eligibleValueIds</code>, <code>isRoundOpen</code>, <code>hasVotedThisRound</code></td>
+</tr>
+<tr>
+<td>conclusion</td>
+<td><code>revealedWinners: [{ valueId, voteCount, actions }]</code>, <code>isConcluded</code></td>
+</tr>
+</tbody>
+</table>
+</div><p>Deliberately absent: any other participant's answer, selection, or votes;
 any tally during an open voting round; any participant identifier other than
 group member display names.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">5.3 <code>FacilitatorWorkshopState</code></h3>
-<p class="my-3 leading-relaxed">| Block | Fields |
-|---|---|
-| roster | <code>participants: [{ participantId, displayName }]</code>, <code>participantCount</code> |
-| quiz | <code>questionId</code>, <code>subState</code>, <code>answerTallies</code>, <code>answeredCount</code> |
-| selection | <code>submittedCount</code>, <code>selectionTallies</code>, <code>topValueIds?</code> |
-| formation | <code>groups: [{ name, members: [{ participantId, displayName }], assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]</code> |
-| presentation | <code>presentingGroupName</code>, <code>presentedValueId</code>, <code>presentedActions: [{ actionId, text }]</code>, <code>remainingValueCount</code> |
-| voting | <code>roundNumber</code>, <code>allotment</code>, <code>eligibleValueIds</code>, <code>isRoundOpen</code>, <code>votedCount</code>, <code>closedRoundTallies?</code>, <code>tiedValueIds?</code> |
-| conclusion | <code>winners: [{ valueId, voteCount }]</code>, <code>revealedCount</code> |
-| controls | <code>enabledIntents: string[]</code> — see § 6.4 |</p>
-<p class="my-3 leading-relaxed"><code>participantId</code> appears only for scribe reassignment (T13) and roster
+<h3>5.3 <code>FacilitatorWorkshopState</code></h3>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>Block</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>roster</td>
+<td><code>participants: [{ participantId, displayName }]</code>, <code>participantCount</code></td>
+</tr>
+<tr>
+<td>quiz</td>
+<td><code>questionId</code>, <code>subState</code>, <code>answerTallies</code>, <code>answeredCount</code></td>
+</tr>
+<tr>
+<td>selection</td>
+<td><code>submittedCount</code>, <code>selectionTallies</code>, <code>topValueIds?</code></td>
+</tr>
+<tr>
+<td>formation</td>
+<td><code>groups: [{ name, members: [{ participantId, displayName }], assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]</code></td>
+</tr>
+<tr>
+<td>presentation</td>
+<td><code>presentingGroupName</code>, <code>presentedValueId</code>, <code>presentedActions: [{ actionId, text }]</code>, <code>remainingValueCount</code></td>
+</tr>
+<tr>
+<td>voting</td>
+<td><code>roundNumber</code>, <code>allotment</code>, <code>eligibleValueIds</code>, <code>isRoundOpen</code>, <code>votedCount</code>, <code>closedRoundTallies?</code>, <code>tiedValueIds?</code></td>
+</tr>
+<tr>
+<td>conclusion</td>
+<td><code>winners: [{ valueId, voteCount }]</code>, <code>revealedCount</code></td>
+</tr>
+<tr>
+<td>controls</td>
+<td><code>enabledIntents: string[]</code> — see § 6.4</td>
+</tr>
+</tbody>
+</table>
+</div><p><code>participantId</code> appears only for scribe reassignment (T13) and roster
 display. It is never paired with an answer, a selection, or a vote.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">5.4 <code>PresenterWorkshopState</code></h3>
-<p class="my-3 leading-relaxed">| Block | Fields |
-|---|---|
-| roster | <code>participantNames</code>, <code>participantCount</code> |
-| quiz | <code>questionId</code>, <code>subState</code>, <code>answerTallies</code>, <code>correctAnswerId?</code> (once revealed) |
-| selection | <code>submittedCount</code>, <code>selectionTallies</code>, <code>topValueIds?</code> |
-| formation | <code>groups: [{ name, memberNames, assignedValueIds, workStatus }]</code> |
-| presentation | <code>presentedValueId</code>, <code>presentedActions: [{ text }]</code> |
-| voting | <code>isRoundOpen</code> only — no tallies while voting (<code>design/screens.md</code>) |
-| conclusion | <code>revealedWinners: [{ valueId, voteCount, actions }]</code>, <code>isConcluded</code> |</p>
-<p class="my-3 leading-relaxed">Deliberately absent: every participant identifier (display names only), every
+<h3>5.4 <code>PresenterWorkshopState</code></h3>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>Block</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>roster</td>
+<td><code>participantNames</code>, <code>participantCount</code></td>
+</tr>
+<tr>
+<td>quiz</td>
+<td><code>questionId</code>, <code>subState</code>, <code>answerTallies</code>, <code>correctAnswerId?</code> (once revealed)</td>
+</tr>
+<tr>
+<td>selection</td>
+<td><code>submittedCount</code>, <code>selectionTallies</code>, <code>topValueIds?</code></td>
+</tr>
+<tr>
+<td>formation</td>
+<td><code>groups: [{ name, memberNames, assignedValueIds, workStatus }]</code></td>
+</tr>
+<tr>
+<td>presentation</td>
+<td><code>presentedValueId</code>, <code>presentedActions: [{ text }]</code></td>
+</tr>
+<tr>
+<td>voting</td>
+<td><code>isRoundOpen</code> only — no tallies while voting (<code>design/screens.md</code>)</td>
+</tr>
+<tr>
+<td>conclusion</td>
+<td><code>revealedWinners: [{ valueId, voteCount, actions }]</code>, <code>isConcluded</code></td>
+</tr>
+</tbody>
+</table>
+</div><p>Deliberately absent: every participant identifier (display names only), every
 per-person fact, and all vote tallies before the winners are revealed.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">5.5 Anonymity argument</h3>
-<ol class="list-decimal pl-6 space-y-1 my-3">
+<h3>5.5 Anonymity argument</h3>
+<ol>
 <li>The model itself has no voter↔vote link: the session records <em>that</em> a
 participant voted and keeps counts per value (I14), and the schema cannot
 express the pairing (<code>design/persistence.md</code>: <code>vote_tallies</code> has no
@@ -264,47 +602,79 @@ reflection test asserts that neither <code>FacilitatorWorkshopState</code> nor
 <code>PresenterWorkshopState</code> contains a field pairing a participant with an
 answer, selection, or vote.</li>
 </ol>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">6. Error model</h2>
-<h3 class="text-xl font-semibold mt-6 mb-2">6.1 <code>IntentResult</code></h3>
-<p class="my-3 leading-relaxed">Every hub method returns <code>IntentResult</code> to the <strong>caller only</strong>:</p>
-<ul class="list-disc pl-6 space-y-1 my-3">
+<hr>
+<h2>6. Error model</h2>
+<h3>6.1 <code>IntentResult</code></h3>
+<p>Every hub method returns <code>IntentResult</code> to the <strong>caller only</strong>:</p>
+<ul>
 <li><code>Accepted</code></li>
 <li><code>Rejected(IntentRejectionCode code, string detail)</code></li>
 </ul>
-<p class="my-3 leading-relaxed">It is never broadcast, and it carries no state — state always arrives through
+<p>It is never broadcast, and it carries no state — state always arrives through
 <code>ReceiveWorkshopState</code>. A rejection is total: no mutation, no persist, no
 broadcast, no <code>revision</code> bump.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">6.2 <code>IntentRejectionCode</code></h3>
-<p class="my-3 leading-relaxed">| Code | Meaning |
-|---|---|
-| <code>WrongPhase</code> | the intent does not exist in the current phase or sub-state |
-| <code>NotAuthorized</code> | right role, wrong standing (e.g. not the scribe, I10) |
-| <code>UnknownSession</code> | no session with that identity |
-| <code>UnknownParticipant</code> | referenced participant is not on the roster |
-| <code>UnknownGroup</code> | referenced group does not exist |
-| <code>UnknownAction</code> | referenced action does not exist or belongs elsewhere |
-| <code>InvariantViolated</code> | a domain invariant refused the mutation (I5–I15) |
-| <code>MalformedPayload</code> | payload failed structural validation (§ 6.3) |</p>
-<p class="my-3 leading-relaxed">The set is closed. A new rejection reason is a protocol change and updates
+<h3>6.2 <code>IntentRejectionCode</code></h3>
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WrongPhase</code></td>
+<td>the intent does not exist in the current phase or sub-state</td>
+</tr>
+<tr>
+<td><code>NotAuthorized</code></td>
+<td>right role, wrong standing (e.g. not the scribe, I10)</td>
+</tr>
+<tr>
+<td><code>UnknownSession</code></td>
+<td>no session with that identity</td>
+</tr>
+<tr>
+<td><code>UnknownParticipant</code></td>
+<td>referenced participant is not on the roster</td>
+</tr>
+<tr>
+<td><code>UnknownGroup</code></td>
+<td>referenced group does not exist</td>
+</tr>
+<tr>
+<td><code>UnknownAction</code></td>
+<td>referenced action does not exist or belongs elsewhere</td>
+</tr>
+<tr>
+<td><code>InvariantViolated</code></td>
+<td>a domain invariant refused the mutation (I5–I15)</td>
+</tr>
+<tr>
+<td><code>MalformedPayload</code></td>
+<td>payload failed structural validation (§ 6.3)</td>
+</tr>
+</tbody>
+</table>
+</div><p>The set is closed. A new rejection reason is a protocol change and updates
 this document.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">6.3 Payload validation</h3>
-<p class="my-3 leading-relaxed">Server-side, in the pipeline, before any domain call: required fields
+<h3>6.3 Payload validation</h3>
+<p>Server-side, in the pipeline, before any domain call: required fields
 present, identifiers non-empty, collections within bounds, free text
 non-empty and ≤ 500 characters, no unknown identifiers. Failure →
 <code>MalformedPayload</code>, nothing else happens.</p>
-<p class="my-3 leading-relaxed">Client-side, at the adapter boundary: every inbound state is parsed with a
+<p>Client-side, at the adapter boundary: every inbound state is parsed with a
 Zod schema before it enters the application. A parse failure is a bug, not a
 user-facing state: it is logged and the state is dropped (the next resend
 arrives within 500 ms).</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">6.4 <code>enabledIntents</code> — no guard logic on the client</h3>
-<p class="my-3 leading-relaxed">The facilitator screen must disable “Advance” exactly when the state machine
+<h3>6.4 <code>enabledIntents</code> — no guard logic on the client</h3>
+<p>The facilitator screen must disable “Advance” exactly when the state machine
 would refuse it (T2a–T2c) and morph its quiz sub-control button (T6→T7→T8).
 Duplicating those guards in the frontend would mean two implementations of
 the same rules. Instead the server evaluates them once and ships the answer:
 <code>enabledIntents</code> lists the facilitator intents that would be accepted right
 now. Buttons render from that list.</p>
-<h3 class="text-xl font-semibold mt-6 mb-2">6.5 Rejection round-trip</h3>
+<h3>6.5 Rejection round-trip</h3>
 <pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
   autonumber
   participant P as Participant phone
@@ -312,39 +682,109 @@ now. Buttons render from that list.</p>
   participant PIPE as IntentPipeline
   participant D as Domain
 
-  P->>PH: SubmitFinalVotes { 5 votes }
-  PH->>PIPE: intent + caller principal
-  PIPE->>D: guard check
+  P-&gt;&gt;PH: SubmitFinalVotes { 5 votes }
+  PH-&gt;&gt;PIPE: intent + caller principal
+  PIPE-&gt;&gt;D: guard check
   D--xPIPE: round already closed (T19)
-  PIPE-->>P: Rejected(WrongPhase, "voting round is closed")
+  PIPE--&gt;&gt;P: Rejected(WrongPhase, &quot;voting round is closed&quot;)
   Note over PIPE: no mutation · no persist · no broadcast · revision unchanged
-  Note over P: phone shows "the round was closed" and keeps<br/>rendering the state it already has
+  Note over P: phone shows &quot;the round was closed&quot; and keeps&lt;br/&gt;rendering the state it already has
 </pre>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">7. Frontend port slices</h2>
-<p class="my-3 leading-relaxed">One slice per concern; each slice is implemented by its own small
+<hr>
+<h2>7. Frontend port slices</h2>
+<p>One slice per concern; each slice is implemented by its own small
 session-bound adapter, all sharing one connection per role (Decision 3).
 Screens depend only on their slice — never on a connection, never on
 <code>sessionIdentity</code>.</p>
-<p class="my-3 leading-relaxed">| Role | Slice | Intents / stream | Task |
-|---|---|---|---|
-| participant | <code>sessionStatePort</code> | state stream + connection state | <strong>9</strong> |
-| participant | <code>quizPort</code> | <code>ChooseQuizAnswer</code> | 12 |
-| participant | <code>selectionPort</code> | <code>SubmitValueSelection</code> | 13 |
-| participant | <code>groupWorkPort</code> | <code>AddAction</code>, <code>EditAction</code>, <code>RemoveAction</code>, <code>SubmitGroupWork</code>, <code>ReopenGroupWork</code> | 16 |
-| participant | <code>votingPort</code> | <code>SubmitFinalVotes</code> | 17 |
-| facilitator | <code>sessionStatePort</code> | state stream + connection state | <strong>9</strong> |
-| facilitator | <code>lifecyclePort</code> | <code>AdvancePhase</code> | <strong>9</strong> |
-| facilitator | <code>quizControlPort</code> | <code>RevealAnswer</code>, <code>ShowLearningText</code>, <code>PoseNextQuestion</code> | 12 |
-| facilitator | <code>formationPort</code> | <code>ReassignScribe</code> | 16 |
-| facilitator | <code>walkControlPort</code> | <code>GoToNextValue</code>, <code>CorrectActionWording</code>, <code>RevealNextValue</code> | 18 |
-| facilitator | <code>votingControlPort</code> | <code>CloseVoting</code>, <code>StartTiebreakRound</code> | 17 |
-| presenter | <code>sessionStatePort</code> | state stream + connection state | <strong>9</strong> |</p>
-<p class="my-3 leading-relaxed">Slices marked <strong>9</strong> are created in Task 9; the rest are created by the task
+<div class="overflow-x-auto my-4"><table class="table table-zebra table-sm my-4">
+<thead>
+<tr>
+<th>Role</th>
+<th>Slice</th>
+<th>Intents / stream</th>
+<th>Task</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>participant</td>
+<td><code>sessionStatePort</code></td>
+<td>state stream + connection state</td>
+<td><strong>9</strong></td>
+</tr>
+<tr>
+<td>participant</td>
+<td><code>quizPort</code></td>
+<td><code>ChooseQuizAnswer</code></td>
+<td>12</td>
+</tr>
+<tr>
+<td>participant</td>
+<td><code>selectionPort</code></td>
+<td><code>SubmitValueSelection</code></td>
+<td>13</td>
+</tr>
+<tr>
+<td>participant</td>
+<td><code>groupWorkPort</code></td>
+<td><code>AddAction</code>, <code>EditAction</code>, <code>RemoveAction</code>, <code>SubmitGroupWork</code>, <code>ReopenGroupWork</code></td>
+<td>16</td>
+</tr>
+<tr>
+<td>participant</td>
+<td><code>votingPort</code></td>
+<td><code>SubmitFinalVotes</code></td>
+<td>17</td>
+</tr>
+<tr>
+<td>facilitator</td>
+<td><code>sessionStatePort</code></td>
+<td>state stream + connection state</td>
+<td><strong>9</strong></td>
+</tr>
+<tr>
+<td>facilitator</td>
+<td><code>lifecyclePort</code></td>
+<td><code>AdvancePhase</code></td>
+<td><strong>9</strong></td>
+</tr>
+<tr>
+<td>facilitator</td>
+<td><code>quizControlPort</code></td>
+<td><code>RevealAnswer</code>, <code>ShowLearningText</code>, <code>PoseNextQuestion</code></td>
+<td>12</td>
+</tr>
+<tr>
+<td>facilitator</td>
+<td><code>formationPort</code></td>
+<td><code>ReassignScribe</code></td>
+<td>16</td>
+</tr>
+<tr>
+<td>facilitator</td>
+<td><code>walkControlPort</code></td>
+<td><code>GoToNextValue</code>, <code>CorrectActionWording</code>, <code>RevealNextValue</code></td>
+<td>18</td>
+</tr>
+<tr>
+<td>facilitator</td>
+<td><code>votingControlPort</code></td>
+<td><code>CloseVoting</code>, <code>StartTiebreakRound</code></td>
+<td>17</td>
+</tr>
+<tr>
+<td>presenter</td>
+<td><code>sessionStatePort</code></td>
+<td>state stream + connection state</td>
+<td><strong>9</strong></td>
+</tr>
+</tbody>
+</table>
+</div><p>Slices marked <strong>9</strong> are created in Task 9; the rest are created by the task
 that implements their domain logic (Decision 4) — no unused ports, no dead
 handlers. <code>POST /api/sessions</code> (T1) is a <code>sessionCreationPort</code> outside the
 hubs, created in Task 10.</p>
-<p class="my-3 leading-relaxed">Layering inside the frontend adapter (Decision 3, FE rules):</p>
+<p>Layering inside the frontend adapter (Decision 3, FE rules):</p>
 <pre class="rounded-box bg-base-300 p-4 overflow-x-auto text-sm my-4"><code>signalRConnection.ts   only maps @microsoft/signalr promises/callbacks to
                        Single / Completable / Observable — no domain knowledge
 &lt;concern&gt;Adapter.ts    our logic: invoke an intent, map IntentResult, parse
@@ -352,32 +792,32 @@ hubs, created in Task 10.</p>
 &lt;Role&gt;SessionContext   creates the connection bound to sessionIdentity and
                        builds every adapter for that role, once, on entry
 </code></pre>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">8. Voting and tiebreak walk-through</h2>
+<hr>
+<h2>8. Voting and tiebreak walk-through</h2>
 <pre class="mermaid my-6 rounded-box border border-base-300 bg-base-100 p-4">sequenceDiagram
   autonumber
   participant F as Facilitator
   participant S as Server
   participant P as Participants
 
-  Note over S: phase 8 entry — main round, allotment 5,<br/>eligible = all presented values
-  P->>S: SubmitFinalVotes (5 votes, once per person) — I13
-  S-->>P: state (hasVotedThisRound = true, no tallies)
-  S-->>F: state (votedCount grows, no tallies)
-  F->>S: CloseVoting (T19)
+  Note over S: phase 8 entry — main round, allotment 5,&lt;br/&gt;eligible = all presented values
+  P-&gt;&gt;S: SubmitFinalVotes (5 votes, once per person) — I13
+  S--&gt;&gt;P: state (hasVotedThisRound = true, no tallies)
+  S--&gt;&gt;F: state (votedCount grows, no tallies)
+  F-&gt;&gt;S: CloseVoting (T19)
   alt no fifth-place tie
-    S->>S: WinnersDetermined (T20, System)
-    S-->>F: state (winners stand, enabledIntents includes advancePhase)
+    S-&gt;&gt;S: WinnersDetermined (T20, System)
+    S--&gt;&gt;F: state (winners stand, enabledIntents includes advancePhase)
   else fifth-place tie
-    S-->>F: state (tiedValueIds set, closedRoundTallies visible)
-    F->>S: StartTiebreakRound (T21)
-    Note over S: new round — eligible = tied values,<br/>allotment = number of tied values
-    S-->>P: state (roundNumber+1, hasVotedThisRound = false)
+    S--&gt;&gt;F: state (tiedValueIds set, closedRoundTallies visible)
+    F-&gt;&gt;S: StartTiebreakRound (T21)
+    Note over S: new round — eligible = tied values,&lt;br/&gt;allotment = number of tied values
+    S--&gt;&gt;P: state (roundNumber+1, hasVotedThisRound = false)
   end
 </pre>
-<hr />
-<h2 class="text-2xl font-bold mt-10 mb-3 pb-1 border-b border-base-300">9. Non-goals</h2>
-<ul class="list-disc pl-6 space-y-1 my-3">
+<hr>
+<h2>9. Non-goals</h2>
+<ul>
 <li><strong>No protocol versioning.</strong> Frontend and backend ship together from one
 repository in one compose deployment; a mismatched pair is not a supported
 state.</li>
@@ -386,7 +826,7 @@ case (§ 3).</li>
 <li><strong>No domain events on the wire.</strong> Events are a domain-modeling and
 persistence concern; clients see state (Decision 6).</li>
 </ul>
-
+<!-- markdown-body:end -->
   <div class="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4 mt-10">
     <div>
       <div class="font-bold">Protocol approved?</div>
