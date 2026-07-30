@@ -4,7 +4,7 @@ public sealed class Session
 {
     public SessionIdentity Identity { get; }
     public Roster Roster { get; }
-    public WorkshopState State { get; }
+    public PhaseProgress PhaseProgress { get; }
     public QuizProgress Quiz { get; }
     public SelectionRound Selection { get; }
     public FormationRecord Formation { get; }
@@ -15,7 +15,7 @@ public sealed class Session
     {
         Identity = identity;
         Roster = new Roster();
-        State = new WorkshopState();
+        PhaseProgress = new PhaseProgress();
         Quiz = new QuizProgress();
         Selection = new SelectionRound();
         Formation = new FormationRecord();
@@ -26,7 +26,7 @@ public sealed class Session
     internal static Session Restore(
         SessionIdentity identity,
         Roster roster,
-        WorkshopState state,
+        PhaseProgress phaseProgress,
         QuizProgress quiz,
         SelectionRound selection,
         FormationRecord formation,
@@ -37,7 +37,7 @@ public sealed class Session
         return new Session(
             identity,
             roster,
-            state,
+            phaseProgress,
             quiz,
             selection,
             formation,
@@ -49,7 +49,7 @@ public sealed class Session
     private Session(
         SessionIdentity identity,
         Roster roster,
-        WorkshopState state,
+        PhaseProgress phaseProgress,
         QuizProgress quiz,
         SelectionRound selection,
         FormationRecord formation,
@@ -59,7 +59,7 @@ public sealed class Session
     {
         Identity = identity;
         Roster = roster;
-        State = state;
+        PhaseProgress = phaseProgress;
         Quiz = quiz;
         Selection = selection;
         Formation = formation;

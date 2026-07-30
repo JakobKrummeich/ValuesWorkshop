@@ -1,11 +1,11 @@
 namespace ValuesWorkshop.Domain.Tests;
 
-public class WorkshopStateTests
+public class PhaseProgressTests
 {
     [Fact]
     public void Initial_phase_is_Join()
     {
-        new WorkshopState().CurrentPhase.ShouldBe(Phase.Join);
+        new PhaseProgress().CurrentPhase.ShouldBe(Phase.Join);
     }
 
     [Fact]

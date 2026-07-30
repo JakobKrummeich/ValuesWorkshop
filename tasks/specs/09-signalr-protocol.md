@@ -88,8 +88,10 @@ Status: **approved by the user** (Lavish review, 3 rounds).
 
 - `OpenSession` (T1) is `POST /api/sessions`, not a hub method — no session
   exists yet to bind a session-bound connection to.
-- `JoinSession` (T4) / resume (T3) are implicit on participant connect; a late
-  arrival gets `membership = "joiningClosed"` instead of a closed connection.
+- `JoinSession` (T4) / resume (T3) are implicit on participant connect. Late
+  joining is allowed in every phase (user decision during the protocol
+  review); from phase 5 on the joiner is placed into the group with the
+  fewest members (T4a `AddParticipantToGroup`, I8).
 - Facilitator state carries `enabledIntents` so guard logic exists only on the
   server (no duplicated phase rules in the frontend).
 - `revision` is a persisted session column (`design/persistence.md` § 2) and is
