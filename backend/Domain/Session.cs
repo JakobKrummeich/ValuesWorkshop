@@ -23,6 +23,26 @@ public sealed class Session
         Voting = new VotingRounds();
     }
 
+    public void Join(ParticipantId participantId, IRandomness randomness)
+    {
+        if (Roster.Contains(participantId))
+        {
+            return;
+        }
+
+        Roster.Add(participantId);
+
+        if (Formation.IsFormed)
+        {
+            Formation.PlaceIntoSmallestGroup(participantId, randomness);
+        }
+    }
+
+    public void AdvancePhase()
+    {
+        PhaseProgress.Advance();
+    }
+
     internal static Session Restore(
         SessionIdentity identity,
         Roster roster,
