@@ -94,12 +94,17 @@ sequenceDiagram
 Joining is **implicit on connect** (`design/screens.md`: “JoinSession fires
 implicitly on arrival; no form, no button”):
 
-- not on the roster and phase is Join → join (T4), `membership = "joined"`
-- already on the roster → resume (T3), `membership = "joined"`
-- not on the roster and phase is past Join → no mutation,
-  `membership = "joiningClosed"`; the connection stays open and the phone
-  shows the closed-joining notice. The connection is never aborted, because
-  an aborted connection cannot explain itself.
+- not on the roster → join (T4), in **any** phase
+- already on the roster → resume (T3)
+
+Late joining is allowed on purpose: someone who arrives in phase 6 still
+belongs in the room. A joiner takes part in everything still ahead of them
+and contributes nothing to what was already computed — the selection tally
+is fixed on entry to phase 4 (I7) and the value-to-group assignment on entry
+to phase 5 (I8). From phase 5 on, joining also places the newcomer in the
+group with the fewest members (ties random, `ParticipantAddedToGroup`), so
+group sizes still differ by at most one; the newcomer is never that group's
+scribe, and a group that already submitted stays submitted.
 
 ### 3.2 Reconnect and backend restart
 
@@ -197,7 +202,8 @@ presenter connection has nothing to call (Decision 5).
 
 ### 4.4 System transitions
 
-T10 `DetermineTopValues`, T11 `FormGroups`, T12 `AppointScribes`, T20
+T4a `AddParticipantToGroup`, T10 `DetermineTopValues`, T11 `FormGroups`,
+T12 `AppointScribes`, T20
 `WinnersDetermined`, T23 `WorkshopConcluded` have **no wire representation**.
 They fire inside the server as part of the transition that triggers them
 (phase entry, or voting close) and are visible only as changed state. This is
@@ -206,9 +212,9 @@ deliberate: nothing a client sends can influence them.
 ### 4.5 Coverage check
 
 T1 → § 2 (HTTP) · T2, T2a–T2c, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
-§ 4.1 · T3, T4 → § 3.1 · T5, T9, T14, T15, T16, T18 → § 4.2 · T10, T11, T12,
-T20, T23 → § 4.4. All 24 transitions of `design/state-machine.md` § 3 are
-accounted for.
+§ 4.1 · T3, T4 → § 3.1 · T5, T9, T14, T15, T16, T18 → § 4.2 · T4a, T10, T11,
+T12, T20, T23 → § 4.4. All 25 transitions of `design/state-machine.md` § 3
+are accounted for.
 
 ---
 
@@ -232,7 +238,7 @@ relevant, and stays present afterwards where the screen still shows it
 
 | Block | Fields |
 |---|---|
-| membership | `membership` (`joined` \| `joiningClosed`), `participantCount` |
+| membership | `participantCount` |
 | quiz | `questionId`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `ownAnswerId?`, `correctAnswerId?` (only once revealed) |
 | selection | `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?`, `topValueIds?` |
 | ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |

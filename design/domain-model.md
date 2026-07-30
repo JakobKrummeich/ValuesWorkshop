@@ -36,7 +36,7 @@ workshop's native language), English term used in model and code.
 | Moderationskennwort | **Facilitator passphrase** | Shared secret known only to facilitators; opening a session requires it. Participants never hold it. |
 | Phase | **Phase** | One of the nine named stages below. Phases advance forward only, and only the facilitator advances them. |
 | Workshop-Zustand | **Workshop state** | The session's current phase plus its within-phase state (e.g. current quiz question, presented value, tiebreak round, revealed winners). |
-| Teilnehmerliste | **Roster** | Who has joined the session. Membership survives leaving and returning: a returning facilitator or participant resumes their exact place. |
+| Teilnehmerliste | **Roster** | Who has joined the session. It grows in every phase — latecomers are welcome. Membership survives leaving and returning: a returning facilitator or participant resumes their exact place. |
 | Lobby | **Lobby** | Where a participant waits after joining, before the workshop proper begins. |
 | Wiederverbindung | **Reconnect** | A facilitator or participant coming back after an interruption; they keep their role, membership, group, scribe status, and prior submissions. |
 
@@ -81,7 +81,7 @@ workshop's native language), English term used in model and code.
 |---|---|---|
 | Gruppe | **Group** | A named subset of participants working together on a share of the top values. Formed once at the start of group formation and fixed thereafter. |
 | Gruppenname | **Group name** | Friendly animal name identifying a group (e.g. "Otter"). |
-| Gruppeneinteilung | **Group formation** | The one-time act of partitioning all present participants into groups and dealing the top values out across the groups — every top value to exactly one group. Formation aims to give each participant as many of their own ten selected values as possible; sizing follows the group sizing rule. |
+| Gruppeneinteilung | **Group formation** | The one-time act of partitioning all present participants into groups and dealing the top values out across the groups — every top value to exactly one group. Formation aims to give each participant as many of their own ten selected values as possible; sizing follows the group sizing rule. Someone joining after formation is placed into a group with the fewest members — they have no value selection to optimise against, and no value is re-dealt. |
 | Gruppengrößenregel | **Group sizing rule** | Number of groups = at least one, otherwise participants divided by four rounded down. Participants and values are dealt round-robin: sizes differ by at most one, earlier groups get the extra ones. |
 | Verhaltensweise | **Action** | A work-related, everyday, pragmatic action a group formulates for one of its assigned values. Between one and five per assigned value. |
 | Gruppenergebnis | **Group work result** | A group's actions for all its assigned values. |
@@ -164,7 +164,8 @@ belongs to the session it happened in.
 
 | Event | Meaning |
 |---|---|
-| **GroupsFormed** | All present participants were partitioned into animal-named groups per the sizing rule, and the top values were dealt out across them — each top value to exactly one group. Fixed from now on. |
+| **GroupsFormed** | All present participants were partitioned into animal-named groups per the sizing rule, and the top values were dealt out across them — each top value to exactly one group. The value assignment is fixed from now on. |
+| **ParticipantAddedToGroup** | A participant who joined after group formation was placed into a group with the fewest members. |
 
 ### Phase 6 — Group work
 
@@ -212,7 +213,7 @@ when a phase begins or a condition is met — no person issues them.
 |---|---|---|
 | **OpenSession** | Facilitator | Requires the facilitator passphrase. → SessionOpened |
 | **AdvancePhase** | Facilitator | Move to the next of the nine phases; allowed forward only. → PhaseAdvanced (entering some phases triggers System commands below) |
-| **JoinSession** | Participant | Enter the roster of a named session. → ParticipantJoined |
+| **JoinSession** | Participant | Enter the roster of a named session, in any phase. Once groups exist, this also places the joiner into a group with the fewest members. → ParticipantJoined (· ParticipantAddedToGroup) |
 | **PoseNextQuestion** | Facilitator | Make the next quiz question current. → QuestionPosed |
 | **ChooseQuizAnswer** | Participant | Pick one answer option for the current question; second picks are refused. → QuizAnswerChosen |
 | **RevealAnswer** | Facilitator | Disclose the correct option. → AnswerRevealed |
@@ -220,6 +221,7 @@ when a phase begins or a condition is met — no person issues them.
 | **SubmitValueSelection** | Participant | Hand in exactly ten distinct values; fewer, more, or duplicates are refused; resubmission is refused. → ValuesSelected |
 | **DetermineTopValues** | System (entering Selection results) | Fix the top values from the selection tally, widening on a tenth-place tie. → TopValuesDetermined |
 | **FormGroups** | System (entering Group formation) | Partition participants and deal out top values per the sizing rule and the formation aim. → GroupsFormed |
+| **AddParticipantToGroup** | System (a participant joins while groups exist) | Place the joiner into a group with the fewest members; ties are broken at random. No top value is re-dealt. → ParticipantAddedToGroup |
 | **AppointScribes** | System (entering Group work) | Pick one member per group at random. → ScribeAppointed (per group) |
 | **ReassignScribe** | Facilitator | Hand a group's scribe role to another of its members. → ScribeReassigned |
 | **AddAction** | Scribe | Add an action under an assigned value of the own group; refused beyond five per value, refused while submitted, refused for non-scribes. → ActionAdded |
@@ -310,11 +312,11 @@ can refuse a command violating it.
 | I1 | Phases move forward only, in the fixed order 1→9; no skipping, no going back. | Session |
 | I2 | Only the facilitator advances phases and operates sub-controls (question, reveal, learning text, presenting group, close voting, tiebreak). | Session |
 | I3 | Opening a session requires the facilitator passphrase. | Session |
-| I4 | A participant belongs to the roster before acting; a returning person resumes their existing place, never a second one. | Session |
+| I4 | A participant belongs to the roster before acting; joining is open in every phase, and a returning person resumes their existing place, never a second one. | Session |
 | I5 | One quiz answer per participant per question; unchangeable once cast. | Session |
 | I6 | A value selection has exactly ten distinct catalog values and is submitted at most once. | Session |
 | I7 | Top values = the ten most-selected, widened to include all values tied at tenth place. | Session |
-| I8 | Groups are formed exactly once, per the sizing rule; each top value is assigned to exactly one group; membership and assignment never change afterwards. | Session |
+| I8 | Groups are formed exactly once, per the sizing rule; each top value is assigned to exactly one group, and that assignment never changes. Membership changes afterwards only by a participant joining the session late: they are placed into a group with the fewest members, keeping sizes within one of each other. | Session |
 | I9 | A group has exactly one scribe at any time, and the scribe is a member of that group. | Group |
 | I10 | During Group work, only the scribe creates, edits, removes actions and submits or reopens; a reassigned-away scribe is refused immediately. During Value presentation, only the facilitator may correct an action's wording (typo fixes); nothing may be added or removed. | Group |
 | I11 | Every assigned value carries between one and five actions when group work is submitted; no edits while submitted. | Group |
