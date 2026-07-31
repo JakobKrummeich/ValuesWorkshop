@@ -44,11 +44,14 @@ describe("useAuthGuard", () => {
   it("transitions to redirecting and calls loginRedirect when no user emitted", () => {
     mockGetAuthenticatedUser.mockReturnValue(EMPTY);
     mockLoginRedirect.mockReturnValue(EMPTY);
+    window.history.replaceState({}, "", "/participant?sessionIdentity=abc");
 
     const { result } = renderHook(() => useAuthGuard());
 
     expect(result.current.state).toBe(AuthGuardState.Redirecting);
-    expect(mockLoginRedirect).toHaveBeenCalledWith(window.location.pathname);
+    expect(mockLoginRedirect).toHaveBeenCalledWith(
+      "/participant?sessionIdentity=abc",
+    );
   });
 
   it("transitions to error when loginRedirect errors", () => {

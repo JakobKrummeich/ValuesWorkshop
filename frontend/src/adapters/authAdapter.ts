@@ -1,5 +1,6 @@
 import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
 import { defer, filter, ignoreElements } from "rxjs";
+import { currentReturnUrl } from "./browserLocation";
 import type { Completable, Maybe, Single } from "../shared/reactiveTypes";
 
 let userManagerInstance: UserManager | null = null;
@@ -37,7 +38,7 @@ export function getAuthenticatedUser(): Maybe<User> {
 export function loginRedirect(returnUrl?: string): Completable {
   return defer(() =>
     getUserManager().signinRedirect({
-      state: returnUrl ?? window.location.pathname,
+      state: returnUrl ?? currentReturnUrl(),
     }),
   ).pipe(ignoreElements());
 }
