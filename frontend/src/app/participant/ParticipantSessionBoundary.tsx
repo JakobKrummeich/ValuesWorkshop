@@ -2,8 +2,7 @@
 
 import type { ReactNode } from "react";
 import { createParticipantSession } from "../../adapters/workshopSessions";
-import { MissingSession } from "../MissingSession";
-import { useWorkshopSession } from "../useWorkshopSession";
+import { SessionBoundary } from "../SessionBoundary";
 import { ParticipantDependencyProvider } from "./dependencies";
 
 export function ParticipantSessionBoundary({
@@ -11,23 +10,15 @@ export function ParticipantSessionBoundary({
 }: {
   children: ReactNode;
 }) {
-  const { session, isSessionIdentityMissing } = useWorkshopSession(
-    createParticipantSession,
-  );
-
-  if (isSessionIdentityMissing) {
-    return <MissingSession />;
-  }
-
-  if (session === null) {
-    return null;
-  }
-
   return (
-    <ParticipantDependencyProvider
-      dependencies={{ sessionState: session.sessionState }}
-    >
-      <div className="screenParticipant">{children}</div>
-    </ParticipantDependencyProvider>
+    <SessionBoundary createSession={createParticipantSession}>
+      {(session) => (
+        <ParticipantDependencyProvider
+          dependencies={{ sessionState: session.sessionState }}
+        >
+          <div className="screenParticipant">{children}</div>
+        </ParticipantDependencyProvider>
+      )}
+    </SessionBoundary>
   );
 }

@@ -53,7 +53,7 @@ export function wrapHubConnection(
     ConnectionState.Disconnected,
   );
 
-  let lifecycle: Promise<unknown> = Promise.resolve();
+  let lifecycle: Promise<void> = Promise.resolve();
 
   function afterPendingLifecycle(
     operation: () => Promise<void>,
