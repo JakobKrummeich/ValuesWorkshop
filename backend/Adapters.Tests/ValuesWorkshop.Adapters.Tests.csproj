@@ -18,6 +18,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Adapters.Persistence\ValuesWorkshop.Adapters.Persistence.csproj" />
+    <ProjectReference Include="..\Adapters.Web\ValuesWorkshop.Adapters.Web.csproj" />
   </ItemGroup>
 </Project>

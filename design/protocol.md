@@ -63,9 +63,20 @@ with `NotAuthorized`.
 exists yet, so there is nothing to bind a session-bound connection to. It is
 an HTTP request that returns the identity the three hubs are then bound to.
 
-Groups: `facilitator:{sessionIdentity}`, `participant:{sessionIdentity}`,
-`presenter:{sessionIdentity}` — added in `OnConnectedAsync`, removed
-automatically on disconnect.
+Groups: `facilitator:{sessionIdentity}`, `presenter:{sessionIdentity}`, and
+`participant:{sessionIdentity}:{participantId}` — added in `OnConnectedAsync`,
+removed automatically on disconnect. The participant group is per person, not
+per session, because participant state is caller-shaped: it carries the
+caller's own answer, own selection, and own group standing (§ 5.2). One group
+per participant keeps “each client can only be sent its own state” a property
+of the addressing itself; a participant's phone and tablet share that group,
+so both stay in sync.
+
+The `participantId` is derived from the token's `sub` claim (SHA-256 over
+`valuesworkshop:participant:{sub}`), never taken from a payload — the same
+person is the same participant on every device and after every reconnect (I4).
+Browsers cannot set headers on a WebSocket handshake, so SignalR passes the
+bearer token as the `access_token` query parameter on `/hub/*`.
 
 ---
 
