@@ -72,9 +72,22 @@ per participant keeps “each client can only be sent its own state” a propert
 of the addressing itself; a participant's phone and tablet share that group,
 so both stay in sync.
 
-The `participantId` is derived from the token's `sub` claim (SHA-256 over
-`valuesworkshop:participant:{sub}`), never taken from a payload — the same
-person is the same participant on every device and after every reconnect (I4).
+The `participantId` is derived from the token's `sub` claim and the session
+(SHA-256 over `valuesworkshop:participant:{sessionIdentity}:{sub}`), never
+taken from a payload — the same person is the same participant on every device
+and after every reconnect (I4), while the same person attending two workshops
+is two unrelated participants, one per session (`design/persistence.md`:
+`participants.id` is globally unique, and a participant belongs to exactly one
+session).
+
+On the participant hub the connect push *is* the join broadcast: the
+connection joins its own group first, then the join intent runs through the
+same write-before-broadcast path as every other mutation (T4 for a newcomer,
+T3 for a returning phone — both persist and broadcast), so the caller receives
+the full current state without a second, connect-only code path. The
+facilitator and presenter hubs have no intent on connect and therefore push
+the state to the caller directly. An unknown `sessionIdentity` closes the
+connection with that reason instead of pushing state.
 Browsers cannot set headers on a WebSocket handshake, so SignalR passes the
 bearer token as the `access_token` query parameter on `/hub/*`.
 
