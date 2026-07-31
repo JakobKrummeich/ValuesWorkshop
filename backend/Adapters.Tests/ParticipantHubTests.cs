@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.Intents;
+using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Adapters.Tests;
@@ -52,6 +53,19 @@ public class ParticipantHubTests
         session.Revision.ShouldBe(0);
         repository.Saved.ShouldBeEmpty();
         broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_reconnecting_participant_is_pushed_its_state_immediately()
+    {
+        var session = new Session(KnownSession);
+        session.Join(Anna, new FixedRandomness(0));
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        await hub.OnConnectedAsync();
+
+        clients.CallerClient.Single<ParticipantWorkshopState>().ShouldBeOfType<ParticipantJoinState>();
     }
 
     [Fact]
@@ -108,7 +122,9 @@ public class ParticipantHubTests
     private ParticipantHub HubWithContext(FakeHubCallerContext context)
     {
         return new ParticipantHub(
+            repository,
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            new WorkshopStateCache(),
             new FixedRandomness(0),
             registry
         )

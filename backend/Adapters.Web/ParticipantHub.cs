@@ -2,12 +2,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using ValuesWorkshop.Application.Intents;
 using ValuesWorkshop.Domain;
+using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Adapters.Web;
 
 [Authorize]
 public sealed class ParticipantHub(
+    ISessionRepository repository,
     IntentPipeline pipeline,
+    WorkshopStateCache cache,
     IRandomness randomness,
     SessionConnectionRegistry registry
 ) : Hub<IParticipantClient>
@@ -32,6 +35,11 @@ public sealed class ParticipantHub(
         {
             throw new HubException(joinResult.Detail);
         }
+
+        var session = await HubSessionLoader.RequiredAsync(repository, sessionIdentity);
+        await Clients.Caller.ReceiveWorkshopState(
+            cache.StatesOf(session).Participants[participantId]
+        );
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
