@@ -14,7 +14,7 @@ export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
   const { lifecycle } = useFacilitatorDependencies();
   const [isAdvancing, setAdvancing] = useState(false);
   const [rejectionDetail, setRejectionDetail] = useState<string | null>(null);
-  const subscriptions = useRef<Subscription>(null!);
+  const subscriptions = useRef<Subscription>(new Subscription());
 
   useEffect(() => {
     subscriptions.current = new Subscription();

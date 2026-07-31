@@ -240,6 +240,6 @@ internal sealed class FixedRandomness(int index) : IRandomness
 {
     public int NextIndex(int exclusiveUpperBound)
     {
-        return index;
+        return index % exclusiveUpperBound;
     }
 }

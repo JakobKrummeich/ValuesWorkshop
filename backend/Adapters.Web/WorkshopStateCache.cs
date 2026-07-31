@@ -19,9 +19,12 @@ public sealed class WorkshopStateCache
         }
 
         var mapped = MapAllRoles(session);
-        statesBySession[session.Identity] = mapped;
 
-        return mapped;
+        return statesBySession.AddOrUpdate(
+            session.Identity,
+            _ => mapped,
+            (_, existing) => existing.Revision >= mapped.Revision ? existing : mapped
+        );
     }
 
     public SessionRoleStates? LatestOf(SessionIdentity sessionIdentity)
