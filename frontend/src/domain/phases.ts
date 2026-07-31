@@ -1,13 +1,11 @@
-export const PHASES = [
-  "join",
-  "quiz",
-  "valueSelection",
-  "selectionResults",
-  "groupFormation",
-  "groupWork",
-  "valuePresentation",
-  "finalVoting",
-  "finalPresentation",
-] as const;
-
-export type Phase = (typeof PHASES)[number];
+export enum Phase {
+  Join = 1,
+  Quiz = 2,
+  ValueSelection = 3,
+  SelectionResults = 4,
+  GroupFormation = 5,
+  GroupWork = 6,
+  ValuePresentation = 7,
+  FinalVoting = 8,
+  FinalPresentation = 9,
+}
