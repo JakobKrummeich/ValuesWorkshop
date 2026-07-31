@@ -20,10 +20,27 @@ public sealed class WorkshopTestFactory : WebApplicationFactory<AssemblyMarker>
         "test-signing-key-that-is-long-enough-for-hmac-sha256"u8.ToArray()
     );
 
-    private readonly string databasePath = Path.Combine(
-        Path.GetTempPath(),
-        $"valuesworkshop-tests-{Guid.NewGuid()}.db"
-    );
+    private readonly string databasePath;
+    private readonly bool ownsDatabaseFile;
+
+    public WorkshopTestFactory()
+        : this(TemporaryDatabasePath(), ownsDatabaseFile: true) { }
+
+    private WorkshopTestFactory(string databasePath, bool ownsDatabaseFile)
+    {
+        this.databasePath = databasePath;
+        this.ownsDatabaseFile = ownsDatabaseFile;
+    }
+
+    internal static string TemporaryDatabasePath()
+    {
+        return Path.Combine(Path.GetTempPath(), $"valuesworkshop-tests-{Guid.NewGuid()}.db");
+    }
+
+    internal static WorkshopTestFactory On(string databasePath)
+    {
+        return new WorkshopTestFactory(databasePath, ownsDatabaseFile: false);
+    }
 
     internal static string TokenFor(
         string subject,
@@ -66,7 +83,11 @@ public sealed class WorkshopTestFactory : WebApplicationFactory<AssemblyMarker>
         if (disposing)
         {
             SqliteConnection.ClearAllPools();
-            File.Delete(databasePath);
+
+            if (ownsDatabaseFile)
+            {
+                File.Delete(databasePath);
+            }
         }
     }
 
