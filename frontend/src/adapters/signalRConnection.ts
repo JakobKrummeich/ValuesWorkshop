@@ -53,6 +53,16 @@ export function wrapHubConnection(
     ConnectionState.Disconnected,
   );
 
+  let lifecycle: Promise<unknown> = Promise.resolve();
+
+  function afterPendingLifecycle(
+    operation: () => Promise<void>,
+  ): Promise<void> {
+    const queued = lifecycle.then(operation, operation);
+    lifecycle = queued.catch(() => undefined);
+    return queued;
+  }
+
   hubConnection.onreconnecting(() => state.next(ConnectionState.Reconnecting));
   hubConnection.onreconnected(() => state.next(ConnectionState.Connected));
   hubConnection.onclose(() => state.next(ConnectionState.Disconnected));
@@ -61,18 +71,23 @@ export function wrapHubConnection(
     connectionState: state.asObservable(),
 
     start: () =>
-      defer(() => {
-        state.next(ConnectionState.Connecting);
-        return hubConnection
-          .start()
-          .then(() => state.next(ConnectionState.Connected))
-          .catch((error: unknown) => {
-            state.next(ConnectionState.Disconnected);
-            throw error;
-          });
-      }).pipe(ignoreElements()),
+      defer(() =>
+        afterPendingLifecycle(() => {
+          state.next(ConnectionState.Connecting);
+          return hubConnection
+            .start()
+            .then(() => state.next(ConnectionState.Connected))
+            .catch((error: unknown) => {
+              state.next(ConnectionState.Disconnected);
+              throw error;
+            });
+        }),
+      ).pipe(ignoreElements()),
 
-    stop: () => defer(() => hubConnection.stop()).pipe(ignoreElements()),
+    stop: () =>
+      defer(() => afterPendingLifecycle(() => hubConnection.stop())).pipe(
+        ignoreElements(),
+      ),
 
     on: (methodName: string) =>
       new Observable<unknown>((subscriber) => {

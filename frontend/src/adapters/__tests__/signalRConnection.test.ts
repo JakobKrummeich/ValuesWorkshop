@@ -181,6 +181,55 @@ describe("signalR connection wrapper", () => {
 
     expect(fake.stop).toHaveBeenCalled();
   });
+
+  it("runs a stop after a pending start instead of overlapping them", async () => {
+    const fake = createFakeHubConnection();
+    const calls: string[] = [];
+    let releaseStart = () => undefined as void;
+    fake.start.mockReturnValue(
+      new Promise<void>((resolve) => {
+        releaseStart = () => resolve();
+      }).then(() => {
+        calls.push("start");
+      }),
+    );
+    fake.stop.mockImplementation(() => {
+      calls.push("stop");
+      return Promise.resolve();
+    });
+    const connection = wrapHubConnection(fake.hubConnection);
+
+    connection.start().subscribe();
+    const stopped = new Promise<void>((resolve) =>
+      connection.stop().subscribe({ complete: () => resolve() }),
+    );
+    expect(calls).toEqual([]);
+    releaseStart();
+    await stopped;
+
+    expect(calls).toEqual(["start", "stop"]);
+  });
+
+  it("starts again once a start aborted by a stop has settled", async () => {
+    const fake = createFakeHubConnection();
+    fake.start
+      .mockReturnValueOnce(
+        Promise.reject(
+          new Error("The connection was stopped during negotiation"),
+        ),
+      )
+      .mockReturnValue(Promise.resolve());
+    const connection = wrapHubConnection(fake.hubConnection);
+
+    connection.start().subscribe({ error: () => undefined });
+    connection.stop().subscribe();
+    await new Promise<void>((resolve) =>
+      connection.start().subscribe({ complete: () => resolve() }),
+    );
+
+    expect(fake.start).toHaveBeenCalledTimes(2);
+    expect(fake.stop).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("reconnect backoff", () => {
