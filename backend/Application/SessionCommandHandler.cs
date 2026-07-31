@@ -13,6 +13,8 @@ public sealed class SessionCommandHandler(ISessionRepository repository, IBroadc
 
         mutation(session);
 
+        session.BumpRevision();
+
         await repository.SaveAsync(session);
 
         await broadcaster.BroadcastSessionStateAsync(session);

@@ -40,7 +40,8 @@ public class SessionAdvancePhaseTests
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, [])
+            VotingRounds.Restore(false, 0, []),
+            revision: 0
         );
     }
 }

@@ -10,6 +10,7 @@ public sealed class Session
     public FormationRecord Formation { get; }
     public PresentationWalk Presentation { get; }
     public VotingRounds Voting { get; }
+    public long Revision { get; private set; }
 
     public Session(SessionIdentity identity)
     {
@@ -43,6 +44,11 @@ public sealed class Session
         PhaseProgress.Advance();
     }
 
+    public void BumpRevision()
+    {
+        Revision++;
+    }
+
     internal static Session Restore(
         SessionIdentity identity,
         Roster roster,
@@ -51,7 +57,8 @@ public sealed class Session
         SelectionRound selection,
         FormationRecord formation,
         PresentationWalk presentation,
-        VotingRounds voting
+        VotingRounds voting,
+        long revision
     )
     {
         return new Session(
@@ -63,7 +70,10 @@ public sealed class Session
             formation,
             presentation,
             voting
-        );
+        )
+        {
+            Revision = revision,
+        };
     }
 
     private Session(

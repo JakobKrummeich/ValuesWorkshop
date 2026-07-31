@@ -20,7 +20,8 @@ internal static class SessionFixtures
         SelectionRound? selection = null,
         FormationRecord? formation = null,
         PresentationWalk? presentation = null,
-        VotingRounds? voting = null
+        VotingRounds? voting = null,
+        long revision = 0
     )
     {
         return Session.Restore(
@@ -31,7 +32,8 @@ internal static class SessionFixtures
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null),
-            voting ?? VotingRounds.Restore(false, 0, [])
+            voting ?? VotingRounds.Restore(false, 0, []),
+            revision
         );
     }
 

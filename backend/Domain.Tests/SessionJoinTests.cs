@@ -154,7 +154,8 @@ public class SessionJoinTests
             SelectionRound.Restore([], []),
             formation,
             PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, [])
+            VotingRounds.Restore(false, 0, []),
+            revision: 0
         );
     }
 }

@@ -29,6 +29,30 @@ public class IntentPipelineTests
     }
 
     [Fact]
+    public async Task An_accepted_intent_bumps_the_revision_before_it_is_persisted()
+    {
+        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Quiz, revision: 4));
+        var broadcaster = new RecordingBroadcaster();
+        var pipeline = PipelineOver(repository, broadcaster);
+
+        await pipeline.ExecuteAsync(KnownSession, session => session.AdvancePhase());
+
+        repository.Saved.ShouldHaveSingleItem().Revision.ShouldBe(5);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(5);
+    }
+
+    [Fact]
+    public async Task A_rejected_intent_leaves_the_revision_untouched()
+    {
+        var session = SessionFixtures.InPhase(Phase.FinalPresentation, revision: 4);
+        var pipeline = PipelineOver(RepositoryWith(session), new RecordingBroadcaster());
+
+        await pipeline.ExecuteAsync(KnownSession, mutatedSession => mutatedSession.AdvancePhase());
+
+        session.Revision.ShouldBe(4);
+    }
+
+    [Fact]
     public async Task An_intent_for_an_unknown_session_changes_nothing()
     {
         var repository = new FakeSessionRepository();
