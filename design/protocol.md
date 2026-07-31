@@ -80,14 +80,14 @@ is two unrelated participants, one per session (`design/persistence.md`:
 `participants.id` is globally unique, and a participant belongs to exactly one
 session).
 
-On the participant hub the connect push *is* the join broadcast: the
-connection joins its own group first, then the join intent runs through the
-same write-before-broadcast path as every other mutation (T4 for a newcomer,
-T3 for a returning phone — both persist and broadcast), so the caller receives
-the full current state without a second, connect-only code path. The
-facilitator and presenter hubs have no intent on connect and therefore push
-the state to the caller directly. An unknown `sessionIdentity` closes the
-connection with that reason instead of pushing state.
+On the participant hub, `OnConnectedAsync` runs the join intent through the
+pipeline and then pushes the current state to the caller directly — the same
+pattern the facilitator and presenter hubs use. For a newcomer (T4) the join
+mutates the roster, persists, bumps `revision`, and broadcasts to all three
+role groups. For a returning participant (T3) the join is a no-op: no
+mutation, no persist, no revision bump, no broadcast — the direct caller push
+is the only message sent. An unknown `sessionIdentity` closes the connection
+with that reason instead of pushing state.
 Browsers cannot set headers on a WebSocket handshake, so SignalR passes the
 bearer token as the `access_token` query parameter on `/hub/*`.
 
@@ -112,7 +112,11 @@ sequenceDiagram
   P->>PH: connect(sessionIdentity, bearer token)
   PH->>PH: JoinSession or resume (T4 / T3, I4)
   PH-->>P: ReceiveWorkshopState(full participant state)
-  PH-->>PH: broadcast to all three role groups (roster changed)
+  alt newcomer (T4)
+    PH-->>PH: broadcast to all three role groups (roster changed)
+  else returning (T3)
+    Note over PH: no-op — no persist, no broadcast, no revision bump
+  end
 ```
 
 Joining is **implicit on connect** (`design/screens.md`: “JoinSession fires
