@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  align-items: flex-start;
+}
+
+.button {
+  min-height: var(--control-height);
+  padding: var(--space-tight) var(--space-gutter);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+}
+
+.button:disabled {
+  background: var(--color-text-muted);
+}
+
+.rejection {
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+}

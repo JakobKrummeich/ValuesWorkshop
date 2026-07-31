@@ -1,6 +1,6 @@
 import type { HubConnection } from "@microsoft/signalr";
+import { ConnectionState } from "../../domain/connectionState";
 import {
-  ConnectionState,
   buildHubConnection,
   createSignalRConnection,
   exponentialBackoffRetryPolicy,

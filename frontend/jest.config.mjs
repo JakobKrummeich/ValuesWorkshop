@@ -4,6 +4,7 @@ const createJestConfig = nextJest({ dir: "./" });
 
 export default createJestConfig({
   testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
     "!src/**/*.test.{ts,tsx}",

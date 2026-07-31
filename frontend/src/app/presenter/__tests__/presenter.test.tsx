@@ -1,15 +1,63 @@
-import { renderToString } from "react-dom/server";
+import { render, screen, act } from "@testing-library/react";
+import { EMPTY, Subject, of } from "rxjs";
+import { ConnectionState } from "../../../domain/connectionState";
+import { Phase } from "../../../domain/phases";
+import type { PresenterWorkshopState } from "../../../domain/workshopState";
+import { currentSessionIdentity } from "../../../adapters/browserLocation";
+import { createPresenterSession } from "../../../adapters/workshopSessions";
 import PresenterLayout from "../layout";
 import PresenterHome from "../page";
 
-describe("presenter screen group", () => {
-  it("receives its gateway through its own dependency context", () => {
-    const html = renderToString(
-      <PresenterLayout>
-        <PresenterHome />
-      </PresenterLayout>,
-    );
+jest.mock("../../../adapters/browserLocation", () => ({
+  currentSessionIdentity: jest.fn(),
+}));
+jest.mock("../../../adapters/workshopSessions", () => ({
+  createPresenterSession: jest.fn(),
+}));
 
-    expect(html).toContain("stub-session");
+const sessionIdentity = currentSessionIdentity as jest.MockedFunction<
+  typeof currentSessionIdentity
+>;
+const createSession = createPresenterSession as jest.MockedFunction<
+  typeof createPresenterSession
+>;
+
+const workshopState = new Subject<PresenterWorkshopState>();
+
+beforeEach(() => {
+  sessionIdentity.mockReturnValue("session-7");
+  createSession.mockReturnValue({
+    sessionState: {
+      workshopState,
+      connectionState: of(ConnectionState.Reconnecting),
+    },
+    start: () => EMPTY,
+    close: () => EMPTY,
+  });
+});
+
+afterEach(() => {
+  jest.clearAllMocks();
+});
+
+describe("presenter screen group", () => {
+  it("renders its anonymous state without asking for a login", async () => {
+    await act(async () => {
+      render(
+        <PresenterLayout>
+          <PresenterHome />
+        </PresenterLayout>,
+      );
+    });
+
+    act(() => {
+      workshopState.next({
+        revision: 2,
+        phase: Phase.Join,
+      } as PresenterWorkshopState);
+    });
+
+    expect(screen.getByTestId("phase")).toHaveTextContent("Phase 1");
+    expect(screen.getByTestId("connection")).toHaveTextContent("reconnecting");
   });
 });

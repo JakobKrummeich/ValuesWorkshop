@@ -118,6 +118,11 @@ export const presenterWorkshopStateSchema = z.object({
   conclusion: conclusionViewSchema.nullable(),
 });
 
+export interface PhasedWorkshopState {
+  revision: number;
+  phase: Phase;
+}
+
 export type ParticipantWorkshopState = z.infer<
   typeof participantWorkshopStateSchema
 >;

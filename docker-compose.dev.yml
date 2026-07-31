@@ -34,6 +34,7 @@ services:
       NEXT_PUBLIC_OIDC_AUTHORITY: http://localhost:9000
       NEXT_PUBLIC_OIDC_CLIENT_ID: valuesworkshop
       NEXT_PUBLIC_OIDC_REDIRECT_URI: http://localhost:3000/auth/callback
+      NEXT_PUBLIC_HUB_BASE_URL: http://localhost:5000
 
   oidc:
     build:

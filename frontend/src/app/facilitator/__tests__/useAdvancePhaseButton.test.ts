@@ -1,0 +1,97 @@
+import { renderHook, act } from "@testing-library/react";
+import { NEVER, Observable, of, throwError } from "rxjs";
+import type { IntentResult } from "../../../domain/intentResult";
+import { IntentRejectionCode } from "../../../domain/intentResult";
+import type { Single } from "../../../shared/reactiveTypes";
+import { useFacilitatorDependencies } from "../dependencies";
+import { useAdvancePhaseButton } from "../useAdvancePhaseButton";
+
+jest.mock("../dependencies", () => ({
+  useFacilitatorDependencies: jest.fn(),
+}));
+
+const dependencies = useFacilitatorDependencies as jest.MockedFunction<
+  typeof useFacilitatorDependencies
+>;
+
+function withAdvancePhase(advancePhase: () => Single<IntentResult>) {
+  dependencies.mockReturnValue({
+    sessionState: { workshopState: NEVER, connectionState: NEVER },
+    lifecycle: { advancePhase },
+  });
+}
+
+describe("advance phase button logic", () => {
+  it("shows no rejection before anything is pressed", () => {
+    withAdvancePhase(() => NEVER);
+
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    expect(result.current).toEqual(
+      expect.objectContaining({ isAdvancing: false, rejectionDetail: null }),
+    );
+  });
+
+  it("clears the rejection when the intent is accepted", () => {
+    withAdvancePhase(() =>
+      of({ isAccepted: true, code: null, detail: null } as IntentResult),
+    );
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    act(() => result.current.advancePhase());
+
+    expect(result.current.rejectionDetail).toBeNull();
+    expect(result.current.isAdvancing).toBe(false);
+  });
+
+  it("shows the detail of a rejected intent", () => {
+    withAdvancePhase(() =>
+      of({
+        isAccepted: false,
+        code: IntentRejectionCode.WrongPhase,
+        detail: "the workshop is already in its last phase",
+      } as IntentResult),
+    );
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    act(() => result.current.advancePhase());
+
+    expect(result.current.rejectionDetail).toBe(
+      "the workshop is already in its last phase",
+    );
+  });
+
+  it("shows a transport failure as its message", () => {
+    withAdvancePhase(() => throwError(() => new Error("connection is closed")));
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    act(() => result.current.advancePhase());
+
+    expect(result.current.rejectionDetail).toBe("connection is closed");
+  });
+
+  it("disables itself while the intent is in flight", () => {
+    withAdvancePhase(() => NEVER);
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    act(() => result.current.advancePhase());
+
+    expect(result.current.isAdvancing).toBe(true);
+  });
+
+  it("abandons an in-flight intent when the screen is left", () => {
+    let isAbandoned = false;
+    withAdvancePhase(
+      () =>
+        new Observable<IntentResult>(() => () => {
+          isAbandoned = true;
+        }),
+    );
+    const { result, unmount } = renderHook(() => useAdvancePhaseButton());
+
+    act(() => result.current.advancePhase());
+    unmount();
+
+    expect(isAbandoned).toBe(true);
+  });
+});

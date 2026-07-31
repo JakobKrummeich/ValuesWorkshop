@@ -1,10 +1,12 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { FacilitatorGateway } from "../../domain/ports/facilitatorGateway";
+import type { FacilitatorLifecyclePort } from "../../domain/ports/facilitator/lifecyclePort";
+import type { FacilitatorSessionStatePort } from "../../domain/ports/facilitator/sessionStatePort";
 
 export interface FacilitatorDependencies {
-  gateway: FacilitatorGateway;
+  sessionState: FacilitatorSessionStatePort;
+  lifecycle: FacilitatorLifecyclePort;
 }
 
 const FacilitatorDependencyContext =

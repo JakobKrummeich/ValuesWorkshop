@@ -5,14 +5,8 @@ import {
   type RetryContext,
 } from "@microsoft/signalr";
 import { BehaviorSubject, Observable, defer, ignoreElements } from "rxjs";
+import { ConnectionState } from "../domain/connectionState";
 import type { Completable, Single } from "../shared/reactiveTypes";
-
-export enum ConnectionState {
-  Disconnected = "disconnected",
-  Connecting = "connecting",
-  Connected = "connected",
-  Reconnecting = "reconnecting",
-}
 
 export interface SignalRConnection {
   readonly connectionState: Observable<ConnectionState>;
