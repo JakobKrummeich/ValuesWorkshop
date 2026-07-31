@@ -14,13 +14,13 @@ export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
   const { lifecycle } = useFacilitatorDependencies();
   const [isAdvancing, setAdvancing] = useState(false);
   const [rejectionDetail, setRejectionDetail] = useState<string | null>(null);
-  const subscriptions = useRef(new Subscription());
+  const subscriptions = useRef<Subscription>(null!);
 
   useEffect(() => {
-    const pending = subscriptions.current;
+    subscriptions.current = new Subscription();
 
     return () => {
-      pending.unsubscribe();
+      subscriptions.current.unsubscribe();
     };
   }, []);
 
