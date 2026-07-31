@@ -2,6 +2,7 @@ import Provider from "oidc-provider";
 
 const port = Number(process.env.OIDC_PORT ?? 9000);
 const issuer = process.env.OIDC_ISSUER ?? `http://localhost:${port}`;
+const apiResource = process.env.OIDC_API_RESOURCE ?? "http://localhost:5000";
 
 const testAccounts = {
   facilitator: { name: "Workshop Facilitator" },
@@ -33,10 +34,16 @@ const provider = new Provider(issuer, {
   features: {
     devInteractions: { enabled: true },
     revocation: { enabled: true },
-  },
-
-  formats: {
-    AccessToken: "jwt",
+    resourceIndicators: {
+      enabled: true,
+      defaultResource: () => apiResource,
+      useGrantedResource: () => true,
+      getResourceServerInfo: () => ({
+        audience: apiResource,
+        scope: "openid profile",
+        accessTokenFormat: "jwt",
+      }),
+    },
   },
 
   ttl: {
