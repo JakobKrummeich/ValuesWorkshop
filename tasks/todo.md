@@ -191,7 +191,10 @@ tab close/reopen restores facilitator control and participant membership.
 - [ ] Wrong/absent facilitator PW → creation rejected
 - [ ] Reconnect (both roles) restores role + session view without rejoin
 - [ ] Membership survives backend restart
-**Verification:** BE tests + Playwright reconnect smoke.
+**Verification:** BE tests + Playwright reconnect smoke, including the browser
+loop deferred from Task 9 (participant joins → facilitator advances phase →
+presenter and participant re-render → backend restart → clients reconnect and
+show identical state), which needs `POST /api/sessions` to seed a session.
 **Dependencies:** 7, 8, 9. **Size:** M
 
 ### Task 11: Phase state machine

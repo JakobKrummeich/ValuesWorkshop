@@ -147,4 +147,18 @@ kill/restart backend → clients reconnect and show identical state.
 6. FE `signalRConnection.ts` wrapper + Zod schemas + marble tests
 7. FE port slices + per-slice adapters + role dependency contexts;
    delete stub gateways
-8. E2E smoke: join → advance → reconnect → restart recovery
+8. E2E smoke: session-less links, hub rejection of missing/forged tokens,
+   and a BE restart test proving a reconnecting client is pushed the state
+   that survived
+
+## Deferred to Task 10
+
+A committed browser smoke of join → advance → reconnect needs a session that
+exists, and nothing can create one until `POST /api/sessions` lands in Task 10.
+The full browser loop was run manually against the dev stack in this task
+(presenter live phase, facilitator advance mirrored to the presenter, backend
+kill → `reconnecting` → restart → `connected` with the persisted phase) and is
+committed as an automated Playwright spec in Task 10.
+
+`joinPort` was dropped: joining is implicit on connect, so `design/protocol.md`
+§7 lists only the four port slices that were built.
