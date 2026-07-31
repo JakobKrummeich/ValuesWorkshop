@@ -23,6 +23,7 @@ public class ParticipantHubTests
     private readonly RecordingBroadcaster broadcaster = new();
     private readonly RecordingHubClients<IParticipantClient> clients = new();
     private readonly RecordingGroupManager groups = new();
+    private readonly SessionConnectionRegistry registry = new();
 
     [Fact]
     public async Task Connecting_puts_a_newcomer_on_the_roster_and_broadcasts_the_new_state()
@@ -106,7 +107,8 @@ public class ParticipantHubTests
     {
         return new ParticipantHub(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            new FixedRandomness(0)
+            new FixedRandomness(0),
+            registry
         )
         {
             Clients = clients,

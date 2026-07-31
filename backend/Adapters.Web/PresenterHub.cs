@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Adapters.Web;
 
 [AllowAnonymous]
-public sealed class PresenterHub(ISessionRepository repository) : Hub<IPresenterClient>
+public sealed class PresenterHub(
+    ISessionRepository repository,
+    WorkshopStateCache cache,
+    SessionConnectionRegistry registry
+) : Hub<IPresenterClient>
 {
     public override async Task OnConnectedAsync()
     {
@@ -17,9 +20,15 @@ public sealed class PresenterHub(ISessionRepository repository) : Hub<IPresenter
             Context.ConnectionId,
             SessionGroups.Presenter(sessionIdentity)
         );
+        registry.Add(sessionIdentity, Context.ConnectionId);
 
-        await Clients.Caller.ReceiveWorkshopState(
-            PresenterWorkshopStateMapper.Map(session, session.Revision)
-        );
+        await Clients.Caller.ReceiveWorkshopState(cache.StatesOf(session).Presenter);
+    }
+
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        registry.Remove(Context.ConnectionId);
+
+        return base.OnDisconnectedAsync(exception);
     }
 }

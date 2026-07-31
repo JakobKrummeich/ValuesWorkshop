@@ -20,4 +20,19 @@ internal sealed class StateInbox<TState>
 
         return await received.Reader.ReadAsync(patience.Token);
     }
+
+    internal async Task<TState> NextMatchingAsync(Func<TState, bool> expectation)
+    {
+        using var patience = new CancellationTokenSource(Patience);
+
+        while (true)
+        {
+            var state = await received.Reader.ReadAsync(patience.Token);
+
+            if (expectation(state))
+            {
+                return state;
+            }
+        }
+    }
 }

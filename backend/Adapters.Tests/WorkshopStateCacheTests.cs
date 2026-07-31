@@ -1,0 +1,83 @@
+using ValuesWorkshop.Adapters.Web;
+using ValuesWorkshop.Domain;
+
+namespace ValuesWorkshop.Adapters.Tests;
+
+public class WorkshopStateCacheTests
+{
+    private static readonly SessionIdentity KnownSession = new(
+        Guid.Parse("00000000-0000-0000-0000-00000000f00d")
+    );
+
+    private readonly WorkshopStateCache cache = new();
+
+    [Fact]
+    public void An_unchanged_session_is_mapped_only_once()
+    {
+        var session = new Session(KnownSession);
+        session.BumpRevision();
+
+        var first = cache.StatesOf(session);
+        var second = cache.StatesOf(session);
+
+        second.ShouldBeSameAs(first);
+    }
+
+    [Fact]
+    public void A_new_revision_is_mapped_again()
+    {
+        var session = new Session(KnownSession);
+        session.BumpRevision();
+        var first = cache.StatesOf(session);
+
+        session.AdvancePhase();
+        session.BumpRevision();
+        var second = cache.StatesOf(session);
+
+        second.ShouldNotBeSameAs(first);
+        second.Revision.ShouldBe(2);
+        second.Facilitator.Phase.ShouldBe(Phase.Quiz);
+    }
+
+    [Fact]
+    public void Every_roster_participant_gets_their_own_mapped_state()
+    {
+        var session = new Session(KnownSession);
+        var anna = new ParticipantId(Guid.NewGuid());
+        session.Join(anna, new FixedRandomness(0));
+        session.BumpRevision();
+
+        var states = cache.StatesOf(session);
+
+        states.Participants.Keys.ShouldBe([anna]);
+        states.Participants[anna].ParticipantCount.ShouldBe(1);
+    }
+
+    [Fact]
+    public void The_latest_state_of_an_unseen_session_is_unknown()
+    {
+        cache.LatestOf(KnownSession).ShouldBeNull();
+    }
+
+    [Fact]
+    public void Sessions_that_are_no_longer_connected_are_forgotten()
+    {
+        var session = new Session(KnownSession);
+        cache.StatesOf(session);
+
+        cache.RetainOnly([new SessionIdentity(Guid.NewGuid())]);
+
+        cache.LatestOf(KnownSession).ShouldBeNull();
+    }
+
+    [Fact]
+    public void Sessions_that_are_still_connected_are_kept()
+    {
+        var session = new Session(KnownSession);
+        cache.StatesOf(session);
+
+        cache.RetainOnly([KnownSession]);
+
+        cache.LatestOf(KnownSession).ShouldNotBeNull();
+    }
+}

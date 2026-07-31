@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,20 @@ builder.Services.AddScoped<IBroadcaster, SignalRBroadcaster>();
 builder.Services.AddScoped<SessionCommandHandler>();
 builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
+builder.Services.AddSingleton<WorkshopStateCache>();
+builder.Services.AddSingleton<SessionConnectionRegistry>();
+builder.Services.AddSingleton<RoleStateDispatcher>();
+builder.Services.AddSingleton(
+    new StateResendInterval(
+        TimeSpan.FromMilliseconds(
+            double.Parse(
+                builder.Configuration["STATE_RESEND_INTERVAL_MS"] ?? "500",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
+builder.Services.AddHostedService<StateResendService>();
 builder.Services.AddSignalR();
 
 var oidcAuthority = Environment.GetEnvironmentVariable("OIDC_AUTHORITY") ?? "http://localhost:9000";

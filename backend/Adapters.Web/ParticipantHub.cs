@@ -6,8 +6,11 @@ using ValuesWorkshop.Domain;
 namespace ValuesWorkshop.Adapters.Web;
 
 [Authorize]
-public sealed class ParticipantHub(IntentPipeline pipeline, IRandomness randomness)
-    : Hub<IParticipantClient>
+public sealed class ParticipantHub(
+    IntentPipeline pipeline,
+    IRandomness randomness,
+    SessionConnectionRegistry registry
+) : Hub<IParticipantClient>
 {
     public override async Task OnConnectedAsync()
     {
@@ -18,6 +21,7 @@ public sealed class ParticipantHub(IntentPipeline pipeline, IRandomness randomne
             Context.ConnectionId,
             SessionGroups.Participant(sessionIdentity, participantId)
         );
+        registry.Add(sessionIdentity, Context.ConnectionId);
 
         var joinResult = await pipeline.ExecuteAsync(
             sessionIdentity,
@@ -28,5 +32,12 @@ public sealed class ParticipantHub(IntentPipeline pipeline, IRandomness randomne
         {
             throw new HubException(joinResult.Detail);
         }
+    }
+
+    public override Task OnDisconnectedAsync(Exception? exception)
+    {
+        registry.Remove(Context.ConnectionId);
+
+        return base.OnDisconnectedAsync(exception);
     }
 }

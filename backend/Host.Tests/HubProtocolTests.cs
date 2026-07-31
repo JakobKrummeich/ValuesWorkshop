@@ -49,9 +49,9 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
         );
 
         result.IsAccepted.ShouldBeTrue();
-        (await participantInbox.NextAsync()).Phase.ShouldBe(Phase.Quiz);
-        (await presenterInbox.NextAsync()).Phase.ShouldBe(Phase.Quiz);
-        (await facilitatorInbox.NextAsync()).Phase.ShouldBe(Phase.Quiz);
+        await participantInbox.NextMatchingAsync(state => state.Phase == Phase.Quiz);
+        await presenterInbox.NextMatchingAsync(state => state.Phase == Phase.Quiz);
+        await facilitatorInbox.NextMatchingAsync(state => state.Phase == Phase.Quiz);
     }
 
     [Fact]
@@ -86,6 +86,19 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
     }
 
     [Fact]
+    public async Task The_latest_state_is_resent_so_a_dropped_message_heals_itself()
+    {
+        var sessionIdentity = await SeededSession();
+        var (_, inbox) = await ConnectPresenter(sessionIdentity);
+
+        var onConnect = await inbox.NextAsync();
+        var resent = await inbox.NextAsync();
+
+        resent.Revision.ShouldBe(onConnect.Revision);
+        resent.Phase.ShouldBe(onConnect.Phase);
+    }
+
+    [Fact]
     public async Task Two_participants_each_receive_their_own_state()
     {
         var sessionIdentity = await SeededSession();
@@ -94,8 +107,8 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
 
         var (_, benInbox) = await ConnectParticipant(sessionIdentity, "ben");
 
-        (await benInbox.NextAsync()).ParticipantCount.ShouldBe(2);
-        (await annaInbox.NextAsync()).ParticipantCount.ShouldBe(2);
+        await benInbox.NextMatchingAsync(state => state.ParticipantCount == 2);
+        await annaInbox.NextMatchingAsync(state => state.ParticipantCount == 2);
     }
 
     [Fact]

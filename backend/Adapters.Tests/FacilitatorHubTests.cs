@@ -17,6 +17,7 @@ public class FacilitatorHubTests
     private readonly RecordingBroadcaster broadcaster = new();
     private readonly RecordingHubClients<IFacilitatorClient> clients = new();
     private readonly RecordingGroupManager groups = new();
+    private readonly SessionConnectionRegistry registry = new();
 
     [Fact]
     public async Task Connecting_pushes_the_current_facilitator_state_to_the_caller_only()
@@ -126,7 +127,9 @@ public class FacilitatorHubTests
     {
         return new FacilitatorHub(
             repository,
-            new IntentPipeline(new SessionCommandHandler(repository, broadcaster))
+            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            new WorkshopStateCache(),
+            registry
         )
         {
             Clients = clients,

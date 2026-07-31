@@ -78,12 +78,17 @@ public class SignalRBroadcasterTests
         return session;
     }
 
-    private SignalRBroadcaster BroadcasterUnderTest()
+    private RoleStateDispatcher DispatcherUnderTest()
     {
-        return new SignalRBroadcaster(
+        return new RoleStateDispatcher(
             new RecordingHubContext<FacilitatorHub, IFacilitatorClient>(facilitatorClients),
             new RecordingHubContext<ParticipantHub, IParticipantClient>(participantClients),
             new RecordingHubContext<PresenterHub, IPresenterClient>(presenterClients)
         );
+    }
+
+    private SignalRBroadcaster BroadcasterUnderTest()
+    {
+        return new SignalRBroadcaster(new WorkshopStateCache(), DispatcherUnderTest());
     }
 }
