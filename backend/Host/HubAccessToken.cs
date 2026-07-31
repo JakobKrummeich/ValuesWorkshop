@@ -4,7 +4,7 @@ namespace ValuesWorkshop.Host;
 
 internal static class HubAccessToken
 {
-    private const string HubPathPrefix = "/hub/";
+    private const string HubPathPrefix = "/hub";
 
     internal static Task ReadFromQueryString(MessageReceivedContext context)
     {

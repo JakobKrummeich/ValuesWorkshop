@@ -33,6 +33,21 @@ public sealed class AuthenticationTests : IClassFixture<WorkshopTestFactory>, ID
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 
+    [Theory]
+    [InlineData("/hub/facilitator")]
+    [InlineData("/hub/participant")]
+    public async Task HubAcceptsTokenFromQueryString(string hubPath)
+    {
+        var token = WorkshopTestFactory.TokenFor("test-user");
+
+        var response = await client.PostAsync(
+            $"{hubPath}/negotiate?negotiateVersion=1&access_token={token}",
+            content: null
+        );
+
+        response.StatusCode.ShouldNotBe(HttpStatusCode.Unauthorized);
+    }
+
     [Fact]
     public async Task ExpiredToken_returns_401()
     {
