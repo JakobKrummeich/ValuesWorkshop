@@ -33,6 +33,7 @@ export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
         },
         error(error: Error) {
           setRejectionDetail(error.message);
+          setAdvancing(false);
         },
         complete() {
           setAdvancing(false);
