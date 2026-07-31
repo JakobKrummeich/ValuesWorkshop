@@ -24,11 +24,11 @@ public sealed class Session
         Voting = new VotingRounds();
     }
 
-    public void Join(ParticipantId participantId, IRandomness randomness)
+    public bool Join(ParticipantId participantId, IRandomness randomness)
     {
         if (Roster.Contains(participantId))
         {
-            return;
+            return false;
         }
 
         Roster.Add(participantId);
@@ -37,6 +37,8 @@ public sealed class Session
         {
             Formation.PlaceIntoSmallestGroup(participantId, randomness);
         }
+
+        return true;
     }
 
     public void AdvancePhase()

@@ -6,7 +6,7 @@ public sealed class IntentPipeline(SessionCommandHandler commandHandler)
 {
     public async Task<IntentResult> ExecuteAsync(
         SessionIdentity sessionIdentity,
-        Action<Session> intent
+        Func<Session, bool> intent
     )
     {
         try

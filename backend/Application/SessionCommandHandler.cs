@@ -5,13 +5,16 @@ namespace ValuesWorkshop.Application;
 
 public sealed class SessionCommandHandler(ISessionRepository repository, IBroadcaster broadcaster)
 {
-    public async Task HandleAsync(SessionIdentity sessionIdentity, Action<Session> mutation)
+    public async Task HandleAsync(SessionIdentity sessionIdentity, Func<Session, bool> mutation)
     {
         var session =
             await repository.LoadAsync(sessionIdentity)
             ?? throw new UnknownSessionException(sessionIdentity);
 
-        mutation(session);
+        if (!mutation(session))
+        {
+            return;
+        }
 
         session.BumpRevision();
 

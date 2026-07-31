@@ -13,12 +13,6 @@ function participantStatePayload(revision: number): unknown {
     revision,
     phase: 1,
     participantCount: 2,
-    quiz: null,
-    selection: null,
-    ownGroup: null,
-    presentation: null,
-    voting: null,
-    conclusion: null,
   };
 }
 

@@ -38,7 +38,7 @@ public sealed class FacilitatorHub(
     {
         return pipeline.ExecuteAsync(
             HubSessionBinding.SessionIdentityOf(Context),
-            session => session.AdvancePhase()
+            session => { session.AdvancePhase(); return true; }
         );
     }
 }

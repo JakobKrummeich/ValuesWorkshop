@@ -17,7 +17,7 @@ public class IntentPipelineTests
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
-        var result = await pipeline.ExecuteAsync(KnownSession, session => session.AdvancePhase());
+        var result = await pipeline.ExecuteAsync(KnownSession, session => { session.AdvancePhase(); return true; });
 
         result.ShouldBe(IntentResult.Accepted());
         repository
@@ -35,7 +35,7 @@ public class IntentPipelineTests
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
-        await pipeline.ExecuteAsync(KnownSession, session => session.AdvancePhase());
+        await pipeline.ExecuteAsync(KnownSession, session => { session.AdvancePhase(); return true; });
 
         repository.Saved.ShouldHaveSingleItem().Revision.ShouldBe(5);
         broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(5);
@@ -47,7 +47,7 @@ public class IntentPipelineTests
         var session = SessionFixtures.InPhase(Phase.FinalPresentation, revision: 4);
         var pipeline = PipelineOver(RepositoryWith(session), new RecordingBroadcaster());
 
-        await pipeline.ExecuteAsync(KnownSession, mutatedSession => mutatedSession.AdvancePhase());
+        await pipeline.ExecuteAsync(KnownSession, mutatedSession => { mutatedSession.AdvancePhase(); return true; });
 
         session.Revision.ShouldBe(4);
     }
@@ -59,7 +59,7 @@ public class IntentPipelineTests
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
-        var result = await pipeline.ExecuteAsync(KnownSession, session => session.AdvancePhase());
+        var result = await pipeline.ExecuteAsync(KnownSession, session => { session.AdvancePhase(); return true; });
 
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.UnknownSession);
@@ -75,7 +75,7 @@ public class IntentPipelineTests
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
-        var result = await pipeline.ExecuteAsync(KnownSession, session => session.AdvancePhase());
+        var result = await pipeline.ExecuteAsync(KnownSession, session => { session.AdvancePhase(); return true; });
 
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.InvariantViolated);

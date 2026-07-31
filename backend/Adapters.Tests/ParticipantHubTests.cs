@@ -49,7 +49,9 @@ public class ParticipantHubTests
         await hub.OnConnectedAsync();
 
         session.Roster.Participants.ShouldBe([Anna]);
-        broadcaster.Broadcasts.ShouldHaveSingleItem();
+        session.Revision.ShouldBe(0);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
     [Fact]
