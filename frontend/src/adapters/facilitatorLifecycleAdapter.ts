@@ -1,10 +1,10 @@
 import { map } from "rxjs";
 import { intentResultSchema } from "../domain/intentResult";
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
-import type { SignalRConnection } from "./signalRConnection";
+import type { WebsocketConnection } from "./websocketConnection";
 
 export function createFacilitatorLifecyclePort(
-  connection: SignalRConnection,
+  connection: WebsocketConnection,
 ): FacilitatorLifecyclePort {
   return {
     advancePhase: () =>

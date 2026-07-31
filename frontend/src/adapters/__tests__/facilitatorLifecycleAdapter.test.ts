@@ -4,10 +4,10 @@ import {
   type IntentResult,
 } from "../../domain/intentResult";
 import { createFacilitatorLifecyclePort } from "../facilitatorLifecycleAdapter";
-import type { SignalRConnection } from "../signalRConnection";
+import type { WebsocketConnection } from "../websocketConnection";
 
 function connectionAnswering(result: unknown): {
-  connection: SignalRConnection;
+  connection: WebsocketConnection;
   invoke: jest.Mock;
 } {
   const invoke = jest.fn(() => of(result));
@@ -68,7 +68,7 @@ describe("facilitator lifecycle port", () => {
   });
 
   it("surfaces a transport failure to the caller", () => {
-    const connection: SignalRConnection = {
+    const connection: WebsocketConnection = {
       connectionState: NEVER,
       start: () => NEVER as never,
       stop: () => NEVER as never,

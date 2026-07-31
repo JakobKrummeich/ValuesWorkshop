@@ -1,9 +1,9 @@
 import type { HubConnection } from "@microsoft/signalr";
+import { of } from "rxjs";
 import { ConnectionState } from "../../domain/connectionState";
 import {
   buildHubConnection,
   createSignalRConnection,
-  exponentialBackoffRetryPolicy,
   wrapHubConnection,
 } from "../signalRConnection";
 
@@ -181,102 +181,13 @@ describe("signalR connection wrapper", () => {
 
     expect(fake.stop).toHaveBeenCalled();
   });
-
-  it("runs a stop after a pending start instead of overlapping them", async () => {
-    const fake = createFakeHubConnection();
-    const calls: string[] = [];
-    let releaseStart = () => undefined as void;
-    fake.start.mockReturnValue(
-      new Promise<void>((resolve) => {
-        releaseStart = () => resolve();
-      }).then(() => {
-        calls.push("start");
-      }),
-    );
-    fake.stop.mockImplementation(() => {
-      calls.push("stop");
-      return Promise.resolve();
-    });
-    const connection = wrapHubConnection(fake.hubConnection);
-
-    connection.start().subscribe();
-    const stopped = new Promise<void>((resolve) =>
-      connection.stop().subscribe({ complete: () => resolve() }),
-    );
-    expect(calls).toEqual([]);
-    releaseStart();
-    await stopped;
-
-    expect(calls).toEqual(["start", "stop"]);
-  });
-
-  it("starts again once a start aborted by a stop has settled", async () => {
-    const fake = createFakeHubConnection();
-    fake.start
-      .mockReturnValueOnce(
-        Promise.reject(
-          new Error("The connection was stopped during negotiation"),
-        ),
-      )
-      .mockReturnValue(Promise.resolve());
-    const connection = wrapHubConnection(fake.hubConnection);
-
-    connection.start().subscribe({ error: () => undefined });
-    connection.stop().subscribe();
-    await new Promise<void>((resolve) =>
-      connection.start().subscribe({ complete: () => resolve() }),
-    );
-
-    expect(fake.start).toHaveBeenCalledTimes(2);
-    expect(fake.stop).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("reconnect backoff", () => {
-  it("grows exponentially and never exceeds the cap", () => {
-    const policy = exponentialBackoffRetryPolicy(() => 1);
-
-    const delays = [0, 1, 2, 3, 10].map((previousRetryCount) =>
-      policy.nextRetryDelayInMilliseconds({
-        previousRetryCount,
-        elapsedMilliseconds: 0,
-        retryReason: new Error("dropped"),
-      }),
-    );
-
-    expect(delays).toEqual([1000, 2000, 4000, 8000, 30000]);
-  });
-
-  it("jitters each delay down to at most half of the exponential value", () => {
-    const policy = exponentialBackoffRetryPolicy(() => 0);
-
-    const delay = policy.nextRetryDelayInMilliseconds({
-      previousRetryCount: 2,
-      elapsedMilliseconds: 0,
-      retryReason: new Error("dropped"),
-    });
-
-    expect(delay).toBe(2000);
-  });
-
-  it("retries forever so a restarted backend is always awaited", () => {
-    const policy = exponentialBackoffRetryPolicy();
-
-    const delay = policy.nextRetryDelayInMilliseconds({
-      previousRetryCount: 500,
-      elapsedMilliseconds: 3_600_000,
-      retryReason: new Error("dropped"),
-    });
-
-    expect(delay).toBeGreaterThan(0);
-  });
 });
 
 describe("hub connection construction", () => {
   it("binds the connection to the given hub url", () => {
     const hubConnection = buildHubConnection({
       url: "http://localhost:5000/hub/participant?sessionIdentity=abc",
-      accessTokenFactory: () => Promise.resolve("token"),
+      accessToken: of("token"),
     });
 
     expect(hubConnection.baseUrl).toBe(

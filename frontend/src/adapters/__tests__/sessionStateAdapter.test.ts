@@ -6,7 +6,7 @@ import {
   type ParticipantWorkshopState,
 } from "../../domain/workshopState";
 import { createSessionStatePort } from "../sessionStateAdapter";
-import type { SignalRConnection } from "../signalRConnection";
+import type { WebsocketConnection } from "../websocketConnection";
 
 function participantStatePayload(revision: number): unknown {
   return {
@@ -19,7 +19,7 @@ function participantStatePayload(revision: number): unknown {
 function connectionEmitting(
   states: Observable<unknown>,
   connectionState: Observable<ConnectionState> = NEVER,
-): SignalRConnection {
+): WebsocketConnection {
   return {
     connectionState,
     start: () => NEVER as never,

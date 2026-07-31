@@ -1,5 +1,5 @@
-import { NEVER, of } from "rxjs";
-import type { SignalRConnection } from "../signalRConnection";
+import { NEVER, firstValueFrom, of } from "rxjs";
+import type { WebsocketConnection } from "../websocketConnection";
 import {
   createFacilitatorSession,
   createParticipantSession,
@@ -22,7 +22,7 @@ const accessToken = getAccessToken as jest.MockedFunction<
 
 const SESSION_IDENTITY = "3f1a0f2e-0000-4000-8000-000000000001";
 
-function fakeConnection(): SignalRConnection & {
+function fakeConnection(): WebsocketConnection & {
   start: jest.Mock;
   stop: jest.Mock;
 } {
@@ -68,17 +68,15 @@ describe("session-bound role connections", () => {
     createPresenterSession(SESSION_IDENTITY);
 
     expect(urlOfLastConnection()).toContain("/hub/presenter");
-    expect(
-      createConnection.mock.calls[0][0].accessTokenFactory,
-    ).toBeUndefined();
+    expect(createConnection.mock.calls[0][0].accessToken).toBeUndefined();
   });
 
   it("hands the current access token to authenticated hubs", async () => {
     createParticipantSession(SESSION_IDENTITY);
 
-    const factory = createConnection.mock.calls[0][0].accessTokenFactory!;
+    const token = createConnection.mock.calls[0][0].accessToken!;
 
-    await expect(factory()).resolves.toBe("a-token");
+    await expect(firstValueFrom(token)).resolves.toBe("a-token");
   });
 
   it("escapes a session identity that is not url safe", () => {

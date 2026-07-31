@@ -10,6 +10,7 @@ using ValuesWorkshop.Application.Intents;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 using ValuesWorkshop.Host;
+using ValuesWorkshop.Host.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
-namespace ValuesWorkshop.Host;
+namespace ValuesWorkshop.Host.Auth;
 
 internal static class HubAccessToken
 {

@@ -1,4 +1,3 @@
-import { firstValueFrom } from "rxjs";
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorSessionStatePort } from "../domain/ports/facilitator/sessionStatePort";
 import type { ParticipantSessionStatePort } from "../domain/ports/participant/sessionStatePort";
@@ -8,14 +7,13 @@ import {
   participantWorkshopStateSchema,
   presenterWorkshopStateSchema,
 } from "../domain/workshopState";
-import type { Completable } from "../shared/reactiveTypes";
+import type { Completable, Single } from "../shared/reactiveTypes";
 import { getAccessToken } from "./authAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
+import { withSerializedLifecycle } from "./serializedLifecycle";
 import { createSessionStatePort } from "./sessionStateAdapter";
-import {
-  createSignalRConnection,
-  type SignalRConnection,
-} from "./signalRConnection";
+import { createSignalRConnection } from "./signalRConnection";
+import type { WebsocketConnection } from "./websocketConnection";
 
 export interface WorkshopSession {
   start(): Completable;
@@ -67,9 +65,7 @@ export function createFacilitatorSession(
 export function createPresenterSession(
   sessionIdentity: string,
 ): PresenterSession {
-  const connection = createSignalRConnection({
-    url: hubUrl("presenter", sessionIdentity),
-  });
+  const connection = connect("presenter", sessionIdentity);
 
   return {
     sessionState: createSessionStatePort(
@@ -83,14 +79,24 @@ export function createPresenterSession(
 function connectAuthenticated(
   role: string,
   sessionIdentity: string,
-): SignalRConnection {
-  return createSignalRConnection({
-    url: hubUrl(role, sessionIdentity),
-    accessTokenFactory: () => firstValueFrom(getAccessToken()),
-  });
+): WebsocketConnection {
+  return connect(role, sessionIdentity, getAccessToken());
 }
 
-function lifetimeOf(connection: SignalRConnection): WorkshopSession {
+function connect(
+  role: string,
+  sessionIdentity: string,
+  accessToken?: Single<string>,
+): WebsocketConnection {
+  return withSerializedLifecycle(
+    createSignalRConnection({
+      url: hubUrl(role, sessionIdentity),
+      accessToken,
+    }),
+  );
+}
+
+function lifetimeOf(connection: WebsocketConnection): WorkshopSession {
   return { start: connection.start, close: connection.stop };
 }
 

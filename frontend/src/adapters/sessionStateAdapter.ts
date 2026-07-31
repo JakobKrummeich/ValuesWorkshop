@@ -9,7 +9,7 @@ import {
 } from "rxjs";
 import type { ZodType } from "zod";
 import type { SessionStatePort } from "../domain/ports/sessionStatePort";
-import type { SignalRConnection } from "./signalRConnection";
+import type { WebsocketConnection } from "./websocketConnection";
 
 const RECEIVE_WORKSHOP_STATE = "ReceiveWorkshopState";
 
@@ -18,7 +18,7 @@ interface RevisionedState {
 }
 
 export function createSessionStatePort<TState extends RevisionedState>(
-  connection: SignalRConnection,
+  connection: WebsocketConnection,
   schema: ZodType<TState>,
 ): SessionStatePort<TState> {
   const workshopState = connection.on(RECEIVE_WORKSHOP_STATE).pipe(
