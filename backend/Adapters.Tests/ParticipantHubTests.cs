@@ -65,7 +65,9 @@ public class ParticipantHubTests
 
         await hub.OnConnectedAsync();
 
-        clients.CallerClient.Single<ParticipantWorkshopState>().ShouldBeOfType<ParticipantJoinState>();
+        clients
+            .CallerClient.Single<ParticipantWorkshopState>()
+            .ShouldBeOfType<ParticipantJoinState>();
     }
 
     [Fact]
