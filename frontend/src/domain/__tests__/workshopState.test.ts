@@ -7,35 +7,22 @@ import {
   presenterWorkshopStateSchema,
 } from "../workshopState";
 
-const emptyBlocks = {
-  quiz: null,
-  selection: null,
-  presentation: null,
-  voting: null,
-  conclusion: null,
-};
-
 describe("participant workshop state schema", () => {
-  it("accepts a fresh join state where every phase block is still absent", () => {
+  it("accepts a join state that carries nothing but the envelope", () => {
     const state = participantWorkshopStateSchema.parse({
       revision: 0,
       phase: 1,
       participantCount: 3,
-      ownGroup: null,
-      ...emptyBlocks,
     });
 
     expect(state.phase).toBe(Phase.Join);
-    expect(state.quiz).toBeNull();
   });
 
-  it("accepts the caller-shaped blocks of a group work state", () => {
+  it("accepts the caller-shaped block of a group work state", () => {
     const state = participantWorkshopStateSchema.parse({
       revision: 12,
       phase: 6,
       participantCount: 8,
-      quiz: { questionNumber: 4, subState: 3 },
-      selection: { isOwnSubmitted: true, topValueIds: ["courage"] },
       ownGroup: {
         name: "otter",
         memberCount: 4,
@@ -43,13 +30,23 @@ describe("participant workshop state schema", () => {
         isCallerScribe: true,
         workStatus: 2,
       },
-      presentation: null,
-      voting: null,
-      conclusion: null,
     });
 
-    expect(state.quiz?.subState).toBe(QuizSubState.LearningTextShown);
+    if (state.phase !== Phase.GroupWork) {
+      throw new Error("expected a group work state");
+    }
     expect(state.ownGroup?.workStatus).toBe(GroupWorkStatus.Submitted);
+  });
+
+  it("accepts a group work state for a caller who is in no group", () => {
+    const state = participantWorkshopStateSchema.parse({
+      revision: 12,
+      phase: 6,
+      participantCount: 8,
+      ownGroup: null,
+    });
+
+    expect(state.phase).toBe(Phase.GroupWork);
   });
 
   it("rejects a state whose phase is outside the nine phases", () => {
@@ -57,39 +54,44 @@ describe("participant workshop state schema", () => {
       revision: 1,
       phase: 10,
       participantCount: 1,
-      ownGroup: null,
-      ...emptyBlocks,
     });
 
     expect(result.success).toBe(false);
   });
 
-  it("rejects a state that is missing a required block", () => {
+  it("rejects a state that is missing the block its phase requires", () => {
     const result = participantWorkshopStateSchema.safeParse({
       revision: 1,
-      phase: 1,
+      phase: 8,
       participantCount: 1,
-      ownGroup: null,
-      quiz: null,
-      selection: null,
-      presentation: null,
-      voting: null,
     });
 
     expect(result.success).toBe(false);
   });
 
-  it("rejects an absent block sent as undefined rather than null", () => {
+  it("rejects a block sent as undefined rather than as its value", () => {
     const result = participantWorkshopStateSchema.safeParse({
       revision: 1,
-      phase: 1,
+      phase: 2,
       participantCount: 1,
-      ownGroup: null,
-      ...emptyBlocks,
       quiz: undefined,
     });
 
     expect(result.success).toBe(false);
+  });
+
+  it("accepts a quiz state before the first question is posed", () => {
+    const state = participantWorkshopStateSchema.parse({
+      revision: 3,
+      phase: 2,
+      participantCount: 1,
+      quiz: { questionNumber: null, subState: 1 },
+    });
+
+    if (state.phase !== Phase.Quiz) {
+      throw new Error("expected a quiz state");
+    }
+    expect(state.quiz.subState).toBe(QuizSubState.Answering);
   });
 });
 
@@ -102,8 +104,6 @@ describe("facilitator workshop state schema", () => {
         participantIds: ["3f1a0f2e-0000-4000-8000-000000000001"],
         participantCount: 1,
       },
-      quiz: null,
-      selection: { submittedCount: 1, topValueIds: ["courage"] },
       groups: [
         {
           name: "otter",
@@ -113,12 +113,12 @@ describe("facilitator workshop state schema", () => {
           workStatus: 1,
         },
       ],
-      presentation: null,
-      voting: null,
-      conclusion: null,
     });
 
-    expect(state.groups?.[0].workStatus).toBe(GroupWorkStatus.Editing);
+    if (state.phase !== Phase.GroupWork) {
+      throw new Error("expected a group work state");
+    }
+    expect(state.groups[0].workStatus).toBe(GroupWorkStatus.Editing);
     expect(state.roster.participantCount).toBe(1);
   });
 
@@ -127,6 +127,7 @@ describe("facilitator workshop state schema", () => {
       revision: 30,
       phase: 5,
       roster: { participantIds: [], participantCount: 0 },
+      selection: { submittedCount: 0, topValueIds: [] },
       groups: [
         {
           name: "otter",
@@ -136,18 +137,18 @@ describe("facilitator workshop state schema", () => {
           workStatus: 1,
         },
       ],
-      ...emptyBlocks,
     });
 
-    expect(state.groups?.[0].scribeParticipantId).toBeNull();
+    if (state.phase !== Phase.GroupFormation) {
+      throw new Error("expected a group formation state");
+    }
+    expect(state.groups[0].scribeParticipantId).toBeNull();
   });
 
   it("rejects a state without a roster", () => {
     const result = facilitatorWorkshopStateSchema.safeParse({
       revision: 1,
       phase: 1,
-      groups: null,
-      ...emptyBlocks,
     });
 
     expect(result.success).toBe(false);
@@ -155,34 +156,24 @@ describe("facilitator workshop state schema", () => {
 });
 
 describe("presenter workshop state schema", () => {
-  it("accepts anonymous group and voting blocks", () => {
+  it("accepts an anonymous voting state", () => {
     const state = presenterWorkshopStateSchema.parse({
       revision: 44,
       phase: 8,
       participantCount: 8,
-      quiz: { questionNumber: 1, subState: 2 },
-      selection: { submittedCount: 8, topValueIds: ["courage"] },
-      groups: [
-        {
-          name: "otter",
-          memberCount: 4,
-          assignedValueIds: ["courage"],
-          workStatus: 2,
-        },
-      ],
-      presentation: { presentedValueId: "courage" },
       voting: { isRoundOpen: true },
-      conclusion: { winningValueIds: [] },
     });
 
-    expect(state.quiz?.subState).toBe(QuizSubState.Revealed);
-    expect(state.voting?.isRoundOpen).toBe(true);
+    if (state.phase !== Phase.FinalVoting) {
+      throw new Error("expected a final voting state");
+    }
+    expect(state.voting.isRoundOpen).toBe(true);
   });
 
   it("rejects a group that reports members instead of an anonymous count", () => {
     const result = presenterWorkshopStateSchema.safeParse({
       revision: 44,
-      phase: 5,
+      phase: 6,
       participantCount: 8,
       groups: [
         {
@@ -192,7 +183,6 @@ describe("presenter workshop state schema", () => {
           workStatus: 1,
         },
       ],
-      ...emptyBlocks,
     });
 
     expect(result.success).toBe(false);
@@ -203,8 +193,6 @@ describe("presenter workshop state schema", () => {
       revision: -1,
       phase: 1,
       participantCount: 0,
-      groups: null,
-      ...emptyBlocks,
     });
 
     expect(result.success).toBe(false);

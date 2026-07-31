@@ -4,43 +4,94 @@ namespace ValuesWorkshop.Application.State;
 
 public static class ParticipantWorkshopStateMapper
 {
+    private static readonly IReadOnlyDictionary<
+        Phase,
+        Func<Session, ParticipantId, long, ParticipantWorkshopState>
+    > StateOfPhase = new Dictionary<
+        Phase,
+        Func<Session, ParticipantId, long, ParticipantWorkshopState>
+    >
+    {
+        [Phase.Join] = (session, _, revision) =>
+            new ParticipantJoinState(revision, ParticipantCount(session)),
+        [Phase.Quiz] = (session, _, revision) =>
+            new ParticipantQuizState(
+                revision,
+                ParticipantCount(session),
+                SessionViews.Quiz(session)
+            ),
+        [Phase.ValueSelection] = (session, caller, revision) =>
+            new ParticipantValueSelectionState(
+                revision,
+                ParticipantCount(session),
+                OwnSelection(session, caller)
+            ),
+        [Phase.SelectionResults] = (session, caller, revision) =>
+            new ParticipantSelectionResultsState(
+                revision,
+                ParticipantCount(session),
+                OwnSelection(session, caller)
+            ),
+        [Phase.GroupFormation] = (session, caller, revision) =>
+            new ParticipantGroupFormationState(
+                revision,
+                ParticipantCount(session),
+                OwnGroup(session, caller)
+            ),
+        [Phase.GroupWork] = (session, caller, revision) =>
+            new ParticipantGroupWorkState(
+                revision,
+                ParticipantCount(session),
+                OwnGroup(session, caller)
+            ),
+        [Phase.ValuePresentation] = (session, caller, revision) =>
+            new ParticipantValuePresentationState(
+                revision,
+                ParticipantCount(session),
+                OwnGroup(session, caller),
+                SessionViews.Presentation(session)
+            ),
+        [Phase.FinalVoting] = (session, _, revision) =>
+            new ParticipantFinalVotingState(
+                revision,
+                ParticipantCount(session),
+                SessionViews.Voting(session)
+            ),
+        [Phase.FinalPresentation] = (session, _, revision) =>
+            new ParticipantFinalPresentationState(
+                revision,
+                ParticipantCount(session),
+                SessionViews.Conclusion(session)
+            ),
+    };
+
     public static ParticipantWorkshopState MapFor(
         Session session,
         ParticipantId caller,
         long revision
     )
     {
-        return new ParticipantWorkshopState(
-            revision,
-            session.PhaseProgress.CurrentPhase,
-            session.Roster.Participants.Count,
-            SessionViews.Quiz(session),
-            MapSelection(session, caller),
-            MapOwnGroup(session, caller),
-            SessionViews.Presentation(session),
-            SessionViews.Voting(session),
-            SessionViews.Conclusion(session)
-        );
+        return StateOfPhase[session.PhaseProgress.CurrentPhase](session, caller, revision);
     }
 
-    private static OwnSelectionView? MapSelection(Session session, ParticipantId caller)
+    private static int ParticipantCount(Session session)
     {
-        if (!SessionViews.HasReachedSelection(session))
-        {
-            return null;
-        }
+        return session.Roster.Participants.Count;
+    }
 
+    private static OwnSelectionView OwnSelection(Session session, ParticipantId caller)
+    {
         return new OwnSelectionView(
             session.Selection.SubmittedBy.Contains(caller),
             SessionViews.TopValueIds(session)
         );
     }
 
-    private static OwnGroupView? MapOwnGroup(Session session, ParticipantId caller)
+    private static OwnGroupView? OwnGroup(Session session, ParticipantId caller)
     {
         var ownGroup = SessionViews
             .Groups(session)
-            ?.SingleOrDefault(group => group.Members.Contains(caller));
+            .SingleOrDefault(group => group.Members.Contains(caller));
 
         if (ownGroup is null)
         {

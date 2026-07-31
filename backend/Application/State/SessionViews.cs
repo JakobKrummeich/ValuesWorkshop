@@ -4,24 +4,9 @@ namespace ValuesWorkshop.Application.State;
 
 internal static class SessionViews
 {
-    internal static QuizView? Quiz(Session session)
+    internal static QuizView Quiz(Session session)
     {
-        if (session.Quiz.CurrentQuestion is not int questionNumber)
-        {
-            return null;
-        }
-
-        return new QuizView(questionNumber, SubStateOf(session.Quiz));
-    }
-
-    internal static bool HasReachedSelection(Session session)
-    {
-        return session.PhaseProgress.CurrentPhase >= Phase.ValueSelection;
-    }
-
-    internal static bool HasReachedVoting(Session session)
-    {
-        return session.PhaseProgress.CurrentPhase >= Phase.FinalVoting;
+        return new QuizView(session.Quiz.CurrentQuestion, SubStateOf(session.Quiz));
     }
 
     internal static IReadOnlyList<string> TopValueIds(Session session)
@@ -29,16 +14,14 @@ internal static class SessionViews
         return ValueIdsOf(session.Selection.TopValues);
     }
 
-    internal static SelectionProgressView? SelectionProgress(Session session)
+    internal static SelectionProgressView SelectionProgress(Session session)
     {
-        return HasReachedSelection(session)
-            ? new SelectionProgressView(session.Selection.SubmittedBy.Count, TopValueIds(session))
-            : null;
+        return new SelectionProgressView(session.Selection.SubmittedBy.Count, TopValueIds(session));
     }
 
-    internal static IReadOnlyList<Group>? Groups(Session session)
+    internal static IReadOnlyList<Group> Groups(Session session)
     {
-        return session.Formation.IsFormed ? session.Formation.Groups : null;
+        return session.Formation.IsFormed ? session.Formation.Groups : [];
     }
 
     internal static GroupWorkStatus WorkStatusOf(Group group)
@@ -51,27 +34,22 @@ internal static class SessionViews
         return session.Presentation.PresentedValue?.Value;
     }
 
-    internal static PresentationView? Presentation(Session session)
+    internal static PresentationView Presentation(Session session)
     {
-        var presentedValueId = PresentedValueId(session);
-
-        return presentedValueId is null
-            ? null
-            : new PresentationView(session.Presentation.PresentingGroup, presentedValueId);
+        return new PresentationView(
+            session.Presentation.PresentingGroup,
+            PresentedValueId(session)
+        );
     }
 
-    internal static VotingView? Voting(Session session)
+    internal static VotingView Voting(Session session)
     {
-        return HasReachedVoting(session)
-            ? new VotingView(session.Voting.RoundNumber, session.Voting.RoundOpen)
-            : null;
+        return new VotingView(session.Voting.RoundNumber, session.Voting.RoundOpen);
     }
 
-    internal static ConclusionView? Conclusion(Session session)
+    internal static ConclusionView Conclusion(Session session)
     {
-        var winners = ValueIdsOf(session.Voting.WinningValues);
-
-        return winners.Count == 0 ? null : new ConclusionView(winners);
+        return new ConclusionView(ValueIdsOf(session.Voting.WinningValues));
     }
 
     internal static IReadOnlyList<string> ValueIdsOf(IEnumerable<ValueId> values)

@@ -20,35 +20,43 @@ public class FacilitatorWorkshopStateMapperTests
         state.Roster.ParticipantCount.ShouldBe(3);
     }
 
-    [Fact]
-    public void Blocks_of_phases_not_yet_reached_are_absent()
+    [Theory]
+    [InlineData(Phase.Join, typeof(FacilitatorJoinState))]
+    [InlineData(Phase.Quiz, typeof(FacilitatorQuizState))]
+    [InlineData(Phase.ValueSelection, typeof(FacilitatorValueSelectionState))]
+    [InlineData(Phase.SelectionResults, typeof(FacilitatorSelectionResultsState))]
+    [InlineData(Phase.GroupFormation, typeof(FacilitatorGroupFormationState))]
+    [InlineData(Phase.GroupWork, typeof(FacilitatorGroupWorkState))]
+    [InlineData(Phase.ValuePresentation, typeof(FacilitatorValuePresentationState))]
+    [InlineData(Phase.FinalVoting, typeof(FacilitatorFinalVotingState))]
+    [InlineData(Phase.FinalPresentation, typeof(FacilitatorFinalPresentationState))]
+    public void Every_phase_maps_to_the_state_variant_that_carries_only_its_own_blocks(
+        Phase phase,
+        Type expectedVariant
+    )
     {
-        var state = Map(SessionFixtures.InPhase(Phase.Join));
+        var state = Map(SessionFixtures.InPhase(phase));
 
-        state.Quiz.ShouldBeNull();
-        state.Selection.ShouldBeNull();
-        state.Groups.ShouldBeNull();
-        state.Presentation.ShouldBeNull();
-        state.Voting.ShouldBeNull();
-        state.Conclusion.ShouldBeNull();
+        state.ShouldBeOfType(expectedVariant);
+        state.Phase.ShouldBe(phase);
     }
 
     [Fact]
-    public void Quiz_block_reports_the_posed_question_and_its_sub_state()
+    public void Quiz_state_reports_the_posed_question_and_its_sub_state()
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
             quiz: QuizProgress.Restore(3, true, true)
         );
 
-        var quiz = Map(session).Quiz.ShouldNotBeNull();
+        var quiz = Map(session).ShouldBeOfType<FacilitatorQuizState>().Quiz;
 
         quiz.QuestionNumber.ShouldBe(3);
         quiz.SubState.ShouldBe(QuizSubState.LearningTextShown);
     }
 
     [Fact]
-    public void Selection_block_reports_how_many_participants_submitted()
+    public void Selection_results_state_reports_how_many_participants_submitted()
     {
         var session = SessionFixtures.InPhase(
             Phase.SelectionResults,
@@ -58,21 +66,21 @@ public class FacilitatorWorkshopStateMapperTests
             )
         );
 
-        var selection = Map(session).Selection.ShouldNotBeNull();
+        var selection = Map(session).ShouldBeOfType<FacilitatorSelectionResultsState>().Selection;
 
         selection.SubmittedCount.ShouldBe(2);
         selection.TopValueIds.ShouldBe(["honesty"]);
     }
 
     [Fact]
-    public void Groups_block_names_members_and_scribes_of_every_group()
+    public void Group_work_state_names_members_and_scribes_of_every_group()
     {
         var session = SessionFixtures.InPhase(
             Phase.GroupWork,
             formation: SessionFixtures.TwoGroups()
         );
 
-        var groups = Map(session).Groups.ShouldNotBeNull();
+        var groups = Map(session).ShouldBeOfType<FacilitatorGroupWorkState>().Groups;
 
         groups.Count.ShouldBe(2);
         groups[0].Name.ShouldBe("fox");
@@ -85,42 +93,54 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Presentation_block_reports_the_presenting_group_and_value()
+    public void Groups_are_empty_until_the_formation_has_run()
+    {
+        var state = Map(SessionFixtures.InPhase(Phase.GroupFormation));
+
+        state.ShouldBeOfType<FacilitatorGroupFormationState>().Groups.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Value_presentation_state_reports_the_presenting_group_and_value()
     {
         var session = SessionFixtures.InPhase(
             Phase.ValuePresentation,
             presentation: PresentationWalk.Restore("owl", new ValueId("courage"))
         );
 
-        var presentation = Map(session).Presentation.ShouldNotBeNull();
+        var presentation = Map(session)
+            .ShouldBeOfType<FacilitatorValuePresentationState>()
+            .Presentation;
 
         presentation.PresentingGroupName.ShouldBe("owl");
         presentation.PresentedValueId.ShouldBe("courage");
     }
 
     [Fact]
-    public void Voting_block_reports_the_round_and_whether_it_is_open()
+    public void Final_voting_state_reports_the_round_and_whether_it_is_open()
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
             voting: VotingRounds.Restore(true, 1, [])
         );
 
-        var voting = Map(session).Voting.ShouldNotBeNull();
+        var voting = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
 
         voting.RoundNumber.ShouldBe(1);
         voting.IsRoundOpen.ShouldBeTrue();
     }
 
     [Fact]
-    public void Conclusion_block_appears_once_winners_stand()
+    public void Final_presentation_state_carries_the_winning_values()
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalPresentation,
             voting: VotingRounds.Restore(false, 1, [new ValueId("courage")])
         );
 
-        Map(session).Conclusion.ShouldNotBeNull().WinningValueIds.ShouldBe(["courage"]);
+        Map(session)
+            .ShouldBeOfType<FacilitatorFinalPresentationState>()
+            .Conclusion.WinningValueIds.ShouldBe(["courage"]);
     }
 
     private static FacilitatorWorkshopState Map(Session session, long revision = 1)

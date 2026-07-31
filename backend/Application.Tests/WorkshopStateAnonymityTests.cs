@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using ValuesWorkshop.Application.State;
 
 namespace ValuesWorkshop.Application.Tests;
@@ -34,10 +35,20 @@ public class WorkshopStateAnonymityTests
 
     private static IReadOnlyList<string> ParticipantIdentifyingPathsOf(Type stateType)
     {
+        var variants = stateType
+            .GetCustomAttributes<JsonDerivedTypeAttribute>()
+            .Select(attribute => attribute.DerivedType)
+            .ToList();
+
+        variants.ShouldNotBeEmpty();
+
         var paths = new List<string>();
-        CollectIdentifyingPaths(stateType, prefix: string.Empty, paths);
-        paths.Sort(StringComparer.Ordinal);
-        return paths;
+        foreach (var variant in variants)
+        {
+            CollectIdentifyingPaths(variant, prefix: string.Empty, paths);
+        }
+
+        return paths.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
     }
 
     private static void CollectIdentifyingPaths(Type type, string prefix, List<string> paths)

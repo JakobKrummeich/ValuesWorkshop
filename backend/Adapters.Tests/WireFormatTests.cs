@@ -27,7 +27,7 @@ public class WireFormatTests
     }
 
     [Fact]
-    public void A_block_that_is_not_relevant_yet_travels_as_null()
+    public void A_state_carries_the_blocks_of_its_own_phase_and_nothing_else()
     {
         var session = new Session(new SessionIdentity(Guid.NewGuid()));
 
@@ -35,7 +35,47 @@ public class WireFormatTests
 
         using var document = JsonDocument.Parse(json);
         var state = document.RootElement.GetProperty("arguments")[0];
-        state.GetProperty("quiz").ValueKind.ShouldBe(JsonValueKind.Null);
+        state
+            .EnumerateObject()
+            .Select(property => property.Name)
+            .ShouldBe(["phase", "revision", "roster"], ignoreOrder: true);
+    }
+
+    [Theory]
+    [MemberData(nameof(EveryPhase))]
+    public void Every_role_state_travels_with_its_phase_as_the_discriminator(Phase phase)
+    {
+        var session = SessionInPhase(phase);
+        var caller = new ParticipantId(Guid.NewGuid());
+
+        DiscriminatorOf(FacilitatorWorkshopStateMapper.Map(session, 1)).ShouldBe((int)phase);
+        DiscriminatorOf(ParticipantWorkshopStateMapper.MapFor(session, caller, 1))
+            .ShouldBe((int)phase);
+        DiscriminatorOf(PresenterWorkshopStateMapper.Map(session, 1)).ShouldBe((int)phase);
+    }
+
+    public static TheoryData<Phase> EveryPhase()
+    {
+        return [.. Enum.GetValues<Phase>()];
+    }
+
+    private static Session SessionInPhase(Phase phase)
+    {
+        var session = new Session(new SessionIdentity(Guid.NewGuid()));
+
+        while (session.PhaseProgress.CurrentPhase != phase)
+        {
+            session.AdvancePhase();
+        }
+
+        return session;
+    }
+
+    private static int DiscriminatorOf(object state)
+    {
+        using var document = JsonDocument.Parse(SerializeStateMessage(state));
+
+        return document.RootElement.GetProperty("arguments")[0].GetProperty("phase").GetInt32();
     }
 
     private static string SerializeStateMessage(object state)

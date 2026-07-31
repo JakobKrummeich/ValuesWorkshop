@@ -247,22 +247,47 @@ are accounted for.
 One client callback per hub, always the same shape for that role:
 `ReceiveWorkshopState(<Role>WorkshopState)`.
 
-### 5.1 Shared envelope
+### 5.1 Envelope and phase variants
+
+Each role state is a **phase-discriminated union**: one record per phase,
+named `<Role><Phase>State`, tagged by the `phase` discriminator
+(`[JsonPolymorphic(TypeDiscriminatorPropertyName = "phase")]` on the server,
+`z.discriminatedUnion("phase", …)` on the client). A state carries exactly
+the blocks its phase needs. A block that belongs to another phase is not sent
+as `null` — it is not part of that variant at all, so a screen can never read
+a block that its phase does not define.
 
 | Field | Type | Meaning |
 |---|---|---|
 | `revision` | long | monotonic, see § 3.4 |
-| `phase` | 1–9 | current phase (I1) |
+| `phase` | 1–9 | discriminator, selects the variant (I1) |
 
-Every phase-specific block below is absent (null) until its phase is
-relevant, and stays present afterwards where the screen still shows it
-(e.g. selection tallies remain visible in phase 4).
+Every variant of a role also carries that role's constant block: `roster` for
+the facilitator, `participantCount` for participant and presenter.
+
+| Phase | Participant blocks | Facilitator blocks | Presenter blocks |
+|---|---|---|---|
+| 1 Join | — | — | — |
+| 2 Quiz | `quiz` | `quiz` | `quiz` |
+| 3 ValueSelection | `selection` | `selection` | `selection` |
+| 4 SelectionResults | `selection` | `selection` | `selection` |
+| 5 GroupFormation | `ownGroup?` | `selection`, `groups` | `selection`, `groups` |
+| 6 GroupWork | `ownGroup?` | `groups` | `groups` |
+| 7 ValuePresentation | `ownGroup?`, `presentation` | `groups`, `presentation` | `groups`, `presentation` |
+| 8 FinalVoting | `voting` | `voting` | `voting` |
+| 9 FinalPresentation | `conclusion` | `conclusion` | `conclusion` |
+
+`ownGroup?` is the one genuinely optional block: a participant who has not
+been placed in a group yet has none. `groups` is a list and is empty until
+the formation has run — never null.
+
+§§ 5.2–5.4 give the shape of each block; the matrix above says which
+variant carries it.
 
 ### 5.2 `ParticipantWorkshopState`
 
 | Block | Fields |
 |---|---|
-| membership | `participantCount` |
 | quiz | `questionId`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `ownAnswerId?`, `correctAnswerId?` (only once revealed) |
 | selection | `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?`, `topValueIds?` |
 | ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
@@ -281,11 +306,13 @@ group member display names.
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
 | quiz | `questionId`, `subState`, `answerTallies`, `answeredCount` |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
-| formation | `groups: [{ name, members: [{ participantId, displayName }], assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
+| groups | `[{ name, memberParticipantIds, assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
 | conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
-| controls | `enabledIntents: string[]` — see § 6.4 |
+
+`enabledIntents: string[]` (§ 6.4) joins the facilitator envelope — it is
+present on every variant, because every phase offers controls.
 
 `participantId` appears only for scribe reassignment (T13) and roster
 display. It is never paired with an answer, a selection, or a vote.
@@ -294,16 +321,16 @@ display. It is never paired with an answer, a selection, or a vote.
 
 | Block | Fields |
 |---|---|
-| roster | `participantNames`, `participantCount` |
 | quiz | `questionId`, `subState`, `answerTallies`, `correctAnswerId?` (once revealed) |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
-| formation | `groups: [{ name, memberNames, assignedValueIds, workStatus }]` |
+| groups | `[{ name, memberCount, assignedValueIds, workStatus }]` |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
 
-Deliberately absent: every participant identifier (display names only), every
-per-person fact, and all vote tallies before the winners are revealed.
+Deliberately absent: every participant identifier, every per-person fact, and
+all vote tallies before the winners are revealed. Groups are counted, not
+named by member.
 
 ### 5.5 Anonymity argument
 
@@ -319,9 +346,10 @@ per-person fact, and all vote tallies before the winners are revealed.
    presenter connection cannot be sent a participant's own block even by
    mistake — it is not part of the type it receives.
 4. Tests: each mapper is asserted against the full domain state, and a
-   reflection test asserts that neither `FacilitatorWorkshopState` nor
-   `PresenterWorkshopState` contains a field pairing a participant with an
-   answer, selection, or vote.
+   reflection test walks every variant of each union and asserts that
+   neither `ParticipantWorkshopState` nor `PresenterWorkshopState` carries a
+   participant identifier at all, and that `FacilitatorWorkshopState` carries
+   one only in the roster and in group membership.
 
 ---
 
