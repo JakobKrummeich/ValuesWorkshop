@@ -77,19 +77,19 @@ concerns):
 
 | Interface | File | Implemented by |
 |---|---|---|
-| `IBroadcaster` | `Application/IBroadcaster.cs` | `NoOpBroadcaster` (Host; real impl in Task 9) |
+| `IBroadcaster` | `Application/IBroadcaster.cs` | `SignalRBroadcaster` (Adapters.Web) |
 
 ### 2.2 Frontend Ports
 
-Port interfaces live in `src/domain/`. Task 1 placeholders:
+Port interfaces live in `src/domain/ports/`, sliced per role and concern:
 
 | Interface | File | Purpose |
 |---|---|---|
-| `FacilitatorGateway` | `src/domain/ports/facilitatorGateway.ts` | Facilitator session operations |
-| `ParticipantGateway` | `src/domain/ports/participantGateway.ts` | Participant session operations |
-| `PresenterGateway` | `src/domain/ports/presenterGateway.ts` | Presenter read-only stream |
-
-Task 9 will slice these per concern (e.g., quiz control, formation control).
+| `SessionStatePort<T>` | `src/domain/ports/sessionStatePort.ts` | Role-generic live state + connection state |
+| `FacilitatorSessionStatePort` | `src/domain/ports/facilitator/sessionStatePort.ts` | Facilitator state stream |
+| `FacilitatorLifecyclePort` | `src/domain/ports/facilitator/lifecyclePort.ts` | Facilitator intents (e.g. `advancePhase`) |
+| `ParticipantSessionStatePort` | `src/domain/ports/participant/sessionStatePort.ts` | Participant state stream |
+| `PresenterSessionStatePort` | `src/domain/ports/presenter/sessionStatePort.ts` | Presenter read-only state stream |
 
 ---
 
@@ -100,9 +100,9 @@ performs dependency injection of port implementations:
 
 | Screen group | Directory | Context file | Injects |
 |---|---|---|---|
-| Facilitator | `src/app/facilitator/` | `dependencies.tsx` | `FacilitatorGateway` |
-| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantGateway` |
-| Presenter | `src/app/presenter/` | `dependencies.tsx` | `PresenterGateway` |
+| Facilitator | `src/app/facilitator/` | `dependencies.tsx` | `FacilitatorSessionStatePort`, `FacilitatorLifecyclePort` |
+| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantSessionStatePort` |
+| Presenter | `src/app/presenter/` | `dependencies.tsx` | `PresenterSessionStatePort` |
 
 **Rules:**
 - Screens never import each other (`app/facilitator/` cannot import from
@@ -137,7 +137,7 @@ Future DTOs, commands, and events → records.
 |---|---|---|
 | `Session` | `sealed class` | Aggregate root. Routes commands to building blocks. Holds mutable composition of building blocks. Identity-based (each session is unique). |
 | `Roster` | `sealed class` | Mutable participant collection. Enforces join/leave invariants. |
-| `WorkshopState` | `sealed class` | Mutable phase + sub-state. Enforces forward-only transitions. |
+| `PhaseProgress` | `sealed class` | Mutable phase tracking. Enforces forward-only transitions. |
 | `QuizProgress` | `sealed class` | Mutable question index, revealed state, tallies. |
 | `SelectionRound` | `sealed class` | Mutable submission tracking + top-value computation. |
 | `FormationRecord` | `sealed class` | Mutable group list. Populated by solver, persisted. |

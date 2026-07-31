@@ -223,7 +223,7 @@ On startup:
 2. `ISessionRepository.LoadAllAsync()` — load all stored sessions
 3. Reconstruct domain `Session` objects from EF entities
 4. Register in the in-memory session registry (available for SignalR
-   hub in Task 9)
+   hubs)
 
 Sessions resume at their exact prior state. No client action needed —
 reconnecting clients are pushed the full current state on connect
