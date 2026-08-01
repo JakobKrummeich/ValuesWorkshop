@@ -281,7 +281,8 @@ dependencies, easily testable.
 
 - **Save:** convert domain `Session` + building blocks → entity graph,
   then `DbContext` upsert (clear + re-add child collections for simplicity;
-  single-writer per session means no contention).
+  the compare-and-set guard on `revision` ensures only the winning
+  writer's transaction commits — see § 4).
 - **Load:** query full entity graph with `.Include()` chains, then
   reconstruct domain objects via internal constructors / factory methods.
 
