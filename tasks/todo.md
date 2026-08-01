@@ -183,6 +183,23 @@ Task-1 placeholder `<Role>Gateway` interfaces (naming decided then).
 **Verification:** BE hub unit tests; FE reducer tests applying snapshot.
 **Dependencies:** 7, 8. **Size:** M
 
+### Task 9b: Optimistic concurrency for session mutations
+**Description:** `SessionCommandHandler` writes the whole aggregate without a
+revision check, so two concurrent intents can lost-update each other (a
+roster change can be overwritten by a concurrent `AdvancePhase`). Add
+revision-checked persistence: load-with-revision, write only when the stored
+revision still matches, retry the intent on conflict, and surface a typed
+rejection when retries are exhausted. Task 9 landed only a defensive
+`TryGetValue` guard in `ParticipantHub` against the resulting
+`KeyNotFoundException`; this task removes the underlying race.
+**Acceptance criteria:**
+- [ ] Concurrent join + advance-phase never loses either mutation
+- [ ] Conflicting write retries, then rejects with a typed error, state
+      unchanged
+- [ ] Revision increases monotonically per accepted mutation
+**Verification:** BE concurrency tests driving two intents against one session.
+**Dependencies:** 9. **Size:** S
+
 ### Task 10: Session lifecycle + reconnect
 **Description:** Facilitator-password-gated session creation (PW server-set,
 never client-stored); participant join by `sessionId`; membership persisted;
