@@ -378,8 +378,6 @@ broadcast, no `revision` bump.
 | `NotAuthorized` | right role, wrong standing (e.g. not the scribe, I10) |
 | `UnknownSession` | no session with that identity |
 | `UnknownParticipant` | referenced participant is not on the roster |
-| `UnknownGroup` | referenced group does not exist |
-| `UnknownAction` | referenced action does not exist or belongs elsewhere |
 | `InvariantViolated` | a domain invariant refused the mutation (I5–I15) |
 | `MalformedPayload` | payload failed structural validation (§ 6.3) |
 | `ConcurrencyConflict` | a concurrent writer won the race three times in a row (`design/persistence.md` § 4) |

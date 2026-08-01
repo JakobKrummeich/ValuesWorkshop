@@ -229,6 +229,17 @@ conflict the exception propagates and `IntentPipeline` turns it into
 `IntentResult.Rejected(ConcurrencyConflict, …)`: nothing persisted, nothing
 broadcast, state unchanged.
 
+**Mutation contract:** a retry re-executes the mutation delegate against the
+freshly loaded session, so the delegate must be a pure function of the
+`Session` it receives — it decides only from that aggregate and writes only
+to it. Side effects outside the aggregate (broadcasts, outbound calls,
+captured counters, wall-clock or random values kept outside the domain) would
+happen once per attempt and are therefore forbidden in the delegate.
+
+A save that cannot take the SQLite write lock before its timeout elapses
+(`SQLITE_BUSY`) is reported as a `ConcurrencyConflictException` too, so it
+uses the same retry budget instead of surfacing a storage-specific failure.
+
 Because a retry must see the winning writer's state, `SqliteSessionRepository`
 reads without change tracking and clears the tracker before a write, so no
 stale EF identity-map snapshot can be re-saved.
