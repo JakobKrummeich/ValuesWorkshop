@@ -2,6 +2,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ValuesWorkshop.Adapters.Persistence;
 using ValuesWorkshop.Domain;
+using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Adapters.Tests;
 
@@ -230,6 +231,98 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task Save_with_the_matching_expected_revision_round_trips()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+
+        await SaveSession(PhasedSession(identity, Phase.Quiz, revision: 5), expectedRevision: 4);
+
+        var loaded = await LoadSession(identity);
+        loaded.ShouldNotBeNull();
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.Revision.ShouldBe(5);
+    }
+
+    [Fact]
+    public async Task Save_with_a_stale_expected_revision_leaves_the_stored_session_untouched()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var survivor = new ParticipantId(Guid.NewGuid());
+        await SaveSession(
+            PhasedSession(identity, Phase.Quiz, revision: 4, survivor),
+            expectedRevision: 0
+        );
+
+        var staleSession = PhasedSession(identity, Phase.GroupWork, revision: 5);
+
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            SaveSession(staleSession, expectedRevision: 3)
+        );
+
+        var loaded = await LoadSession(identity);
+        loaded.ShouldNotBeNull();
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.Roster.Participants.ShouldBe([survivor]);
+        loaded.Revision.ShouldBe(4);
+    }
+
+    [Fact]
+    public async Task Save_of_an_unknown_session_with_expected_revision_zero_inserts_it()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+
+        await SaveSession(PhasedSession(identity, Phase.Quiz, revision: 1), expectedRevision: 0);
+
+        var loaded = await LoadSession(identity);
+        loaded.ShouldNotBeNull();
+        loaded.Revision.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Save_of_an_unknown_session_with_a_nonzero_expected_revision_conflicts()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            SaveSession(PhasedSession(identity, Phase.Quiz, revision: 8), expectedRevision: 7)
+        );
+
+        (await LoadSession(identity)).ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task Only_one_of_two_contexts_that_loaded_the_same_revision_can_save()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+
+        using var contextOne = new WorkshopDbContext(_options);
+        using var contextTwo = new WorkshopDbContext(_options);
+        var repositoryOne = new SqliteSessionRepository(contextOne);
+        var repositoryTwo = new SqliteSessionRepository(contextTwo);
+
+        var joiner = new ParticipantId(Guid.NewGuid());
+        var sessionForJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
+        var sessionForAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+        sessionForJoin.Join(joiner, new FixedRandomness(0));
+        sessionForJoin.BumpRevision();
+        sessionForAdvance.AdvancePhase();
+        sessionForAdvance.BumpRevision();
+
+        await repositoryOne.SaveAsync(sessionForJoin, expectedRevision: 4);
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            repositoryTwo.SaveAsync(sessionForAdvance, expectedRevision: 4)
+        );
+
+        var loaded = await LoadSession(identity);
+        loaded.ShouldNotBeNull();
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
+        loaded.Roster.Participants.ShouldBe([joiner]);
+        loaded.Revision.ShouldBe(5);
+    }
+
+    [Fact]
     public async Task Load_returns_null_for_nonexistent_session()
     {
         var loaded = await LoadSession(new SessionIdentity(Guid.NewGuid()));
@@ -298,6 +391,26 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             .ToList();
         columnNames.ShouldNotContain("value_id");
         columnNames.ShouldNotContain("vote_count");
+    }
+
+    private static Session PhasedSession(
+        SessionIdentity identity,
+        Phase phase,
+        long revision,
+        params ParticipantId[] participants
+    )
+    {
+        return Session.Restore(
+            identity,
+            Roster.Restore(participants),
+            PhaseProgress.Restore(phase),
+            QuizProgress.Restore(null, false, false),
+            SelectionRound.Restore([], []),
+            FormationRecord.Restore(false, []),
+            PresentationWalk.Restore(null, null),
+            VotingRounds.Restore(false, 0, []),
+            revision
+        );
     }
 
     private async Task SaveSession(Session session, long expectedRevision = 0)

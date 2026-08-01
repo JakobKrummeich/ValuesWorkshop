@@ -10,12 +10,21 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
     {
         var identityString = session.Identity.Value.ToString();
 
+        await using var transaction = await database.Database.BeginTransactionAsync();
+
+        var claimedRows = await database.Database.ExecuteSqlInterpolatedAsync(
+            $"UPDATE sessions SET revision = {session.Revision} WHERE identity = {identityString} AND revision = {expectedRevision}"
+        );
+
+        if (claimedRows == 0)
+        {
+            await RequireAbsentSession(session.Identity, identityString, expectedRevision);
+        }
+
         var existingEntity = await QueryFullSession()
             .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
 
         var newEntity = DomainEntityMapper.ToEntity(session);
-
-        await using var transaction = await database.Database.BeginTransactionAsync();
 
         if (existingEntity is not null)
         {
@@ -46,6 +55,26 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         var entities = await QueryFullSession().ToListAsync();
 
         return entities.Select(DomainEntityMapper.ToDomain).ToList();
+    }
+
+    private async Task RequireAbsentSession(
+        SessionIdentity sessionIdentity,
+        string identityString,
+        long expectedRevision
+    )
+    {
+        var storedRevision = await database
+            .Sessions.AsNoTracking()
+            .Where(sessionEntity => sessionEntity.Identity == identityString)
+            .Select(sessionEntity => (long?)sessionEntity.Revision)
+            .FirstOrDefaultAsync();
+
+        if (storedRevision is null && expectedRevision == 0)
+        {
+            return;
+        }
+
+        throw new ConcurrencyConflictException(sessionIdentity, expectedRevision, storedRevision);
     }
 
     private IQueryable<Persistence.Entities.SessionEntity> QueryFullSession()
