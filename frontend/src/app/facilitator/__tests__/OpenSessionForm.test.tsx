@@ -83,10 +83,15 @@ describe("open session form", () => {
   it("asks the hook to open the session when submitted", () => {
     const { submit } = formShowing({});
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
-    fireEvent.click(screen.getByRole("button", { name: "Open session" }));
+    const { container } = render(
+      <OpenSessionForm sessionCreation={sessionCreation} />,
+    );
+    fireEvent.submit(container.querySelector("form") as HTMLFormElement);
 
     expect(submit).toHaveBeenCalled();
+    expect(
+      screen.getByRole("button", { name: "Open session" }),
+    ).toHaveAttribute("type", "submit");
   });
 
   it("locks the form while the session is being opened", () => {
