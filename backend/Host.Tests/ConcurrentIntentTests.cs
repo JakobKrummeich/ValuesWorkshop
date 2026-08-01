@@ -74,7 +74,8 @@ public sealed class ConcurrentIntentTests
                 services.AddScoped<SqliteSessionRepository>();
                 services.AddScoped<ISessionRepository>(provider => new GatedSessionRepository(
                     provider.GetRequiredService<SqliteSessionRepository>(),
-                    gate
+                    gate,
+                    new CreateRace()
                 ));
             })
         );

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,8 @@ namespace ValuesWorkshop.Adapters.Web;
 public static class SessionCreationEndpoint
 {
     private const string InvalidRequestDetail = "The session name is missing, blank, or too long.";
+    private const string UnavailableDetail =
+        "The session could not be opened right now. Please try again.";
 
     public static IEndpointRouteBuilder MapSessionCreation(this IEndpointRouteBuilder endpoints)
     {
@@ -42,19 +45,22 @@ public static class SessionCreationEndpoint
 
     private static IResult ResponseFor(SessionCreationResult result)
     {
-        if (result.IsAccepted && result.SessionIdentity is { } sessionIdentity)
+        return result switch
         {
-            return Results.Json(
-                new SessionCreationResponse(sessionIdentity.Value),
+            SessionCreationResult.Accepted accepted => Results.Json(
+                new SessionCreationResponse(accepted.SessionIdentity.Value),
                 statusCode: StatusCodes.Status201Created
-            );
-        }
-
-        return result.Rejection == SessionCreationRejection.InvalidRequest
-            ? Results.Problem(
+            ),
+            SessionCreationResult.InvalidRequest => Results.Problem(
                 detail: InvalidRequestDetail,
                 statusCode: StatusCodes.Status400BadRequest
-            )
-            : Results.Unauthorized();
+            ),
+            SessionCreationResult.CreationUnavailable => Results.Problem(
+                detail: UnavailableDetail,
+                statusCode: StatusCodes.Status503ServiceUnavailable
+            ),
+            SessionCreationResult.PassphraseRejected => Results.Unauthorized(),
+            _ => throw new UnreachableException($"Unmapped session creation result {result}."),
+        };
     }
 }

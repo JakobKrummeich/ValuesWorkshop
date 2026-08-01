@@ -3,12 +3,20 @@ using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Host.Tests;
 
-internal sealed class GatedSessionRepository(ISessionRepository inner, SaveGate gate)
-    : ISessionRepository
+internal sealed class GatedSessionRepository(
+    ISessionRepository inner,
+    SaveGate gate,
+    CreateRace createRace
+) : ISessionRepository
 {
-    public Task CreateAsync(Session session)
+    public async Task CreateAsync(Session session)
     {
-        return inner.CreateAsync(session);
+        if (createRace.ShouldARivalWinTheNextCreate())
+        {
+            await inner.CreateAsync(session);
+        }
+
+        await inner.CreateAsync(session);
     }
 
     public async Task SaveAsync(Session session, long expectedRevision)

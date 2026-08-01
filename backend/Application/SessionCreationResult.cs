@@ -2,35 +2,15 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application;
 
-public sealed record SessionCreationResult(
-    bool IsAccepted,
-    SessionIdentity? SessionIdentity,
-    SessionCreationRejection? Rejection,
-    string? Detail
-)
+public abstract record SessionCreationResult
 {
-    public static SessionCreationResult Accepted(SessionIdentity sessionIdentity)
-    {
-        return new SessionCreationResult(true, sessionIdentity, null, null);
-    }
+    private protected SessionCreationResult() { }
 
-    public static SessionCreationResult PassphraseRejected()
-    {
-        return new SessionCreationResult(
-            false,
-            null,
-            SessionCreationRejection.PassphraseRejected,
-            null
-        );
-    }
+    public sealed record Accepted(SessionIdentity SessionIdentity) : SessionCreationResult;
 
-    public static SessionCreationResult InvalidRequest(string detail)
-    {
-        return new SessionCreationResult(
-            false,
-            null,
-            SessionCreationRejection.InvalidRequest,
-            detail
-        );
-    }
+    public sealed record PassphraseRejected : SessionCreationResult;
+
+    public sealed record InvalidRequest : SessionCreationResult;
+
+    public sealed record CreationUnavailable : SessionCreationResult;
 }

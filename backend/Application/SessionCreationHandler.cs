@@ -17,7 +17,7 @@ public sealed class SessionCreationHandler(
     {
         if (!passphrase.Matches(candidatePassphrase))
         {
-            return SessionCreationResult.PassphraseRejected();
+            return new SessionCreationResult.PassphraseRejected();
         }
 
         Session session;
@@ -26,13 +26,20 @@ public sealed class SessionCreationHandler(
         {
             session = Session.Open(new SessionIdentity(Guid.NewGuid()), facilitator, name);
         }
-        catch (InvariantViolationException exception)
+        catch (InvariantViolationException)
         {
-            return SessionCreationResult.InvalidRequest(exception.Message);
+            return new SessionCreationResult.InvalidRequest();
         }
 
-        await repository.CreateAsync(session);
+        try
+        {
+            await repository.CreateAsync(session);
+        }
+        catch (ConcurrencyConflictException)
+        {
+            return new SessionCreationResult.CreationUnavailable();
+        }
 
-        return SessionCreationResult.Accepted(session.Identity);
+        return new SessionCreationResult.Accepted(session.Identity);
     }
 }

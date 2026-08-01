@@ -15,8 +15,7 @@ public class SessionCreationHandlerTests
 
         var result = await handler.CreateAsync(Facilitator, new SessionName("Workshop"), "wrong");
 
-        result.IsAccepted.ShouldBeFalse();
-        result.Rejection.ShouldBe(SessionCreationRejection.PassphraseRejected);
+        result.ShouldBeOfType<SessionCreationResult.PassphraseRejected>();
         repository.Created.ShouldBeEmpty();
         repository.Loads.ShouldBe(0);
     }
@@ -29,8 +28,7 @@ public class SessionCreationHandlerTests
 
         var result = await handler.CreateAsync(Facilitator, new SessionName("   "), "wrong");
 
-        result.Rejection.ShouldBe(SessionCreationRejection.PassphraseRejected);
-        result.Detail.ShouldBeNull();
+        result.ShouldBeOfType<SessionCreationResult.PassphraseRejected>();
     }
 
     [Fact]
@@ -41,9 +39,7 @@ public class SessionCreationHandlerTests
 
         var result = await handler.CreateAsync(Facilitator, new SessionName("   "), "correct");
 
-        result.IsAccepted.ShouldBeFalse();
-        result.Rejection.ShouldBe(SessionCreationRejection.InvalidRequest);
-        result.Detail.ShouldNotBeNullOrWhiteSpace();
+        result.ShouldBeOfType<SessionCreationResult.InvalidRequest>();
         repository.Created.ShouldBeEmpty();
     }
 
@@ -59,7 +55,7 @@ public class SessionCreationHandlerTests
             "correct"
         );
 
-        result.Rejection.ShouldBe(SessionCreationRejection.InvalidRequest);
+        result.ShouldBeOfType<SessionCreationResult.InvalidRequest>();
         repository.Created.ShouldBeEmpty();
     }
 
@@ -75,12 +71,11 @@ public class SessionCreationHandlerTests
             "correct"
         );
 
-        result.IsAccepted.ShouldBeTrue();
-        result.SessionIdentity.ShouldNotBeNull();
+        var accepted = result.ShouldBeOfType<SessionCreationResult.Accepted>();
         repository.Created.Count.ShouldBe(1);
 
         var created = repository.Created[0];
-        created.Identity.ShouldBe(result.SessionIdentity!.Value);
+        created.Identity.ShouldBe(accepted.SessionIdentity);
         created.Name.Value.ShouldBe("Workshop");
         created.Revision.ShouldBe(0);
         created.IsFacilitatedBy(Facilitator).ShouldBeTrue();
@@ -95,7 +90,25 @@ public class SessionCreationHandlerTests
         var first = await handler.CreateAsync(Facilitator, new SessionName("First"), "correct");
         var second = await handler.CreateAsync(Facilitator, new SessionName("Second"), "correct");
 
-        first.SessionIdentity.ShouldNotBe(second.SessionIdentity);
+        first
+            .ShouldBeOfType<SessionCreationResult.Accepted>()
+            .SessionIdentity.ShouldNotBe(
+                second.ShouldBeOfType<SessionCreationResult.Accepted>().SessionIdentity
+            );
+    }
+
+    [Fact]
+    public async Task An_identity_that_the_repository_rejects_as_a_conflict_is_unavailable()
+    {
+        var repository = FakeSessionRepository.Holding(
+            TestSessions.Open(new SessionIdentity(Guid.NewGuid()))
+        );
+        var handler = new SessionCreationHandler(repository, new FakePassphrase("correct"));
+
+        var result = await handler.CreateAsync(Facilitator, new SessionName("Workshop"), "correct");
+
+        result.ShouldBeOfType<SessionCreationResult.CreationUnavailable>();
+        repository.Created.ShouldBeEmpty();
     }
 
     private sealed class FakePassphrase(string expected) : IFacilitatorPassphrase
