@@ -18,14 +18,12 @@ function createFakeConnection(
 
   const connection: WebsocketConnection = {
     connectionState: EMPTY,
-    start: () =>
-      defer(() => startOperations[startCount++] ?? EMPTY) as Completable,
-    stop: () =>
-      defer(() => {
-        stopCount++;
-        onStop();
-        return EMPTY;
-      }) as Completable,
+    start: defer(() => startOperations[startCount++] ?? EMPTY) as Completable,
+    stop: defer(() => {
+      stopCount++;
+      onStop();
+      return EMPTY;
+    }) as Completable,
     on: () => EMPTY,
     invoke: () => EMPTY,
   };
@@ -51,9 +49,9 @@ describe("serialized connection lifecycle", () => {
     );
     const connection = withSerializedLifecycle(fake.connection);
 
-    connection.start().subscribe();
+    connection.start.subscribe();
     const stopped = new Promise<void>((resolve) =>
-      connection.stop().subscribe({ complete: () => resolve() }),
+      connection.stop.subscribe({ complete: () => resolve() }),
     );
     expect(calls).toEqual([]);
     calls.push("start");
@@ -69,10 +67,10 @@ describe("serialized connection lifecycle", () => {
     ]);
     const connection = withSerializedLifecycle(fake.connection);
 
-    connection.start().subscribe({ error: () => undefined });
-    connection.stop().subscribe();
+    connection.start.subscribe({ error: () => undefined });
+    connection.stop.subscribe();
     await new Promise<void>((resolve) =>
-      connection.start().subscribe({ complete: () => resolve() }),
+      connection.start.subscribe({ complete: () => resolve() }),
     );
 
     expect(fake.startCount()).toBe(2);

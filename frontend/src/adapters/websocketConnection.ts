@@ -4,8 +4,8 @@ import type { Completable, Single } from "../shared/reactiveTypes";
 
 export interface WebsocketConnection {
   readonly connectionState: Observable<ConnectionState>;
-  start(): Completable;
-  stop(): Completable;
+  readonly start: Completable;
+  readonly stop: Completable;
   on(methodName: string): Observable<unknown>;
   invoke(methodName: string, ...payload: unknown[]): Single<unknown>;
 }

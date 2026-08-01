@@ -42,8 +42,8 @@ beforeEach(() => {
       connectionState: of(ConnectionState.Connected),
     },
     lifecycle: { advancePhase },
-    start: () => EMPTY,
-    close: () => EMPTY,
+    start: EMPTY,
+    close: EMPTY,
   });
 });
 

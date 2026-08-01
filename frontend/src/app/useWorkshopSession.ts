@@ -9,7 +9,7 @@ export interface WorkshopSessionResult<TSession> {
   isSessionIdentityMissing: boolean;
 }
 
-function subscribeToNothing() {
+function neverChanges() {
   return () => undefined;
 }
 
@@ -21,7 +21,7 @@ export function useWorkshopSession<TSession extends WorkshopSession>(
   createSession: (sessionIdentity: string) => TSession,
 ): WorkshopSessionResult<TSession> {
   const sessionIdentity = useSyncExternalStore(
-    subscribeToNothing,
+    neverChanges,
     currentSessionIdentity,
     unknownOnTheServer,
   );
@@ -39,7 +39,7 @@ export function useWorkshopSession<TSession extends WorkshopSession>(
       return;
     }
 
-    const subscription = session.start().subscribe({
+    const subscription = session.start.subscribe({
       error(error) {
         console.error("The workshop connection could not be started", error);
       },
@@ -47,7 +47,11 @@ export function useWorkshopSession<TSession extends WorkshopSession>(
 
     return () => {
       subscription.unsubscribe();
-      session.close().subscribe({ error: () => undefined });
+      session.close.subscribe({
+        error(error) {
+          console.error("The workshop connection could not be closed", error);
+        },
+      });
     };
   }, [session]);
 

@@ -31,8 +31,8 @@ beforeEach(() => {
       workshopState,
       connectionState: of(ConnectionState.Reconnecting),
     },
-    start: () => EMPTY,
-    close: () => EMPTY,
+    start: EMPTY,
+    close: EMPTY,
   });
 });
 

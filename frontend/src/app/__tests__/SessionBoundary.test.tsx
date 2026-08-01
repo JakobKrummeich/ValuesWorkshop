@@ -17,7 +17,7 @@ interface FakeSession extends WorkshopSession {
 }
 
 function createFakeSession(identity: string): FakeSession {
-  return { identity, start: () => EMPTY, close: () => EMPTY };
+  return { identity, start: EMPTY, close: EMPTY };
 }
 
 describe("SessionBoundary", () => {

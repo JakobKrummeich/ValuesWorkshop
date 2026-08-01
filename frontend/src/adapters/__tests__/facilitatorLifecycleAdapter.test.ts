@@ -15,8 +15,8 @@ function connectionAnswering(result: unknown): {
   return {
     connection: {
       connectionState: NEVER,
-      start: () => NEVER as never,
-      stop: () => NEVER as never,
+      start: NEVER,
+      stop: NEVER,
       on: () => NEVER,
       invoke,
     },
@@ -70,8 +70,8 @@ describe("facilitator lifecycle port", () => {
   it("surfaces a transport failure to the caller", () => {
     const connection: WebsocketConnection = {
       connectionState: NEVER,
-      start: () => NEVER as never,
-      stop: () => NEVER as never,
+      start: NEVER,
+      stop: NEVER,
       on: () => NEVER,
       invoke: () => throwError(() => new Error("connection is closed")),
     };

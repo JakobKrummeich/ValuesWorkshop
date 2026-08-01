@@ -22,8 +22,8 @@ function connectionEmitting(
 ): WebsocketConnection {
   return {
     connectionState,
-    start: () => NEVER as never,
-    stop: () => NEVER as never,
+    start: NEVER,
+    stop: NEVER,
     on: (methodName: string) =>
       methodName === "ReceiveWorkshopState" ? states : NEVER,
     invoke: () => NEVER,

@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react";
-import { EMPTY, Subject, ignoreElements, throwError } from "rxjs";
+import { EMPTY, Subject, defer, ignoreElements, throwError } from "rxjs";
 import { currentSessionIdentity } from "../../adapters/browserLocation";
 import type { WorkshopSession } from "../../adapters/workshopSessions";
 import { useWorkshopSession } from "../useWorkshopSession";
@@ -27,11 +27,11 @@ function fakeSessionFactory(): {
     const session: FakeSession = {
       identity,
       stopped,
-      start: () => EMPTY,
-      close: () => {
+      start: EMPTY,
+      close: defer(() => {
         stopped.complete();
         return EMPTY;
-      },
+      }),
     };
     sessions.push(session);
     return session;
@@ -85,9 +85,10 @@ describe("workshop session lifetime", () => {
       .spyOn(console, "error")
       .mockImplementation(() => undefined);
     const create = (): WorkshopSession => ({
-      start: () =>
-        throwError(() => new Error("the hub refused")).pipe(ignoreElements()),
-      close: () => EMPTY,
+      start: throwError(() => new Error("the hub refused")).pipe(
+        ignoreElements(),
+      ),
+      close: EMPTY,
     });
 
     renderHook(() => useWorkshopSession(create));

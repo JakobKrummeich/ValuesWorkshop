@@ -76,8 +76,7 @@ describe("signalR connection wrapper", () => {
     const fake = createFakeHubConnection();
     const connection = wrapHubConnection(fake.hubConnection);
 
-    connection.start();
-
+    expect(connection.start).toBeDefined();
     expect(fake.start).not.toHaveBeenCalled();
   });
 
@@ -88,7 +87,7 @@ describe("signalR connection wrapper", () => {
     connection.connectionState.subscribe(collectStates(states));
 
     await new Promise<void>((resolve) =>
-      connection.start().subscribe({ complete: resolve }),
+      connection.start.subscribe({ complete: resolve }),
     );
 
     expect(states).toEqual([
@@ -106,7 +105,7 @@ describe("signalR connection wrapper", () => {
     connection.connectionState.subscribe(collectStates(states));
 
     const error = await new Promise<Error>((resolve) =>
-      connection.start().subscribe({ error: resolve }),
+      connection.start.subscribe({ error: resolve }),
     );
 
     expect(error.message).toBe("handshake refused");
@@ -176,7 +175,7 @@ describe("signalR connection wrapper", () => {
     const connection = wrapHubConnection(fake.hubConnection);
 
     await new Promise<void>((resolve) =>
-      connection.stop().subscribe({ complete: resolve }),
+      connection.stop.subscribe({ complete: resolve }),
     );
 
     expect(fake.stop).toHaveBeenCalled();

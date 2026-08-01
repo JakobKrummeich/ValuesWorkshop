@@ -7,6 +7,8 @@ import {
   participantWorkshopStateSchema,
   presenterWorkshopStateSchema,
 } from "../domain/workshopState";
+import { WorkshopRole } from "../domain/workshopRole";
+import { hubBaseUrl } from "../config/environment";
 import type { Completable, Single } from "../shared/reactiveTypes";
 import { getAccessToken } from "./authAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
@@ -16,8 +18,8 @@ import { createSignalRConnection } from "./signalRConnection";
 import type { WebsocketConnection } from "./websocketConnection";
 
 export interface WorkshopSession {
-  start(): Completable;
-  close(): Completable;
+  readonly start: Completable;
+  readonly close: Completable;
 }
 
 export interface ParticipantSession extends WorkshopSession {
@@ -36,7 +38,10 @@ export interface PresenterSession extends WorkshopSession {
 export function createParticipantSession(
   sessionIdentity: string,
 ): ParticipantSession {
-  const connection = connectAuthenticated("participant", sessionIdentity);
+  const connection = connectAuthenticated(
+    WorkshopRole.Participant,
+    sessionIdentity,
+  );
 
   return {
     sessionState: createSessionStatePort(
@@ -50,7 +55,10 @@ export function createParticipantSession(
 export function createFacilitatorSession(
   sessionIdentity: string,
 ): FacilitatorSession {
-  const connection = connectAuthenticated("facilitator", sessionIdentity);
+  const connection = connectAuthenticated(
+    WorkshopRole.Facilitator,
+    sessionIdentity,
+  );
 
   return {
     sessionState: createSessionStatePort(
@@ -65,7 +73,7 @@ export function createFacilitatorSession(
 export function createPresenterSession(
   sessionIdentity: string,
 ): PresenterSession {
-  const connection = connect("presenter", sessionIdentity);
+  const connection = connect(WorkshopRole.Presenter, sessionIdentity);
 
   return {
     sessionState: createSessionStatePort(
@@ -77,14 +85,14 @@ export function createPresenterSession(
 }
 
 function connectAuthenticated(
-  role: string,
+  role: WorkshopRole,
   sessionIdentity: string,
 ): WebsocketConnection {
   return connect(role, sessionIdentity, getAccessToken());
 }
 
 function connect(
-  role: string,
+  role: WorkshopRole,
   sessionIdentity: string,
   accessToken?: Single<string>,
 ): WebsocketConnection {
@@ -100,9 +108,6 @@ function lifetimeOf(connection: WebsocketConnection): WorkshopSession {
   return { start: connection.start, close: connection.stop };
 }
 
-function hubUrl(role: string, sessionIdentity: string): string {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_HUB_BASE_URL ?? "http://localhost:5000";
-
-  return `${baseUrl}/hub/${role}?sessionIdentity=${encodeURIComponent(sessionIdentity)}`;
+function hubUrl(role: WorkshopRole, sessionIdentity: string): string {
+  return `${hubBaseUrl()}/hub/${role}?sessionIdentity=${encodeURIComponent(sessionIdentity)}`;
 }

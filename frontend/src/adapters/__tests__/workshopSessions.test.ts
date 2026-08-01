@@ -1,4 +1,4 @@
-import { NEVER, firstValueFrom, of } from "rxjs";
+import { EMPTY, NEVER, defer, firstValueFrom, of } from "rxjs";
 import type { WebsocketConnection } from "../websocketConnection";
 import {
   createFacilitatorSession,
@@ -22,16 +22,32 @@ const accessToken = getAccessToken as jest.MockedFunction<
 
 const SESSION_IDENTITY = "3f1a0f2e-0000-4000-8000-000000000001";
 
-function fakeConnection(): WebsocketConnection & {
-  start: jest.Mock;
-  stop: jest.Mock;
-} {
+interface FakeConnection {
+  connection: WebsocketConnection;
+  isStarted: () => boolean;
+  isStopped: () => boolean;
+}
+
+function fakeConnection(): FakeConnection {
+  let isStarted = false;
+  let isStopped = false;
+
   return {
-    connectionState: NEVER,
-    start: jest.fn(() => NEVER as never),
-    stop: jest.fn(() => NEVER as never),
-    on: () => NEVER,
-    invoke: () => NEVER,
+    connection: {
+      connectionState: NEVER,
+      start: defer(() => {
+        isStarted = true;
+        return EMPTY;
+      }),
+      stop: defer(() => {
+        isStopped = true;
+        return EMPTY;
+      }),
+      on: () => NEVER,
+      invoke: () => NEVER,
+    },
+    isStarted: () => isStarted,
+    isStopped: () => isStopped,
   };
 }
 
@@ -41,7 +57,7 @@ function urlOfLastConnection(): string {
 
 describe("session-bound role connections", () => {
   beforeEach(() => {
-    createConnection.mockReturnValue(fakeConnection());
+    createConnection.mockReturnValue(fakeConnection().connection);
     accessToken.mockReturnValue(of("a-token"));
   });
 
@@ -86,14 +102,14 @@ describe("session-bound role connections", () => {
   });
 
   it("starts and closes the underlying connection", () => {
-    const connection = fakeConnection();
-    createConnection.mockReturnValue(connection);
+    const fake = fakeConnection();
+    createConnection.mockReturnValue(fake.connection);
 
     const session = createParticipantSession(SESSION_IDENTITY);
-    session.start().subscribe();
-    session.close().subscribe();
+    session.start.subscribe();
+    session.close.subscribe();
 
-    expect(connection.start).toHaveBeenCalled();
-    expect(connection.stop).toHaveBeenCalled();
+    expect(fake.isStarted()).toBe(true);
+    expect(fake.isStopped()).toBe(true);
   });
 });

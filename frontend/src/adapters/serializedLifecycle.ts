@@ -9,8 +9,8 @@ export function withSerializedLifecycle(
 
   return {
     ...connection,
-    start: () => queue(connection.start()),
-    stop: () => queue(connection.stop()),
+    start: queue(connection.start),
+    stop: queue(connection.stop),
   };
 }
 

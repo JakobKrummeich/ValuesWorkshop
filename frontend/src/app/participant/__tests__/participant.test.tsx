@@ -40,8 +40,8 @@ beforeEach(() => {
       workshopState,
       connectionState: of(ConnectionState.Connected),
     },
-    start: () => EMPTY,
-    close: () => EMPTY,
+    start: EMPTY,
+    close: EMPTY,
   });
 });
 

@@ -5,6 +5,7 @@ import {
   defer,
   firstValueFrom,
   ignoreElements,
+  tap,
 } from "rxjs";
 import { ConnectionState } from "../domain/connectionState";
 import { reconnectDelayMilliseconds } from "./reconnectBackoff";
@@ -43,19 +44,18 @@ export function wrapHubConnection(
   return {
     connectionState: state.asObservable(),
 
-    start: () =>
-      defer(() => {
-        state.next(ConnectionState.Connecting);
-        return hubConnection
-          .start()
-          .then(() => state.next(ConnectionState.Connected))
-          .catch((error: unknown) => {
-            state.next(ConnectionState.Disconnected);
-            throw error;
-          });
-      }).pipe(ignoreElements()),
+    start: defer(() => {
+      state.next(ConnectionState.Connecting);
+      return hubConnection.start();
+    }).pipe(
+      tap({
+        next: () => state.next(ConnectionState.Connected),
+        error: () => state.next(ConnectionState.Disconnected),
+      }),
+      ignoreElements(),
+    ),
 
-    stop: () => defer(() => hubConnection.stop()).pipe(ignoreElements()),
+    stop: defer(() => hubConnection.stop()).pipe(ignoreElements()),
 
     on: (methodName: string) =>
       new Observable<unknown>((subscriber) => {
