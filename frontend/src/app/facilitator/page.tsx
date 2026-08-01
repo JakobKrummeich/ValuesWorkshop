@@ -3,13 +3,14 @@
 import { SessionStatusBanner } from "../SessionStatusBanner";
 import { AdvancePhaseButton } from "./AdvancePhaseButton";
 import { useFacilitatorDependencies } from "./dependencies";
+import styles from "./page.module.css";
 
 export default function FacilitatorHome() {
   const { sessionState } = useFacilitatorDependencies();
 
   return (
-    <main>
-      <h1>Facilitator</h1>
+    <main className={styles.page}>
+      <h1 className={styles.heading}>Facilitator</h1>
       <SessionStatusBanner sessionState={sessionState} />
       <AdvancePhaseButton />
     </main>
