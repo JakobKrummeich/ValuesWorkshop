@@ -46,7 +46,7 @@ public sealed class Session
 
     public bool IsFacilitatedBy(FacilitatorSubject subject)
     {
-        return string.Equals(Facilitator.Value, subject.Value, StringComparison.Ordinal);
+        return Facilitator == subject;
     }
 
     public bool Join(ParticipantId participantId, IRandomness randomness)
