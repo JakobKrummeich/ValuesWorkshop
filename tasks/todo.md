@@ -261,6 +261,10 @@ through workshop phase 2.
 - [ ] Bars update without reload as votes arrive
 - [ ] Correct answer highlighted after reveal; learning text togglable
 - [ ] Multi-client e2e now covers phases 1–2 and runs in CI
+- [ ] Playwright wired into CI for the first time: `webServer` (or compose)
+      startup in `playwright.config.ts` plus a job in `.github/workflows/ci.yml`,
+      covering the reconnect/restart smoke written in Task 10 and left
+      local-only there
 **Verification:** FE component/reducer tests; Playwright: 3 participants vote,
 bars reflect tallies.
 **Dependencies:** 12, 13. **Size:** M

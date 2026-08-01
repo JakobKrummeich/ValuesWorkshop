@@ -1,0 +1,102 @@
+<h1>Task 10: Session lifecycle + reconnect</h1>
+<h2>Problem</h2>
+<p>A session can only come into existence through a test calling
+<code>SaveAsync(new Session(id), 0)</code>. There is no HTTP surface, no facilitator
+passphrase, and no facilitator identity anywhere: <code>FacilitatorHub</code>
+(<code>Adapters.Web/FacilitatorHub.cs:16</code>) hands full session control to any
+authenticated <code>sub</code> that guesses a <code>sessionIdentity</code>. <code>IntentRejectionCode .NotAuthorized</code> exists and is never produced. Reconnect works for
+participants (roster + <code>LoadAllAsync</code>) but is unproven in a browser, and the
+facilitator has no identity to restore.</p>
+<p><code>design/protocol.md</code> §2 already locks the contract: <code>POST /api/sessions</code> with
+the passphrase in the body, 401 on a wrong one, and &quot;the facilitator is the
+<code>sub</code> recorded when creation was accepted; the facilitator hub refuses any
+other <code>sub</code> with <code>NotAuthorized</code>&quot;. This task implements exactly that.</p>
+<h2>Solution</h2>
+<ol>
+<li><strong>Domain</strong> — <code>Session.Open(SessionIdentity, FacilitatorSubject, SessionName)</code> factory; <code>FacilitatorSubject</code> (record over the OIDC <code>sub</code>)
+and <code>SessionName</code> become session state. <code>Session.IsFacilitatedBy(subject)</code>
+is the authorization predicate. The existing <code>Session(SessionIdentity)</code>
+constructor goes away.</li>
+<li><strong>Persistence</strong> — <code>ISessionRepository.CreateAsync(Session)</code>, an explicit
+insert. <code>SaveAsync</code> stops inserting: a missing row is now a
+<code>ConcurrencyConflictException</code>, which closes the Task 9b latent gap where
+&quot;row absent + expectedRevision 0&quot; was indistinguishable from &quot;row stored at
+revision 0&quot;. <code>sessions</code> gains <code>facilitator_subject</code> and <code>name</code> columns.
+A duplicate <code>identity</code> insert surfaces as <code>ConcurrencyConflictException</code>.</li>
+<li><strong>Passphrase</strong> — <code>FACILITATOR_PASSPHRASE</code> env var, bound to an options
+record, validated at startup: absent or empty fails the host fast rather
+than silently opening session creation. Comparison is
+<code>CryptographicOperations.FixedTimeEquals</code> over UTF-8 bytes. The value is
+never logged, never echoed, never sent to a client.</li>
+<li><strong>Endpoint</strong> — <code>POST /api/sessions</code>, bearer-authenticated (the token is
+what supplies the facilitator <code>sub</code>), body <code>{ sessionName, passphrase }</code>.
+Wrong or absent passphrase → <code>401</code>, no session created, no detail leaked.
+Accepted → <code>201</code> + <code>{ sessionIdentity }</code>, session persisted through
+<code>CreateAsync</code> with <code>revision = 0</code>.</li>
+<li><strong>Hub authorization</strong> — <code>FacilitatorHub.OnConnectedAsync</code> loads the session
+and aborts the connection when the caller <code>sub</code> is not the recorded
+facilitator. Participant and presenter hubs are untouched.</li>
+<li><strong>Frontend</strong> — <code>/facilitator</code> without a <code>sessionIdentity</code> renders the open
+session form (name + passphrase, <code>design/screens.md:80</code>); success navigates
+to <code>/facilitator?sessionIdentity=…</code>. The passphrase lives in component
+state only: no <code>localStorage</code>, no URL, no cookie, cleared on submit.
+Reconnect needs nothing stored — the URL carries the identity and the OIDC
+token carries the <code>sub</code>.</li>
+</ol>
+<h2>Acceptance criteria</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Wrong or absent passphrase → <code>401</code>, and no row is written</li>
+<li><input disabled="" type="checkbox"> Accepted creation returns a <code>sessionIdentity</code> whose facilitator is the
+caller&#39;s <code>sub</code>, persisted at <code>revision = 0</code></li>
+<li><input disabled="" type="checkbox"> A different <code>sub</code> on <code>/hub/facilitator</code> is refused; the recorded
+facilitator connects and receives full facilitator state</li>
+<li><input disabled="" type="checkbox"> Facilitator closes and reopens the tab → control restored from URL +
+token alone, no rejoin, nothing read from client storage</li>
+<li><input disabled="" type="checkbox"> Participant membership and facilitator identity both survive a backend
+restart</li>
+<li><input disabled="" type="checkbox"> Playwright: participant joins → facilitator advances a phase →
+presenter and participant re-render → backend restarts → all three
+clients reconnect and show identical state (the loop deferred from
+Task 9)</li>
+</ul>
+<h2>Non-goals</h2>
+<ul>
+<li>No facilitator hand-off, no second facilitator, no session transfer.</li>
+<li>No session listing, closing, or deletion endpoint.</li>
+<li>No participant-facing join UI beyond what exists (Task 12 owns QR + lobby).</li>
+<li>No wiring of Playwright into CI (Task 14 acceptance criterion).</li>
+<li>No password hashing scheme for the passphrase — it is a server-set shared
+secret compared in constant time, not a stored user credential.</li>
+</ul>
+<h2>Decisions (approved)</h2>
+<ol>
+<li><strong><code>sessionName</code> is persisted now</strong> (<code>sessions.name</code>), for consumers that
+arrive later, instead of adding the column in a later task.</li>
+<li><strong>Missing <code>FACILITATOR_PASSPHRASE</code> fails host startup.</strong> It must be set;
+a misconfigured deploy must not look like a wrong passphrase.</li>
+<li><strong>Playwright stays local in this task.</strong> The reconnect smoke runs against
+<code>docker-compose.dev.yml</code>; the CI job is Task 14, whose acceptance criteria
+now name this suite explicitly.</li>
+</ol>
+<h2>Slices</h2>
+<ol>
+<li><strong>Domain + persistence</strong>: <code>FacilitatorSubject</code>, <code>SessionName</code>,
+<code>Session.Open</code>, <code>IsFacilitatedBy</code>, <code>CreateAsync</code>, the two new columns,
+<code>SaveAsync</code> insert path removed. <code>Domain.Tests</code> + <code>Adapters.Tests</code> incl.
+duplicate-create and save-without-row.</li>
+<li><strong>Endpoint + passphrase</strong>: options record with startup validation,
+fixed-time compare, <code>POST /api/sessions</code>, <code>Host.Tests</code> for 401 (wrong,
+absent, empty), 401 (no bearer), 201 + persisted facilitator.</li>
+<li><strong>Facilitator authorization</strong>: hub check + <code>NotAuthorized</code>,
+<code>Adapters.Tests</code> and <code>Host.Tests</code> for refused foreign <code>sub</code> and accepted
+owner, including after a restart.</li>
+<li><strong>Frontend</strong>: open-session form component + CSS module, session creation
+port/adapter, routing on success, Jest tests for validation, 401 handling,
+and &quot;passphrase never persisted&quot;.</li>
+<li><strong>E2E + docs</strong>: Playwright reconnect/restart loop, <code>docker-compose.dev.yml</code>
+passphrase wiring, updates to <code>design/protocol.md</code>, <code>design/persistence.md</code>
+(new columns, create path), <code>tasks/todo.md</code>.</li>
+</ol>
+<h2>Verification</h2>
+<p><code>./scripts/ci-lint.sh</code>, <code>./scripts/ci-test.sh</code>, plus <code>npx playwright test</code>
+against the dev compose stack for the multi-client reconnect loop.</p>
