@@ -198,11 +198,11 @@ SessionCommandHandler.HandleAsync(sessionIdentity, mutation)
     │     │
     │     └─ Throws on invariant violation → no persist, no broadcast
     │
-    ├─ 3. Persist via ISessionRepository.SaveAsync()
+    ├─ 3. Bump session revision (monotonic, one per accepted mutation)
+    │
+    ├─ 4. Persist via ISessionRepository.SaveAsync()
     │     │
     │     └─ Failure → exception propagates, no broadcast
-    │
-    ├─ 4. Bump session revision (monotonic, one per persisted mutation)
     │
     └─ 5. Broadcast via IBroadcaster
           │

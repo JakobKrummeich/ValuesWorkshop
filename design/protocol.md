@@ -83,7 +83,7 @@ session).
 On the participant hub, `OnConnectedAsync` runs the join intent through the
 pipeline and then pushes the current state to the caller directly — the same
 pattern the facilitator and presenter hubs use. For a newcomer (T4) the join
-mutates the roster, persists, bumps `revision`, and broadcasts to all three
+mutates the roster, bumps `revision`, persists, and broadcasts to all three
 role groups. For a returning participant (T3) the join is a no-op: no
 mutation, no persist, no revision bump, no broadcast — the direct caller push
 is the only message sent. An unknown `sessionIdentity` closes the connection
