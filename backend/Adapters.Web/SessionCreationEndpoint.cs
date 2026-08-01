@@ -16,7 +16,7 @@ public static class SessionCreationEndpoint
 
     public static IEndpointRouteBuilder MapSessionCreation(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/api/sessions", CreateSessionAsync);
+        endpoints.MapPost("/api/sessions", CreateSessionAsync).RequireAuthorization();
 
         return endpoints;
     }

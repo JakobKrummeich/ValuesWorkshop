@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
@@ -26,6 +27,27 @@ public sealed class SessionCreationEndpointTests
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         (await StoredSessionsAsync(backend)).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_request_without_a_token_is_challenged_even_without_the_fallback_policy()
+    {
+        using var origin = new WorkshopTestFactory();
+        using var backend = origin.WithWebHostBuilder(builder =>
+            builder.ConfigureServices(services =>
+                services.Configure<AuthorizationOptions>(options => options.FallbackPolicy = null)
+            )
+        );
+        using var client = backend.CreateClient();
+
+        var response = await PostSessionAsync(
+            client,
+            sessionName: "Workshop",
+            passphrase: WorkshopTestFactory.FacilitatorPassphrase
+        );
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        response.Headers.WwwAuthenticate.ShouldContain(header => header.Scheme == "Bearer");
     }
 
     [Fact]
