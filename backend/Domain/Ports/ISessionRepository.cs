@@ -2,7 +2,7 @@ namespace ValuesWorkshop.Domain.Ports;
 
 public interface ISessionRepository
 {
-    Task SaveAsync(Session session);
+    Task SaveAsync(Session session, long expectedRevision);
     Task<Session?> LoadAsync(SessionIdentity sessionIdentity);
     Task<IReadOnlyList<Session>> LoadAllAsync();
 }

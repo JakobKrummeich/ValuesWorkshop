@@ -8,4 +8,5 @@ public enum IntentRejectionCode
     InvariantViolated = 4,
     MalformedPayload = 5,
     UnknownParticipant = 6,
+    ConcurrencyConflict = 7,
 }

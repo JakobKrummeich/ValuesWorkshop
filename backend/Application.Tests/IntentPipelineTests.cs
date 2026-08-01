@@ -1,6 +1,5 @@
 using ValuesWorkshop.Application.Intents;
 using ValuesWorkshop.Domain;
-using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Application.Tests;
 
@@ -58,8 +57,10 @@ public class IntentPipelineTests
     [Fact]
     public async Task A_rejected_intent_leaves_the_revision_untouched()
     {
-        var session = SessionFixtures.InPhase(Phase.FinalPresentation, revision: 4);
-        var pipeline = PipelineOver(RepositoryWith(session), new RecordingBroadcaster());
+        var repository = RepositoryWith(
+            SessionFixtures.InPhase(Phase.FinalPresentation, revision: 4)
+        );
+        var pipeline = PipelineOver(repository, new RecordingBroadcaster());
 
         await pipeline.ExecuteAsync(
             KnownSession,
@@ -70,13 +71,14 @@ public class IntentPipelineTests
             }
         );
 
-        session.Revision.ShouldBe(4);
+        repository.Saved.ShouldBeEmpty();
+        (await repository.LoadAsync(KnownSession)).ShouldNotBeNull().Revision.ShouldBe(4);
     }
 
     [Fact]
     public async Task An_intent_for_an_unknown_session_changes_nothing()
     {
-        var repository = new FakeSessionRepository();
+        var repository = FakeSessionRepository.Empty();
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
@@ -119,6 +121,30 @@ public class IntentPipelineTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task An_intent_that_keeps_conflicting_is_rejected_as_a_concurrency_conflict()
+    {
+        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Quiz));
+        repository.ConflictingSaves = 3;
+        var broadcaster = new RecordingBroadcaster();
+        var pipeline = PipelineOver(repository, broadcaster);
+
+        var result = await pipeline.ExecuteAsync(
+            KnownSession,
+            session =>
+            {
+                session.AdvancePhase();
+                return true;
+            }
+        );
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.ConcurrencyConflict);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
     private static IntentPipeline PipelineOver(
         FakeSessionRepository repository,
         RecordingBroadcaster broadcaster
@@ -129,39 +155,6 @@ public class IntentPipelineTests
 
     private static FakeSessionRepository RepositoryWith(Session session)
     {
-        return new FakeSessionRepository { Stored = session };
-    }
-
-    private sealed class FakeSessionRepository : ISessionRepository
-    {
-        internal Session? Stored { get; set; }
-        internal List<Session> Saved { get; } = [];
-
-        public Task<Session?> LoadAsync(SessionIdentity sessionIdentity)
-        {
-            return Task.FromResult(Stored);
-        }
-
-        public Task SaveAsync(Session session)
-        {
-            Saved.Add(session);
-            return Task.CompletedTask;
-        }
-
-        public Task<IReadOnlyList<Session>> LoadAllAsync()
-        {
-            return Task.FromResult<IReadOnlyList<Session>>(Stored is null ? [] : [Stored]);
-        }
-    }
-
-    private sealed class RecordingBroadcaster : IBroadcaster
-    {
-        internal List<Session> Broadcasts { get; } = [];
-
-        public Task BroadcastSessionStateAsync(Session session)
-        {
-            Broadcasts.Add(session);
-            return Task.CompletedTask;
-        }
+        return FakeSessionRepository.Holding(session);
     }
 }

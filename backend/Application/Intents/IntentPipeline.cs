@@ -1,4 +1,5 @@
 using ValuesWorkshop.Domain;
+using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Application.Intents;
 
@@ -20,6 +21,13 @@ public sealed class IntentPipeline(SessionCommandHandler commandHandler)
         catch (InvariantViolationException exception)
         {
             return IntentResult.Rejected(IntentRejectionCode.InvariantViolated, exception.Message);
+        }
+        catch (ConcurrencyConflictException exception)
+        {
+            return IntentResult.Rejected(
+                IntentRejectionCode.ConcurrencyConflict,
+                exception.Message
+            );
         }
 
         return IntentResult.Accepted();

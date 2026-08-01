@@ -2,6 +2,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ValuesWorkshop.Adapters.Persistence;
 using ValuesWorkshop.Domain;
+using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Adapters.Tests;
 
@@ -9,6 +10,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly DbContextOptions<WorkshopDbContext> _options;
+    private readonly List<WorkshopDbContext> _openContexts = [];
 
     public SqliteSessionRepositoryTests()
     {
@@ -23,6 +25,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
     public void Dispose()
     {
+        foreach (var context in _openContexts)
+        {
+            context.Dispose();
+        }
+
         _connection.Dispose();
     }
 
@@ -230,6 +237,111 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task Save_with_the_matching_expected_revision_round_trips()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+
+        await SaveSession(PhasedSession(identity, Phase.Quiz, revision: 5), expectedRevision: 4);
+
+        var loaded = await LoadSession(identity);
+        loaded.ShouldNotBeNull();
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.Revision.ShouldBe(5);
+    }
+
+    [Fact]
+    public async Task Save_with_a_stale_expected_revision_leaves_the_stored_session_untouched()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var survivor = new ParticipantId(Guid.NewGuid());
+        await SaveSession(
+            PhasedSession(identity, Phase.Quiz, revision: 4, survivor),
+            expectedRevision: 0
+        );
+
+        var staleSession = PhasedSession(identity, Phase.GroupWork, revision: 5);
+
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            SaveSession(staleSession, expectedRevision: 3)
+        );
+
+        var loaded = await LoadSession(identity);
+        loaded.ShouldNotBeNull();
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.Roster.Participants.ShouldBe([survivor]);
+        loaded.Revision.ShouldBe(4);
+    }
+
+    [Fact]
+    public async Task Save_of_an_unknown_session_with_expected_revision_zero_inserts_it()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+
+        await SaveSession(PhasedSession(identity, Phase.Quiz, revision: 1), expectedRevision: 0);
+
+        var loaded = await LoadSession(identity);
+        loaded.ShouldNotBeNull();
+        loaded.Revision.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Save_of_an_unknown_session_with_a_nonzero_expected_revision_conflicts()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            SaveSession(PhasedSession(identity, Phase.Quiz, revision: 8), expectedRevision: 7)
+        );
+
+        (await LoadSession(identity)).ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task A_save_from_a_context_that_loaded_an_overtaken_revision_conflicts()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var writers = await TwoWritersThatLoadedRevisionFour(identity);
+
+        await writers.RepositoryOne.SaveAsync(writers.SessionWithJoin, expectedRevision: 4);
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            writers.RepositoryTwo.SaveAsync(writers.SessionWithAdvance, expectedRevision: 4)
+        );
+
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
+        loaded.Roster.Participants.ShouldBe([writers.Joiner]);
+        loaded.Revision.ShouldBe(5);
+
+        var reloadedByTheLoser = (
+            await writers.RepositoryTwo.LoadAsync(identity)
+        ).ShouldNotBeNull();
+        reloadedByTheLoser.Revision.ShouldBe(5);
+        reloadedByTheLoser.Roster.Participants.ShouldBe([writers.Joiner]);
+    }
+
+    [Fact]
+    public async Task A_retried_save_after_a_conflict_keeps_both_writers_changes()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var writers = await TwoWritersThatLoadedRevisionFour(identity);
+        await writers.RepositoryOne.SaveAsync(writers.SessionWithJoin, expectedRevision: 4);
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            writers.RepositoryTwo.SaveAsync(writers.SessionWithAdvance, expectedRevision: 4)
+        );
+
+        var retried = (await writers.RepositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+        retried.AdvancePhase();
+        retried.BumpRevision();
+        await writers.RepositoryTwo.SaveAsync(retried, expectedRevision: 5);
+
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+        loaded.Revision.ShouldBe(6);
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.Roster.Participants.ShouldBe([writers.Joiner]);
+    }
+
+    [Fact]
     public async Task Load_returns_null_for_nonexistent_session()
     {
         var loaded = await LoadSession(new SessionIdentity(Guid.NewGuid()));
@@ -300,11 +412,71 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         columnNames.ShouldNotContain("vote_count");
     }
 
-    private async Task SaveSession(Session session)
+    private sealed record RacingWriters(
+        SqliteSessionRepository RepositoryOne,
+        SqliteSessionRepository RepositoryTwo,
+        Session SessionWithJoin,
+        Session SessionWithAdvance,
+        ParticipantId Joiner
+    );
+
+    private async Task<RacingWriters> TwoWritersThatLoadedRevisionFour(SessionIdentity identity)
+    {
+        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+
+        var repositoryOne = new SqliteSessionRepository(TrackedContext());
+        var repositoryTwo = new SqliteSessionRepository(TrackedContext());
+        var joiner = new ParticipantId(Guid.NewGuid());
+        var sessionWithJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
+        var sessionWithAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+
+        sessionWithJoin.Join(joiner, new FixedRandomness(0));
+        sessionWithJoin.BumpRevision();
+        sessionWithAdvance.AdvancePhase();
+        sessionWithAdvance.BumpRevision();
+
+        return new RacingWriters(
+            repositoryOne,
+            repositoryTwo,
+            sessionWithJoin,
+            sessionWithAdvance,
+            joiner
+        );
+    }
+
+    private WorkshopDbContext TrackedContext()
+    {
+        var context = new WorkshopDbContext(_options);
+        _openContexts.Add(context);
+
+        return context;
+    }
+
+    private static Session PhasedSession(
+        SessionIdentity identity,
+        Phase phase,
+        long revision,
+        params ParticipantId[] participants
+    )
+    {
+        return Session.Restore(
+            identity,
+            Roster.Restore(participants),
+            PhaseProgress.Restore(phase),
+            QuizProgress.Restore(null, false, false),
+            SelectionRound.Restore([], []),
+            FormationRecord.Restore(false, []),
+            PresentationWalk.Restore(null, null),
+            VotingRounds.Restore(false, 0, []),
+            revision
+        );
+    }
+
+    private async Task SaveSession(Session session, long expectedRevision = 0)
     {
         using var context = new WorkshopDbContext(_options);
         var repository = new SqliteSessionRepository(context);
-        await repository.SaveAsync(session);
+        await repository.SaveAsync(session, expectedRevision);
     }
 
     private async Task<Session?> LoadSession(SessionIdentity identity)

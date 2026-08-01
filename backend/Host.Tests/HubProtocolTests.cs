@@ -165,7 +165,9 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
         }
 
         using var scope = factory.Services.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<ISessionRepository>().SaveAsync(session);
+        await scope
+            .ServiceProvider.GetRequiredService<ISessionRepository>()
+            .SaveAsync(session, expectedRevision: 0);
 
         return sessionIdentity;
     }

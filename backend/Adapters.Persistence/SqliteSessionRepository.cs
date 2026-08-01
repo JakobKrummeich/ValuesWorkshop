@@ -1,3 +1,5 @@
+using System.Globalization;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
@@ -6,16 +8,49 @@ namespace ValuesWorkshop.Adapters.Persistence;
 
 public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessionRepository
 {
-    public async Task SaveAsync(Session session)
+    private const int SqliteBusyErrorCode = 5;
+
+    public async Task SaveAsync(Session session, long expectedRevision)
+    {
+        try
+        {
+            await SaveWithinTransactionAsync(session, expectedRevision);
+        }
+        catch (SqliteException exception) when (exception.SqliteErrorCode == SqliteBusyErrorCode)
+        {
+            throw new ConcurrencyConflictException(
+                DescribeMissingWriteLock(session.Identity, expectedRevision),
+                exception
+            );
+        }
+    }
+
+    private async Task SaveWithinTransactionAsync(Session session, long expectedRevision)
     {
         var identityString = session.Identity.Value.ToString();
+
+        database.ChangeTracker.Clear();
+
+        await using var transaction = await database.Database.BeginTransactionAsync();
+
+        var claimedRows = await database
+            .Sessions.Where(sessionEntity =>
+                sessionEntity.Identity == identityString
+                && sessionEntity.Revision == expectedRevision
+            )
+            .ExecuteUpdateAsync(setters =>
+                setters.SetProperty(sessionEntity => sessionEntity.Revision, session.Revision)
+            );
+
+        if (claimedRows == 0)
+        {
+            await RequireInsertableSession(session.Identity, expectedRevision);
+        }
 
         var existingEntity = await QueryFullSession()
             .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
 
         var newEntity = DomainEntityMapper.ToEntity(session);
-
-        await using var transaction = await database.Database.BeginTransactionAsync();
 
         if (existingEntity is not null)
         {
@@ -36,6 +71,7 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         var identityString = sessionIdentity.Value.ToString();
 
         var entity = await QueryFullSession()
+            .AsNoTracking()
             .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
 
         return entity is null ? null : DomainEntityMapper.ToDomain(entity);
@@ -43,9 +79,41 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
 
     public async Task<IReadOnlyList<Session>> LoadAllAsync()
     {
-        var entities = await QueryFullSession().ToListAsync();
+        var entities = await QueryFullSession().AsNoTracking().ToListAsync();
 
         return entities.Select(DomainEntityMapper.ToDomain).ToList();
+    }
+
+    private static string DescribeMissingWriteLock(
+        SessionIdentity sessionIdentity,
+        long expectedRevision
+    )
+    {
+        return string.Create(
+            CultureInfo.InvariantCulture,
+            $"Session {sessionIdentity.Value} expected revision {expectedRevision} but the write lock was not obtained before the timeout elapsed."
+        );
+    }
+
+    private async Task RequireInsertableSession(
+        SessionIdentity sessionIdentity,
+        long expectedRevision
+    )
+    {
+        var identityString = sessionIdentity.Value.ToString();
+
+        var storedRevision = await database
+            .Sessions.AsNoTracking()
+            .Where(sessionEntity => sessionEntity.Identity == identityString)
+            .Select(sessionEntity => (long?)sessionEntity.Revision)
+            .FirstOrDefaultAsync();
+
+        if (storedRevision is null && expectedRevision == 0)
+        {
+            return;
+        }
+
+        throw new ConcurrencyConflictException(sessionIdentity, expectedRevision, storedRevision);
     }
 
     private IQueryable<Persistence.Entities.SessionEntity> QueryFullSession()

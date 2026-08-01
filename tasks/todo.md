@@ -193,10 +193,10 @@ rejection when retries are exhausted. Task 9 landed only a defensive
 `TryGetValue` guard in `ParticipantHub` against the resulting
 `KeyNotFoundException`; this task removes the underlying race.
 **Acceptance criteria:**
-- [ ] Concurrent join + advance-phase never loses either mutation
-- [ ] Conflicting write retries, then rejects with a typed error, state
+- [x] Concurrent join + advance-phase never loses either mutation
+- [x] Conflicting write retries, then rejects with a typed error, state
       unchanged
-- [ ] Revision increases monotonically per accepted mutation
+- [x] Revision increases monotonically per accepted mutation
 **Verification:** BE concurrency tests driving two intents against one session.
 **Dependencies:** 9. **Size:** S
 

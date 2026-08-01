@@ -55,7 +55,9 @@ public sealed class BackendRestartTests
         }
 
         using var scope = backend.Services.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<ISessionRepository>().SaveAsync(session);
+        await scope
+            .ServiceProvider.GetRequiredService<ISessionRepository>()
+            .SaveAsync(session, expectedRevision: 0);
 
         return sessionIdentity;
     }
