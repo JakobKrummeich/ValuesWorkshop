@@ -14,8 +14,7 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
     public Task CreateAsync(Session session)
     {
         return TranslatingMissingWriteLockAsync(
-            session.Identity,
-            expectedRevision: 0,
+            DescribeMissingCreateLock(session.Identity),
             () => CreateWithinTransactionAsync(session)
         );
     }
@@ -23,15 +22,13 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
     public Task SaveAsync(Session session, long expectedRevision)
     {
         return TranslatingMissingWriteLockAsync(
-            session.Identity,
-            expectedRevision,
+            DescribeMissingSaveLock(session.Identity, expectedRevision),
             () => SaveWithinTransactionAsync(session, expectedRevision)
         );
     }
 
     private static async Task TranslatingMissingWriteLockAsync(
-        SessionIdentity sessionIdentity,
-        long expectedRevision,
+        string missingWriteLockDescription,
         Func<Task> write
     )
     {
@@ -41,10 +38,7 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == SqliteBusyErrorCode)
         {
-            throw new ConcurrencyConflictException(
-                DescribeMissingWriteLock(sessionIdentity, expectedRevision),
-                exception
-            );
+            throw new ConcurrencyConflictException(missingWriteLockDescription, exception);
         }
     }
 
@@ -53,17 +47,6 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         database.ChangeTracker.Clear();
 
         await using var transaction = await database.Database.BeginTransactionAsync();
-
-        var storedRevision = await StoredRevisionAsync(session.Identity);
-
-        if (storedRevision is not null)
-        {
-            throw new ConcurrencyConflictException(
-                session.Identity,
-                expectedRevision: 0,
-                storedRevision
-            );
-        }
 
         database.Sessions.Add(DomainEntityMapper.ToEntity(session));
 
@@ -144,7 +127,7 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         return entities.Select(DomainEntityMapper.ToDomain).ToList();
     }
 
-    private static string DescribeMissingWriteLock(
+    private static string DescribeMissingSaveLock(
         SessionIdentity sessionIdentity,
         long expectedRevision
     )
@@ -152,6 +135,14 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         return string.Create(
             CultureInfo.InvariantCulture,
             $"Session {sessionIdentity.Value} expected revision {expectedRevision} but the write lock was not obtained before the timeout elapsed."
+        );
+    }
+
+    private static string DescribeMissingCreateLock(SessionIdentity sessionIdentity)
+    {
+        return string.Create(
+            CultureInfo.InvariantCulture,
+            $"Session {sessionIdentity.Value} could not be created because the write lock was not obtained before the timeout elapsed."
         );
     }
 

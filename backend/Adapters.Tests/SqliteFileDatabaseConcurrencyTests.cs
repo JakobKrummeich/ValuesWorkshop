@@ -54,6 +54,23 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IDisposable
     }
 
     [Fact]
+    public async Task Two_concurrent_creates_of_the_same_identity_leave_exactly_one_winner()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        using var startLine = new Barrier(2);
+
+        var outcomes = await Task.WhenAll(
+            CreateOnceEveryoneIsReady(startLine, TestSessions.Open(identity)),
+            CreateOnceEveryoneIsReady(startLine, TestSessions.Open(identity))
+        );
+
+        outcomes.Count(outcome => outcome is null).ShouldBe(1);
+        var conflict = outcomes.OfType<ConcurrencyConflictException>().ShouldHaveSingleItem();
+        conflict.Message.ShouldContain("already exists");
+        (await LoadThrough(identity)).ShouldNotBeNull();
+    }
+
+    [Fact]
     public async Task A_save_that_cannot_take_the_write_lock_is_reported_as_a_conflict()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
@@ -80,6 +97,48 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IDisposable
         );
 
         conflict.Message.ShouldContain("write lock");
+        conflict.Message.ShouldContain("expected revision 4");
+    }
+
+    [Fact]
+    public async Task A_create_that_cannot_take_the_write_lock_never_claims_an_expected_revision()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+
+        await using var lockHolder = new SqliteConnection(ConnectionString());
+        await lockHolder.OpenAsync();
+        await using var writeLock = await lockHolder.BeginTransactionAsync(
+            System.Data.IsolationLevel.Serializable
+        );
+        await using var claim = lockHolder.CreateCommand();
+        claim.CommandText = "UPDATE sessions SET revision = revision";
+        await claim.ExecuteNonQueryAsync();
+
+        var conflict = await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            CreateThrough(OptionsFor(waitForTheWriteLock: false), TestSessions.Open(identity))
+        );
+
+        conflict.Message.ShouldContain("write lock");
+        conflict.Message.ShouldNotContain("expected revision");
+    }
+
+    private async Task<Exception?> CreateOnceEveryoneIsReady(Barrier startLine, Session session)
+    {
+        return await Task.Run(async () =>
+        {
+            startLine.SignalAndWait();
+
+            try
+            {
+                await CreateThrough(OptionsFor(waitForTheWriteLock: true), session);
+
+                return null;
+            }
+            catch (Exception exception)
+            {
+                return exception;
+            }
+        });
     }
 
     private async Task<Exception?> SaveOnceEveryoneIsReady(Barrier startLine, Session session)
