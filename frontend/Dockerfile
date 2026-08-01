@@ -5,6 +5,7 @@ RUN corepack enable && corepack prepare pnpm@11.15.1 --activate
 WORKDIR /app
 
 COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY patches/ patches/
 COPY frontend/package.json frontend/
 RUN pnpm install --frozen-lockfile --filter frontend
 
