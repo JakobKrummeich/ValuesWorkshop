@@ -10,6 +10,11 @@ COPY frontend/package.json frontend/
 RUN pnpm install --frozen-lockfile --filter frontend
 
 COPY frontend/ frontend/
+
+ARG NEXT_PUBLIC_OIDC_AUTHORITY
+ARG NEXT_PUBLIC_OIDC_CLIENT_ID
+ARG NEXT_PUBLIC_OIDC_REDIRECT_URI
+ARG NEXT_PUBLIC_HUB_BASE_URL
 RUN pnpm --filter frontend build
 
 FROM node:22-slim AS runtime
