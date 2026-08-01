@@ -42,6 +42,12 @@ stateDiagram-v2
     P9 --> [*] : WorkshopConcluded
 
     note right of P1
+      Join - any phase:
+      latecomers are welcome (I4);
+      from phase 5 on the joiner is placed
+      into a group with the fewest members
+      (ParticipantAddedToGroup, I8).
+
       Reconnect - any phase:
       a returning facilitator or participant
       resumes their exact prior place
@@ -54,7 +60,7 @@ Session-wide commands, allowed in any phase:
 
 | Command | Actor | Guard | Event |
 |---|---|---|---|
-| JoinSession | Participant | phase is Join (see §2.1) | ParticipantJoined |
+| JoinSession | Participant | not already on the roster (I4) — allowed in every phase; from phase 5 on it also places the joiner into a group (see § 2.5) | ParticipantJoined |
 | (return after interruption) | Facilitator / Participant | already on the roster (I4) | ParticipantRejoined |
 | AdvancePhase | Facilitator | forward only; next phase's entry guard holds | PhaseAdvanced |
 
@@ -66,7 +72,9 @@ There is no backward transition anywhere in this document — by design (I1).
 
 ### 2.1 Phase 1 — Join
 
-No sub-states. The roster grows; joiners wait in the lobby.
+No sub-states. The roster grows; joiners wait in the lobby. Joining is not
+confined to this phase — it is a session-wide command (§ 1); this is only the
+phase whose entire purpose is waiting for it.
 
 | Command | Actor | Guard | Event |
 |---|---|---|---|
@@ -126,9 +134,16 @@ values are fixed from the selection tally, widened on a tenth-place tie
 ### 2.5 Phase 5 — Group formation
 
 On entry: `FormGroups [System] / GroupsFormed` — participants partitioned
-and top values dealt out per the sizing rule and the formation aim; fixed
-from then on (I8). No further sub-states; groups and assignments are shown
-until `AdvancePhase`.
+and top values dealt out per the sizing rule and the formation aim; the
+value-to-group assignment is fixed from then on (I8). No further sub-states;
+groups and assignments are shown until `AdvancePhase`.
+
+From this phase on, `JoinSession` carries a second effect:
+`AddParticipantToGroup [System] / ParticipantAddedToGroup` puts the joiner
+into a group with the fewest members (ties random). Sizes therefore stay
+within one of each other, no top value is re-dealt, and the joiner is never
+that group's scribe — scribes are appointed once, on entry to phase 6 (I9),
+and a group that has already submitted stays submitted.
 
 ### 2.6 Phase 6 — Group work
 
@@ -258,7 +273,8 @@ facilitator sub-controls are marked ◆.
 | T2b | 8→9 | — exit guard | — | winners stand (I15) | — |
 | T2c | 2→3, 7→8 | — exit guard | — | walk complete (all questions / all values shown) | — |
 | T3 | any | Return after interruption | Facilitator / Participant | on the roster (I4) | ParticipantRejoined |
-| T4 | 1 | Join | Participant | not already on the roster (I4) | ParticipantJoined |
+| T4 | any | Join | Participant | not already on the roster (I4) | ParticipantJoined |
+| T4a | 5–9 | — joiner placed into a group | System | groups exist; group with the fewest members, ties random (I8) | ParticipantAddedToGroup |
 | T5 | 2 | Choose quiz answer | Participant | not yet answered this question (I5) | QuizAnswerChosen |
 | T6 | 2 | Reveal answer ◆ | Facilitator | current question unrevealed | AnswerRevealed |
 | T7 | 2 | Show learning text ◆ | Facilitator | answer revealed, text unshown | LearningTextShown |

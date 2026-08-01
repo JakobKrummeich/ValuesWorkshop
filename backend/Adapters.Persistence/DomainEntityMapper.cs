@@ -12,7 +12,8 @@ internal static class DomainEntityMapper
         return new SessionEntity
         {
             Identity = identityString,
-            CurrentPhase = (int)session.State.CurrentPhase,
+            CurrentPhase = (int)session.PhaseProgress.CurrentPhase,
+            Revision = session.Revision,
             IsFormed = session.Formation.IsFormed,
             CreatedAt = DateTime.UtcNow.ToString("o"),
             QuizState = new QuizStateEntity
@@ -78,7 +79,7 @@ internal static class DomainEntityMapper
             entity.Participants.Select(participant => new ParticipantId(Guid.Parse(participant.Id)))
         );
 
-        var state = WorkshopState.Restore((Phase)entity.CurrentPhase);
+        var state = PhaseProgress.Restore((Phase)entity.CurrentPhase);
 
         var quiz = QuizProgress.Restore(
             entity.QuizState.CurrentQuestionIndex,
@@ -140,7 +141,8 @@ internal static class DomainEntityMapper
             selection,
             formation,
             presentation,
-            voting
+            voting,
+            entity.Revision
         );
     }
 

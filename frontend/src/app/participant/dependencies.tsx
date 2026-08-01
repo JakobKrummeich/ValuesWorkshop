@@ -1,10 +1,10 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { ParticipantGateway } from "../../domain/ports/participantGateway";
+import type { ParticipantSessionStatePort } from "../../domain/ports/participant/sessionStatePort";
 
 export interface ParticipantDependencies {
-  gateway: ParticipantGateway;
+  sessionState: ParticipantSessionStatePort;
 }
 
 const ParticipantDependencyContext =

@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en" data-theme="emerald">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task 9 — Real-time Protocol: decisions to make</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      :where(.grid, .flex) > * { min-width: 0; }
+      :where(p, h1, h2, h3, h4, li, dd, td, th, .badge, .label) { overflow-wrap: anywhere; }
+      :where(img, svg, video, canvas, iframe) { max-width: 100%; height: auto; }
+      body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+      .mermaid { display: flex; justify-content: center; }
+      .mermaid svg { max-width: 100%; }
+    </style>
+  </head>
+  <body class="bg-base-200 text-base-content">
+    <div class="mx-auto max-w-5xl px-4 py-10 space-y-10">
+      <header class="space-y-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="badge badge-primary">Task 9</span>
+          <span class="badge badge-outline">Spec — round 3</span>
+          <span class="badge badge-success">6 decisions locked</span>
+          <span class="badge badge-warning">1 new question</span>
+        </div>
+        <h1 class="text-4xl font-bold">SignalR hubs + live state protocol</h1>
+        <p class="text-lg opacity-80">
+          All six decisions are answered and locked in below. New in this round:
+          your <strong>periodic state resend</strong> requirement — designed out in
+          § 4, with one open question (the interval).
+        </p>
+        <p class="text-sm opacity-60">
+          Design source: this project's own token palette
+          (<code>frontend/src/app/tokens.css</code> — green/amber/stone,
+          system-ui) mapped onto the DaisyUI <em>emerald</em> theme, so the
+          artifact looks like the product it describes.
+        </p>
+      </header>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">Your feedback → what changed</h2>
+        <div class="overflow-x-auto rounded-box border border-base-300 bg-base-100">
+          <table class="table table-zebra">
+            <thead>
+              <tr><th>Your point</th><th>Resolution</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>“On reconnect we cannot just wait for the next update.”</td>
+                <td><strong>Fixed.</strong> The server pushes the full current state to the
+                  <em>calling connection</em> in <code>OnConnectedAsync</code>, before any
+                  broadcast can happen. Reconnect is a new connection, so it gets the same
+                  immediate push. Broadcasts are only for <em>changes</em> after that.</td>
+              </tr>
+              <tr>
+                <td>“We need periodic resends of the current state so a lost update eventually
+                  self-heals — say every 500 ms if nothing changed.”</td>
+                <td><strong>Designed in § 4.</strong> A per-session ticker resends the latest
+                  role state to each role group on an interval; every state carries a
+                  monotonic <code>revision</code> so clients drop duplicates and stale
+                  arrivals cheaply. Interval is the one open question.</td>
+              </tr>
+              <tr>
+                <td>“Can we split the hub into 3 hubs, one per role?”</td>
+                <td><strong>Yes — locked (Decision 1).</strong> Each role gets its own
+                  hub class, own URL, own auth attribute, own client-callback contract, own
+                  state type. Nothing role-specific left to runtime <code>if</code>-checks.</td>
+              </tr>
+              <tr>
+                <td>“Backend must only send data the role may have.”</td>
+                <td><strong>By construction.</strong> Each hub can only send its own state
+                  record type, mapped by its own mapper. A participant connection is
+                  physically not in any group that carries facilitator or vote-attribution
+                  data. Tests assert type-level absence of forbidden fields.</td>
+              </tr>
+              <tr>
+                <td>“Typed hub methods — yes. But what is <code>IntentResult</code>?”</td>
+                <td><strong>Explained with code below</strong> (§ 5). Short version:
+                  the return value of a hub method — the caller's private, per-call
+                  acknowledgement (accepted, or rejected with a typed reason).</td>
+              </tr>
+              <tr>
+                <td>“BE must validate every payload; FE Zod at the boundary is great.”</td>
+                <td><strong>Kept as specified.</strong> No change.</td>
+              </tr>
+              <tr>
+                <td>“Draw the architecture: hub, domain, intent, port slice.”</td>
+                <td><strong>Three diagrams below</strong> — one request round-trip, one showing
+                  how concerns sit side-by-side, one connect/reconnect sequence.</td>
+              </tr>
+              <tr>
+                <td>“Careful: the role adapter must not become huge.”</td>
+                <td><strong>Fixed — locked (Decision 3).</strong> One small adapter file per port
+                  slice, all sharing one session-bound connection object. No god adapter.</td>
+              </tr>
+              <tr>
+                <td>“I don't like ‘Snapshot’ — it is really <code>WorkshopState</code>.”</td>
+                <td><strong>Agreed — locked (Decision 2).</strong> One catch: the Domain already has
+                  a class named <code>WorkshopState</code> (it holds only the current phase), so
+                  it is renamed to <code>PhaseProgress</code> and the wire types take the good
+                  name.</td>
+              </tr>
+              <tr>
+                <td>“One wrapper that <em>only</em> maps SignalR promises to observables, plus an adapter with our logic.”</td>
+                <td><strong>Adopted.</strong> <code>signalRConnection.ts</code> = pure
+                  library→RxJS mapping, zero domain knowledge. Adapters use it and hold all
+                  our logic. Two layers, strictly separated.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">1. One intent, end to end</h2>
+        <p class="opacity-80">
+          The question this answers: <em>what exactly sits between a tap on a
+          participant phone and a row in SQLite — and who is allowed to know
+          the session id?</em>
+        </p>
+        <div class="card card-border bg-base-100">
+          <div class="card-body">
+            <pre class="mermaid">
+flowchart TD
+  subgraph FEC["Frontend — participant screen"]
+    UI["Screen component + hook<br/>(no sessionId anywhere)"]
+    SLICE["Port slice: selectionPort<br/>src/domain/ports/participant/"]
+    ADAPT["selectionAdapter<br/>session-bound, small"]
+    CONN["signalRConnection.ts<br/>ONLY promise → observable"]
+    CTX["ParticipantSessionContext<br/>binds sessionId once, at screen entry"]
+    UI --> SLICE
+    SLICE -. implemented by .-> ADAPT
+    ADAPT --> CONN
+    CTX -. builds .-> ADAPT
+  end
+
+  CONN == "invoke SubmitSelection(payload)" ==> HUB
+  HUB == "IntentResult (caller only)" ==> CONN
+
+  subgraph BEC["Backend"]
+    HUB["ParticipantHub — Adapters.Web<br/>typed methods, Authorize"]
+    PIPE["IntentPipeline — Application<br/>validate · load · guard · mutate · persist · broadcast"]
+    HANDLER["SubmitSelectionHandler<br/>Application/Selection"]
+    DOMAIN["Session → SelectionRound<br/>Domain: guards + invariants"]
+    REPO["ISessionRepository<br/>Adapters.Persistence → SQLite"]
+    CAST["IWorkshopStateBroadcaster<br/>3 role mappers, 3 groups"]
+    HUB --> PIPE
+    PIPE --> HANDLER
+    HANDLER --> DOMAIN
+    PIPE --> REPO
+    PIPE --> CAST
+  end
+
+  CAST -- "participant group: participant state" --> CONN
+  CAST -- "facilitator group: facilitator state" --> FHUB["FacilitatorHub clients"]
+  CAST -- "presenter group: presenter state" --> PHUB["PresenterHub clients"]
+            </pre>
+            <p class="text-sm opacity-70">
+              Persist happens <em>before</em> broadcast, in one place only — the pipeline
+              reuses today's <code>SessionCommandHandler</code>
+              (<code>backend/Application/SessionCommandHandler.cs</code>), so Task 7's
+              write-before-broadcast guarantee is not duplicated.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">2. How the different domain logics sit side by side</h2>
+        <p class="opacity-80">
+          One vertical slice per <strong>concern</strong>. A concern owns: its intent records,
+          its handler, the domain aggregate part it mutates, and the matching frontend port
+          slice. Adding “group work” later touches only its own column — no shared switch
+          statement, no growing god class anywhere.
+        </p>
+        <div class="card card-border bg-base-100">
+          <div class="card-body">
+            <pre class="mermaid">
+flowchart TD
+  FH["FacilitatorHub<br/>/hub/facilitator"]
+  PH["ParticipantHub<br/>/hub/participant"]
+  PRH["PresenterHub<br/>/hub/presenter (read-only)"]
+
+  FH --> L["Lifecycle<br/>OpenSession · AdvancePhase"]
+  FH --> QC["QuizControl<br/>PoseQuestion · Reveal"]
+  FH --> FM["Formation<br/>ReassignScribe"]
+  FH --> WC["WalkControl<br/>PresentGroup"]
+  FH --> TB["Tiebreak<br/>StartTiebreakRound"]
+
+  PH --> JN["Join<br/>JoinSession"]
+  PH --> QA["QuizAnswering<br/>CastQuizAnswer"]
+  PH --> SEL["Selection<br/>ToggleValue · SubmitSelection"]
+  PH --> GW["GroupWork<br/>WriteActions · Submit"]
+  PH --> VT["Voting<br/>CastVotes"]
+
+  L --> WS["WorkshopState / Phase"]
+  QC --> QP["QuizProgress"]
+  QA --> QP
+  SEL --> SR["SelectionRound"]
+  FM --> FR["FormationRecord"]
+  GW --> GR["Group"]
+  WC --> PW["PresentationWalk"]
+  TB --> VR["VotingRounds"]
+  VT --> VR
+
+  WS --> AGG["Session aggregate root<br/>(single writer per session)"]
+  QP --> AGG
+  SR --> AGG
+  FR --> AGG
+  GR --> AGG
+  PW --> AGG
+  VR --> AGG
+
+  PRH -. "no intents — subscribe only" .-> AGG
+            </pre>
+            <div class="grid gap-4 sm:grid-cols-3 text-sm">
+              <div class="rounded-box bg-base-200 p-4">
+                <div class="font-bold mb-1">Backend shape</div>
+                <code class="block">Application/Selection/</code>
+                <code class="block">&nbsp;&nbsp;SubmitSelection.cs (record)</code>
+                <code class="block">&nbsp;&nbsp;SubmitSelectionHandler.cs</code>
+              </div>
+              <div class="rounded-box bg-base-200 p-4">
+                <div class="font-bold mb-1">Domain shape (exists)</div>
+                <code class="block">Domain/SelectionRound.cs</code>
+                <span class="opacity-70">guards + invariants, no transport words</span>
+              </div>
+              <div class="rounded-box bg-base-200 p-4">
+                <div class="font-bold mb-1">Frontend shape</div>
+                <code class="block">domain/ports/participant/selectionPort.ts</code>
+                <code class="block">adapters/participant/selectionAdapter.ts</code>
+              </div>
+            </div>
+            <p class="text-sm opacity-70">
+              The aggregate parts on the third row already exist in
+              <code>backend/Domain/</code> (verified: <code>QuizProgress.cs</code>,
+              <code>SelectionRound.cs</code>, <code>FormationRecord.cs</code>,
+              <code>Group.cs</code>, <code>PresentationWalk.cs</code>,
+              <code>VotingRounds.cs</code>, <code>WorkshopState.cs</code>) — this task adds
+              only the columns above them.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">3. Connect, reconnect, restart</h2>
+        <div class="card card-border bg-base-100">
+          <div class="card-body">
+            <pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant P as Participant client
+  participant H as ParticipantHub
+  participant A as IntentPipeline
+  participant D as SQLite
+
+  P->>H: connect (bearer token, sessionId in query)
+  H->>H: OnConnectedAsync — add to group participant:{sessionId}
+  H->>D: load session
+  H-->>P: ReceiveWorkshopState(full current state)  %% immediate, caller-only
+  Note over P,H: no waiting for the next mutation — ever
+
+  P->>H: SubmitSelection(payload)
+  H->>A: intent
+  A->>D: persist
+  A-->>P: IntentResult.Accepted (return value, caller only)
+  A-->>H: broadcast to all 3 role groups
+  H-->>P: ReceiveWorkshopState(new state)
+
+  Note over P,H: connection drops (tunnel, phone sleep, backend restart)
+  P->>H: automatic reconnect with backoff
+  H->>H: OnConnectedAsync again — rejoin group
+  H->>D: load session (survived restart, Task 7)
+  H-->>P: ReceiveWorkshopState(full current state)
+
+  loop every interval (Decision 7)
+    H-->>P: ReceiveWorkshopState(latest state, same revision)
+    Note over P: revision unchanged → client ignores it
+  end
+            </pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">4. Periodic state resend — self-healing sync</h2>
+        <p class="opacity-80">
+          Your requirement: a dropped broadcast must not leave a client stale forever. With a
+          full-state protocol this is cheap to guarantee — just send the latest state again on
+          a timer. Two pieces make it safe and quiet:
+        </p>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div class="card card-border bg-base-100"><div class="card-body">
+            <h3 class="card-title text-base">1. <code>revision</code> on every state</h3>
+            <p class="text-sm opacity-80">
+              The session carries a monotonic counter, bumped on every persisted mutation.
+              Every role state record ships it. The client keeps the last revision it applied
+              and drops anything not newer — so a resend of unchanged state costs the UI
+              nothing (no re-render, no flicker), and an out-of-order late arrival can never
+              move the screen backwards.
+            </p>
+          </div></div>
+          <div class="card card-border bg-base-100"><div class="card-body">
+            <h3 class="card-title text-base">2. One ticker, per-session, only where it matters</h3>
+            <p class="text-sm opacity-80">
+              A single hosted background service ticks; per session it resends only when that
+              session has connected clients. The three mapped role states are cached and
+              re-mapped only when <code>revision</code> changes, so a tick between mutations
+              is pure serialization — no repository reads, no domain work, no SQLite traffic.
+            </p>
+          </div></div>
+        </div>
+        <div class="alert alert-warning">
+          <span>
+            Honest cost at 500 ms: 2 messages/second/client forever. For 30 phones + laptop +
+            beamer that is ~64 msg/s and a few hundred kB/min of mostly redundant traffic —
+            harmless on a LAN, noticeable on bad conference WiFi (exactly the network where
+            drops happen). Hence the interval question below.
+          </span>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">5. What <code>IntentResult</code> is</h2>
+        <p class="opacity-80">
+          A hub method is a <em>call</em>, so it can answer the caller privately. That answer
+          is <code>IntentResult</code>: “I accepted it” or “I rejected it, here is the typed
+          reason”. It is not broadcast, it carries no state (state always arrives through the
+          broadcast channel), and it is what lets a phone show
+          “<em>too late — the facilitator already closed this round</em>” instead of silently
+          doing nothing.
+        </p>
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div class="card card-border bg-base-100"><div class="card-body">
+            <h3 class="card-title text-base">Backend — <code>Application/IntentResult.cs</code></h3>
+            <div id="code-intent-be"></div>
+          </div></div>
+          <div class="card card-border bg-base-100"><div class="card-body">
+            <h3 class="card-title text-base">Frontend — port slice + usage</h3>
+            <div id="code-intent-fe"></div>
+          </div></div>
+        </div>
+        <div class="alert alert-info">
+          <span>
+            Rejection is total: no mutation, no persist, no broadcast. Only the caller learns
+            about it. A rejected intent can never move the workshop.
+          </span>
+        </div>
+      </section>
+
+      <section class="space-y-6">
+        <h2 class="text-2xl font-bold">Decisions</h2>
+        <div class="overflow-x-auto rounded-box border border-success/40 bg-base-100">
+          <table class="table table-sm">
+            <thead><tr><th>#</th><th>Decision</th><th>Locked answer</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Hub topology</td><td class="font-semibold">Three hubs, one per role</td></tr>
+              <tr><td>2</td><td>State naming</td><td class="font-semibold">Domain <code>WorkshopState</code> → <code>PhaseProgress</code>; wire types <code>…WorkshopState</code></td></tr>
+              <tr><td>3</td><td>FE adapter granularity</td><td class="font-semibold">One adapter per port slice, one shared session-bound connection</td></tr>
+              <tr><td>4</td><td>Scope now</td><td class="font-semibold">Full catalog documented; only <code>JoinSession</code> + <code>AdvancePhase</code> wired</td></tr>
+              <tr><td>5</td><td>Presenter access</td><td class="font-semibold">Unauthenticated; presenter state carries no PII, no vote attribution</td></tr>
+              <tr><td>6</td><td>Broadcast granularity</td><td class="font-semibold">Always the full role-shaped state; no deltas</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <form class="card card-border border-warning bg-base-100" data-lavish-question="interval"
+          onsubmit="event.preventDefault(); queueAnswer(event, 'state resend interval');">
+          <div class="card-body space-y-3">
+            <h3 class="card-title">Decision 7 — resend interval <span class="badge badge-warning badge-sm">open</span></h3>
+            <p class="text-sm opacity-80">
+              All options include the <code>revision</code> field and the
+              ignore-if-not-newer client rule, so none of them can cause flicker. They differ
+              only in worst-case staleness vs. wire traffic.
+            </p>
+            <div class="space-y-3">
+              <label class="rounded-box border border-base-300 p-4 flex gap-3 cursor-pointer">
+                <input type="radio" name="interval" value="500ms fixed resend interval as originally requested" class="radio mt-1" />
+                <span><span class="font-bold">500 ms, as you said</span>
+                  <span class="block text-sm opacity-80 mt-1">Worst-case staleness ½ s. Highest
+                    traffic; ~64 msg/s for a 30-person workshop.</span></span>
+              </label>
+              <label class="rounded-box border border-primary bg-primary/5 p-4 flex gap-3 cursor-pointer">
+                <input type="radio" name="interval" value="2s configurable resend interval, environment variable, default 2000ms" class="radio radio-primary mt-1" checked />
+                <span><span class="font-bold">2 s, configurable by environment variable</span>
+                  <span class="badge badge-primary badge-sm ml-2">recommended</span>
+                  <span class="block text-sm opacity-80 mt-1">Worst-case staleness 2 s for a
+                    <em>lost</em> message only (normal path is still instant). A quarter of the
+                    traffic, and you can dial it to 500 ms in compose if a real workshop ever
+                    feels sluggish.</span></span>
+              </label>
+              <label class="rounded-box border border-base-300 p-4 flex gap-3 cursor-pointer">
+                <input type="radio" name="interval" value="send only a lightweight revision ping on the interval; client requests full state on mismatch" class="radio mt-1" />
+                <span><span class="font-bold">Interval sends only a tiny <code>revision</code> ping</span>
+                  <span class="block text-sm opacity-80 mt-1">Client asks for the full state
+                    only when its revision is behind. Least traffic by far, but it adds a
+                    second message type and a client-initiated resync path — more moving parts
+                    than the full resend.</span></span>
+              </label>
+            </div>
+            <div class="card-actions justify-end"><button type="submit" class="btn btn-primary btn-sm">Queue answer</button></div>
+          </div>
+        </form>
+
+
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4">
+          <div>
+            <div class="font-bold">Ready to write <code>design/protocol.md</code>?</div>
+            <div class="text-sm opacity-70">Approves the spec with the recommended 2 s configurable resend interval.</div>
+          </div>
+          <span class="btn btn-primary" data-lavish-action
+            onclick="window.lavish.queuePrompt('Spec for Task 9 approved. Use the recommended resend interval (2s, configurable by environment variable, with revision field and ignore-if-not-newer client rule). Start with design/protocol.md.', { tag: 'approval', text: 'Approve spec — start design/protocol.md' })">
+            Approve spec — start protocol.md
+          </span>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">Deliverables &amp; slices</h2>
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div class="card card-border bg-base-100"><div class="card-body">
+            <h3 class="card-title text-base">Deliverables</h3>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li><code>design/protocol.md</code> — intent catalog per role (payload, guard,
+                rejection codes), the three state schemas with the anonymity argument, error
+                model, sequence diagrams, port-slice map. Reviewed by you before any code.</li>
+              <li>BE: three hubs + role mappers in <code>Adapters.Web</code>; intent pipeline,
+                intent records, state records (with <code>revision</code>) in
+                <code>Application</code>; broadcaster replacing
+                <code>Host/NoOpBroadcaster.cs</code>; periodic resend hosted service.</li>
+              <li>FE: <code>signalRConnection.ts</code> wrapper, per-slice adapters, port
+                slices, role contexts; the three <code>stub*Gateway.ts</code> files deleted.</li>
+              <li>E2E: join → advance → reconnect → backend restart recovery.</li>
+            </ul>
+          </div></div>
+          <div class="card card-border bg-base-100"><div class="card-body">
+            <h3 class="card-title text-base">Slices (in order)</h3>
+            <ol class="list-decimal pl-5 space-y-1 text-sm">
+              <li><code>design/protocol.md</code> — doc only, your review gate</li>
+              <li>BE role state records + mappers + anonymity tests</li>
+              <li>BE intent pipeline + rejection model + tests (no transport yet)</li>
+              <li>BE three hubs + broadcaster + Host wiring + hub tests</li>
+              <li>BE integration test: real SignalR client through the whole loop</li>
+              <li>BE periodic resend service + revision counter + tests (resend is skipped for
+                sessions with no connections; unchanged revision is not re-mapped)</li>
+              <li>FE <code>signalRConnection.ts</code> + Zod schemas + marble tests</li>
+              <li>FE port slices, per-slice adapters, role contexts; stubs deleted</li>
+              <li>E2E smoke incl. restart recovery</li>
+            </ol>
+          </div></div>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">Acceptance criteria</h2>
+        <div class="card card-border bg-base-100"><div class="card-body">
+          <ul class="space-y-2 text-sm">
+            <li>✅ <code>design/protocol.md</code> covers every transition in <code>design/state-machine.md</code>; all three role states specified</li>
+            <li>✅ Invalid or out-of-phase intent → typed rejection; state unchanged; nothing persisted; nothing broadcast</li>
+            <li>✅ Fresh connect <em>and</em> reconnect receive the complete current state immediately, caller-only</li>
+            <li>✅ A presenter connection cannot invoke any mutating method (there is none on its hub)</li>
+            <li>✅ No <code>sessionId</code> in domain, UI props, or port signatures — enforced by test</li>
+            <li>✅ A dropped broadcast self-heals: with no further mutations, every connected
+              client converges on the current state within one resend interval</li>
+            <li>✅ Gates green: BE + FE tests, coverage ≥ 80 %, lint, arch, complexity, duplication</li>
+          </ul>
+        </div></div>
+      </section>
+
+      <section class="space-y-4">
+        <h2 class="text-2xl font-bold">Risks</h2>
+        <div class="grid gap-4 md:grid-cols-3 text-sm">
+          <div class="alert alert-warning"><span><strong>Next.js dev proxy + WebSockets.</strong>
+            Flagged in <code>tasks/plan.md</code>. Slice 8 proves it in the real
+            compose environment before phases are built on top.</span></div>
+          <div class="alert alert-warning"><span><strong>Reconnect storms after restart.</strong>
+            All clients reconnect at once; each triggers a load. Mitigation: backoff jitter,
+            plus a single in-memory session cache in the repository if measurement demands it.</span></div>
+          <div class="alert alert-warning"><span><strong>State type drift FE↔BE.</strong>
+            Two hand-written type sets. Mitigation: Zod schemas are the FE source of truth and
+            the integration test asserts a real payload parses against them.</span></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      function queueAnswer(event, label) {
+        const form = event.currentTarget;
+        const data = new FormData(form);
+        const name = form.getAttribute("data-lavish-question");
+        const answer = data.get(name);
+        if (!answer) return;
+        window.lavish.queuePrompt("Decision — " + label + ": " + answer, {
+          tag: "choice",
+          text: label + ": " + answer,
+          element: form,
+          queueKey: name,
+          data: { question: name, answer: answer },
+        });
+      }
+    </script>
+
+    <script type="module">
+      import { File } from "https://esm.sh/@pierre/diffs@1.2.10?bundle";
+
+      const options = {
+        theme: { light: "github-light", dark: "github-dark" },
+        themeType: "light",
+        overflow: "wrap",
+      };
+
+      new File(options).render({
+        containerWrapper: document.querySelector("#code-intent-be"),
+        file: {
+          name: "backend/Application/IntentResult.cs",
+          contents: [
+            "public enum IntentRejectionCode",
+            "{",
+            "    WrongPhase,",
+            "    NotAuthorized,",
+            "    UnknownSession,",
+            "    UnknownParticipant,",
+            "    InvariantViolated,",
+            "    MalformedPayload,",
+            "}",
+            "",
+            "public abstract record IntentResult",
+            "{",
+            "    public sealed record Accepted : IntentResult;",
+            "",
+            "    public sealed record Rejected(IntentRejectionCode Code, string Detail)",
+            "        : IntentResult;",
+            "}",
+            "",
+            "// ParticipantHub.cs — the hub method returns it to the caller only",
+            "[Authorize]",
+            "public sealed class ParticipantHub(IntentPipeline pipeline) : Hub<IParticipantClient>",
+            "{",
+            "    public Task<IntentResult> SubmitSelection(SubmitSelection intent) =>",
+            "        pipeline.RunAsync(SessionOf(Context), Caller(Context), intent);",
+            "}",
+            "",
+          ].join("\n"),
+        },
+      });
+
+      new File(options).render({
+        containerWrapper: document.querySelector("#code-intent-fe"),
+        file: {
+          name: "frontend/src/domain/ports/participant/selectionPort.ts",
+          contents: [
+            "export type IntentResult =",
+            "  | { outcome: \"accepted\" }",
+            "  | { outcome: \"rejected\"; code: IntentRejectionCode; detail: string };",
+            "",
+            "export interface SelectionPort {",
+            "  submitSelection(values: readonly ValueId[]): Single<IntentResult>;",
+            "}",
+            "",
+            "// useValueSelection.ts — no sessionId, no promises, no transport words",
+            "const submit = () =>",
+            "  selectionPort.submitSelection(chosenValues).pipe(",
+            "    map((result) =>",
+            "      result.outcome === \"rejected\" ? rejectionMessage(result.code) : null,",
+            "    ),",
+            "  );",
+            "",
+          ].join("\n"),
+        },
+      });
+    </script>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+
+      const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const paint = document.createElement("canvas").getContext("2d");
+      function toRgba(color) {
+        paint.clearRect(0, 0, 1, 1);
+        paint.fillStyle = "#000";
+        paint.fillStyle = color;
+        paint.fillRect(0, 0, 1, 1);
+        return paint.getImageData(0, 0, 1, 1).data;
+      }
+      function compositeRgba(foreground, background) {
+        const foregroundAlpha = foreground[3] / 255;
+        const backgroundAlpha = background[3] / 255;
+        const alpha = foregroundAlpha + backgroundAlpha * (1 - foregroundAlpha);
+        if (alpha === 0) return [0, 0, 0, 0];
+        return [
+          (foreground[0] * foregroundAlpha + background[0] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[1] * foregroundAlpha + background[1] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[2] * foregroundAlpha + background[2] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          alpha * 255,
+        ];
+      }
+      function pageIsDark() {
+        const root = document.documentElement;
+        const rootBackground = toRgba(getComputedStyle(root).backgroundColor);
+        const bodyBackground = document.body ? toRgba(getComputedStyle(document.body).backgroundColor) : [0, 0, 0, 0];
+        const [r, g, b, a] = compositeRgba(bodyBackground, rootBackground);
+        if (a > 0) return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.5;
+        return darkQuery.matches;
+      }
+
+      const diagrams = [...document.querySelectorAll(".mermaid")].map((el) => ({ el, src: el.textContent }));
+      let applied;
+      let rendering = false;
+      let queued = false;
+      function queueRender() {
+        queued = true;
+        if (rendering) return;
+        void render();
+      }
+      async function render() {
+        rendering = true;
+        try {
+          while (queued) {
+            queued = false;
+            const theme = pageIsDark() ? "dark" : "default";
+            if (theme === applied) continue;
+            mermaid.initialize({ startOnLoad: false, theme, securityLevel: "strict" });
+            for (const { el, src } of diagrams) {
+              el.removeAttribute("data-processed");
+              el.textContent = src;
+            }
+            try {
+              await mermaid.run({ nodes: diagrams.map((d) => d.el) });
+            } catch (error) {
+              console.error("Mermaid diagram render failed:", error);
+              return;
+            }
+            applied = theme;
+          }
+        } finally {
+          rendering = false;
+          if (queued) queueRender();
+        }
+      }
+      if (document.readyState === "complete") queueRender();
+      else window.addEventListener("load", queueRender, { once: true });
+      const themeObserver = new MutationObserver(queueRender);
+      for (const el of [document.documentElement, document.body]) {
+        if (!el) continue;
+        themeObserver.observe(el, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+      }
+      darkQuery.addEventListener("change", queueRender);
+    </script>
+  </body>
+</html>

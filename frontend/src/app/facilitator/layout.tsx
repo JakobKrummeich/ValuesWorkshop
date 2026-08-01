@@ -1,9 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { stubFacilitatorGateway } from "../../adapters/stubFacilitatorGateway";
 import { AuthGuard } from "../AuthGuard";
-import { FacilitatorDependencyProvider } from "./dependencies";
+import { FacilitatorSessionBoundary } from "./FacilitatorSessionBoundary";
 import "./tokens.facilitator.css";
 
 export default function FacilitatorLayout({
@@ -13,11 +12,7 @@ export default function FacilitatorLayout({
 }) {
   return (
     <AuthGuard>
-      <FacilitatorDependencyProvider
-        dependencies={{ gateway: stubFacilitatorGateway }}
-      >
-        <div className="screenFacilitator">{children}</div>
-      </FacilitatorDependencyProvider>
+      <FacilitatorSessionBoundary>{children}</FacilitatorSessionBoundary>
     </AuthGuard>
   );
 }

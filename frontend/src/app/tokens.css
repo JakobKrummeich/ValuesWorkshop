@@ -47,6 +47,8 @@
   --base-space-64: 64px;
   --base-space-96: 96px;
 
+  --base-border-hairline: 1px;
+
   --base-radius-sm: 6px;
   --base-radius-md: 10px;
   --base-radius-full: 999px;
@@ -84,6 +86,7 @@
   --space-gutter: var(--base-space-16);
 
   --control-height: 32px;
+  --border-hairline: var(--base-border-hairline);
 
   --radius-sm: var(--base-radius-sm);
   --radius-md: var(--base-radius-md);

@@ -26,6 +26,7 @@ phase, and timestamp. Per-phase state gets its own table.
 CREATE TABLE sessions (
     identity           TEXT    PRIMARY KEY,
     current_phase      INTEGER NOT NULL,
+    revision           INTEGER NOT NULL DEFAULT 0,
     created_at         TEXT    NOT NULL
 );
 ```
@@ -197,11 +198,13 @@ SessionCommandHandler.HandleAsync(sessionIdentity, mutation)
     │     │
     │     └─ Throws on invariant violation → no persist, no broadcast
     │
-    ├─ 3. Persist via ISessionRepository.SaveAsync()
+    ├─ 3. Bump session revision (monotonic, one per accepted mutation)
+    │
+    ├─ 4. Persist via ISessionRepository.SaveAsync()
     │     │
     │     └─ Failure → exception propagates, no broadcast
     │
-    └─ 4. Broadcast via IBroadcaster (no-op until Task 9)
+    └─ 5. Broadcast via IBroadcaster
           │
           └─ Only reached after successful persist
 ```
@@ -220,11 +223,11 @@ On startup:
 2. `ISessionRepository.LoadAllAsync()` — load all stored sessions
 3. Reconstruct domain `Session` objects from EF entities
 4. Register in the in-memory session registry (available for SignalR
-   hub in Task 9)
+   hubs)
 
 Sessions resume at their exact prior state. No client action needed —
-reconnecting clients receive current state via the normal snapshot mechanism
-(Task 9).
+reconnecting clients are pushed the full current state on connect
+(`design/protocol.md` § 3).
 
 ---
 

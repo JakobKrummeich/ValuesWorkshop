@@ -1,5 +1,11 @@
 import { UserManager, WebStorageStateStore, type User } from "oidc-client-ts";
 import { defer, filter, ignoreElements } from "rxjs";
+import {
+  oidcAuthority,
+  oidcClientId,
+  oidcRedirectUri,
+} from "../config/environment";
+import { currentReturnUrl } from "./browserLocation";
 import type { Completable, Maybe, Single } from "../shared/reactiveTypes";
 
 let userManagerInstance: UserManager | null = null;
@@ -10,12 +16,9 @@ function getUserManager(): UserManager {
   }
   if (!userManagerInstance) {
     userManagerInstance = new UserManager({
-      authority:
-        process.env.NEXT_PUBLIC_OIDC_AUTHORITY ?? "http://localhost:9000",
-      client_id: process.env.NEXT_PUBLIC_OIDC_CLIENT_ID ?? "valuesworkshop",
-      redirect_uri:
-        process.env.NEXT_PUBLIC_OIDC_REDIRECT_URI ??
-        `${window.location.origin}/auth/callback`,
+      authority: oidcAuthority(),
+      client_id: oidcClientId(),
+      redirect_uri: oidcRedirectUri(),
       response_type: "code",
       scope: "openid profile offline_access",
       automaticSilentRenew: true,
@@ -37,7 +40,7 @@ export function getAuthenticatedUser(): Maybe<User> {
 export function loginRedirect(returnUrl?: string): Completable {
   return defer(() =>
     getUserManager().signinRedirect({
-      state: returnUrl ?? window.location.pathname,
+      state: returnUrl ?? currentReturnUrl(),
     }),
   ).pipe(ignoreElements());
 }

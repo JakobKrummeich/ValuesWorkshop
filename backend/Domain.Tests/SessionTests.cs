@@ -9,7 +9,7 @@ public class SessionTests
         var session = new Session(identity);
 
         session.Identity.ShouldBe(identity);
-        session.State.CurrentPhase.ShouldBe(Phase.Join);
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
         session.Roster.Participants.ShouldBeEmpty();
         session.Quiz.CurrentQuestion.ShouldBeNull();
         session.Selection.TopValues.ShouldBeEmpty();

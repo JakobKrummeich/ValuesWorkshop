@@ -12,7 +12,7 @@ values and pragmatic everyday actions. See `SPEC.md` for the product spec.
 | `e2e/` | Playwright end-to-end tests |
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
-| `design/` | Architecture, domain model, persistence, state machine, screens |
+| `design/` | Architecture, domain model, persistence, protocol, state machine, screens |
 | `tasks/` | Plan, backlog, per-task mini-specs |
 
 ## Commands

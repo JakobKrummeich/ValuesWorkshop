@@ -37,7 +37,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
         loaded.ShouldNotBeNull();
         loaded.Identity.ShouldBe(identity);
-        loaded.State.CurrentPhase.ShouldBe(Phase.Join);
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
         loaded.Roster.Participants.ShouldBeEmpty();
         loaded.Quiz.CurrentQuestion.ShouldBeNull();
         loaded.Quiz.IsRevealed.ShouldBeFalse();
@@ -51,6 +51,23 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         loaded.Voting.RoundOpen.ShouldBeFalse();
         loaded.Voting.RoundNumber.ShouldBe(0);
         loaded.Voting.WinningValues.ShouldBeEmpty();
+        loaded.Revision.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task Round_trip_preserves_the_revision()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var session = new Session(identity);
+        session.BumpRevision();
+        session.BumpRevision();
+        session.BumpRevision();
+
+        await SaveSession(session);
+        var loaded = await LoadSession(identity);
+
+        loaded.ShouldNotBeNull();
+        loaded.Revision.ShouldBe(3);
     }
 
     [Fact]
@@ -62,12 +79,13 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var session = Session.Restore(
             identity,
             Roster.Restore([participantOne, participantTwo]),
-            WorkshopState.Restore(Phase.Quiz),
+            PhaseProgress.Restore(Phase.Quiz),
             QuizProgress.Restore(2, true, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, [])
+            VotingRounds.Restore(false, 0, []),
+            revision: 0
         );
 
         await SaveSession(session);
@@ -75,7 +93,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
         loaded.ShouldNotBeNull();
         loaded.Identity.ShouldBe(identity);
-        loaded.State.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
         loaded.Roster.Participants.Count.ShouldBe(2);
         loaded.Roster.Participants.ShouldContain(participantOne);
         loaded.Roster.Participants.ShouldContain(participantTwo);
@@ -94,12 +112,13 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var session = Session.Restore(
             identity,
             Roster.Restore([participant]),
-            WorkshopState.Restore(Phase.SelectionResults),
+            PhaseProgress.Restore(Phase.SelectionResults),
             QuizProgress.Restore(4, true, true),
             SelectionRound.Restore([participant], [topValueOne, topValueTwo]),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, [])
+            VotingRounds.Restore(false, 0, []),
+            revision: 0
         );
 
         await SaveSession(session);
@@ -125,12 +144,13 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var session = Session.Restore(
             identity,
             Roster.Restore([memberOne, memberTwo]),
-            WorkshopState.Restore(Phase.GroupWork),
+            PhaseProgress.Restore(Phase.GroupWork),
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(true, [group]),
             PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, [])
+            VotingRounds.Restore(false, 0, []),
+            revision: 0
         );
 
         await SaveSession(session);
@@ -160,12 +180,13 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var session = Session.Restore(
             identity,
             Roster.Restore([]),
-            WorkshopState.Restore(Phase.FinalPresentation),
+            PhaseProgress.Restore(Phase.FinalPresentation),
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore("Eagle", new ValueId("courage")),
-            VotingRounds.Restore(false, 2, [winnerOne, winnerTwo])
+            VotingRounds.Restore(false, 2, [winnerOne, winnerTwo]),
+            revision: 0
         );
 
         await SaveSession(session);
@@ -191,19 +212,20 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var updatedSession = Session.Restore(
             identity,
             Roster.Restore([new ParticipantId(Guid.NewGuid())]),
-            WorkshopState.Restore(Phase.Quiz),
+            PhaseProgress.Restore(Phase.Quiz),
             QuizProgress.Restore(1, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, [])
+            VotingRounds.Restore(false, 0, []),
+            revision: 0
         );
         await SaveSession(updatedSession);
 
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
-        loaded.State.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
         loaded.Roster.Participants.Count.ShouldBe(1);
     }
 
@@ -224,12 +246,13 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             Session.Restore(
                 identityB,
                 Roster.Restore([new ParticipantId(Guid.NewGuid())]),
-                WorkshopState.Restore(Phase.ValueSelection),
+                PhaseProgress.Restore(Phase.ValueSelection),
                 QuizProgress.Restore(null, false, false),
                 SelectionRound.Restore([], []),
                 FormationRecord.Restore(false, []),
                 PresentationWalk.Restore(null, null),
-                VotingRounds.Restore(false, 0, [])
+                VotingRounds.Restore(false, 0, []),
+                revision: 0
             )
         );
 

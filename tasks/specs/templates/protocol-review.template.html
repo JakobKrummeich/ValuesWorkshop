@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en" data-theme="emerald">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>design/protocol.md — Task 9 slice 1 review</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, li, td, th) { overflow-wrap: anywhere; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .mermaid { display: flex; justify-content: center; }
+  .mermaid svg { max-width: 100%; }
+  code { font-size: 0.9em; }
+  :not(pre) > code { background: var(--color-base-300); padding: 0.1em 0.35em; border-radius: 0.3em; }
+</style>
+</head>
+<body class="bg-base-200 text-base-content">
+<div class="mx-auto max-w-5xl px-4 py-10">
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <span class="badge badge-primary">Task 9 · slice 1</span>
+    <span class="badge badge-outline">design/protocol.md</span>
+    <span class="badge badge-warning">review gate before any code</span>
+  </div>
+  <div class="alert alert-info mb-6"><span>
+    This is the full FE/BE contract, written from your locked decisions. It covers
+    every transition T1–T23 + T17a of <code>design/state-machine.md</code> (coverage
+    check in § 4.5), the three role state shapes with the anonymity argument (§ 5),
+    the error model (§ 6), and the port-slice map (§ 7). Annotate anything you want
+    changed; approve below when it reads right.
+  </span></div>
+
+  <div class="card bg-base-100 border-2 border-warning mb-8">
+    <div class="card-body gap-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="badge badge-warning">open decision</span>
+        <h2 class="card-title">Late joining — yes, it is possible. Pick the shape.</h2>
+      </div>
+      <p class="text-sm opacity-80">
+        Today the docs close the door after phase 1: a phone that arrives later is put on
+        <code>membership = "joiningClosed"</code>. Opening it up is a domain change — guard T4 in
+        <code>design/state-machine.md</code>, invariant I4 wording in <code>design/domain-model.md</code>,
+        and § 3.1 here. Nothing in the phase machine actually depends on a frozen roster;
+        the only thing a late arrival misses is what was already computed before they existed:
+        the selection tally (fixed on entry to phase 4) and the group partition (fixed on entry
+        to phase 5, I8).
+      </p>
+
+      <div class="alert alert-success mb-2"><span>
+        <strong>Your idea beats both of mine.</strong> Auto-placing the late arrival into the
+        currently smallest group (option C below) needs no facilitator action, no new UI, and no
+        “you are in no group” dead end. It is now the recommendation. The only thing it gives up is
+        the formation <em>aim</em> — a late arrival has no value selection to optimise against
+        (they were not there in phase 3), so there is nothing to optimise, and the sizing rule
+        (sizes differ by at most one) is exactly what “smallest group” preserves.
+      </span></div>
+
+      <div class="rounded-box border-2 border-success bg-base-200 p-4 mb-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="badge badge-success badge-sm">C</span>
+          <span class="font-bold">Join in any phase; after formation, auto-placed into the smallest group</span>
+          <span class="badge badge-outline badge-sm">recommended</span>
+        </div>
+        <ul class="list-disc pl-5 space-y-1 text-sm">
+          <li>Everything in A, plus: if groups already exist, joining also emits <code>ParticipantAddedToGroup</code> (System, part of the same join) into the group with the fewest members — ties broken randomly.</li>
+          <li>Sizing rule survives: groups still differ by at most one member. No values are re-dealt — the value–group assignment stays frozen, so I12 and the presentation walk are untouched.</li>
+          <li>The new member is never the scribe (I9 appointed one at phase-6 entry); if the group already submitted, it stays submitted — an extra member changes nothing about I11.</li>
+          <li>Same rule in every phase from 5 on, so there is no special case to reason about: whenever groups exist, a joiner lands in one.</li>
+          <li>I8 changes from “membership never changes” to “the partition and the value assignment are formed once; a participant who joins later is placed into the smallest group”.</li>
+        </ul>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="rounded-box border border-base-300 bg-base-200 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="badge badge-neutral badge-sm">A</span>
+            <span class="font-bold">Join in any phase, no group after formation</span>
+          </div>
+          <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>T4 guard drops the phase condition; <code>joiningClosed</code> disappears from the protocol.</li>
+            <li>Phase 2: answers the currently posed question like everyone else. Phase 3: submits their ten values, counted in the tally.</li>
+            <li>Phases 4 and 7 and 9 are watch-only anyway — identical experience.</li>
+            <li>Arriving in phase 5+ means no group (I8 keeps the partition frozen): their phone mirrors the presenter content through phases 5–7.</li>
+            <li>Phase 8: votes with the full allotment of the open round — I13 is per participant, so this needs no change.</li>
+            <li>Cost: one guard, one wording change, one FE state ("you are not in a group"). No new command, no relaxed invariant.</li>
+          </ul>
+        </div>
+        <div class="rounded-box border border-base-300 bg-base-200 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="badge badge-neutral badge-sm">B</span>
+            <span class="font-bold">A, plus the facilitator can place them in a group</span>
+          </div>
+          <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>Everything in A, and a new facilitator command <code>AddParticipantToGroup</code> / event <code>ParticipantAddedToGroup</code>, allowed in phases 5–7.</li>
+            <li>I8 softens from "groups are fixed" to "the partition is fixed; the facilitator may add a late arrival to one group".</li>
+            <li>Needs a facilitator control (group picker), a new rejection path, and scribe rules stay untouched (the new member is a plain member).</li>
+            <li>Real benefit only if late arrivals are common enough that sitting out group work would hurt the workshop.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <span class="btn btn-success" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: option C. Allow JoinSession in any phase; if groups already exist, the joiner is automatically placed into the group with the fewest members (ties random), no values re-dealt, never scribe. Update state-machine T4 and phase 5/6, domain-model I4 and I8 plus a ParticipantAddedToGroup event, and protocol 3.1.', { tag: 'decision', text: 'Option C — auto-place late joiners into the smallest group' })">
+          Choose C
+        </span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: option A. Allow JoinSession in any phase; a participant who arrives after group formation stays out of every group and mirrors presenter content in phases 5-7, and votes normally in phase 8. Update state-machine T4, domain-model I4, and protocol 3.1.', { tag: 'decision', text: 'Option A — join any phase, no late group placement' })">
+          Choose A
+        </span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: option B. Option A plus a facilitator command AddParticipantToGroup, allowed in phases 5-7, so a late arrival can be placed into an existing group. Update state-machine T4 and I8, domain-model I4 and I8, and protocol 3.1 plus the intent catalog.', { tag: 'decision', text: 'Option B — also let the facilitator place late joiners in a group' })">
+          Choose B
+        </span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Late joining: keep the current behaviour - joining closes when phase 1 ends.', { tag: 'decision', text: 'Keep joining closed after phase 1' })">
+          Keep it closed
+        </span>
+      </div>
+    </div>
+  </div>
+
+<!-- markdown-body:start -->
+<!-- markdown-body:end -->
+  <div class="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4 mt-10">
+    <div>
+      <div class="font-bold">Protocol approved?</div>
+      <div class="text-sm opacity-70">Next slice: backend role state records + per-role mappers, TDD.</div>
+    </div>
+    <span class="btn btn-primary" data-lavish-action
+      onclick="window.lavish.queuePrompt('design/protocol.md approved. Continue with slice 2 (backend role state records + per-role mappers, TDD).', { tag: 'approval', text: 'Approve protocol — continue with slice 2' })">
+      Approve protocol
+    </span>
+  </div>
+</div>
+<script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+
+      const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const paint = document.createElement("canvas").getContext("2d");
+      function toRgba(color) {
+        paint.clearRect(0, 0, 1, 1);
+        paint.fillStyle = "#000";
+        paint.fillStyle = color;
+        paint.fillRect(0, 0, 1, 1);
+        return paint.getImageData(0, 0, 1, 1).data;
+      }
+      function compositeRgba(foreground, background) {
+        const foregroundAlpha = foreground[3] / 255;
+        const backgroundAlpha = background[3] / 255;
+        const alpha = foregroundAlpha + backgroundAlpha * (1 - foregroundAlpha);
+        if (alpha === 0) return [0, 0, 0, 0];
+        return [
+          (foreground[0] * foregroundAlpha + background[0] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[1] * foregroundAlpha + background[1] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[2] * foregroundAlpha + background[2] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          alpha * 255,
+        ];
+      }
+      function pageIsDark() {
+        const root = document.documentElement;
+        const rootBackground = toRgba(getComputedStyle(root).backgroundColor);
+        const bodyBackground = document.body ? toRgba(getComputedStyle(document.body).backgroundColor) : [0, 0, 0, 0];
+        const [r, g, b, a] = compositeRgba(bodyBackground, rootBackground);
+        if (a > 0) return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.5;
+        return darkQuery.matches;
+      }
+
+      const diagrams = [...document.querySelectorAll(".mermaid")].map((el) => ({ el, src: el.textContent }));
+      let applied;
+      let rendering = false;
+      let queued = false;
+      function queueRender() {
+        queued = true;
+        if (rendering) return;
+        void render();
+      }
+      async function render() {
+        rendering = true;
+        try {
+          while (queued) {
+            queued = false;
+            const theme = pageIsDark() ? "dark" : "default";
+            if (theme === applied) continue;
+            mermaid.initialize({ startOnLoad: false, theme, securityLevel: "strict" });
+            for (const { el, src } of diagrams) {
+              el.removeAttribute("data-processed");
+              el.textContent = src;
+            }
+            try {
+              await mermaid.run({ nodes: diagrams.map((d) => d.el) });
+            } catch (error) {
+              console.error("Mermaid diagram render failed:", error);
+              return;
+            }
+            applied = theme;
+          }
+        } finally {
+          rendering = false;
+          if (queued) queueRender();
+        }
+      }
+      if (document.readyState === "complete") queueRender();
+      else window.addEventListener("load", queueRender, { once: true });
+      const themeObserver = new MutationObserver(queueRender);
+      for (const el of [document.documentElement, document.body]) {
+        if (!el) continue;
+        themeObserver.observe(el, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+      }
+      darkQuery.addEventListener("change", queueRender);
+    </script>
+</body>
+</html>

@@ -2,8 +2,10 @@ namespace ValuesWorkshop.Domain;
 
 public sealed class Group
 {
+    private readonly List<ParticipantId> _members;
+
     public string Name { get; }
-    public IReadOnlyList<ParticipantId> Members { get; }
+    public IReadOnlyList<ParticipantId> Members => _members;
     public IReadOnlyList<ValueId> AssignedValues { get; }
     public ParticipantId? Scribe { get; private set; }
     public bool IsSubmitted { get; private set; }
@@ -15,8 +17,13 @@ public sealed class Group
     )
     {
         Name = name;
-        Members = members;
+        _members = [.. members];
         AssignedValues = assignedValues;
+    }
+
+    internal void AddMember(ParticipantId participantId)
+    {
+        _members.Add(participantId);
     }
 
     internal static Group Restore(

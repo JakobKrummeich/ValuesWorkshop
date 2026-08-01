@@ -71,13 +71,14 @@ describe("authAdapter", () => {
       });
     });
 
-    it("uses current pathname when no return URL provided", async () => {
+    it("keeps the session identity of the current link when no return URL provided", async () => {
       mockSigninRedirect.mockResolvedValue(undefined);
+      window.history.replaceState({}, "", "/participant?sessionIdentity=abc");
 
       await lastValueFrom(loginRedirect(), { defaultValue: undefined });
 
       expect(mockSigninRedirect).toHaveBeenCalledWith({
-        state: window.location.pathname,
+        state: "/participant?sessionIdentity=abc",
       });
     });
   });

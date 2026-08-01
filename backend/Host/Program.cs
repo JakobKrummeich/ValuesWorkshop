@@ -1,11 +1,16 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ValuesWorkshop.Adapters.Persistence;
+using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
+using ValuesWorkshop.Application.Intents;
+using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 using ValuesWorkshop.Host;
+using ValuesWorkshop.Host.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +22,25 @@ builder.Services.AddDbContext<WorkshopDbContext>(options =>
     options.UseSqlite($"Data Source={databasePath}")
 );
 builder.Services.AddScoped<ISessionRepository, SqliteSessionRepository>();
-builder.Services.AddScoped<IBroadcaster, NoOpBroadcaster>();
+builder.Services.AddScoped<IBroadcaster, SignalRBroadcaster>();
 builder.Services.AddScoped<SessionCommandHandler>();
+builder.Services.AddScoped<IntentPipeline>();
+builder.Services.AddSingleton<IRandomness, SystemRandomness>();
+builder.Services.AddSingleton<WorkshopStateCache>();
+builder.Services.AddSingleton<SessionConnectionRegistry>();
+builder.Services.AddSingleton<RoleStateDispatcher>();
+builder.Services.AddSingleton(
+    new StateResendInterval(
+        TimeSpan.FromMilliseconds(
+            double.Parse(
+                builder.Configuration["STATE_RESEND_INTERVAL_MS"] ?? "500",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
+builder.Services.AddHostedService<StateResendService>();
+builder.Services.AddSignalR();
 
 var oidcAuthority = Environment.GetEnvironmentVariable("OIDC_AUTHORITY") ?? "http://localhost:9000";
 var oidcMetadataUrl = Environment.GetEnvironmentVariable("OIDC_METADATA_URL");
@@ -41,6 +63,10 @@ builder
         {
             options.MetadataAddress = oidcMetadataUrl;
         }
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = HubAccessToken.ReadFromQueryString,
+        };
     });
 builder
     .Services.AddAuthorizationBuilder()
@@ -74,6 +100,10 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "ValuesWorkshop API").AllowAnonymous();
 app.MapGet("/health", () => Results.Ok("ok")).AllowAnonymous();
+
+app.MapHub<FacilitatorHub>("/hub/facilitator");
+app.MapHub<ParticipantHub>("/hub/participant");
+app.MapHub<PresenterHub>("/hub/presenter");
 
 await app.RunAsync();
 

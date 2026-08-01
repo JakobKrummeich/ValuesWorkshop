@@ -1,9 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { stubParticipantGateway } from "../../adapters/stubParticipantGateway";
 import { AuthGuard } from "../AuthGuard";
-import { ParticipantDependencyProvider } from "./dependencies";
+import { ParticipantSessionBoundary } from "./ParticipantSessionBoundary";
 import "./tokens.participant.css";
 
 export default function ParticipantLayout({
@@ -13,11 +12,7 @@ export default function ParticipantLayout({
 }) {
   return (
     <AuthGuard>
-      <ParticipantDependencyProvider
-        dependencies={{ gateway: stubParticipantGateway }}
-      >
-        <div className="screenParticipant">{children}</div>
-      </ParticipantDependencyProvider>
+      <ParticipantSessionBoundary>{children}</ParticipantSessionBoundary>
     </AuthGuard>
   );
 }

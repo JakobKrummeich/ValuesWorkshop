@@ -4,18 +4,19 @@ public sealed class Session
 {
     public SessionIdentity Identity { get; }
     public Roster Roster { get; }
-    public WorkshopState State { get; }
+    public PhaseProgress PhaseProgress { get; }
     public QuizProgress Quiz { get; }
     public SelectionRound Selection { get; }
     public FormationRecord Formation { get; }
     public PresentationWalk Presentation { get; }
     public VotingRounds Voting { get; }
+    public long Revision { get; private set; }
 
     public Session(SessionIdentity identity)
     {
         Identity = identity;
         Roster = new Roster();
-        State = new WorkshopState();
+        PhaseProgress = new PhaseProgress();
         Quiz = new QuizProgress();
         Selection = new SelectionRound();
         Formation = new FormationRecord();
@@ -23,33 +24,64 @@ public sealed class Session
         Voting = new VotingRounds();
     }
 
+    public bool Join(ParticipantId participantId, IRandomness randomness)
+    {
+        if (Roster.Contains(participantId))
+        {
+            return false;
+        }
+
+        Roster.Add(participantId);
+
+        if (Formation.IsFormed)
+        {
+            Formation.PlaceIntoSmallestGroup(participantId, randomness);
+        }
+
+        return true;
+    }
+
+    public void AdvancePhase()
+    {
+        PhaseProgress.Advance();
+    }
+
+    public void BumpRevision()
+    {
+        Revision++;
+    }
+
     internal static Session Restore(
         SessionIdentity identity,
         Roster roster,
-        WorkshopState state,
+        PhaseProgress phaseProgress,
         QuizProgress quiz,
         SelectionRound selection,
         FormationRecord formation,
         PresentationWalk presentation,
-        VotingRounds voting
+        VotingRounds voting,
+        long revision
     )
     {
         return new Session(
             identity,
             roster,
-            state,
+            phaseProgress,
             quiz,
             selection,
             formation,
             presentation,
             voting
-        );
+        )
+        {
+            Revision = revision,
+        };
     }
 
     private Session(
         SessionIdentity identity,
         Roster roster,
-        WorkshopState state,
+        PhaseProgress phaseProgress,
         QuizProgress quiz,
         SelectionRound selection,
         FormationRecord formation,
@@ -59,7 +91,7 @@ public sealed class Session
     {
         Identity = identity;
         Roster = roster;
-        State = state;
+        PhaseProgress = phaseProgress;
         Quiz = quiz;
         Selection = selection;
         Formation = formation;

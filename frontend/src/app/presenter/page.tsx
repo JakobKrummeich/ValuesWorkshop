@@ -1,13 +1,15 @@
 "use client";
 
+import { SessionStatusBanner } from "../SessionStatusBanner";
 import { usePresenterDependencies } from "./dependencies";
 
 export default function PresenterHome() {
-  const { gateway } = usePresenterDependencies();
+  const { sessionState } = usePresenterDependencies();
+
   return (
     <main>
       <h1>Presenter</h1>
-      <p>Session: {gateway.sessionIdentity()}</p>
+      <SessionStatusBanner sessionState={sessionState} />
     </main>
   );
 }

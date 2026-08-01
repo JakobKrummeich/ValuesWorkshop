@@ -3,12 +3,25 @@ set -euo pipefail
 
 echo "=== Pre-commit: auto-format ==="
 
-echo "[1/2] Prettier (FE)..."
-pnpm --dir frontend fmt
-git add -u frontend/
+staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
 
-echo "[2/2] CSharpier (BE)..."
-dotnet csharpier format backend/
-git add -u backend/
+frontend_files=$(echo "${staged_files}" | { grep '^frontend/' || true; })
+backend_files=$(echo "${staged_files}" | { grep '^backend/.*\.cs$' || true; })
+
+if [[ -n "${frontend_files}" ]]; then
+  echo "[1/2] Prettier (FE)..."
+  echo "${frontend_files}" | sed 's|^frontend/||' | xargs pnpm --dir frontend exec prettier --write --ignore-unknown
+  echo "${frontend_files}" | xargs git add
+else
+  echo "[1/2] Prettier (FE): no staged frontend files"
+fi
+
+if [[ -n "${backend_files}" ]]; then
+  echo "[2/2] CSharpier (BE)..."
+  echo "${backend_files}" | xargs dotnet csharpier format
+  echo "${backend_files}" | xargs git add
+else
+  echo "[2/2] CSharpier (BE): no staged backend files"
+fi
 
 echo "=== Pre-commit formatting done ==="

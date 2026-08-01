@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { concat, defer, take, tap } from "rxjs";
 import { getAuthenticatedUser, loginRedirect } from "../adapters/authAdapter";
+import { currentReturnUrl } from "../adapters/browserLocation";
 
 export enum AuthGuardState {
   Checking = "checking",
@@ -27,7 +28,7 @@ export function useAuthGuard(): AuthGuardResult {
       ),
       defer(() => {
         setAuthState(AuthGuardState.Redirecting);
-        return loginRedirect(window.location.pathname);
+        return loginRedirect(currentReturnUrl());
       }),
     )
       .pipe(take(1))

@@ -99,6 +99,12 @@ reflows to a centered single column on landscape laptop screens.
  JoinSession fires implicitly on arrival — no form, no button
 ```
 
+This flow works in every phase, not only phase 1: a latecomer lands directly
+on the participant screen of the current phase (I4). Arriving from phase 5 on,
+they are placed into the smallest group (I8), so the group screens behave
+exactly as they do for everyone else — minus the scribe role, which was
+appointed on entry to phase 6.
+
 ### Phase 1 — Join
 
 **Presenter · Join QR + live names (fullscreen)**
