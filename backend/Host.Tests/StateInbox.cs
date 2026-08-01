@@ -14,6 +14,8 @@ internal sealed class StateInbox<TState>
         connection.On<TState>("ReceiveWorkshopState", state => received.Writer.TryWrite(state));
     }
 
+    internal bool IsEmpty => received.Reader.Count == 0;
+
     internal async Task<TState> NextAsync()
     {
         using var patience = new CancellationTokenSource(Patience);
