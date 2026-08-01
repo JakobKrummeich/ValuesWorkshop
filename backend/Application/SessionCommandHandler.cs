@@ -9,8 +9,10 @@ public sealed class SessionCommandHandler(ISessionRepository repository, IBroadc
 
     public async Task HandleAsync(SessionIdentity sessionIdentity, Func<Session, bool> mutation)
     {
-        for (var attemptsLeft = MaximumAttempts; ; attemptsLeft--)
+        for (var attempt = 1; ; attempt++)
         {
+            var isLastAttempt = attempt == MaximumAttempts;
+
             try
             {
                 var persisted = await ApplyOnceAsync(sessionIdentity, mutation);
@@ -22,7 +24,7 @@ public sealed class SessionCommandHandler(ISessionRepository repository, IBroadc
 
                 return;
             }
-            catch (ConcurrencyConflictException) when (attemptsLeft > 1) { }
+            catch (ConcurrencyConflictException) when (!isLastAttempt) { }
         }
     }
 
