@@ -46,6 +46,20 @@ builder.Services.AddSingleton(
 );
 builder.Services.AddHostedService<StateResendService>();
 builder.Services.AddSignalR();
+builder.Services.AddSessionCreationRateLimit(
+    new SessionCreationRateLimit(
+        int.Parse(
+            builder.Configuration["SESSION_CREATION_ATTEMPTS_PER_WINDOW"] ?? "5",
+            CultureInfo.InvariantCulture
+        ),
+        TimeSpan.FromSeconds(
+            double.Parse(
+                builder.Configuration["SESSION_CREATION_ATTEMPT_WINDOW_SECONDS"] ?? "60",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
 
 var oidcAuthority = Environment.GetEnvironmentVariable("OIDC_AUTHORITY") ?? "http://localhost:9000";
 var oidcMetadataUrl = Environment.GetEnvironmentVariable("OIDC_METADATA_URL");
@@ -102,6 +116,7 @@ LogOrToolsVersion(app);
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapGet("/", () => "ValuesWorkshop API").AllowAnonymous();
 app.MapGet("/health", () => Results.Ok("ok")).AllowAnonymous();
