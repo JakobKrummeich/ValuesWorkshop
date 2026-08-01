@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using ValuesWorkshop.Application.Intents;
+using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 
@@ -37,9 +38,11 @@ public sealed class ParticipantHub(
         }
 
         var session = await HubSessionLoader.RequiredAsync(repository, sessionIdentity);
-        await Clients.Caller.ReceiveWorkshopState(
-            cache.StatesOf(session).Participants[participantId]
-        );
+        var states = cache.StatesOf(session);
+        var participantState = states.Participants.TryGetValue(participantId, out var cached)
+            ? cached
+            : ParticipantWorkshopStateMapper.MapFor(session, participantId, session.Revision);
+        await Clients.Caller.ReceiveWorkshopState(participantState);
     }
 
     public override Task OnDisconnectedAsync(Exception? exception)
