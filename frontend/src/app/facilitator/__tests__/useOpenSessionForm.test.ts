@@ -185,6 +185,17 @@ describe("useOpenSessionForm", () => {
     );
   });
 
+  it("asks the facilitator to sign in again when the token is gone", () => {
+    const { result } = answerWith(
+      sessionCreationRejected(SessionCreationFailure.NotAuthenticated),
+    );
+
+    expect(result.current.errorMessage).toBe(
+      "Your sign-in has expired. Sign in again to open a session.",
+    );
+    expect(mockNavigateTo).not.toHaveBeenCalled();
+  });
+
   it("reports an unreachable backend", () => {
     const { result } = answerWith(
       sessionCreationRejected(SessionCreationFailure.Unexpected),

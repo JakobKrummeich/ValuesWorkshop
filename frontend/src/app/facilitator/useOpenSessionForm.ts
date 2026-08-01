@@ -6,6 +6,7 @@ import type { Subscription } from "rxjs";
 import { navigateTo, sessionUrl } from "../../adapters/browserLocation";
 import type { FacilitatorSessionCreationPort } from "../../domain/ports/facilitator/sessionCreationPort";
 import {
+  maximumSessionNameLength,
   SessionCreationFailure,
   type SessionCreationOutcome,
 } from "../../domain/sessionCreation";
@@ -14,10 +15,11 @@ const FACILITATOR_PATH = "/facilitator";
 const BLANK_SESSION_NAME_MESSAGE = "Enter a session name.";
 
 const messageByFailure: Record<SessionCreationFailure, string> = {
+  [SessionCreationFailure.NotAuthenticated]:
+    "Your sign-in has expired. Sign in again to open a session.",
   [SessionCreationFailure.PassphraseRejected]:
     "That facilitator passphrase was not accepted.",
-  [SessionCreationFailure.SessionNameRejected]:
-    "That session name was not accepted. Use up to 120 characters.",
+  [SessionCreationFailure.SessionNameRejected]: `That session name was not accepted. Use up to ${maximumSessionNameLength} characters.`,
   [SessionCreationFailure.Unexpected]:
     "The session could not be opened. Please try again.",
 };
@@ -73,17 +75,18 @@ export function useOpenSessionForm(
       setSubmitting(true);
       inFlightCreation.current?.unsubscribe();
 
-      let isLeaving = false;
       inFlightCreation.current = sessionCreation
         .openSession(requestedName, passphrase)
         .subscribe({
           next(outcome: SessionCreationOutcome) {
+            setPassphrase("");
+
             if (!outcome.isCreated) {
               setErrorMessage(messageByFailure[outcome.failure]);
+              setSubmitting(false);
               return;
             }
 
-            isLeaving = true;
             navigateTo(sessionUrl(FACILITATOR_PATH, outcome.sessionIdentity));
           },
           error() {
@@ -92,12 +95,6 @@ export function useOpenSessionForm(
             );
             setPassphrase("");
             setSubmitting(false);
-          },
-          complete() {
-            setPassphrase("");
-            if (!isLeaving) {
-              setSubmitting(false);
-            }
           },
         });
     },

@@ -6,15 +6,15 @@ A session can only come into existence through a test calling
 `SaveAsync(new Session(id), 0)`. There is no HTTP surface, no facilitator
 passphrase, and no facilitator identity anywhere: `FacilitatorHub`
 (`Adapters.Web/FacilitatorHub.cs:16`) hands full session control to any
-authenticated `sub` that guesses a `sessionIdentity`. `IntentRejectionCode
-.NotAuthorized` exists and is never produced. Reconnect works for
+authenticated `sub` that guesses a `sessionIdentity`. Reconnect works for
 participants (roster + `LoadAllAsync`) but is unproven in a browser, and the
 facilitator has no identity to restore.
 
 `design/protocol.md` §2 already locks the contract: `POST /api/sessions` with
 the passphrase in the body, 401 on a wrong one, and "the facilitator is the
-`sub` recorded when creation was accepted; the facilitator hub refuses any
-other `sub` with `NotAuthorized`". This task implements exactly that.
+`sub` recorded when creation was accepted". The hub refuses a foreign `sub`
+at connect time, before any group join or state send, so the refusal is a
+failed connection rather than an `IntentRejectionCode`.
 
 ## Solution
 
@@ -41,7 +41,8 @@ other `sub` with `NotAuthorized`". This task implements exactly that.
    `CreateAsync` with `revision = 0`.
 5. **Hub authorization** — `FacilitatorHub.OnConnectedAsync` loads the session
    and aborts the connection when the caller `sub` is not the recorded
-   facilitator. Participant and presenter hubs are untouched.
+   facilitator. No intent runs, so no rejection code travels. Participant and
+   presenter hubs are untouched.
 6. **Frontend** — `/facilitator` without a `sessionIdentity` renders the open
    session form (name + passphrase, `design/screens.md:80`); success navigates
    to `/facilitator?sessionIdentity=…`. The passphrase lives in component
@@ -93,7 +94,7 @@ other `sub` with `NotAuthorized`". This task implements exactly that.
 2. **Endpoint + passphrase**: options record with startup validation,
    fixed-time compare, `POST /api/sessions`, `Host.Tests` for 401 (wrong,
    absent, empty), 401 (no bearer), 201 + persisted facilitator.
-3. **Facilitator authorization**: hub check + `NotAuthorized`,
+3. **Facilitator authorization**: hub connect check,
    `Adapters.Tests` and `Host.Tests` for refused foreign `sub` and accepted
    owner, including after a restart.
 4. **Frontend**: open-session form component + CSS module, session creation

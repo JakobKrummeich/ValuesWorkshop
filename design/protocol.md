@@ -68,6 +68,12 @@ Content-Type: application/json
 | `201 Created` | `{ "sessionIdentity": "<guid>" }` | passphrase matched and the name is valid; the session is persisted at `revision = 0` with the caller's `sub` as its facilitator |
 | `400 Bad Request` | problem detail “The session name is missing, blank, or too long.” | passphrase matched, name missing, blank, or over 120 characters |
 | `401 Unauthorized` | empty | no bearer token, no `sub` claim, or a wrong, absent, or empty passphrase |
+| `429 Too Many Requests` | empty | the caller exceeded `SESSION_CREATION_ATTEMPTS_PER_WINDOW` attempts inside `SESSION_CREATION_ATTEMPT_WINDOW_SECONDS` |
+
+The rate limit is a fixed window partitioned by caller — the token `sub` when
+there is one, otherwise the remote IP address — so one attacker guessing
+passphrases cannot lock out every other facilitator. It defaults to 5 attempts
+per 60 seconds and is refused before the passphrase is compared.
 
 The passphrase is compared with `CryptographicOperations.FixedTimeEquals`
 over UTF-8 bytes, **before** the name is validated: a wrong passphrase always

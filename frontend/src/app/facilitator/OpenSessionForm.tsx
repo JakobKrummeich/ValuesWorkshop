@@ -1,6 +1,7 @@
 "use client";
 
 import type { FacilitatorSessionCreationPort } from "../../domain/ports/facilitator/sessionCreationPort";
+import { maximumSessionNameLength } from "../../domain/sessionCreation";
 import styles from "./OpenSessionForm.module.css";
 import { useOpenSessionForm } from "./useOpenSessionForm";
 
@@ -33,6 +34,7 @@ export function OpenSessionForm({
               className={styles.input}
               type="text"
               autoComplete="off"
+              maxLength={maximumSessionNameLength}
               value={sessionName}
               disabled={isSubmitting}
               onChange={changeSessionName}

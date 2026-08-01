@@ -1,4 +1,7 @@
+export const maximumSessionNameLength = 120;
+
 export enum SessionCreationFailure {
+  NotAuthenticated = "notAuthenticated",
   PassphraseRejected = "passphraseRejected",
   SessionNameRejected = "sessionNameRejected",
   Unexpected = "unexpected",

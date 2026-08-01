@@ -156,19 +156,22 @@ test.describe.serial("session lifecycle and reconnect", () => {
     browser,
   }) => {
     const intruderContext = await browser.newContext();
-    const intruderPage = await intruderContext.newPage();
 
-    await intruderPage.goto(facilitatorPath(sessionIdentity));
-    await signInThroughOidcProvider(intruderPage, OTHER_FACILITATOR_ACCOUNT);
+    try {
+      const intruderPage = await intruderContext.newPage();
 
-    await expect(intruderPage.getByTestId("connection")).toHaveText(
-      "disconnected",
-    );
-    await expect(intruderPage.getByTestId("phase")).toHaveText(
-      "Waiting for the workshop\u2026",
-    );
+      await intruderPage.goto(facilitatorPath(sessionIdentity));
+      await signInThroughOidcProvider(intruderPage, OTHER_FACILITATOR_ACCOUNT);
 
-    await intruderContext.close();
+      await expect(intruderPage.getByTestId("connection")).toHaveText(
+        "disconnected",
+      );
+      await expect(intruderPage.getByTestId("phase")).toHaveText(
+        "Waiting for the workshop\u2026",
+      );
+    } finally {
+      await intruderContext.close();
+    }
   });
 });
 

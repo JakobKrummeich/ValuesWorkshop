@@ -118,13 +118,13 @@ describe("facilitator session creation port", () => {
     });
   });
 
-  it("reports a missing access token as unexpected without calling the backend", async () => {
+  it("reports a missing access token as not authenticated without calling the backend", async () => {
     const fetchMock = respondWith(201, { sessionIdentity: SESSION_IDENTITY });
     accessToken.mockReturnValue(EMPTY);
 
     await expect(openSession()).resolves.toEqual({
       isCreated: false,
-      failure: SessionCreationFailure.Unexpected,
+      failure: SessionCreationFailure.NotAuthenticated,
     });
     expect(fetchMock).not.toHaveBeenCalled();
   });

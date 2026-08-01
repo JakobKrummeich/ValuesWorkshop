@@ -58,8 +58,12 @@ a schema change needs `down -v` before the next `up`.
 | `OIDC_AUTHORITY` / `OIDC_METADATA_URL` | no | `http://localhost:9000` |
 | `CORS_ORIGINS` | no | `http://localhost:3000` |
 | `STATE_RESEND_INTERVAL_MS` | no (`500`) | `500` |
+| `SESSION_CREATION_ATTEMPTS_PER_WINDOW` | no (`5`) | `5` |
+| `SESSION_CREATION_ATTEMPT_WINDOW_SECONDS` | no (`60`) | `60` |
 
 The dev passphrase is a local development value only; a real deployment sets
-its own secret through the environment.
+its own secret through the environment. Session creation is rate limited per
+caller (the token `sub`, or the remote IP address when there is none):
+attempts beyond the window get `429` without the passphrase being compared.
 
 Layer mapping FE ↔ BE and architecture rules: `design/architecture.md`.

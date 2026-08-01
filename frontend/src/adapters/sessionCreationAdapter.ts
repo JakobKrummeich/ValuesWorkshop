@@ -32,7 +32,9 @@ function openSession(
     switchMap((accessToken) =>
       postSession(accessToken, sessionName, passphrase),
     ),
-    defaultIfEmpty(sessionCreationRejected(SessionCreationFailure.Unexpected)),
+    defaultIfEmpty(
+      sessionCreationRejected(SessionCreationFailure.NotAuthenticated),
+    ),
   );
 }
 

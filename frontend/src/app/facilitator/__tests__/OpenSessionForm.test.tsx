@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { FacilitatorSessionCreationPort } from "../../../domain/ports/facilitator/sessionCreationPort";
+import { maximumSessionNameLength } from "../../../domain/sessionCreation";
 import { OpenSessionForm } from "../OpenSessionForm";
 import {
   useOpenSessionForm,
@@ -59,14 +60,24 @@ describe("open session form", () => {
     expect(passphraseInput()).toHaveAttribute("type", "password");
   });
 
-  it("never submits the passphrase through a GET url", () => {
+  it("keeps the passphrase out of any native form submission", () => {
     formShowing({});
 
-    const { container } = render(
-      <OpenSessionForm sessionCreation={sessionCreation} />,
-    );
+    render(<OpenSessionForm sessionCreation={sessionCreation} />);
 
-    expect(container.querySelector("form")).toHaveAttribute("method", "post");
+    expect(passphraseInput()).not.toHaveAttribute("name");
+    expect(sessionNameInput()).not.toHaveAttribute("name");
+  });
+
+  it("caps the session name at the length the backend accepts", () => {
+    formShowing({});
+
+    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+
+    expect(sessionNameInput()).toHaveAttribute(
+      "maxlength",
+      String(maximumSessionNameLength),
+    );
   });
 
   it("reports typing back to the hook", () => {

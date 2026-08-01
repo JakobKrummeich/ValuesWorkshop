@@ -8,7 +8,6 @@
 
 .heading {
   color: var(--color-text);
-  font-family: var(--font-sans);
   font-size: var(--text-heading);
   font-weight: var(--weight-bold);
   line-height: var(--leading-tight);

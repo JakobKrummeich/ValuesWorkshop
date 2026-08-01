@@ -16,7 +16,20 @@ export async function signInThroughOidcProvider(
   await page.locator('input[name="password"]').fill(DEVELOPMENT_PASSWORD);
   await page.locator('button[type="submit"]').click();
 
-  await page.getByRole("button", { name: "Continue" }).click();
+  await confirmConsentIfAsked(page);
+}
+
+async function confirmConsentIfAsked(page: Page): Promise<void> {
+  const consent = page.getByRole("button", { name: "Continue" });
+  const leftTheProvider = page.waitForURL(
+    (url) => !OIDC_PROVIDER_URL.test(url.href),
+    { timeout: PROVIDER_TIMEOUT_MILLISECONDS },
+  );
+
+  await Promise.race([
+    consent.click({ timeout: PROVIDER_TIMEOUT_MILLISECONDS }),
+    leftTheProvider,
+  ]).catch(() => undefined);
 }
 
 export async function openSignedIn(
