@@ -199,9 +199,9 @@ the caller's authenticated principal, so no client can act as another.
 | T6 | `RevealAnswer` | — | phase Quiz; current question unrevealed | `WrongPhase` |
 | T7 | `ShowLearningText` | — | phase Quiz; answer revealed, text unshown | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
-| T13 | `ReassignScribe` | `{ groupName, participantId }` | phase Group work; target is a member of that group (I9) | `WrongPhase`, `UnknownGroup`, `UnknownParticipant` |
+| T13 | `ReassignScribe` | `{ groupName, participantId }` | phase Group work; target is a member of that group (I9) | `WrongPhase`, `InvariantViolated`, `UnknownParticipant` |
 | T17 | `GoToNextValue` | — | phase Value presentation; values remain (I12) | `WrongPhase` |
-| T17a | `CorrectActionWording` | `{ actionId, text }` | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | `WrongPhase`, `UnknownAction`, `MalformedPayload` |
+| T17a | `CorrectActionWording` | `{ actionId, text }` | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | `WrongPhase`, `InvariantViolated`, `MalformedPayload` |
 | T19 | `CloseVoting` | — | phase Final voting; round open | `WrongPhase` |
 | T21 | `StartTiebreakRound` | — | phase Final voting; last closed round left a fifth-place tie (I15) | `WrongPhase`, `InvariantViolated` |
 | T22 | `RevealNextValue` | — | phase Final presentation; winners remain | `WrongPhase` |
@@ -214,8 +214,8 @@ the caller's authenticated principal, so no client can act as another.
 | T5 | `ChooseQuizAnswer` | `{ questionId, answerId }` | phase Quiz; `questionId` is the posed question; answer belongs to it; not yet answered (I5) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
 | T9 | `SubmitValueSelection` | `{ valueIds }` | phase Value selection; exactly ten distinct catalog values; not yet submitted (I6) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
 | T14 | `AddAction` | `{ valueId, text }` | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text non-empty ≤ 500 chars | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
-| T14 | `EditAction` | `{ actionId, text }` | as `AddAction`; action belongs to the caller's group | `WrongPhase`, `NotAuthorized`, `UnknownAction`, `MalformedPayload` |
-| T14 | `RemoveAction` | `{ actionId }` | as `EditAction` | `WrongPhase`, `NotAuthorized`, `UnknownAction` |
+| T14 | `EditAction` | `{ actionId, text }` | as `AddAction`; action belongs to the caller's group | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
+| T14 | `RemoveAction` | `{ actionId }` | as `EditAction` | `WrongPhase`, `NotAuthorized`, `InvariantViolated` |
 | T15 | `SubmitGroupWork` | — | phase Group work; caller is scribe; one to five actions on every assigned value (I11) | `WrongPhase`, `NotAuthorized`, `InvariantViolated` |
 | T16 | `ReopenGroupWork` | — | phase Group work; caller is scribe; group Submitted | `WrongPhase`, `NotAuthorized` |
 | T18 | `SubmitFinalVotes` | `{ votes: [{ valueId, voteCount }] }` | phase Final voting; round open; totals equal the round allotment; only eligible values; not yet voted this round (I13) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
