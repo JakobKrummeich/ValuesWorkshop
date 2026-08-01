@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.SignalR;
@@ -15,9 +14,7 @@ internal static class CallerParticipantIdentity
         SessionIdentity sessionIdentity
     )
     {
-        var subject =
-            context.User?.FindFirst("sub")?.Value
-            ?? context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var subject = CallerSubject.Of(context.User);
 
         if (string.IsNullOrWhiteSpace(subject))
         {

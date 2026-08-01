@@ -7,6 +7,7 @@ using ValuesWorkshop.Adapters.Persistence;
 using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.Intents;
+using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 using ValuesWorkshop.Host;
@@ -24,8 +25,12 @@ builder.Services.AddDbContext<WorkshopDbContext>(options =>
 builder.Services.AddScoped<ISessionRepository, SqliteSessionRepository>();
 builder.Services.AddScoped<IBroadcaster, SignalRBroadcaster>();
 builder.Services.AddScoped<SessionCommandHandler>();
+builder.Services.AddScoped<SessionCreationHandler>();
 builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
+builder.Services.AddSingleton<IFacilitatorPassphrase>(
+    new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))
+);
 builder.Services.AddSingleton<WorkshopStateCache>();
 builder.Services.AddSingleton<SessionConnectionRegistry>();
 builder.Services.AddSingleton<RoleStateDispatcher>();
@@ -100,6 +105,8 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "ValuesWorkshop API").AllowAnonymous();
 app.MapGet("/health", () => Results.Ok("ok")).AllowAnonymous();
+
+app.MapSessionCreation();
 
 app.MapHub<FacilitatorHub>("/hub/facilitator");
 app.MapHub<ParticipantHub>("/hub/participant");
