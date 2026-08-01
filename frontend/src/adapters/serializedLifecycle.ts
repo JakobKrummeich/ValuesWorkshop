@@ -1,4 +1,4 @@
-import { EMPTY, ReplaySubject, catchError, concat, defer } from "rxjs";
+import { AsyncSubject, EMPTY, catchError, concat, defer } from "rxjs";
 import type { Completable } from "../shared/reactiveTypes";
 import type { WebsocketConnection } from "./websocketConnection";
 
@@ -19,7 +19,7 @@ function createLifecycleQueue(): (operation: Completable) => Completable {
 
   return (operation: Completable) =>
     defer(() => {
-      const settled = new ReplaySubject<never>();
+      const settled = new AsyncSubject<never>();
       const queued = concat(pending, operation);
 
       pending = settled.pipe(catchError(() => EMPTY));

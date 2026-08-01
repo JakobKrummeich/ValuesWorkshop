@@ -79,6 +79,22 @@ describe("advance phase button logic", () => {
     expect(result.current.isAdvancing).toBe(true);
   });
 
+  it("abandons an earlier intent when the button is pressed again", () => {
+    let abandonedCount = 0;
+    withAdvancePhase(
+      () =>
+        new Observable<IntentResult>(() => () => {
+          abandonedCount += 1;
+        }),
+    );
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    act(() => result.current.advancePhase());
+    act(() => result.current.advancePhase());
+
+    expect(abandonedCount).toBe(1);
+  });
+
   it("abandons an in-flight intent when the screen is left", () => {
     let isAbandoned = false;
     withAdvancePhase(

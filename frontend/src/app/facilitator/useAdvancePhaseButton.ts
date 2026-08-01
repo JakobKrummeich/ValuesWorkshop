@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Subscription } from "rxjs";
+import type { Subscription } from "rxjs";
 import { useFacilitatorDependencies } from "./dependencies";
 
 export interface AdvancePhaseButtonResult {
@@ -14,32 +14,30 @@ export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
   const { lifecycle } = useFacilitatorDependencies();
   const [isAdvancing, setAdvancing] = useState(false);
   const [rejectionDetail, setRejectionDetail] = useState<string | null>(null);
-  const subscriptions = useRef<Subscription>(new Subscription());
+  const inFlightIntent = useRef<Subscription | null>(null);
 
-  useEffect(() => {
-    subscriptions.current = new Subscription();
-
-    return () => {
-      subscriptions.current.unsubscribe();
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      inFlightIntent.current?.unsubscribe();
+    },
+    [],
+  );
 
   const advancePhase = useCallback(() => {
     setAdvancing(true);
-    subscriptions.current.add(
-      lifecycle.advancePhase().subscribe({
-        next(result) {
-          setRejectionDetail(result.isAccepted ? null : result.detail);
-        },
-        error(error: Error) {
-          setRejectionDetail(error.message);
-          setAdvancing(false);
-        },
-        complete() {
-          setAdvancing(false);
-        },
-      }),
-    );
+    inFlightIntent.current?.unsubscribe();
+    inFlightIntent.current = lifecycle.advancePhase().subscribe({
+      next(result) {
+        setRejectionDetail(result.isAccepted ? null : result.detail);
+      },
+      error(error: Error) {
+        setRejectionDetail(error.message);
+        setAdvancing(false);
+      },
+      complete() {
+        setAdvancing(false);
+      },
+    });
   }, [lifecycle]);
 
   return { isAdvancing, rejectionDetail, advancePhase };
