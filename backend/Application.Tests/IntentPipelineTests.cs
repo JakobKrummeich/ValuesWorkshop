@@ -1,6 +1,5 @@
 using ValuesWorkshop.Application.Intents;
 using ValuesWorkshop.Domain;
-using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Application.Tests;
 
@@ -76,7 +75,7 @@ public class IntentPipelineTests
     [Fact]
     public async Task An_intent_for_an_unknown_session_changes_nothing()
     {
-        var repository = new FakeSessionRepository();
+        var repository = FakeSessionRepository.Empty();
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
@@ -129,39 +128,6 @@ public class IntentPipelineTests
 
     private static FakeSessionRepository RepositoryWith(Session session)
     {
-        return new FakeSessionRepository { Stored = session };
-    }
-
-    private sealed class FakeSessionRepository : ISessionRepository
-    {
-        internal Session? Stored { get; set; }
-        internal List<Session> Saved { get; } = [];
-
-        public Task<Session?> LoadAsync(SessionIdentity sessionIdentity)
-        {
-            return Task.FromResult(Stored);
-        }
-
-        public Task SaveAsync(Session session, long expectedRevision)
-        {
-            Saved.Add(session);
-            return Task.CompletedTask;
-        }
-
-        public Task<IReadOnlyList<Session>> LoadAllAsync()
-        {
-            return Task.FromResult<IReadOnlyList<Session>>(Stored is null ? [] : [Stored]);
-        }
-    }
-
-    private sealed class RecordingBroadcaster : IBroadcaster
-    {
-        internal List<Session> Broadcasts { get; } = [];
-
-        public Task BroadcastSessionStateAsync(Session session)
-        {
-            Broadcasts.Add(session);
-            return Task.CompletedTask;
-        }
+        return FakeSessionRepository.Holding(session);
     }
 }

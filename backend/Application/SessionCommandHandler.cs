@@ -5,7 +5,31 @@ namespace ValuesWorkshop.Application;
 
 public sealed class SessionCommandHandler(ISessionRepository repository, IBroadcaster broadcaster)
 {
+    private const int MaximumAttempts = 3;
+
     public async Task HandleAsync(SessionIdentity sessionIdentity, Func<Session, bool> mutation)
+    {
+        for (var attemptsLeft = MaximumAttempts; ; attemptsLeft--)
+        {
+            try
+            {
+                var persisted = await ApplyOnceAsync(sessionIdentity, mutation);
+
+                if (persisted is not null)
+                {
+                    await broadcaster.BroadcastSessionStateAsync(persisted);
+                }
+
+                return;
+            }
+            catch (ConcurrencyConflictException) when (attemptsLeft > 1) { }
+        }
+    }
+
+    private async Task<Session?> ApplyOnceAsync(
+        SessionIdentity sessionIdentity,
+        Func<Session, bool> mutation
+    )
     {
         var session =
             await repository.LoadAsync(sessionIdentity)
@@ -13,7 +37,7 @@ public sealed class SessionCommandHandler(ISessionRepository repository, IBroadc
 
         if (!mutation(session))
         {
-            return;
+            return null;
         }
 
         var expectedRevision = session.Revision;
@@ -22,6 +46,6 @@ public sealed class SessionCommandHandler(ISessionRepository repository, IBroadc
 
         await repository.SaveAsync(session, expectedRevision);
 
-        await broadcaster.BroadcastSessionStateAsync(session);
+        return session;
     }
 }
