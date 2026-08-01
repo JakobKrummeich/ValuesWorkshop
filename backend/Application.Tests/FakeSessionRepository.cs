@@ -12,7 +12,47 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
 
     internal static FakeSessionRepository Holding(Session session)
     {
-        return new FakeSessionRepository(() => session);
+        return new FakeSessionRepository(() => SnapshotOf(session));
+    }
+
+    private static Session SnapshotOf(Session session)
+    {
+        return Session.Restore(
+            session.Identity,
+            Roster.Restore(session.Roster.Participants),
+            PhaseProgress.Restore(session.PhaseProgress.CurrentPhase),
+            QuizProgress.Restore(
+                session.Quiz.CurrentQuestion,
+                session.Quiz.IsRevealed,
+                session.Quiz.IsLearningTextShown
+            ),
+            SelectionRound.Restore(session.Selection.SubmittedBy, session.Selection.TopValues),
+            FormationRecord.Restore(
+                session.Formation.IsFormed,
+                session.Formation.Groups.Select(SnapshotOf)
+            ),
+            PresentationWalk.Restore(
+                session.Presentation.PresentingGroup,
+                session.Presentation.PresentedValue
+            ),
+            VotingRounds.Restore(
+                session.Voting.RoundOpen,
+                session.Voting.RoundNumber,
+                session.Voting.WinningValues
+            ),
+            session.Revision
+        );
+    }
+
+    private static Group SnapshotOf(Group group)
+    {
+        return Group.Restore(
+            group.Name,
+            [.. group.Members],
+            [.. group.AssignedValues],
+            group.Scribe,
+            group.IsSubmitted
+        );
     }
 
     internal static FakeSessionRepository Empty()

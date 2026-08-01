@@ -63,8 +63,9 @@ public class SessionCommandHandlerRetryTests
     [Fact]
     public async Task A_mutation_that_changes_nothing_is_neither_persisted_nor_retried()
     {
-        var session = SessionFixtures.InPhase(Phase.Quiz, revision: 4);
-        var repository = FakeSessionRepository.Holding(session);
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, revision: 4)
+        );
         repository.ConflictingSaves = 1;
         var broadcaster = new RecordingBroadcaster();
 
@@ -73,7 +74,7 @@ public class SessionCommandHandlerRetryTests
         repository.Loads.ShouldBe(1);
         repository.Saved.ShouldBeEmpty();
         broadcaster.Broadcasts.ShouldBeEmpty();
-        session.Revision.ShouldBe(4);
+        (await repository.LoadAsync(KnownSession)).ShouldNotBeNull().Revision.ShouldBe(4);
     }
 
     [Fact]

@@ -57,8 +57,10 @@ public class IntentPipelineTests
     [Fact]
     public async Task A_rejected_intent_leaves_the_revision_untouched()
     {
-        var session = SessionFixtures.InPhase(Phase.FinalPresentation, revision: 4);
-        var pipeline = PipelineOver(RepositoryWith(session), new RecordingBroadcaster());
+        var repository = RepositoryWith(
+            SessionFixtures.InPhase(Phase.FinalPresentation, revision: 4)
+        );
+        var pipeline = PipelineOver(repository, new RecordingBroadcaster());
 
         await pipeline.ExecuteAsync(
             KnownSession,
@@ -69,7 +71,8 @@ public class IntentPipelineTests
             }
         );
 
-        session.Revision.ShouldBe(4);
+        repository.Saved.ShouldBeEmpty();
+        (await repository.LoadAsync(KnownSession)).ShouldNotBeNull().Revision.ShouldBe(4);
     }
 
     [Fact]

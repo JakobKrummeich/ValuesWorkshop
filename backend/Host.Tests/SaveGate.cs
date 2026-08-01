@@ -11,10 +11,18 @@ internal sealed class SaveGate
         TaskCreationOptions.RunContinuationsAsynchronously
     );
 
+    private int holdsRequested;
     private int savesToHold;
 
-    internal void HoldNextSave()
+    internal void HoldTheNextSave()
     {
+        if (Interlocked.Increment(ref holdsRequested) > 1)
+        {
+            throw new InvalidOperationException(
+                "A SaveGate holds one save for its whole lifetime; use a second gate."
+            );
+        }
+
         Interlocked.Exchange(ref savesToHold, 1);
     }
 

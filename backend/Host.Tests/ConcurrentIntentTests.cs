@@ -27,7 +27,7 @@ public sealed class ConcurrentIntentTests
         await facilitator.StartAsync();
         await facilitatorInbox.NextAsync();
 
-        gate.HoldNextSave();
+        gate.HoldTheNextSave();
         await using var participant = ConnectionFor(backend, "participant", sessionIdentity);
         var participantInbox = new StateInbox<ParticipantWorkshopState>(participant);
         var joining = participant.StartAsync();

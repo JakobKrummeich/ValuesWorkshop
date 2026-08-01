@@ -10,6 +10,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly DbContextOptions<WorkshopDbContext> _options;
+    private readonly List<WorkshopDbContext> _openContexts = [];
 
     public SqliteSessionRepositoryTests()
     {
@@ -24,6 +25,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
     public void Dispose()
     {
+        foreach (var context in _openContexts)
+        {
+            context.Dispose();
+        }
+
         _connection.Dispose();
     }
 
@@ -292,97 +298,47 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     }
 
     [Fact]
-    public async Task Only_one_of_two_contexts_that_loaded_the_same_revision_can_save()
+    public async Task A_save_from_a_context_that_loaded_an_overtaken_revision_conflicts()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+        var writers = await TwoWritersThatLoadedRevisionFour(identity);
 
-        using var contextOne = new WorkshopDbContext(_options);
-        using var contextTwo = new WorkshopDbContext(_options);
-        var repositoryOne = new SqliteSessionRepository(contextOne);
-        var repositoryTwo = new SqliteSessionRepository(contextTwo);
-
-        var joiner = new ParticipantId(Guid.NewGuid());
-        var sessionForJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
-        var sessionForAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
-        sessionForJoin.Join(joiner, new FixedRandomness(0));
-        sessionForJoin.BumpRevision();
-        sessionForAdvance.AdvancePhase();
-        sessionForAdvance.BumpRevision();
-
-        await repositoryOne.SaveAsync(sessionForJoin, expectedRevision: 4);
+        await writers.RepositoryOne.SaveAsync(writers.SessionWithJoin, expectedRevision: 4);
         await Should.ThrowAsync<ConcurrencyConflictException>(() =>
-            repositoryTwo.SaveAsync(sessionForAdvance, expectedRevision: 4)
+            writers.RepositoryTwo.SaveAsync(writers.SessionWithAdvance, expectedRevision: 4)
         );
 
-        var loaded = await LoadSession(identity);
-        loaded.ShouldNotBeNull();
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
-        loaded.Roster.Participants.ShouldBe([joiner]);
+        loaded.Roster.Participants.ShouldBe([writers.Joiner]);
         loaded.Revision.ShouldBe(5);
-    }
 
-    [Fact]
-    public async Task A_reload_after_a_conflict_sees_what_the_winning_writer_stored()
-    {
-        var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
-
-        using var contextOne = new WorkshopDbContext(_options);
-        using var contextTwo = new WorkshopDbContext(_options);
-        var repositoryOne = new SqliteSessionRepository(contextOne);
-        var repositoryTwo = new SqliteSessionRepository(contextTwo);
-
-        var joiner = new ParticipantId(Guid.NewGuid());
-        var sessionForJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
-        var sessionForAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
-        sessionForJoin.Join(joiner, new FixedRandomness(0));
-        sessionForJoin.BumpRevision();
-        await repositoryOne.SaveAsync(sessionForJoin, expectedRevision: 4);
-        sessionForAdvance.AdvancePhase();
-        sessionForAdvance.BumpRevision();
-        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
-            repositoryTwo.SaveAsync(sessionForAdvance, expectedRevision: 4)
-        );
-
-        var reloaded = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
-
-        reloaded.Revision.ShouldBe(5);
-        reloaded.Roster.Participants.ShouldBe([joiner]);
+        var reloadedByTheLoser = (
+            await writers.RepositoryTwo.LoadAsync(identity)
+        ).ShouldNotBeNull();
+        reloadedByTheLoser.Revision.ShouldBe(5);
+        reloadedByTheLoser.Roster.Participants.ShouldBe([writers.Joiner]);
     }
 
     [Fact]
     public async Task A_retried_save_after_a_conflict_keeps_both_writers_changes()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
-
-        using var contextOne = new WorkshopDbContext(_options);
-        using var contextTwo = new WorkshopDbContext(_options);
-        var repositoryOne = new SqliteSessionRepository(contextOne);
-        var repositoryTwo = new SqliteSessionRepository(contextTwo);
-
-        var joiner = new ParticipantId(Guid.NewGuid());
-        var sessionForJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
-        var sessionForAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
-        sessionForJoin.Join(joiner, new FixedRandomness(0));
-        sessionForJoin.BumpRevision();
-        await repositoryOne.SaveAsync(sessionForJoin, expectedRevision: 4);
-        sessionForAdvance.AdvancePhase();
-        sessionForAdvance.BumpRevision();
+        var writers = await TwoWritersThatLoadedRevisionFour(identity);
+        await writers.RepositoryOne.SaveAsync(writers.SessionWithJoin, expectedRevision: 4);
         await Should.ThrowAsync<ConcurrencyConflictException>(() =>
-            repositoryTwo.SaveAsync(sessionForAdvance, expectedRevision: 4)
+            writers.RepositoryTwo.SaveAsync(writers.SessionWithAdvance, expectedRevision: 4)
         );
 
-        var retried = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+        var retried = (await writers.RepositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
         retried.AdvancePhase();
         retried.BumpRevision();
-        await repositoryTwo.SaveAsync(retried, expectedRevision: 5);
+        await writers.RepositoryTwo.SaveAsync(retried, expectedRevision: 5);
 
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
         loaded.Revision.ShouldBe(6);
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
-        loaded.Roster.Participants.ShouldBe([joiner]);
+        loaded.Roster.Participants.ShouldBe([writers.Joiner]);
     }
 
     [Fact]
@@ -454,6 +410,46 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             .ToList();
         columnNames.ShouldNotContain("value_id");
         columnNames.ShouldNotContain("vote_count");
+    }
+
+    private sealed record RacingWriters(
+        SqliteSessionRepository RepositoryOne,
+        SqliteSessionRepository RepositoryTwo,
+        Session SessionWithJoin,
+        Session SessionWithAdvance,
+        ParticipantId Joiner
+    );
+
+    private async Task<RacingWriters> TwoWritersThatLoadedRevisionFour(SessionIdentity identity)
+    {
+        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+
+        var repositoryOne = new SqliteSessionRepository(TrackedContext());
+        var repositoryTwo = new SqliteSessionRepository(TrackedContext());
+        var joiner = new ParticipantId(Guid.NewGuid());
+        var sessionWithJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
+        var sessionWithAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+
+        sessionWithJoin.Join(joiner, new FixedRandomness(0));
+        sessionWithJoin.BumpRevision();
+        sessionWithAdvance.AdvancePhase();
+        sessionWithAdvance.BumpRevision();
+
+        return new RacingWriters(
+            repositoryOne,
+            repositoryTwo,
+            sessionWithJoin,
+            sessionWithAdvance,
+            joiner
+        );
+    }
+
+    private WorkshopDbContext TrackedContext()
+    {
+        var context = new WorkshopDbContext(_options);
+        _openContexts.Add(context);
+
+        return context;
     }
 
     private static Session PhasedSession(
