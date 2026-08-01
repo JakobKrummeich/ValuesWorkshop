@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { openSignedIn } from "./support/oidcLogin";
 
 const HTTP_OK = 200;
 const HTTP_UNAUTHORIZED = 401;
@@ -28,31 +29,9 @@ test.describe("OIDC authentication", () => {
   test("scripted login against dev provider reaches facilitator page", async ({
     page,
   }) => {
-    await page.goto("/facilitator");
+    await openSignedIn(page, "/facilitator", "facilitator");
 
-    await expect(page).toHaveURL(/localhost:9000/, { timeout: 10_000 });
-
-    await page.locator('input[name="login"]').fill("facilitator");
-    await page.locator('input[name="password"]').fill("any");
-    await page.locator('button[type="submit"]').click();
-
-    const consentButton = page.locator(
-      'button[type="submit"][autofocus], button.login-submit',
-    );
-    await consentButton
-      .first()
-      .waitFor({ timeout: 5_000 })
-      .catch(() => {});
-    if (
-      await consentButton
-        .first()
-        .isVisible()
-        .catch(() => false)
-    ) {
-      await consentButton.first().click();
-    }
-
-    await expect(page).toHaveURL(/\/facilitator/, { timeout: 15_000 });
+    await expect(page.getByLabel("Facilitator passphrase")).toBeVisible();
   });
 
   test("backend health endpoint accessible without auth", async ({
