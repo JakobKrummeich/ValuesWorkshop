@@ -11,6 +11,7 @@ services:
       OIDC_AUTHORITY: http://localhost:9000
       OIDC_METADATA_URL: http://oidc:9000/.well-known/openid-configuration
       CORS_ORIGINS: http://localhost:3000
+      FACILITATOR_PASSPHRASE: dev-facilitator-passphrase
     volumes:
       - vw-data:/data
     depends_on:

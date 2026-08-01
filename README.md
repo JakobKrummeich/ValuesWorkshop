@@ -28,4 +28,17 @@ scripts/ci-lint.sh                         # all lint gates
 scripts/ci-test.sh                         # all test gates
 ```
 
+## Backend configuration
+
+| Variable | Required | Dev value |
+|---|---|---|
+| `FACILITATOR_PASSPHRASE` | yes — the host refuses to start without it | `dev-facilitator-passphrase` |
+| `DATA_DIR` | no (`data`) | `/data` in compose |
+| `OIDC_AUTHORITY` / `OIDC_METADATA_URL` | no | `http://localhost:9000` |
+| `CORS_ORIGINS` | no | `http://localhost:3000` |
+| `STATE_RESEND_INTERVAL_MS` | no (`500`) | `500` |
+
+The dev passphrase is a local development value only; a real deployment sets
+its own secret through the environment.
+
 Layer mapping FE ↔ BE and architecture rules: `design/architecture.md`.
