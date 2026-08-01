@@ -28,6 +28,27 @@ scripts/ci-lint.sh                         # all lint gates
 scripts/ci-test.sh                         # all test gates
 ```
 
+## End-to-end tests
+
+Playwright drives real browsers against the compose stack. The config has no
+`webServer` block, so bring the stack up first; the suite is deliberately not
+wired into CI yet (Task 14 owns that).
+
+```sh
+docker compose -f docker-compose.dev.yml up -d --build   # wait for backend healthy
+npx playwright test                                      # whole suite
+npx playwright test sessionLifecycle                     # one spec
+docker compose -f docker-compose.dev.yml down            # add -v to drop the database
+```
+
+`e2e/sessionLifecycle.spec.ts` restarts the backend container mid-suite, so
+Playwright runs with one worker; `retries` stays `0`.
+
+Two things bite when the stack is stale: the frontend image inlines the
+`NEXT_PUBLIC_*` values at build time (compose passes them as build args), so
+changing them needs `up -d --build`; and `EnsureCreated()` never migrates, so
+a schema change needs `down -v` before the next `up`.
+
 ## Backend configuration
 
 | Variable | Required | Dev value |

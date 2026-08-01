@@ -51,16 +51,16 @@ other `sub` with `NotAuthorized`". This task implements exactly that.
 
 ## Acceptance criteria
 
-- [ ] Wrong or absent passphrase → `401`, and no row is written
-- [ ] Accepted creation returns a `sessionIdentity` whose facilitator is the
+- [x] Wrong or absent passphrase → `401`, and no row is written
+- [x] Accepted creation returns a `sessionIdentity` whose facilitator is the
       caller's `sub`, persisted at `revision = 0`
-- [ ] A different `sub` on `/hub/facilitator` is refused; the recorded
+- [x] A different `sub` on `/hub/facilitator` is refused; the recorded
       facilitator connects and receives full facilitator state
-- [ ] Facilitator closes and reopens the tab → control restored from URL +
+- [x] Facilitator closes and reopens the tab → control restored from URL +
       token alone, no rejoin, nothing read from client storage
-- [ ] Participant membership and facilitator identity both survive a backend
+- [x] Participant membership and facilitator identity both survive a backend
       restart
-- [ ] Playwright: participant joins → facilitator advances a phase →
+- [x] Playwright: participant joins → facilitator advances a phase →
       presenter and participant re-render → backend restarts → all three
       clients reconnect and show identical state (the loop deferred from
       Task 9)

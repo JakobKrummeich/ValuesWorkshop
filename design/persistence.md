@@ -11,7 +11,10 @@ SQLite via EF Core (`Microsoft.EntityFrameworkCore.Sqlite`). Single file
 database at `$DATA_DIR/valuesworkshop.db` (default `DATA_DIR=data`).
 
 No migration framework. Schema created via `EnsureCreated()` on startup.
-During development, drop and recreate the DB file on schema changes.
+During development, drop and recreate the DB file on schema changes — with
+the compose stack that means `docker compose -f docker-compose.dev.yml down -v`,
+because `EnsureCreated()` leaves an existing file's schema untouched and a
+stale one fails at query time (`no such column: …`).
 
 ---
 
@@ -24,12 +27,20 @@ phase, and timestamp. Per-phase state gets its own table.
 
 ```sql
 CREATE TABLE sessions (
-    identity           TEXT    PRIMARY KEY,
-    current_phase      INTEGER NOT NULL,
-    revision           INTEGER NOT NULL DEFAULT 0,
-    created_at         TEXT    NOT NULL
+    identity             TEXT    PRIMARY KEY,
+    facilitator_subject  TEXT    NOT NULL,
+    name                 TEXT    NOT NULL,
+    current_phase        INTEGER NOT NULL,
+    revision             INTEGER NOT NULL DEFAULT 0,
+    created_at           TEXT    NOT NULL
 );
 ```
+
+`facilitator_subject` is the OIDC `sub` recorded when `POST /api/sessions`
+accepted the passphrase; it is the whole of the facilitator's identity, so
+facilitator control survives a restart and a reopened tab without anything
+being kept on the client (`design/protocol.md` § 2.1). `name` is the session
+name the facilitator typed, persisted for consumers that arrive later.
 
 ### Per-phase state (1:1 with session)
 
@@ -207,7 +218,8 @@ SessionCommandHandler.HandleAsync(sessionIdentity, mutation)
     ├─ 4. Persist via ISessionRepository.SaveAsync(session, expectedRevision)
     │     │
     │     ├─ Compare-and-set on the stored revision column; another writer
-    │     │  won the race → ConcurrencyConflictException, nothing written
+    │     │  won the race, or no row exists at all → ConcurrencyConflict-
+    │     │  Exception, nothing written
     │     │
     │     └─ Failure → exception propagates, no broadcast
     │
@@ -219,6 +231,18 @@ SessionCommandHandler.HandleAsync(sessionIdentity, mutation)
 **Structural guarantee:** broadcast runs only after persist succeeds. There
 is no alternate mutation path — all session commands enter through the
 handler.
+
+**Create is its own path.** A session comes into existence only through
+`ISessionRepository.CreateAsync(session)`, an explicit insert at
+`revision = 0` driven by `POST /api/sessions`. `SaveAsync` therefore no
+longer inserts: a save against an absent row is a
+`ConcurrencyConflictException`, and a `CreateAsync` for an identity that
+already exists is one too. That closes the gap Task 9b left open: while
+`SaveAsync` still inserted, "no row at all" and "a row stored at revision 0"
+were the same situation to a save with `expectedRevision = 0`, so a write
+against a session that had been deleted underneath it looked like a
+successful compare-and-set. An update can now only ever hit a row that a
+create put there.
 
 **Conflict handling:** a `ConcurrencyConflictException` restarts the flow at
 step 1 — the handler loads the session again, so the mutation is re-applied
@@ -279,8 +303,10 @@ dependencies, easily testable.
 
 ### Mapping strategy
 
-- **Save:** convert domain `Session` + building blocks → entity graph,
-  then `DbContext` upsert (clear + re-add child collections for simplicity;
+- **Create:** insert the session row and its entity graph at `revision = 0`;
+  a duplicate `identity` surfaces as `ConcurrencyConflictException`.
+- **Save:** convert domain `Session` + building blocks → entity graph, then
+  update the existing rows (clear + re-add child collections for simplicity;
   the compare-and-set guard on `revision` ensures only the winning
   writer's transaction commits — see § 4).
 - **Load:** query full entity graph with `.Include()` chains, then
