@@ -104,7 +104,7 @@ public class FacilitatorHubTests
 
     private static Session SessionInPhase(Phase phase)
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
 
         while (session.PhaseProgress.CurrentPhase != phase)
         {

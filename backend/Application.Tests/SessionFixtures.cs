@@ -26,6 +26,8 @@ internal static class SessionFixtures
     {
         return Session.Restore(
             new SessionIdentity(Guid.Parse("00000000-0000-0000-0000-00000000f00d")),
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([Anna, Ben, Chris]),
             PhaseProgress.Restore(phase),
             quiz ?? QuizProgress.Restore(null, false, false),

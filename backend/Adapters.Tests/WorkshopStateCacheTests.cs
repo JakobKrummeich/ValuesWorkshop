@@ -14,7 +14,7 @@ public class WorkshopStateCacheTests
     [Fact]
     public void An_unchanged_session_is_mapped_only_once()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         session.BumpRevision();
 
         var first = cache.StatesOf(session);
@@ -26,7 +26,7 @@ public class WorkshopStateCacheTests
     [Fact]
     public void A_new_revision_is_mapped_again()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         session.BumpRevision();
         var first = cache.StatesOf(session);
 
@@ -42,7 +42,7 @@ public class WorkshopStateCacheTests
     [Fact]
     public void Every_roster_participant_gets_their_own_mapped_state()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         var anna = new ParticipantId(Guid.NewGuid());
         session.Join(anna, new FixedRandomness(0));
         session.BumpRevision();
@@ -62,7 +62,7 @@ public class WorkshopStateCacheTests
     [Fact]
     public void Sessions_that_are_no_longer_connected_are_forgotten()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         cache.StatesOf(session);
 
         cache.RetainOnly([new SessionIdentity(Guid.NewGuid())]);
@@ -73,7 +73,7 @@ public class WorkshopStateCacheTests
     [Fact]
     public void Sessions_that_are_still_connected_are_kept()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         cache.StatesOf(session);
 
         cache.RetainOnly([KnownSession]);

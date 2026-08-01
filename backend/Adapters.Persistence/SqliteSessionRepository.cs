@@ -9,20 +9,80 @@ namespace ValuesWorkshop.Adapters.Persistence;
 public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessionRepository
 {
     private const int SqliteBusyErrorCode = 5;
+    private const int SqliteConstraintErrorCode = 19;
 
-    public async Task SaveAsync(Session session, long expectedRevision)
+    public Task CreateAsync(Session session)
+    {
+        return TranslatingMissingWriteLockAsync(
+            session.Identity,
+            expectedRevision: 0,
+            () => CreateWithinTransactionAsync(session)
+        );
+    }
+
+    public Task SaveAsync(Session session, long expectedRevision)
+    {
+        return TranslatingMissingWriteLockAsync(
+            session.Identity,
+            expectedRevision,
+            () => SaveWithinTransactionAsync(session, expectedRevision)
+        );
+    }
+
+    private static async Task TranslatingMissingWriteLockAsync(
+        SessionIdentity sessionIdentity,
+        long expectedRevision,
+        Func<Task> write
+    )
     {
         try
         {
-            await SaveWithinTransactionAsync(session, expectedRevision);
+            await write();
         }
         catch (SqliteException exception) when (exception.SqliteErrorCode == SqliteBusyErrorCode)
         {
             throw new ConcurrencyConflictException(
-                DescribeMissingWriteLock(session.Identity, expectedRevision),
+                DescribeMissingWriteLock(sessionIdentity, expectedRevision),
                 exception
             );
         }
+    }
+
+    private async Task CreateWithinTransactionAsync(Session session)
+    {
+        database.ChangeTracker.Clear();
+
+        await using var transaction = await database.Database.BeginTransactionAsync();
+
+        var storedRevision = await StoredRevisionAsync(session.Identity);
+
+        if (storedRevision is not null)
+        {
+            throw new ConcurrencyConflictException(
+                session.Identity,
+                expectedRevision: 0,
+                storedRevision
+            );
+        }
+
+        database.Sessions.Add(DomainEntityMapper.ToEntity(session));
+
+        try
+        {
+            await database.SaveChangesAsync();
+        }
+        catch (DbUpdateException exception)
+            when (exception.InnerException is SqliteException innerException
+                && innerException.SqliteErrorCode == SqliteConstraintErrorCode
+            )
+        {
+            throw new ConcurrencyConflictException(
+                DescribeExistingSession(session.Identity),
+                exception
+            );
+        }
+
+        await transaction.CommitAsync();
     }
 
     private async Task SaveWithinTransactionAsync(Session session, long expectedRevision)
@@ -44,21 +104,21 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
 
         if (claimedRows == 0)
         {
-            await RequireInsertableSession(session.Identity, expectedRevision);
+            throw new ConcurrencyConflictException(
+                session.Identity,
+                expectedRevision,
+                await StoredRevisionAsync(session.Identity)
+            );
         }
 
         var existingEntity = await QueryFullSession()
-            .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
+            .FirstAsync(sessionEntity => sessionEntity.Identity == identityString);
 
         var newEntity = DomainEntityMapper.ToEntity(session);
-
-        if (existingEntity is not null)
-        {
-            newEntity.CreatedAt = existingEntity.CreatedAt;
-            RemoveExistingChildren(existingEntity);
-            database.Sessions.Remove(existingEntity);
-            await database.SaveChangesAsync();
-        }
+        newEntity.CreatedAt = existingEntity.CreatedAt;
+        RemoveExistingChildren(existingEntity);
+        database.Sessions.Remove(existingEntity);
+        await database.SaveChangesAsync();
 
         database.Sessions.Add(newEntity);
         await database.SaveChangesAsync();
@@ -95,25 +155,23 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         );
     }
 
-    private async Task RequireInsertableSession(
-        SessionIdentity sessionIdentity,
-        long expectedRevision
-    )
+    private static string DescribeExistingSession(SessionIdentity sessionIdentity)
+    {
+        return string.Create(
+            CultureInfo.InvariantCulture,
+            $"Session {sessionIdentity.Value} already exists and cannot be created twice."
+        );
+    }
+
+    private async Task<long?> StoredRevisionAsync(SessionIdentity sessionIdentity)
     {
         var identityString = sessionIdentity.Value.ToString();
 
-        var storedRevision = await database
+        return await database
             .Sessions.AsNoTracking()
             .Where(sessionEntity => sessionEntity.Identity == identityString)
             .Select(sessionEntity => (long?)sessionEntity.Revision)
             .FirstOrDefaultAsync();
-
-        if (storedRevision is null && expectedRevision == 0)
-        {
-            return;
-        }
-
-        throw new ConcurrencyConflictException(sessionIdentity, expectedRevision, storedRevision);
     }
 
     private IQueryable<Persistence.Entities.SessionEntity> QueryFullSession()

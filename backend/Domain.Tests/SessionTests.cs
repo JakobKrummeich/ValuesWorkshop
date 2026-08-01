@@ -6,7 +6,7 @@ public class SessionTests
     public void New_session_starts_with_all_building_blocks_in_initial_state()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        var session = new Session(identity);
+        var session = TestSessions.Open(identity);
 
         session.Identity.ShouldBe(identity);
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);

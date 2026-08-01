@@ -212,6 +212,20 @@ internal sealed class InMemorySessionRepository : ISessionRepository
         return Task.FromResult(sessions.GetValueOrDefault(sessionIdentity));
     }
 
+    public Task CreateAsync(Session session)
+    {
+        if (!sessions.TryAdd(session.Identity, session))
+        {
+            throw new ConcurrencyConflictException(
+                session.Identity,
+                expectedRevision: 0,
+                sessions[session.Identity].Revision
+            );
+        }
+
+        return Task.CompletedTask;
+    }
+
     public Task SaveAsync(Session session, long expectedRevision)
     {
         sessions[session.Identity] = session;

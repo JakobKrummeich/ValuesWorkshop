@@ -2,7 +2,11 @@ namespace ValuesWorkshop.Domain;
 
 public sealed class Session
 {
+    private const int MaximumNameLength = 120;
+
     public SessionIdentity Identity { get; }
+    public FacilitatorSubject Facilitator { get; }
+    public SessionName Name { get; }
     public Roster Roster { get; }
     public PhaseProgress PhaseProgress { get; }
     public QuizProgress Quiz { get; }
@@ -12,16 +16,37 @@ public sealed class Session
     public VotingRounds Voting { get; }
     public long Revision { get; private set; }
 
-    public Session(SessionIdentity identity)
+    public static Session Open(
+        SessionIdentity identity,
+        FacilitatorSubject facilitator,
+        SessionName name
+    )
     {
-        Identity = identity;
-        Roster = new Roster();
-        PhaseProgress = new PhaseProgress();
-        Quiz = new QuizProgress();
-        Selection = new SelectionRound();
-        Formation = new FormationRecord();
-        Presentation = new PresentationWalk();
-        Voting = new VotingRounds();
+        if (string.IsNullOrWhiteSpace(facilitator.Value))
+        {
+            throw new InvariantViolationException("A session needs a facilitator subject.");
+        }
+
+        if (string.IsNullOrWhiteSpace(name.Value))
+        {
+            throw new InvariantViolationException("A session needs a name.");
+        }
+
+        var trimmedName = name.Value.Trim();
+
+        if (trimmedName.Length > MaximumNameLength)
+        {
+            throw new InvariantViolationException(
+                $"A session name may not exceed {MaximumNameLength} characters."
+            );
+        }
+
+        return new Session(identity, facilitator, new SessionName(trimmedName));
+    }
+
+    public bool IsFacilitatedBy(FacilitatorSubject subject)
+    {
+        return string.Equals(Facilitator.Value, subject.Value, StringComparison.Ordinal);
     }
 
     public bool Join(ParticipantId participantId, IRandomness randomness)
@@ -53,6 +78,8 @@ public sealed class Session
 
     internal static Session Restore(
         SessionIdentity identity,
+        FacilitatorSubject facilitator,
+        SessionName name,
         Roster roster,
         PhaseProgress phaseProgress,
         QuizProgress quiz,
@@ -65,6 +92,8 @@ public sealed class Session
     {
         return new Session(
             identity,
+            facilitator,
+            name,
             roster,
             phaseProgress,
             quiz,
@@ -78,8 +107,24 @@ public sealed class Session
         };
     }
 
+    private Session(SessionIdentity identity, FacilitatorSubject facilitator, SessionName name)
+        : this(
+            identity,
+            facilitator,
+            name,
+            new Roster(),
+            new PhaseProgress(),
+            new QuizProgress(),
+            new SelectionRound(),
+            new FormationRecord(),
+            new PresentationWalk(),
+            new VotingRounds()
+        ) { }
+
     private Session(
         SessionIdentity identity,
+        FacilitatorSubject facilitator,
+        SessionName name,
         Roster roster,
         PhaseProgress phaseProgress,
         QuizProgress quiz,
@@ -90,6 +135,8 @@ public sealed class Session
     )
     {
         Identity = identity;
+        Facilitator = facilitator;
+        Name = name;
         Roster = roster;
         PhaseProgress = phaseProgress;
         Quiz = quiz;

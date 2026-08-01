@@ -26,10 +26,9 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IDisposable
     public async Task Two_overlapping_saves_of_the_same_revision_leave_exactly_one_winner()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveThrough(
+        await CreateThrough(
             OptionsFor(waitForTheWriteLock: true),
-            PhasedSession(identity, Phase.Join, revision: 4),
-            expectedRevision: 0
+            PhasedSession(identity, Phase.Join, revision: 4)
         );
 
         var joiner = new ParticipantId(Guid.NewGuid());
@@ -58,10 +57,9 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IDisposable
     public async Task A_save_that_cannot_take_the_write_lock_is_reported_as_a_conflict()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveThrough(
+        await CreateThrough(
             OptionsFor(waitForTheWriteLock: true),
-            PhasedSession(identity, Phase.Join, revision: 4),
-            expectedRevision: 0
+            PhasedSession(identity, Phase.Join, revision: 4)
         );
 
         await using var lockHolder = new SqliteConnection(ConnectionString());
@@ -107,6 +105,15 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IDisposable
         });
     }
 
+    private static async Task CreateThrough(
+        DbContextOptions<WorkshopDbContext> options,
+        Session session
+    )
+    {
+        await using var context = new WorkshopDbContext(options);
+        await new SqliteSessionRepository(context).CreateAsync(session);
+    }
+
     private static async Task SaveThrough(
         DbContextOptions<WorkshopDbContext> options,
         Session session,
@@ -149,6 +156,8 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IDisposable
     {
         return Session.Restore(
             identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore(participants),
             PhaseProgress.Restore(phase),
             QuizProgress.Restore(null, false, false),

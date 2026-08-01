@@ -76,7 +76,7 @@ public class StateResendServiceTests
 
     private static Session SessionWithOneParticipant()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         session.Join(new ParticipantId(Guid.NewGuid()), new FixedRandomness(0));
         session.BumpRevision();
 

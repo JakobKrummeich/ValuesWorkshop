@@ -79,7 +79,7 @@ public sealed class ConcurrentIntentTests
         using var scope = backend.Services.CreateScope();
         await scope
             .ServiceProvider.GetRequiredService<ISessionRepository>()
-            .SaveAsync(new Session(sessionIdentity), expectedRevision: 0);
+            .CreateAsync(TestSessions.Open(sessionIdentity));
 
         return sessionIdentity;
     }

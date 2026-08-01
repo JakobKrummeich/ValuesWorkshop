@@ -6,6 +6,11 @@ namespace ValuesWorkshop.Host.Tests;
 internal sealed class GatedSessionRepository(ISessionRepository inner, SaveGate gate)
     : ISessionRepository
 {
+    public Task CreateAsync(Session session)
+    {
+        return inner.CreateAsync(session);
+    }
+
     public async Task SaveAsync(Session session, long expectedRevision)
     {
         await gate.PassAsync();

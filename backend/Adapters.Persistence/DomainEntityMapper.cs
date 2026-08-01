@@ -12,6 +12,8 @@ internal static class DomainEntityMapper
         return new SessionEntity
         {
             Identity = identityString,
+            FacilitatorSubject = session.Facilitator.Value,
+            Name = session.Name.Value,
             CurrentPhase = (int)session.PhaseProgress.CurrentPhase,
             Revision = session.Revision,
             IsFormed = session.Formation.IsFormed,
@@ -135,6 +137,8 @@ internal static class DomainEntityMapper
 
         return Session.Restore(
             identity,
+            new FacilitatorSubject(entity.FacilitatorSubject),
+            new SessionName(entity.Name),
             roster,
             state,
             quiz,

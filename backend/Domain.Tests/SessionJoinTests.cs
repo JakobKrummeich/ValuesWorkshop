@@ -21,7 +21,7 @@ public class SessionJoinTests
     [Fact]
     public void Joining_puts_the_participant_on_the_roster()
     {
-        var session = new Session(new SessionIdentity(Guid.NewGuid()));
+        var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
         session.Join(Anna, Randomness.Fixed(0));
 
@@ -31,7 +31,7 @@ public class SessionJoinTests
     [Fact]
     public void Joining_twice_resumes_the_existing_place_instead_of_creating_a_second_one()
     {
-        var session = new Session(new SessionIdentity(Guid.NewGuid()));
+        var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
         session.Join(Anna, Randomness.Fixed(0));
         session.Join(Anna, Randomness.Fixed(0));
@@ -148,6 +148,8 @@ public class SessionJoinTests
     {
         return Session.Restore(
             new SessionIdentity(Guid.NewGuid()),
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([Anna, Ben]),
             PhaseProgress.Restore(phase),
             QuizProgress.Restore(null, false, false),

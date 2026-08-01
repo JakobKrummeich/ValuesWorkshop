@@ -3,6 +3,8 @@ namespace ValuesWorkshop.Adapters.Persistence.Entities;
 public sealed class SessionEntity
 {
     public string Identity { get; set; } = "";
+    public string FacilitatorSubject { get; set; } = "";
+    public string Name { get; set; } = "";
     public int CurrentPhase { get; set; }
     public long Revision { get; set; }
     public bool IsFormed { get; set; }

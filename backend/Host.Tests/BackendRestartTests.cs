@@ -47,7 +47,7 @@ public sealed class BackendRestartTests
     private static async Task<SessionIdentity> SeedSession(WorkshopTestFactory backend, Phase phase)
     {
         var sessionIdentity = new SessionIdentity(Guid.NewGuid());
-        var session = new Session(sessionIdentity);
+        var session = TestSessions.Open(sessionIdentity);
 
         while (session.PhaseProgress.CurrentPhase != phase)
         {
@@ -55,9 +55,7 @@ public sealed class BackendRestartTests
         }
 
         using var scope = backend.Services.CreateScope();
-        await scope
-            .ServiceProvider.GetRequiredService<ISessionRepository>()
-            .SaveAsync(session, expectedRevision: 0);
+        await scope.ServiceProvider.GetRequiredService<ISessionRepository>().CreateAsync(session);
 
         return sessionIdentity;
     }
