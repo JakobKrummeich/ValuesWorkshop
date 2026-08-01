@@ -255,7 +255,7 @@ owning exactly one slice of state and its invariants:
 
 | Building block | Owns | Enforces |
 |---|---|---|
-| **Roster** | participants + facilitator, membership, reconnect/resume | I4 |
+| **Roster** | participants, membership, reconnect/resume | I4 |
 | **Workshop state** | current phase + within-phase state | I1, I2 |
 | **Quiz progress** | current question, reveal/learning-text shown, answer tallies, who-answered-which-question | I5 |
 | **Selection round** | value selections, who-has-submitted, top values | I6, I7 |
@@ -263,9 +263,10 @@ owning exactly one slice of state and its invariants:
 | **Presentation walk** | presenting group + presented value position | I12 |
 | **Voting rounds** | allotment, who-has-voted flags, anonymous tallies, tie state, winning values, reveal position | I13, I14, I15 |
 
-The Session **root** itself does only two things: guard the boundary
-(check phase + actor — I2, I3) and route each command to exactly one
-building block. I16 spans the whole boundary.
+The Session **root** itself owns the facilitator identity
+(`FacilitatorSubject`) and the session name, guards the boundary (check
+phase + actor — I2, I3), and routes each command to exactly one building
+block. I16 spans the whole boundary.
 
 > **Implementation guardrail (for implementer agents):** a Session class
 > that implements the rules of these building blocks itself is a god class
