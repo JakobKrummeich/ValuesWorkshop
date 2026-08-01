@@ -323,6 +323,69 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task A_reload_after_a_conflict_sees_what_the_winning_writer_stored()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+
+        using var contextOne = new WorkshopDbContext(_options);
+        using var contextTwo = new WorkshopDbContext(_options);
+        var repositoryOne = new SqliteSessionRepository(contextOne);
+        var repositoryTwo = new SqliteSessionRepository(contextTwo);
+
+        var joiner = new ParticipantId(Guid.NewGuid());
+        var sessionForJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
+        var sessionForAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+        sessionForJoin.Join(joiner, new FixedRandomness(0));
+        sessionForJoin.BumpRevision();
+        await repositoryOne.SaveAsync(sessionForJoin, expectedRevision: 4);
+        sessionForAdvance.AdvancePhase();
+        sessionForAdvance.BumpRevision();
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            repositoryTwo.SaveAsync(sessionForAdvance, expectedRevision: 4)
+        );
+
+        var reloaded = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+
+        reloaded.Revision.ShouldBe(5);
+        reloaded.Roster.Participants.ShouldBe([joiner]);
+    }
+
+    [Fact]
+    public async Task A_retried_save_after_a_conflict_keeps_both_writers_changes()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+
+        using var contextOne = new WorkshopDbContext(_options);
+        using var contextTwo = new WorkshopDbContext(_options);
+        var repositoryOne = new SqliteSessionRepository(contextOne);
+        var repositoryTwo = new SqliteSessionRepository(contextTwo);
+
+        var joiner = new ParticipantId(Guid.NewGuid());
+        var sessionForJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
+        var sessionForAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+        sessionForJoin.Join(joiner, new FixedRandomness(0));
+        sessionForJoin.BumpRevision();
+        await repositoryOne.SaveAsync(sessionForJoin, expectedRevision: 4);
+        sessionForAdvance.AdvancePhase();
+        sessionForAdvance.BumpRevision();
+        await Should.ThrowAsync<ConcurrencyConflictException>(() =>
+            repositoryTwo.SaveAsync(sessionForAdvance, expectedRevision: 4)
+        );
+
+        var retried = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
+        retried.AdvancePhase();
+        retried.BumpRevision();
+        await repositoryTwo.SaveAsync(retried, expectedRevision: 5);
+
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+        loaded.Revision.ShouldBe(6);
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.Roster.Participants.ShouldBe([joiner]);
+    }
+
+    [Fact]
     public async Task Load_returns_null_for_nonexistent_session()
     {
         var loaded = await LoadSession(new SessionIdentity(Guid.NewGuid()));

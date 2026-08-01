@@ -192,15 +192,22 @@ Client intent
     ▼
 SessionCommandHandler.HandleAsync(sessionIdentity, mutation)
     │
-    ├─ 1. Load Session from ISessionRepository
+    ├─ 1. Load Session from ISessionRepository (remembers its revision as
+    │     the expected revision)
     │
     ├─ 2. Apply domain mutation (Session method call)
+    │     │
+    │     ├─ Returns false (nothing changed) → no bump, no persist,
+    │     │  no broadcast, no retry
     │     │
     │     └─ Throws on invariant violation → no persist, no broadcast
     │
     ├─ 3. Bump session revision (monotonic, one per accepted mutation)
     │
-    ├─ 4. Persist via ISessionRepository.SaveAsync()
+    ├─ 4. Persist via ISessionRepository.SaveAsync(session, expectedRevision)
+    │     │
+    │     ├─ Compare-and-set on the stored revision column; another writer
+    │     │  won the race → ConcurrencyConflictException, nothing written
     │     │
     │     └─ Failure → exception propagates, no broadcast
     │
@@ -212,6 +219,19 @@ SessionCommandHandler.HandleAsync(sessionIdentity, mutation)
 **Structural guarantee:** broadcast runs only after persist succeeds. There
 is no alternate mutation path — all session commands enter through the
 handler.
+
+**Conflict handling:** a `ConcurrencyConflictException` restarts the flow at
+step 1 — the handler loads the session again, so the mutation is re-applied
+to the state the winning writer stored, and bumps that session's revision.
+The budget is three attempts in total. The revision therefore grows by
+exactly one per accepted mutation, never once per attempt. After the third
+conflict the exception propagates and `IntentPipeline` turns it into
+`IntentResult.Rejected(ConcurrencyConflict, …)`: nothing persisted, nothing
+broadcast, state unchanged.
+
+Because a retry must see the winning writer's state, `SqliteSessionRepository`
+reads without change tracking and clears the tracker before a write, so no
+stale EF identity-map snapshot can be re-saved.
 
 ---
 

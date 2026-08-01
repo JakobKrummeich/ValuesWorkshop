@@ -118,6 +118,30 @@ public class IntentPipelineTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task An_intent_that_keeps_conflicting_is_rejected_as_a_concurrency_conflict()
+    {
+        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Quiz));
+        repository.ConflictingSaves = 3;
+        var broadcaster = new RecordingBroadcaster();
+        var pipeline = PipelineOver(repository, broadcaster);
+
+        var result = await pipeline.ExecuteAsync(
+            KnownSession,
+            session =>
+            {
+                session.AdvancePhase();
+                return true;
+            }
+        );
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.ConcurrencyConflict);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
     private static IntentPipeline PipelineOver(
         FakeSessionRepository repository,
         RecordingBroadcaster broadcaster

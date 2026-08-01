@@ -382,6 +382,7 @@ broadcast, no `revision` bump.
 | `UnknownAction` | referenced action does not exist or belongs elsewhere |
 | `InvariantViolated` | a domain invariant refused the mutation (I5–I15) |
 | `MalformedPayload` | payload failed structural validation (§ 6.3) |
+| `ConcurrencyConflict` | a concurrent writer won the race three times in a row (`design/persistence.md` § 4) |
 
 The set is closed. A new rejection reason is a protocol change and updates
 this document.

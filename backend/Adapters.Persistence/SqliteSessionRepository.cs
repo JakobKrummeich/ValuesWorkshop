@@ -10,6 +10,8 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
     {
         var identityString = session.Identity.Value.ToString();
 
+        database.ChangeTracker.Clear();
+
         await using var transaction = await database.Database.BeginTransactionAsync();
 
         var claimedRows = await database.Database.ExecuteSqlInterpolatedAsync(
@@ -45,6 +47,7 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         var identityString = sessionIdentity.Value.ToString();
 
         var entity = await QueryFullSession()
+            .AsNoTracking()
             .FirstOrDefaultAsync(sessionEntity => sessionEntity.Identity == identityString);
 
         return entity is null ? null : DomainEntityMapper.ToDomain(entity);
@@ -52,7 +55,7 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
 
     public async Task<IReadOnlyList<Session>> LoadAllAsync()
     {
-        var entities = await QueryFullSession().ToListAsync();
+        var entities = await QueryFullSession().AsNoTracking().ToListAsync();
 
         return entities.Select(DomainEntityMapper.ToDomain).ToList();
     }
