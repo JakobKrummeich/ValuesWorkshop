@@ -142,7 +142,7 @@ public class IntentPipelineTests
             return Task.FromResult(Stored);
         }
 
-        public Task SaveAsync(Session session)
+        public Task SaveAsync(Session session, long expectedRevision)
         {
             Saved.Add(session);
             return Task.CompletedTask;

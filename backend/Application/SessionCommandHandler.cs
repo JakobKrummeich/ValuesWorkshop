@@ -16,9 +16,11 @@ public sealed class SessionCommandHandler(ISessionRepository repository, IBroadc
             return;
         }
 
+        var expectedRevision = session.Revision;
+
         session.BumpRevision();
 
-        await repository.SaveAsync(session);
+        await repository.SaveAsync(session, expectedRevision);
 
         await broadcaster.BroadcastSessionStateAsync(session);
     }

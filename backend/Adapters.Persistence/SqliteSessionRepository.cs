@@ -6,7 +6,7 @@ namespace ValuesWorkshop.Adapters.Persistence;
 
 public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessionRepository
 {
-    public async Task SaveAsync(Session session)
+    public async Task SaveAsync(Session session, long expectedRevision)
     {
         var identityString = session.Identity.Value.ToString();
 

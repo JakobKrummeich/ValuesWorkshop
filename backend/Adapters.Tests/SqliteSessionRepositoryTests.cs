@@ -300,11 +300,11 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         columnNames.ShouldNotContain("vote_count");
     }
 
-    private async Task SaveSession(Session session)
+    private async Task SaveSession(Session session, long expectedRevision = 0)
     {
         using var context = new WorkshopDbContext(_options);
         var repository = new SqliteSessionRepository(context);
-        await repository.SaveAsync(session);
+        await repository.SaveAsync(session, expectedRevision);
     }
 
     private async Task<Session?> LoadSession(SessionIdentity identity)

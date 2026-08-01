@@ -212,7 +212,7 @@ internal sealed class InMemorySessionRepository : ISessionRepository
         return Task.FromResult(sessions.GetValueOrDefault(sessionIdentity));
     }
 
-    public Task SaveAsync(Session session)
+    public Task SaveAsync(Session session, long expectedRevision)
     {
         sessions[session.Identity] = session;
         Saved.Add(session);
