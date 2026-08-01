@@ -13,3 +13,15 @@ export function currentSessionIdentity(): string | null {
     SESSION_IDENTITY_PARAMETER,
   );
 }
+
+export function sessionUrl(path: string, sessionIdentity: string): string {
+  return `${path}?${SESSION_IDENTITY_PARAMETER}=${encodeURIComponent(sessionIdentity)}`;
+}
+
+export function navigateTo(url: string): void {
+  window.location.assign(url);
+}
+
+export function navigateReplace(url: string): void {
+  window.location.replace(url);
+}

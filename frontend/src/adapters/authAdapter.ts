@@ -66,7 +66,3 @@ export function logout(): Completable {
     return manager.signoutRedirect();
   }).pipe(ignoreElements());
 }
-
-export function navigateReplace(url: string): void {
-  window.location.replace(url);
-}

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import { handleCallback, navigateReplace } from "../../../adapters/authAdapter";
+import { handleCallback } from "../../../adapters/authAdapter";
+import { navigateReplace } from "../../../adapters/browserLocation";
 import { errorMessage } from "../../../shared/errorMessage";
 
 const returnUrlSchema = z.string().startsWith("/").catch("/");
