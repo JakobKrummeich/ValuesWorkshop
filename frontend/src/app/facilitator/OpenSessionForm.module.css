@@ -50,7 +50,7 @@
 
 .input {
   min-height: var(--control-height);
-  padding: var(--space-tight) var(--space-gap);
+  padding: var(--space-gap);
   border: var(--border-hairline) solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
@@ -85,13 +85,14 @@
 
 .submit {
   min-height: var(--control-height);
-  padding: var(--space-tight) var(--space-gutter);
+  padding: var(--space-gap) var(--space-gutter);
   border: none;
   border-radius: var(--radius-sm);
   background: var(--color-primary);
   color: var(--color-on-primary);
   font-family: var(--font-sans);
   font-size: var(--text-body);
+  font-weight: var(--weight-bold);
   cursor: pointer;
 }
 
