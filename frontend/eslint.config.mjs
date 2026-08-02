@@ -13,6 +13,10 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    files: ["**/*.cjs"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
+  {
     plugins: { "react-hooks": reactHooksPlugin },
     rules: {
       "react-hooks/exhaustive-deps": "error",

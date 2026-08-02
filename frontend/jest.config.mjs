@@ -1,13 +1,11 @@
 import nextJest from "next/jest.js";
 
-const createJestConfig = nextJest({ dir: "./" });
-
-export default createJestConfig({
+const createNextJestConfig = nextJest({ dir: "./" })({
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
-    "scripts/**/*.ts",
+    "scripts/**/*.mts",
     "!scripts/**/__tests__/**",
     "!src/**/*.test.{ts,tsx}",
     "!src/**/*.d.ts",
@@ -18,3 +16,21 @@ export default createJestConfig({
     },
   },
 });
+
+export default async function jestConfig() {
+  const nextConfig = await createNextJestConfig();
+  const [[transformerPath, transformerOptions]] = Object.values(
+    nextConfig.transform,
+  );
+
+  return {
+    ...nextConfig,
+    transform: {
+      ...nextConfig.transform,
+      "^.+\\.mts$": [
+        "<rootDir>/jest.moduleTypescriptTransformer.cjs",
+        { transformerPath, transformerOptions },
+      ],
+    },
+  };
+}
