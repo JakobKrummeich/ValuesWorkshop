@@ -12,7 +12,7 @@ public class IntentPipelineTests
     [Fact]
     public async Task An_accepted_intent_mutates_persists_and_then_broadcasts()
     {
-        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Quiz));
+        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Join));
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
@@ -26,18 +26,16 @@ public class IntentPipelineTests
         );
 
         result.ShouldBe(IntentResult.Accepted());
-        repository
-            .Saved.ShouldHaveSingleItem()
-            .PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
+        repository.Saved.ShouldHaveSingleItem().PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
         broadcaster
             .Broadcasts.ShouldHaveSingleItem()
-            .PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
+            .PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
     }
 
     [Fact]
     public async Task An_accepted_intent_bumps_the_revision_before_it_is_persisted()
     {
-        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Quiz, revision: 4));
+        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Join, revision: 4));
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);
 
@@ -124,7 +122,7 @@ public class IntentPipelineTests
     [Fact]
     public async Task An_intent_that_keeps_conflicting_is_rejected_as_a_concurrency_conflict()
     {
-        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Quiz));
+        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Join));
         repository.ConflictingSaves = 3;
         var broadcaster = new RecordingBroadcaster();
         var pipeline = PipelineOver(repository, broadcaster);

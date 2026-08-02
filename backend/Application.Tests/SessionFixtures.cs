@@ -33,7 +33,7 @@ internal static class SessionFixtures
             quiz ?? QuizProgress.Restore(null, false, false),
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
-            presentation ?? PresentationWalk.Restore(null, null),
+            presentation ?? PresentationWalk.Restore(null, null, 0),
             voting ?? VotingRounds.Restore(false, 0, []),
             revision
         );

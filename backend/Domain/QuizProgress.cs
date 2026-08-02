@@ -6,6 +6,11 @@ public sealed class QuizProgress
     public bool IsRevealed { get; private set; }
     public bool IsLearningTextShown { get; private set; }
 
+    public bool IsWalkComplete(int questionCount)
+    {
+        return CurrentQuestion >= questionCount && IsRevealed && IsLearningTextShown;
+    }
+
     internal static QuizProgress Restore(
         int? currentQuestion,
         bool isRevealed,

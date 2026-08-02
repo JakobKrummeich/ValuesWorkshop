@@ -66,7 +66,7 @@ public sealed class Session
         return true;
     }
 
-    public void AdvancePhase(FacilitatorSubject actor)
+    public void AdvancePhase(FacilitatorSubject actor, WorkshopContentSizes contentSizes)
     {
         if (!IsFacilitatedBy(actor))
         {
@@ -74,6 +74,8 @@ public sealed class Session
                 "Only the facilitator of this session may advance the phase (I2)."
             );
         }
+
+        PhaseExitGuard.RequireSatisfied(this, contentSizes);
 
         PhaseProgress.Advance();
     }

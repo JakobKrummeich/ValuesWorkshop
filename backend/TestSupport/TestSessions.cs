@@ -17,7 +17,15 @@ public static class TestSessions
         return Session.Open(identity, facilitator, Name);
     }
 
-    public static Session InPhase(SessionIdentity identity, Phase phase)
+    public static Session InPhase(
+        SessionIdentity identity,
+        Phase phase,
+        QuizProgress? quiz = null,
+        FormationRecord? formation = null,
+        PresentationWalk? presentation = null,
+        VotingRounds? voting = null,
+        long revision = 0
+    )
     {
         return Session.Restore(
             identity,
@@ -25,17 +33,17 @@ public static class TestSessions
             Name,
             Roster.Restore([]),
             PhaseProgress.Restore(phase),
-            QuizProgress.Restore(null, false, false),
+            quiz ?? QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
-            FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, []),
-            revision: 0
+            formation ?? FormationRecord.Restore(false, []),
+            presentation ?? PresentationWalk.Restore(null, null, 0),
+            voting ?? VotingRounds.Restore(false, 0, []),
+            revision
         );
     }
 
     public static void AdvanceToNextPhase(Session session)
     {
-        session.AdvancePhase(session.Facilitator);
+        session.AdvancePhase(session.Facilitator, WorkshopContentSizes.Placeholder);
     }
 }

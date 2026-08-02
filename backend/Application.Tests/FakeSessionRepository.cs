@@ -36,7 +36,8 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
             ),
             PresentationWalk.Restore(
                 session.Presentation.PresentingGroup,
-                session.Presentation.PresentedValue
+                session.Presentation.PresentedValue,
+                session.Presentation.ShownValueCount
             ),
             VotingRounds.Restore(
                 session.Voting.RoundOpen,

@@ -92,7 +92,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(2, true, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -127,7 +127,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(4, true, true),
             SelectionRound.Restore([participant], [topValueOne, topValueTwo]),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -161,7 +161,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(true, [group]),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -199,7 +199,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore("Eagle", new ValueId("courage")),
+            PresentationWalk.Restore("Eagle", new ValueId("courage"), 3),
             VotingRounds.Restore(false, 2, [winnerOne, winnerTwo]),
             revision: 0
         );
@@ -233,7 +233,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(1, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -359,7 +359,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
                 QuizProgress.Restore(null, false, false),
                 SelectionRound.Restore([], []),
                 FormationRecord.Restore(false, []),
-                PresentationWalk.Restore(null, null),
+                PresentationWalk.Restore(null, null, 0),
                 VotingRounds.Restore(false, 0, []),
                 revision: 0
             )
@@ -465,7 +465,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision
         );

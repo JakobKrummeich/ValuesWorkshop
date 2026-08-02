@@ -146,6 +146,20 @@ public class FacilitatorHubTests
     }
 
     [Fact]
+    public async Task Advancing_out_of_an_unfinished_quiz_is_rejected_and_broadcasts_nothing()
+    {
+        repository.Add(SessionInPhase(Phase.Quiz));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.AdvancePhase();
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task Advancing_an_unknown_session_is_rejected()
     {
         var hub = HubBoundTo(KnownSession);
@@ -179,7 +193,8 @@ public class FacilitatorHubTests
         return new FacilitatorHub(
             repository,
             new FacilitatorIntentHandler(
-                new IntentPipeline(new SessionCommandHandler(repository, broadcaster))
+                new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+                WorkshopContentSizes.Placeholder
             ),
             new WorkshopStateCache(),
             registry

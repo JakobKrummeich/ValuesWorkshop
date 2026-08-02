@@ -46,10 +46,50 @@ public class FacilitatorIntentHandlerTests
             .PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
     }
 
+    [Fact]
+    public async Task An_advance_blocked_by_an_exit_guard_is_rejected_as_a_wrong_phase()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(
+                Phase.GroupWork,
+                formation: SessionFixtures.TwoGroups(),
+                revision: 4
+            )
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.Facilitator));
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+
+        var stored = (await repository.LoadAsync(KnownSession)).ShouldNotBeNull();
+        stored.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupWork);
+        stored.Revision.ShouldBe(4);
+    }
+
+    [Fact]
+    public async Task An_advance_past_the_last_phase_stays_an_invariant_violation()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.FinalPresentation)
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.Facilitator));
+
+        result.Code.ShouldBe(IntentRejectionCode.InvariantViolated);
+        repository.Saved.ShouldBeEmpty();
+    }
+
     private FacilitatorIntentHandler HandlerOver(FakeSessionRepository repository)
     {
         return new FacilitatorIntentHandler(
-            new IntentPipeline(new SessionCommandHandler(repository, broadcaster))
+            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            WorkshopContentSizes.Placeholder
         );
     }
 }

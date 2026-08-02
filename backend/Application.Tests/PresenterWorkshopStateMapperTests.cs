@@ -95,7 +95,7 @@ public class PresenterWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.ValuePresentation,
-            presentation: PresentationWalk.Restore("fox", new ValueId("honesty"))
+            presentation: PresentationWalk.Restore("fox", new ValueId("honesty"), 1)
         );
 
         Map(session)
