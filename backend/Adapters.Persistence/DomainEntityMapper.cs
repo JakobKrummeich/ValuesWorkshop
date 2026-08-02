@@ -21,7 +21,7 @@ internal static class DomainEntityMapper
             QuizState = new QuizStateEntity
             {
                 SessionIdentity = identityString,
-                CurrentQuestionIndex = session.Quiz.CurrentQuestion,
+                CurrentQuestionIndex = session.Quiz.CurrentQuestionIndex,
                 IsRevealed = session.Quiz.IsRevealed,
                 IsLearningTextShown = session.Quiz.IsLearningTextShown,
             },

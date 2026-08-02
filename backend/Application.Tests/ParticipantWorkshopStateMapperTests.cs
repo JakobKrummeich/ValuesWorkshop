@@ -46,7 +46,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var quiz = Map(session).ShouldBeOfType<ParticipantQuizState>().Quiz;
 
-        quiz.QuestionNumber.ShouldBe(2);
+        quiz.QuestionIndex.ShouldBe(2);
         quiz.SubState.ShouldBe(QuizSubState.Revealed);
     }
 

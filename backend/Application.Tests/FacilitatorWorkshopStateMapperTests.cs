@@ -51,7 +51,7 @@ public class FacilitatorWorkshopStateMapperTests
 
         var quiz = Map(session).ShouldBeOfType<FacilitatorQuizState>().Quiz;
 
-        quiz.QuestionNumber.ShouldBe(3);
+        quiz.QuestionIndex.ShouldBe(3);
         quiz.SubState.ShouldBe(QuizSubState.LearningTextShown);
     }
 

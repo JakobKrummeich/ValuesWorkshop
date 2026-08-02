@@ -46,7 +46,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         loaded.Identity.ShouldBe(identity);
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
         loaded.Roster.Participants.ShouldBeEmpty();
-        loaded.Quiz.CurrentQuestion.ShouldBeNull();
+        loaded.Quiz.CurrentQuestionIndex.ShouldBeNull();
         loaded.Quiz.IsRevealed.ShouldBeFalse();
         loaded.Quiz.IsLearningTextShown.ShouldBeFalse();
         loaded.Selection.SubmittedBy.ShouldBeEmpty();
@@ -106,7 +106,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         loaded.Roster.Participants.Count.ShouldBe(2);
         loaded.Roster.Participants.ShouldContain(participantOne);
         loaded.Roster.Participants.ShouldContain(participantTwo);
-        loaded.Quiz.CurrentQuestion.ShouldBe(2);
+        loaded.Quiz.CurrentQuestionIndex.ShouldBe(2);
         loaded.Quiz.IsRevealed.ShouldBeTrue();
         loaded.Quiz.IsLearningTextShown.ShouldBeFalse();
     }

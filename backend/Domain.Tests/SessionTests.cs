@@ -11,7 +11,7 @@ public class SessionTests
         session.Identity.ShouldBe(identity);
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
         session.Roster.Participants.ShouldBeEmpty();
-        session.Quiz.CurrentQuestion.ShouldBeNull();
+        session.Quiz.CurrentQuestionIndex.ShouldBeNull();
         session.Selection.TopValues.ShouldBeEmpty();
         session.Formation.IsFormed.ShouldBeFalse();
         session.Presentation.PresentedValue.ShouldBeNull();

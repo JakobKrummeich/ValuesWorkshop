@@ -13,7 +13,7 @@ public enum GroupWorkStatus
     Submitted = 2,
 }
 
-public sealed record QuizView(int? QuestionNumber, QuizSubState SubState);
+public sealed record QuizView(int? QuestionIndex, QuizSubState SubState);
 
 public sealed record RosterView(IReadOnlyList<Guid> ParticipantIds, int ParticipantCount);
 
