@@ -91,7 +91,7 @@ public class SessionCommandHandlerRetryTests
 
     private static bool AdvanceOnePhase(Session session)
     {
-        session.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(session);
 
         return true;
     }

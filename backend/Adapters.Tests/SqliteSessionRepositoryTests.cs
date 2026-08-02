@@ -326,7 +326,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         );
 
         var retried = (await writers.RepositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
-        retried.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(retried);
         retried.BumpRevision();
         await writers.RepositoryTwo.SaveAsync(retried, expectedRevision: 5);
 
@@ -429,7 +429,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
         sessionWithJoin.Join(joiner, new FixedRandomness(0));
         sessionWithJoin.BumpRevision();
-        sessionWithAdvance.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(sessionWithAdvance);
         sessionWithAdvance.BumpRevision();
 
         return new RacingWriters(

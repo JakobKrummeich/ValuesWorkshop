@@ -9,7 +9,7 @@ namespace ValuesWorkshop.Adapters.Web;
 [Authorize]
 public sealed class FacilitatorHub(
     ISessionRepository repository,
-    IntentPipeline pipeline,
+    FacilitatorIntentHandler intentHandler,
     WorkshopStateCache cache,
     SessionConnectionRegistry registry
 ) : Hub<IFacilitatorClient>
@@ -52,13 +52,11 @@ public sealed class FacilitatorHub(
 
     public Task<IntentResult> AdvancePhase()
     {
-        return pipeline.ExecuteAsync(
-            HubSessionBinding.SessionIdentityOf(Context),
-            session =>
-            {
-                session.AdvancePhase();
-                return true;
-            }
+        return intentHandler.HandleAsync(
+            new AdvancePhaseCommand(
+                HubSessionBinding.SessionIdentityOf(Context),
+                new FacilitatorSubject(CallerSubject.Of(Context.User) ?? "")
+            )
         );
     }
 }

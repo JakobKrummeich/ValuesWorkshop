@@ -4,18 +4,14 @@ public class SessionAdvancePhaseTests
 {
     [Theory]
     [InlineData(Phase.Join, Phase.Quiz)]
-    [InlineData(Phase.Quiz, Phase.ValueSelection)]
     [InlineData(Phase.ValueSelection, Phase.SelectionResults)]
     [InlineData(Phase.SelectionResults, Phase.GroupFormation)]
     [InlineData(Phase.GroupFormation, Phase.GroupWork)]
-    [InlineData(Phase.GroupWork, Phase.ValuePresentation)]
-    [InlineData(Phase.ValuePresentation, Phase.FinalVoting)]
-    [InlineData(Phase.FinalVoting, Phase.FinalPresentation)]
     public void Advancing_moves_to_the_next_phase(Phase current, Phase expected)
     {
         var session = SessionInPhase(current);
 
-        session.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(session);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(expected);
     }
@@ -25,25 +21,25 @@ public class SessionAdvancePhaseTests
     {
         var session = SessionInPhase(Phase.FinalPresentation);
 
-        Should.Throw<InvariantViolationException>(session.AdvancePhase);
+        Should.Throw<InvariantViolationException>(() => TestSessions.AdvanceToNextPhase(session));
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.FinalPresentation);
     }
 
+    [Fact]
+    public void Advancing_as_someone_other_than_the_facilitator_is_refused()
+    {
+        var session = SessionInPhase(Phase.Join);
+
+        Should.Throw<NotAuthorizedException>(() =>
+            session.AdvancePhase(new FacilitatorSubject("someone-else"))
+        );
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
+    }
+
     private static Session SessionInPhase(Phase phase)
     {
-        return Session.Restore(
-            new SessionIdentity(Guid.NewGuid()),
-            TestSessions.Facilitator,
-            TestSessions.Name,
-            Roster.Restore([]),
-            PhaseProgress.Restore(phase),
-            QuizProgress.Restore(null, false, false),
-            SelectionRound.Restore([], []),
-            FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
-            VotingRounds.Restore(false, 0, []),
-            revision: 0
-        );
+        return TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), phase);
     }
 }

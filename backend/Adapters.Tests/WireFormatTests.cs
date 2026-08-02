@@ -14,7 +14,7 @@ public class WireFormatTests
     public void Workshop_state_travels_as_camel_case_json_with_numeric_enums()
     {
         var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
-        session.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(session);
         session.BumpRevision();
 
         var json = SerializeStateMessage(FacilitatorWorkshopStateMapper.Map(session, 1));
@@ -61,14 +61,7 @@ public class WireFormatTests
 
     private static Session SessionInPhase(Phase phase)
     {
-        var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
-
-        while (session.PhaseProgress.CurrentPhase != phase)
-        {
-            session.AdvancePhase();
-        }
-
-        return session;
+        return TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), phase);
     }
 
     private static int DiscriminatorOf(object state)

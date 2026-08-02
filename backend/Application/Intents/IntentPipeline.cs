@@ -18,6 +18,10 @@ public sealed class IntentPipeline(SessionCommandHandler commandHandler)
         {
             return IntentResult.Rejected(IntentRejectionCode.UnknownSession, exception.Message);
         }
+        catch (NotAuthorizedException exception)
+        {
+            return IntentResult.Rejected(IntentRejectionCode.NotAuthorized, exception.Message);
+        }
         catch (InvariantViolationException exception)
         {
             return IntentResult.Rejected(IntentRejectionCode.InvariantViolated, exception.Message);

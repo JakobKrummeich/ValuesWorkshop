@@ -188,12 +188,7 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
     private async Task<SessionIdentity> SeededSession(Phase phase = Phase.Join)
     {
         var sessionIdentity = new SessionIdentity(Guid.NewGuid());
-        var session = TestSessions.Open(sessionIdentity);
-
-        while (session.PhaseProgress.CurrentPhase != phase)
-        {
-            session.AdvancePhase();
-        }
+        var session = TestSessions.InPhase(sessionIdentity, phase);
 
         using var scope = factory.Services.CreateScope();
         await scope.ServiceProvider.GetRequiredService<ISessionRepository>().CreateAsync(session);

@@ -66,8 +66,15 @@ public sealed class Session
         return true;
     }
 
-    public void AdvancePhase()
+    public void AdvancePhase(FacilitatorSubject actor)
     {
+        if (!IsFacilitatedBy(actor))
+        {
+            throw new NotAuthorizedException(
+                "Only the facilitator of this session may advance the phase (I2)."
+            );
+        }
+
         PhaseProgress.Advance();
     }
 

@@ -16,4 +16,26 @@ public static class TestSessions
     {
         return Session.Open(identity, facilitator, Name);
     }
+
+    public static Session InPhase(SessionIdentity identity, Phase phase)
+    {
+        return Session.Restore(
+            identity,
+            Facilitator,
+            Name,
+            Roster.Restore([]),
+            PhaseProgress.Restore(phase),
+            QuizProgress.Restore(null, false, false),
+            SelectionRound.Restore([], []),
+            FormationRecord.Restore(false, []),
+            PresentationWalk.Restore(null, null),
+            VotingRounds.Restore(false, 0, []),
+            revision: 0
+        );
+    }
+
+    public static void AdvanceToNextPhase(Session session)
+    {
+        session.AdvancePhase(session.Facilitator);
+    }
 }

@@ -92,16 +92,43 @@ public class FacilitatorHubTests
     [Fact]
     public async Task Advancing_the_phase_mutates_persists_and_broadcasts()
     {
-        repository.Add(SessionInPhase(Phase.Quiz));
+        repository.Add(SessionInPhase(Phase.Join));
         var hub = HubBoundTo(KnownSession);
 
         var result = await hub.AdvancePhase();
 
         result.ShouldBe(IntentResult.Accepted());
-        repository
-            .Saved.ShouldHaveSingleItem()
-            .PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
+        repository.Saved.ShouldHaveSingleItem().PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
         broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Advancing_as_a_subject_that_is_not_the_facilitator_is_rejected()
+    {
+        repository.Add(SessionInPhase(Phase.Join));
+        var hub = HubWithContext(
+            new FakeHubCallerContext(KnownSession.Value.ToString(), "another-subject")
+        );
+
+        var result = await hub.AdvancePhase();
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Advancing_without_an_authenticated_subject_is_rejected()
+    {
+        repository.Add(SessionInPhase(Phase.Join));
+        var hub = HubWithContext(new FakeHubCallerContext(KnownSession.Value.ToString()));
+
+        var result = await hub.AdvancePhase();
+
+        result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
     [Fact]
@@ -130,12 +157,7 @@ public class FacilitatorHubTests
 
     private static Session SessionInPhase(Phase phase)
     {
-        var session = TestSessions.Open(KnownSession);
-
-        while (session.PhaseProgress.CurrentPhase != phase)
-        {
-            session.AdvancePhase();
-        }
+        var session = TestSessions.InPhase(KnownSession, phase);
 
         session.BumpRevision();
 
@@ -156,7 +178,9 @@ public class FacilitatorHubTests
     {
         return new FacilitatorHub(
             repository,
-            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            new FacilitatorIntentHandler(
+                new IntentPipeline(new SessionCommandHandler(repository, broadcaster))
+            ),
             new WorkshopStateCache(),
             registry
         )
