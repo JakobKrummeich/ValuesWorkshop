@@ -1,4 +1,4 @@
-import { defaultIfEmpty, defer, switchMap } from "rxjs";
+import { catchError, defaultIfEmpty, map, of, switchMap } from "rxjs";
 import { z } from "zod";
 import { hubBaseUrl } from "../config/environment";
 import type { FacilitatorSessionCreationPort } from "../domain/ports/facilitator/sessionCreationPort";
@@ -10,6 +10,7 @@ import {
 } from "../domain/sessionCreation";
 import type { Single } from "../shared/reactiveTypes";
 import { getAccessToken } from "./authAdapter";
+import { postJson, type JsonResponse } from "./http";
 
 const sessionCreationResponseSchema = z.object({
   sessionIdentity: z.uuid(),
@@ -43,34 +44,26 @@ function postSession(
   sessionName: string,
   passphrase: string,
 ): Single<SessionCreationOutcome> {
-  return defer(() =>
-    fetch(`${hubBaseUrl()}/api/sessions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ sessionName, passphrase }),
-    })
-      .then(outcomeOf)
-      .catch(() => sessionCreationRejected(SessionCreationFailure.Unexpected)),
+  return postJson(
+    `${hubBaseUrl()}/api/sessions`,
+    { sessionName, passphrase },
+    accessToken,
+  ).pipe(
+    map(outcomeOf),
+    catchError(() =>
+      of(sessionCreationRejected(SessionCreationFailure.Unexpected)),
+    ),
   );
 }
 
-function outcomeOf(response: Response): Promise<SessionCreationOutcome> {
+function outcomeOf(response: JsonResponse): SessionCreationOutcome {
   if (response.status === 201) {
-    return response
-      .json()
-      .then((body: unknown) =>
-        sessionCreated(
-          sessionCreationResponseSchema.parse(body).sessionIdentity,
-        ),
-      );
+    return sessionCreated(
+      sessionCreationResponseSchema.parse(response.body).sessionIdentity,
+    );
   }
 
-  return Promise.resolve(
-    sessionCreationRejected(
-      failureByStatus[response.status] ?? SessionCreationFailure.Unexpected,
-    ),
+  return sessionCreationRejected(
+    failureByStatus[response.status] ?? SessionCreationFailure.Unexpected,
   );
 }
