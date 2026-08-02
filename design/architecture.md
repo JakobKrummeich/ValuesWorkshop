@@ -131,6 +131,7 @@ Records are the default for all new C# types (AGENTS.md hard rule). A mutable
 | `ParticipantId` | `readonly record struct` | Value semantics, identity by value |
 | `ValueId` | `readonly record struct` | Value semantics, identity by value |
 | `FacilitatorSubject` | `readonly record struct` | OIDC `sub` of the facilitator who opened the session |
+| `CallerSubject` | `readonly record struct` | OIDC `sub` of whoever issues an intent, unverified until `Session.IsFacilitatedBy` compares it |
 | `SessionName` | `readonly record struct` | Facilitator-chosen session name (≤ 120 chars) |
 
 Future DTOs, commands, and events → records.

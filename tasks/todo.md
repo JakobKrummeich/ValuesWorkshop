@@ -238,8 +238,8 @@ deferred to their phase tasks (13, 21, 22) per review decision Q1.
 - [ ] Phase + guard state survive a store round-trip
 **Note:** phase 8→9 cannot be walked until Task 22 lands the winning values —
 the I15 guard blocks by design and no other producer of winners exists. The
-quiz and value-presentation guards stay inactive until Tasks 13 and 21 supply
-the real content counts to `WorkshopContentSizes`.
+quiz and value-presentation guards stay unregistered until Tasks 13 and 21
+construct them with the real content counts.
 **Verification:** `dotnet test backend` (state machine suite) + codegen check.
 **Dependencies:** 7, 9. **Size:** M
 
@@ -272,9 +272,8 @@ question, live tallies, sub-controls (next question, reveal, learning text).
       `PoseNextQuestion` / `RevealAnswer` / `ShowLearningText`, strictly forward
       `Answering → Revealed → LearningTextShown` per question, illegal order
       rejected, transitions round-trip through the store
-- [ ] **From Task 11:** turn on the phase exit guard by supplying the real
-      question count to `WorkshopContentSizes` (host DI stops registering
-      `NotConfigured` for it)
+- [ ] **From Task 11:** turn on the phase exit guard by registering a
+      `QuizExitGuard` with the real question count in the host `PhaseExitGuards`
 - [ ] **From Task 11:** the quiz cursor stays 0-based end to end —
       `current_question_index`, `QuizProgress.CurrentQuestionIndex`, the
       `questionIndex` wire field, no number/index conversion anywhere
@@ -389,9 +388,9 @@ shows that group's values + actions; participants see passive view.
 - [ ] Only submitted content shown
 - [ ] **From Task 11 (Q1 deferral):** presentation walk cursor mechanics land
       here — `GoToNextValue` over group → value, persisted
-- [ ] **From Task 11:** turn on the phase exit guard by supplying the real
-      presented-value count to `WorkshopContentSizes` (host DI stops
-      registering `NotConfigured` for it)
+- [ ] **From Task 11:** turn on the phase exit guard by registering a
+      `ValuePresentationExitGuard` with the real presented-value count in the
+      host `PhaseExitGuards`
 - [ ] Multi-client e2e extended through phase 7
 **Verification:** FE tests + Playwright switch check.
 **Dependencies:** 20. **Size:** S
