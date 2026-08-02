@@ -218,6 +218,39 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task Round_trip_preserves_the_state_the_exit_guards_read()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var member = new ParticipantId(Guid.NewGuid());
+        var session = Session.Restore(
+            identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
+            Roster.Restore([member]),
+            PhaseProgress.Restore(Phase.ValuePresentation),
+            QuizProgress.Restore(5, true, true),
+            SelectionRound.Restore([], []),
+            FormationRecord.Restore(
+                true,
+                [Group.Restore("Otter", [member], [new ValueId("honesty")], member, true)]
+            ),
+            PresentationWalk.Restore("Otter", new ValueId("honesty"), 7),
+            VotingRounds.Restore(false, 1, Winners),
+            revision: 3
+        );
+
+        await CreateSession(session);
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
+        loaded.Quiz.IsWalkComplete(questionCount: 5).ShouldBeTrue();
+        loaded.Formation.IsEveryGroupSubmitted.ShouldBeTrue();
+        loaded.Presentation.ShownValueCount.ShouldBe(7);
+        loaded.Presentation.IsWalkComplete(presentedValueCount: 7).ShouldBeTrue();
+        loaded.Voting.WinnersStand.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Save_overwrites_existing_session()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
@@ -408,6 +441,15 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         columnNames.ShouldNotContain("value_id");
         columnNames.ShouldNotContain("vote_count");
     }
+
+    private static IReadOnlyList<ValueId> Winners =>
+        [
+            new ValueId("courage"),
+            new ValueId("integrity"),
+            new ValueId("honesty"),
+            new ValueId("respect"),
+            new ValueId("trust"),
+        ];
 
     private sealed record RacingWriters(
         SqliteSessionRepository RepositoryOne,
