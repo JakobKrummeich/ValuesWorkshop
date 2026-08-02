@@ -222,7 +222,7 @@ presenter and participant re-render → backend restart → clients reconnect an
 show identical state), which needs `POST /api/sessions` to seed a session.
 **Dependencies:** 7, 8, 9. **Size:** M
 
-### Task 11: Phase state machine
+### Task 11: Phase state machine ✅
 **Spec:** `tasks/specs/11-phase-state-machine.md` (approved via Lavish).
 **Description:** 9 phases, forward-only, facilitator-only advance enforced per
 intent, exit guards T2a–T2c with injected question/value counts, named intent
@@ -230,12 +230,12 @@ records replacing the anonymous lambda, `phases.ts` generated from the C#
 `Phase` enum with a build-time drift check. Sub-state transition mechanics are
 deferred to their phase tasks (13, 21, 22) per review decision Q1.
 **Acceptance criteria:**
-- [ ] Non-facilitator advance intent rejected with `NotAuthorized`, state
+- [x] Non-facilitator advance intent rejected with `NotAuthorized`, state
       unchanged
-- [ ] Backward transition impossible; past-phase-9 advance rejected
-- [ ] Each exit guard red-then-green tested
-- [ ] Build fails when checked-in `phases.ts` diverges from the C# enum
-- [ ] Phase + guard state survive a store round-trip
+- [x] Backward transition impossible; past-phase-9 advance rejected
+- [x] Each exit guard red-then-green tested
+- [x] Build fails when checked-in `phases.ts` diverges from the C# enum
+- [x] Phase + guard state survive a store round-trip
 **Note:** phase 8→9 cannot be walked until Task 22 lands the winning values —
 the I15 guard blocks by design and no other producer of winners exists. The
 quiz and value-presentation guards stay unregistered until Tasks 13 and 21
