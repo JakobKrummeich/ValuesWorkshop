@@ -19,9 +19,15 @@ const createNextJestConfig = nextJest({ dir: "./" })({
 
 export default async function jestConfig() {
   const nextConfig = await createNextJestConfig();
-  const [[transformerPath, transformerOptions]] = Object.values(
-    nextConfig.transform,
+  const tsEntry = Object.entries(nextConfig.transform).find(([pattern]) =>
+    new RegExp(pattern).test(".tsx"),
   );
+  if (!tsEntry) {
+    throw new Error(
+      "jest.config.mjs: no transform entry matching .tsx found in next/jest config",
+    );
+  }
+  const [transformerPath, transformerOptions] = tsEntry[1];
 
   return {
     ...nextConfig,
