@@ -289,7 +289,7 @@ deliberate: nothing a client sends can influence them.
 
 T1 → § 2 (HTTP) · T2, T2a–T2c, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
 § 4.1 · T3, T4 → § 3.1 · T5, T9, T14, T15, T16, T18 → § 4.2 · T4a, T10, T11,
-T12, T20, T23 → § 4.4. All 25 transitions of `design/state-machine.md` § 3
+T12, T20, T23 → § 4.4. All 28 transitions of `design/state-machine.md` § 3
 are accounted for.
 
 ---
