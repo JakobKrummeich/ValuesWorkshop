@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,6 +78,53 @@ public sealed class SessionCreationEndpointTests
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         (await response.Content.ReadAsStringAsync()).ShouldBeEmpty();
+        (await StoredSessionsAsync(backend)).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task An_absent_passphrase_is_401_and_persists_nothing()
+    {
+        using var backend = new WorkshopTestFactory();
+        using var client = AuthenticatedClient(backend);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/sessions",
+            new { sessionName = "Workshop" },
+            JsonSerializerOptions.Web
+        );
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        (await StoredSessionsAsync(backend)).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task An_absent_session_name_is_400_and_persists_nothing()
+    {
+        using var backend = new WorkshopTestFactory();
+        using var client = AuthenticatedClient(backend);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/sessions",
+            new { passphrase = WorkshopTestFactory.FacilitatorPassphrase },
+            JsonSerializerOptions.Web
+        );
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await StoredSessionsAsync(backend)).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_body_that_is_not_json_is_400_and_persists_nothing()
+    {
+        using var backend = new WorkshopTestFactory();
+        using var client = AuthenticatedClient(backend);
+
+        var response = await client.PostAsync(
+            "/api/sessions",
+            new StringContent("{ not json", Encoding.UTF8, "application/json")
+        );
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
         (await StoredSessionsAsync(backend)).ShouldBeEmpty();
     }
 

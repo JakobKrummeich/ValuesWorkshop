@@ -42,8 +42,8 @@ public static class SessionCreationEndpoint
 
         var result = await handler.CreateAsync(
             new FacilitatorSubject(subject),
-            new SessionName(request.SessionName ?? string.Empty),
-            request.Passphrase ?? string.Empty
+            new SessionName(request.SessionName),
+            request.Passphrase
         );
 
         if (result is SessionCreationResult.PassphraseRejected)
