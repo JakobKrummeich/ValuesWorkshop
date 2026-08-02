@@ -19,14 +19,14 @@ internal static class PhaseExitGuard
             Phase.Quiz
                 when IsWalkUnfinished(
                     contentSizes.QuizQuestionCount,
-                    session.Quiz.IsWalkComplete
+                    session.Quiz.IsQuizComplete
                 ) => "The quiz is left once the last question's learning text has been shown.",
             Phase.GroupWork when !session.Formation.IsEveryGroupSubmitted =>
                 "Group work is left once every group has submitted its result.",
             Phase.ValuePresentation
                 when IsWalkUnfinished(
                     contentSizes.PresentedValueCount,
-                    session.Presentation.IsWalkComplete
+                    session.Presentation.IsPresentationComplete
                 ) => "Value presentation is left once every group's every value has been shown.",
             Phase.FinalVoting when !session.Voting.WinnersStand =>
                 "Final voting is left once the winning values stand.",

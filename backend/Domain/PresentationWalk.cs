@@ -6,7 +6,7 @@ public sealed class PresentationWalk
     public ValueId? PresentedValue { get; private set; }
     public int ShownValueCount { get; private set; }
 
-    public bool IsWalkComplete(int presentedValueCount)
+    public bool IsPresentationComplete(int presentedValueCount)
     {
         return ShownValueCount >= presentedValueCount;
     }

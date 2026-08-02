@@ -6,7 +6,7 @@ public sealed class QuizProgress
     public bool IsRevealed { get; private set; }
     public bool IsLearningTextShown { get; private set; }
 
-    public bool IsWalkComplete(int questionCount)
+    public bool IsQuizComplete(int questionCount)
     {
         return CurrentQuestionIndex >= questionCount - 1 && IsRevealed && IsLearningTextShown;
     }

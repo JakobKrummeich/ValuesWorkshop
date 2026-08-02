@@ -243,10 +243,10 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
 
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
-        loaded.Quiz.IsWalkComplete(questionCount: 5).ShouldBeTrue();
+        loaded.Quiz.IsQuizComplete(questionCount: 5).ShouldBeTrue();
         loaded.Formation.IsEveryGroupSubmitted.ShouldBeTrue();
         loaded.Presentation.ShownValueCount.ShouldBe(7);
-        loaded.Presentation.IsWalkComplete(presentedValueCount: 7).ShouldBeTrue();
+        loaded.Presentation.IsPresentationComplete(presentedValueCount: 7).ShouldBeTrue();
         loaded.Voting.WinnersStand.ShouldBeTrue();
     }
 
