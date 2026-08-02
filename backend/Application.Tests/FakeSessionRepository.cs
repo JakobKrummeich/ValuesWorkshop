@@ -5,6 +5,7 @@ namespace ValuesWorkshop.Application.Tests;
 
 internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepository
 {
+    internal List<Session> Created { get; } = [];
     internal List<Session> Saved { get; } = [];
     internal List<long> ExpectedRevisions { get; } = [];
     internal int Loads { get; private set; }
@@ -19,6 +20,8 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
     {
         return Session.Restore(
             session.Identity,
+            session.Facilitator,
+            session.Name,
             Roster.Restore(session.Roster.Participants),
             PhaseProgress.Restore(session.PhaseProgress.CurrentPhase),
             QuizProgress.Restore(
@@ -65,6 +68,22 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
         Loads++;
 
         return Task.FromResult(load());
+    }
+
+    public Task CreateAsync(Session session)
+    {
+        if (load() is { } stored)
+        {
+            throw new ConcurrencyConflictException(
+                session.Identity,
+                expectedRevision: 0,
+                stored.Revision
+            );
+        }
+
+        Created.Add(session);
+
+        return Task.CompletedTask;
     }
 
     public Task SaveAsync(Session session, long expectedRevision)

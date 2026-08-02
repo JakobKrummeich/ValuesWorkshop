@@ -37,9 +37,9 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     public async Task Round_trip_empty_session()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        var session = new Session(identity);
+        var session = TestSessions.Open(identity);
 
-        await SaveSession(session);
+        await CreateSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -65,12 +65,12 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     public async Task Round_trip_preserves_the_revision()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        var session = new Session(identity);
+        var session = TestSessions.Open(identity);
         session.BumpRevision();
         session.BumpRevision();
         session.BumpRevision();
 
-        await SaveSession(session);
+        await CreateSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -85,6 +85,8 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var participantTwo = new ParticipantId(Guid.NewGuid());
         var session = Session.Restore(
             identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([participantOne, participantTwo]),
             PhaseProgress.Restore(Phase.Quiz),
             QuizProgress.Restore(2, true, false),
@@ -95,7 +97,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             revision: 0
         );
 
-        await SaveSession(session);
+        await CreateSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -118,6 +120,8 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var topValueTwo = new ValueId("respect");
         var session = Session.Restore(
             identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([participant]),
             PhaseProgress.Restore(Phase.SelectionResults),
             QuizProgress.Restore(4, true, true),
@@ -128,7 +132,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             revision: 0
         );
 
-        await SaveSession(session);
+        await CreateSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -150,6 +154,8 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
         var session = Session.Restore(
             identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([memberOne, memberTwo]),
             PhaseProgress.Restore(Phase.GroupWork),
             QuizProgress.Restore(null, false, false),
@@ -160,7 +166,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             revision: 0
         );
 
-        await SaveSession(session);
+        await CreateSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -186,6 +192,8 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         var winnerTwo = new ValueId("integrity");
         var session = Session.Restore(
             identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([]),
             PhaseProgress.Restore(Phase.FinalPresentation),
             QuizProgress.Restore(null, false, false),
@@ -196,7 +204,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             revision: 0
         );
 
-        await SaveSession(session);
+        await CreateSession(session);
         var loaded = await LoadSession(identity);
 
         loaded.ShouldNotBeNull();
@@ -213,11 +221,13 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     public async Task Save_overwrites_existing_session()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        var session = new Session(identity);
-        await SaveSession(session);
+        var session = TestSessions.Open(identity);
+        await CreateSession(session);
 
         var updatedSession = Session.Restore(
             identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([new ParticipantId(Guid.NewGuid())]),
             PhaseProgress.Restore(Phase.Quiz),
             QuizProgress.Restore(1, false, false),
@@ -240,7 +250,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     public async Task Save_with_the_matching_expected_revision_round_trips()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+        await CreateSession(PhasedSession(identity, Phase.Join, revision: 4));
 
         await SaveSession(PhasedSession(identity, Phase.Quiz, revision: 5), expectedRevision: 4);
 
@@ -255,10 +265,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     {
         var identity = new SessionIdentity(Guid.NewGuid());
         var survivor = new ParticipantId(Guid.NewGuid());
-        await SaveSession(
-            PhasedSession(identity, Phase.Quiz, revision: 4, survivor),
-            expectedRevision: 0
-        );
+        await CreateSession(PhasedSession(identity, Phase.Quiz, revision: 4, survivor));
 
         var staleSession = PhasedSession(identity, Phase.GroupWork, revision: 5);
 
@@ -271,18 +278,6 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
         loaded.Roster.Participants.ShouldBe([survivor]);
         loaded.Revision.ShouldBe(4);
-    }
-
-    [Fact]
-    public async Task Save_of_an_unknown_session_with_expected_revision_zero_inserts_it()
-    {
-        var identity = new SessionIdentity(Guid.NewGuid());
-
-        await SaveSession(PhasedSession(identity, Phase.Quiz, revision: 1), expectedRevision: 0);
-
-        var loaded = await LoadSession(identity);
-        loaded.ShouldNotBeNull();
-        loaded.Revision.ShouldBe(1);
     }
 
     [Fact]
@@ -353,10 +348,12 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     {
         var identityA = new SessionIdentity(Guid.NewGuid());
         var identityB = new SessionIdentity(Guid.NewGuid());
-        await SaveSession(new Session(identityA));
-        await SaveSession(
+        await CreateSession(TestSessions.Open(identityA));
+        await CreateSession(
             Session.Restore(
                 identityB,
+                TestSessions.Facilitator,
+                TestSessions.Name,
                 Roster.Restore([new ParticipantId(Guid.NewGuid())]),
                 PhaseProgress.Restore(Phase.ValueSelection),
                 QuizProgress.Restore(null, false, false),
@@ -422,7 +419,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
     private async Task<RacingWriters> TwoWritersThatLoadedRevisionFour(SessionIdentity identity)
     {
-        await SaveSession(PhasedSession(identity, Phase.Join, revision: 4), expectedRevision: 0);
+        await CreateSession(PhasedSession(identity, Phase.Join, revision: 4));
 
         var repositoryOne = new SqliteSessionRepository(TrackedContext());
         var repositoryTwo = new SqliteSessionRepository(TrackedContext());
@@ -461,6 +458,8 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     {
         return Session.Restore(
             identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore(participants),
             PhaseProgress.Restore(phase),
             QuizProgress.Restore(null, false, false),
@@ -470,6 +469,13 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             VotingRounds.Restore(false, 0, []),
             revision
         );
+    }
+
+    private async Task CreateSession(Session session)
+    {
+        using var context = new WorkshopDbContext(_options);
+        var repository = new SqliteSessionRepository(context);
+        await repository.CreateAsync(session);
     }
 
     private async Task SaveSession(Session session, long expectedRevision = 0)

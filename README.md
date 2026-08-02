@@ -28,4 +28,42 @@ scripts/ci-lint.sh                         # all lint gates
 scripts/ci-test.sh                         # all test gates
 ```
 
+## End-to-end tests
+
+Playwright drives real browsers against the compose stack. The config has no
+`webServer` block, so bring the stack up first; the suite is deliberately not
+wired into CI yet (Task 14 owns that).
+
+```sh
+docker compose -f docker-compose.dev.yml up -d --build   # wait for backend healthy
+npx playwright test                                      # whole suite
+npx playwright test sessionLifecycle                     # one spec
+docker compose -f docker-compose.dev.yml down            # add -v to drop the database
+```
+
+`e2e/sessionLifecycle.spec.ts` restarts the backend container mid-suite, so
+Playwright runs with one worker; `retries` stays `0`.
+
+Two things bite when the stack is stale: the frontend image inlines the
+`NEXT_PUBLIC_*` values at build time (compose passes them as build args), so
+changing them needs `up -d --build`; and `EnsureCreated()` never migrates, so
+a schema change needs `down -v` before the next `up`.
+
+## Backend configuration
+
+| Variable | Required | Dev value |
+|---|---|---|
+| `FACILITATOR_PASSPHRASE` | yes — the host refuses to start without it | `dev-facilitator-passphrase` |
+| `DATA_DIR` | no (`data`) | `/data` in compose |
+| `OIDC_AUTHORITY` / `OIDC_METADATA_URL` | no | `http://localhost:9000` |
+| `CORS_ORIGINS` | no | `http://localhost:3000` |
+| `STATE_RESEND_INTERVAL_MS` | no (`500`) | `500` |
+| `SESSION_CREATION_ATTEMPTS_PER_WINDOW` | no (`5`) | `5` |
+| `SESSION_CREATION_ATTEMPT_WINDOW_SECONDS` | no (`60`) | `60` |
+
+The dev passphrase is a local development value only; a real deployment sets
+its own secret through the environment. Session creation is rate limited per
+caller (the token `sub`, or the remote IP address when there is none):
+attempts beyond the window get `429` without the passphrase being compared.
+
 Layer mapping FE ↔ BE and architecture rules: `design/architecture.md`.

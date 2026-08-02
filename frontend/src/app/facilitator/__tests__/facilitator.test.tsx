@@ -18,6 +18,7 @@ jest.mock("../../useAuthGuard", () => ({
   },
 }));
 jest.mock("../../../adapters/browserLocation", () => ({
+  ...jest.requireActual("../../../adapters/browserLocation"),
   currentSessionIdentity: jest.fn(),
 }));
 jest.mock("../../../adapters/workshopSessions", () => ({
@@ -70,5 +71,22 @@ describe("facilitator screen group", () => {
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 6");
     screen.getByRole("button", { name: "Advance phase" });
+  });
+
+  it("offers the open session form when the link carries no session", async () => {
+    sessionIdentity.mockReturnValue(null);
+
+    await act(async () => {
+      render(
+        <FacilitatorLayout>
+          <FacilitatorHome />
+        </FacilitatorLayout>,
+      );
+    });
+
+    screen.getByRole("heading", { name: "ValuesWorkshop · Open a session" });
+    screen.getByLabelText("Facilitator passphrase");
+    expect(createSession).not.toHaveBeenCalled();
+    expect(screen.queryByText(/no workshop session/i)).not.toBeInTheDocument();
   });
 });

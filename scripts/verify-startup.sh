@@ -17,6 +17,7 @@ trap cleanup EXIT
 
 echo "Starting backend on :${BACKEND_PORT}..."
 ASPNETCORE_URLS="http://localhost:${BACKEND_PORT}" \
+  FACILITATOR_PASSPHRASE="${FACILITATOR_PASSPHRASE:-dev-facilitator-passphrase}" \
   dotnet run --project backend/Host --no-launch-profile &
 PIDS+=($!)
 

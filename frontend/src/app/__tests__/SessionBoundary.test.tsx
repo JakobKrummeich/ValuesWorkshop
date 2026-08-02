@@ -33,6 +33,22 @@ describe("SessionBoundary", () => {
     expect(screen.getByText(/no workshop session/i)).toBeInTheDocument();
   });
 
+  it("renders the screen's own fallback for a link that carries no session", () => {
+    sessionIdentity.mockReturnValue(null);
+
+    render(
+      <SessionBoundary
+        createSession={createFakeSession}
+        missingSession={<p>Open a session</p>}
+      >
+        {(session) => <p>{session.identity}</p>}
+      </SessionBoundary>,
+    );
+
+    expect(screen.getByText("Open a session")).toBeInTheDocument();
+    expect(screen.queryByText(/no workshop session/i)).not.toBeInTheDocument();
+  });
+
   it("renders its children with the session bound to the link", () => {
     sessionIdentity.mockReturnValue("abc-123");
 

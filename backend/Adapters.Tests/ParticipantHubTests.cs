@@ -29,7 +29,7 @@ public class ParticipantHubTests
     [Fact]
     public async Task Connecting_puts_a_newcomer_on_the_roster_and_broadcasts_the_new_state()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         repository.Add(session);
         var hub = HubBoundTo(KnownSession, Subject);
 
@@ -42,7 +42,7 @@ public class ParticipantHubTests
     [Fact]
     public async Task A_returning_participant_resumes_instead_of_joining_twice()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         session.Join(Anna, new FixedRandomness(0));
         repository.Add(session);
         var hub = HubBoundTo(KnownSession, Subject);
@@ -58,7 +58,7 @@ public class ParticipantHubTests
     [Fact]
     public async Task A_reconnecting_participant_is_pushed_its_state_immediately()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         session.Join(Anna, new FixedRandomness(0));
         repository.Add(session);
         var hub = HubBoundTo(KnownSession, Subject);
@@ -85,7 +85,7 @@ public class ParticipantHubTests
     [Fact]
     public async Task Connecting_joins_the_group_that_only_this_participant_receives()
     {
-        repository.Add(new Session(KnownSession));
+        repository.Add(TestSessions.Open(KnownSession));
         var hub = HubBoundTo(KnownSession, Subject);
 
         await hub.OnConnectedAsync();
@@ -106,7 +106,7 @@ public class ParticipantHubTests
     [Fact]
     public async Task Connecting_without_an_authenticated_subject_is_refused()
     {
-        repository.Add(new Session(KnownSession));
+        repository.Add(TestSessions.Open(KnownSession));
         var hub = HubWithContext(
             new FakeHubCallerContext(KnownSession.Value.ToString(), subject: null)
         );

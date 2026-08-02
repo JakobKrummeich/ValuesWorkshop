@@ -34,6 +34,8 @@ public class SessionAdvancePhaseTests
     {
         return Session.Restore(
             new SessionIdentity(Guid.NewGuid()),
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([]),
             PhaseProgress.Restore(phase),
             QuizProgress.Restore(null, false, false),

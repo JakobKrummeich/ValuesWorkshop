@@ -44,10 +44,44 @@ transition referenced as `T*` is defined in `design/state-machine.md`.
 
 | Endpoint | Kind | Auth | Purpose |
 |---|---|---|---|
-| `POST /api/sessions` | HTTP | facilitator passphrase in body | Open a session (T1) and receive its `sessionIdentity` |
+| `POST /api/sessions` | HTTP | Bearer + facilitator passphrase in body | Open a session (T1) and receive its `sessionIdentity` (§ 2.1) |
 | `/hub/facilitator?sessionIdentity=…` | SignalR | Bearer (facilitator) | Facilitator intents + facilitator state |
 | `/hub/participant?sessionIdentity=…` | SignalR | Bearer (participant) | Participant intents + participant state |
 | `/hub/presenter?sessionIdentity=…` | SignalR | anonymous | Presenter state only, no intents |
+
+### 2.1 `POST /api/sessions`
+
+Bearer-authenticated: the token supplies the facilitator `sub`, the body
+supplies the shared facilitator passphrase (`FACILITATOR_PASSPHRASE`, set on
+the server; the host refuses to start without it).
+
+```http
+POST /api/sessions
+Authorization: Bearer <OIDC access token>
+Content-Type: application/json
+
+{ "sessionName": "Acme values workshop", "passphrase": "…" }
+```
+
+| Status | Body | When |
+|---|---|---|
+| `201 Created` | `{ "sessionIdentity": "<guid>" }` | passphrase matched and the name is valid; the session is persisted at `revision = 0` with the caller's `sub` as its facilitator |
+| `400 Bad Request` | problem detail “The session name is missing, blank, or too long.” | passphrase matched, name missing, blank, or over 120 characters |
+| `401 Unauthorized` | empty | no bearer token, no `sub` claim, or a wrong, absent, or empty passphrase |
+| `429 Too Many Requests` | empty | the caller exceeded `SESSION_CREATION_ATTEMPTS_PER_WINDOW` attempts inside `SESSION_CREATION_ATTEMPT_WINDOW_SECONDS` |
+
+The rate limit is a fixed window partitioned by caller — the token `sub` when
+there is one, otherwise the remote IP address — so one attacker guessing
+passphrases cannot lock out every other facilitator. It defaults to 5 attempts
+per 60 seconds and is refused before the passphrase is compared.
+
+The passphrase is compared with `CryptographicOperations.FixedTimeEquals`
+over SHA-256 digests of the UTF-8 bytes, **before** the name is validated: a wrong passphrase always
+yields `401`, never a `400` that would confirm the passphrase was right. No
+response echoes the passphrase, and a rejected request writes nothing.
+
+The returned `sessionIdentity` is the only thing the client keeps — the
+passphrase lives in component state until submit and is never stored.
 
 **Bearer** is the OIDC JWT access token of Task 8 (`oidc-client-ts` in the
 browser, handed to SignalR through `accessTokenFactory`, silently renewed
@@ -56,8 +90,22 @@ roster stores, so a reconnecting phone resumes its existing place instead of
 becoming a second participant (T3, I4). The token proves *who* the person is,
 never *what role* they hold — role is session state, not a token claim:
 the facilitator is the `sub` recorded when `POST /api/sessions` accepted the
-facilitator passphrase (I3), and the facilitator hub refuses any other `sub`
-with `NotAuthorized`.
+facilitator passphrase (I3).
+
+The facilitator hub enforces that at **connect** time, not per intent:
+`OnConnectedAsync` loads the session and, unless the caller's `sub` is the
+recorded facilitator, aborts the connection with a `HubException` before the
+caller joins any group or is sent any state. A refused caller therefore never
+receives facilitator state and has no connection to invoke an intent on — the
+refusal is a failed connection, not an `IntentResult`, so no rejection code
+travels for it (§ 6.2 applies to intents only). The frontend shows such a
+connection as `disconnected`; SignalR's automatic reconnect covers dropped
+connections, not a start that was refused. An unknown `sessionIdentity` fails
+the same way, on every hub.
+
+The facilitator needs nothing in client storage to come back: the URL carries
+`sessionIdentity` and the token carries the `sub`, so reopening the tab
+restores control without re-entering the passphrase.
 
 `OpenSession` (T1) is the one intent that is **not** a hub method: no session
 exists yet, so there is nothing to bind a session-bound connection to. It is
@@ -105,8 +153,8 @@ sequenceDiagram
   participant PH as ParticipantHub
   participant P as Participant phone
 
-  F->>API: OpenSession { sessionName, passphrase }
-  API-->>F: { sessionIdentity }  %% 401 on wrong passphrase (I3)
+  F->>API: OpenSession { sessionName, passphrase } + bearer token
+  API-->>F: 201 { sessionIdentity }  %% 401 wrong passphrase, 400 bad name (I3)
   Note over F: QR code + presenter URL derive from sessionIdentity
 
   P->>PH: connect(sessionIdentity, bearer token)

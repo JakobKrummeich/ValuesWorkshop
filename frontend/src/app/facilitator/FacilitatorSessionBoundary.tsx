@@ -1,9 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { facilitatorSessionCreation } from "../../adapters/sessionCreationAdapter";
 import { createFacilitatorSession } from "../../adapters/workshopSessions";
 import { SessionBoundary } from "../SessionBoundary";
 import { FacilitatorDependencyProvider } from "./dependencies";
+import { OpenSessionForm } from "./OpenSessionForm";
 
 export function FacilitatorSessionBoundary({
   children,
@@ -11,7 +13,14 @@ export function FacilitatorSessionBoundary({
   children: ReactNode;
 }) {
   return (
-    <SessionBoundary createSession={createFacilitatorSession}>
+    <SessionBoundary
+      createSession={createFacilitatorSession}
+      missingSession={
+        <div className="screenFacilitator">
+          <OpenSessionForm sessionCreation={facilitatorSessionCreation} />
+        </div>
+      }
+    >
       {(session) => (
         <FacilitatorDependencyProvider
           dependencies={{

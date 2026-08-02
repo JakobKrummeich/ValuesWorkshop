@@ -39,7 +39,10 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
         var sessionIdentity = await SeededSession();
         var (_, participantInbox) = await ConnectParticipant(sessionIdentity, "anna");
         var (_, presenterInbox) = await ConnectPresenter(sessionIdentity);
-        var (facilitator, facilitatorInbox) = await ConnectFacilitator(sessionIdentity, "olga");
+        var (facilitator, facilitatorInbox) = await ConnectFacilitator(
+            sessionIdentity,
+            TestSessions.Facilitator.Value
+        );
         await participantInbox.NextAsync();
         await presenterInbox.NextAsync();
         await facilitatorInbox.NextAsync();
@@ -55,10 +58,38 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
     }
 
     [Fact]
+    public async Task A_subject_that_did_not_open_the_session_cannot_connect_as_facilitator()
+    {
+        var sessionIdentity = await SeededSession();
+
+        var connection = HubConnectionFor(
+            "facilitator",
+            sessionIdentity,
+            WorkshopTestFactory.TokenFor("someone-else")
+        );
+        var inbox = new StateInbox<FacilitatorWorkshopState>(connection);
+        var closed = new TaskCompletionSource<Exception?>();
+        connection.Closed += error =>
+        {
+            closed.TrySetResult(error);
+            return Task.CompletedTask;
+        };
+
+        await connection.StartAsync();
+
+        var closingError = await closed.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        closingError.ShouldNotBeNull().Message.ShouldContain("not the facilitator");
+        inbox.IsEmpty.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task A_refused_intent_is_reported_to_the_caller_and_changes_nothing()
     {
         var sessionIdentity = await SeededSession(Phase.FinalPresentation);
-        var (facilitator, inbox) = await ConnectFacilitator(sessionIdentity, "olga");
+        var (facilitator, inbox) = await ConnectFacilitator(
+            sessionIdentity,
+            TestSessions.Facilitator.Value
+        );
         var stateOnConnect = await inbox.NextAsync();
 
         var result = await facilitator.InvokeAsync<IntentResult>(
@@ -157,7 +188,7 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
     private async Task<SessionIdentity> SeededSession(Phase phase = Phase.Join)
     {
         var sessionIdentity = new SessionIdentity(Guid.NewGuid());
-        var session = new Session(sessionIdentity);
+        var session = TestSessions.Open(sessionIdentity);
 
         while (session.PhaseProgress.CurrentPhase != phase)
         {
@@ -165,9 +196,7 @@ public sealed class HubProtocolTests : IClassFixture<WorkshopTestFactory>, IAsyn
         }
 
         using var scope = factory.Services.CreateScope();
-        await scope
-            .ServiceProvider.GetRequiredService<ISessionRepository>()
-            .SaveAsync(session, expectedRevision: 0);
+        await scope.ServiceProvider.GetRequiredService<ISessionRepository>().CreateAsync(session);
 
         return sessionIdentity;
     }

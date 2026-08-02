@@ -8,6 +8,8 @@ const mockNavigateReplace = jest.fn();
 
 jest.mock("../../../../adapters/authAdapter", () => ({
   handleCallback: (...args: unknown[]) => mockHandleCallback(...args),
+}));
+jest.mock("../../../../adapters/browserLocation", () => ({
   navigateReplace: (...args: unknown[]) => mockNavigateReplace(...args),
 }));
 

@@ -16,12 +16,19 @@ public sealed class WorkshopTestFactory : WebApplicationFactory<AssemblyMarker>
 {
     internal const string Issuer = "test-issuer";
 
+    internal const string FacilitatorPassphrase = "test-facilitator-passphrase";
+
     internal static readonly SymmetricSecurityKey SigningKey = new(
         "test-signing-key-that-is-long-enough-for-hmac-sha256"u8.ToArray()
     );
 
     private readonly string databasePath;
     private readonly bool ownsDatabaseFile;
+
+    static WorkshopTestFactory()
+    {
+        Environment.SetEnvironmentVariable("FACILITATOR_PASSPHRASE", FacilitatorPassphrase);
+    }
 
     public WorkshopTestFactory()
         : this(TemporaryDatabasePath(), ownsDatabaseFile: true) { }

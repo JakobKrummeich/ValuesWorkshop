@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Using Include="Shouldly" />
+    <Using Include="ValuesWorkshop.TestSupport" />
     <Using Include="Xunit" />
   </ItemGroup>
 
@@ -22,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TestSupport\ValuesWorkshop.TestSupport.csproj" />
     <ProjectReference Include="..\Adapters.Persistence\ValuesWorkshop.Adapters.Persistence.csproj" />
     <ProjectReference Include="..\Adapters.Web\ValuesWorkshop.Adapters.Web.csproj" />
   </ItemGroup>

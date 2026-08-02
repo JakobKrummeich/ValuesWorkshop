@@ -78,6 +78,7 @@ concerns):
 | Interface | File | Implemented by |
 |---|---|---|
 | `IBroadcaster` | `Application/IBroadcaster.cs` | `SignalRBroadcaster` (Adapters.Web) |
+| `IFacilitatorPassphrase` | `Application/Ports/Driven/IFacilitatorPassphrase.cs` | `FacilitatorPassphrase` (Host.Auth) |
 
 ### 2.2 Frontend Ports
 
@@ -88,6 +89,7 @@ Port interfaces live in `src/domain/ports/`, sliced per role and concern:
 | `SessionStatePort<T>` | `src/domain/ports/sessionStatePort.ts` | Role-generic live state + connection state |
 | `FacilitatorSessionStatePort` | `src/domain/ports/facilitator/sessionStatePort.ts` | Facilitator state stream |
 | `FacilitatorLifecyclePort` | `src/domain/ports/facilitator/lifecyclePort.ts` | Facilitator intents (e.g. `advancePhase`) |
+| `FacilitatorSessionCreationPort` | `src/domain/ports/facilitator/sessionCreationPort.ts` | Open a session over `POST /api/sessions` |
 | `ParticipantSessionStatePort` | `src/domain/ports/participant/sessionStatePort.ts` | Participant state stream |
 | `PresenterSessionStatePort` | `src/domain/ports/presenter/sessionStatePort.ts` | Presenter read-only state stream |
 
@@ -128,6 +130,8 @@ Records are the default for all new C# types (AGENTS.md hard rule). A mutable
 | `SessionIdentity` | `readonly record struct` | Value semantics, identity by value |
 | `ParticipantId` | `readonly record struct` | Value semantics, identity by value |
 | `ValueId` | `readonly record struct` | Value semantics, identity by value |
+| `FacilitatorSubject` | `readonly record struct` | OIDC `sub` of the facilitator who opened the session |
+| `SessionName` | `readonly record struct` | Facilitator-chosen session name (≤ 120 chars) |
 
 Future DTOs, commands, and events → records.
 

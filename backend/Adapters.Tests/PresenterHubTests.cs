@@ -20,7 +20,7 @@ public class PresenterHubTests
     [Fact]
     public async Task Connecting_pushes_the_current_presenter_state_and_joins_the_presenter_group()
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
         session.AdvancePhase();
         repository.Add(session);
         var hub = HubBoundTo(KnownSession);

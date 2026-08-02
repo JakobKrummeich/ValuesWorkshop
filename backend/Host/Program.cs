@@ -7,6 +7,7 @@ using ValuesWorkshop.Adapters.Persistence;
 using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.Intents;
+using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 using ValuesWorkshop.Host;
@@ -24,8 +25,12 @@ builder.Services.AddDbContext<WorkshopDbContext>(options =>
 builder.Services.AddScoped<ISessionRepository, SqliteSessionRepository>();
 builder.Services.AddScoped<IBroadcaster, SignalRBroadcaster>();
 builder.Services.AddScoped<SessionCommandHandler>();
+builder.Services.AddScoped<SessionCreationHandler>();
 builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
+builder.Services.AddSingleton<IFacilitatorPassphrase>(
+    new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))
+);
 builder.Services.AddSingleton<WorkshopStateCache>();
 builder.Services.AddSingleton<SessionConnectionRegistry>();
 builder.Services.AddSingleton<RoleStateDispatcher>();
@@ -41,6 +46,20 @@ builder.Services.AddSingleton(
 );
 builder.Services.AddHostedService<StateResendService>();
 builder.Services.AddSignalR();
+builder.Services.AddSessionCreationRateLimit(
+    new SessionCreationRateLimit(
+        int.Parse(
+            builder.Configuration["SESSION_CREATION_ATTEMPTS_PER_WINDOW"] ?? "5",
+            CultureInfo.InvariantCulture
+        ),
+        TimeSpan.FromSeconds(
+            double.Parse(
+                builder.Configuration["SESSION_CREATION_ATTEMPT_WINDOW_SECONDS"] ?? "60",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
 
 var oidcAuthority = Environment.GetEnvironmentVariable("OIDC_AUTHORITY") ?? "http://localhost:9000";
 var oidcMetadataUrl = Environment.GetEnvironmentVariable("OIDC_METADATA_URL");
@@ -97,9 +116,12 @@ LogOrToolsVersion(app);
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapGet("/", () => "ValuesWorkshop API").AllowAnonymous();
 app.MapGet("/health", () => Results.Ok("ok")).AllowAnonymous();
+
+app.MapSessionCreation();
 
 app.MapHub<FacilitatorHub>("/hub/facilitator");
 app.MapHub<ParticipantHub>("/hub/participant");

@@ -7,16 +7,18 @@ import { useWorkshopSession } from "./useWorkshopSession";
 
 export function SessionBoundary<TSession extends WorkshopSession>({
   createSession,
+  missingSession = <MissingSession />,
   children,
 }: {
   createSession: (sessionIdentity: string) => TSession;
+  missingSession?: ReactNode;
   children: (session: TSession) => ReactNode;
 }) {
   const { session, isSessionIdentityMissing } =
     useWorkshopSession(createSession);
 
   if (isSessionIdentityMissing) {
-    return <MissingSession />;
+    return missingSession;
   }
 
   if (session === null) {

@@ -58,9 +58,35 @@ public class FacilitatorHubTests
     [Fact]
     public async Task Connecting_without_a_session_identity_is_refused()
     {
-        var hub = HubWithContext(new FakeHubCallerContext(subject: "facilitator"));
+        var hub = HubWithContext(new FakeHubCallerContext(subject: TestSessions.Facilitator.Value));
 
         await Should.ThrowAsync<HubException>(hub.OnConnectedAsync);
+    }
+
+    [Fact]
+    public async Task Connecting_as_another_subject_is_refused_and_pushes_nothing()
+    {
+        repository.Add(SessionInPhase(Phase.Quiz));
+        var hub = HubWithContext(
+            new FakeHubCallerContext(KnownSession.Value.ToString(), "another-subject")
+        );
+
+        await Should.ThrowAsync<HubException>(hub.OnConnectedAsync);
+
+        clients.CallerClient.ReceivedStates.ShouldBeEmpty();
+        groups.JoinedGroups.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Connecting_without_an_authenticated_subject_is_refused()
+    {
+        repository.Add(SessionInPhase(Phase.Quiz));
+        var hub = HubWithContext(new FakeHubCallerContext(KnownSession.Value.ToString()));
+
+        await Should.ThrowAsync<HubException>(hub.OnConnectedAsync);
+
+        clients.CallerClient.ReceivedStates.ShouldBeEmpty();
+        groups.JoinedGroups.ShouldBeEmpty();
     }
 
     [Fact]
@@ -104,7 +130,7 @@ public class FacilitatorHubTests
 
     private static Session SessionInPhase(Phase phase)
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
 
         while (session.PhaseProgress.CurrentPhase != phase)
         {
@@ -119,7 +145,10 @@ public class FacilitatorHubTests
     private FacilitatorHub HubBoundTo(SessionIdentity sessionIdentity)
     {
         return HubWithContext(
-            new FakeHubCallerContext(sessionIdentity.Value.ToString(), "facilitator")
+            new FakeHubCallerContext(
+                sessionIdentity.Value.ToString(),
+                TestSessions.Facilitator.Value
+            )
         );
     }
 

@@ -199,12 +199,14 @@ internal sealed class FakeHubCallerContext : HubCallerContext
 internal sealed class InMemorySessionRepository : ISessionRepository
 {
     private readonly Dictionary<SessionIdentity, Session> sessions = [];
+    private readonly Dictionary<SessionIdentity, long> storedRevisions = [];
 
     internal List<Session> Saved { get; } = [];
 
     internal void Add(Session session)
     {
         sessions[session.Identity] = session;
+        storedRevisions[session.Identity] = session.Revision;
     }
 
     public Task<Session?> LoadAsync(SessionIdentity sessionIdentity)
@@ -212,10 +214,41 @@ internal sealed class InMemorySessionRepository : ISessionRepository
         return Task.FromResult(sessions.GetValueOrDefault(sessionIdentity));
     }
 
+    public Task CreateAsync(Session session)
+    {
+        if (!sessions.TryAdd(session.Identity, session))
+        {
+            throw new ConcurrencyConflictException(
+                session.Identity,
+                expectedRevision: 0,
+                storedRevisions[session.Identity]
+            );
+        }
+
+        storedRevisions[session.Identity] = session.Revision;
+
+        return Task.CompletedTask;
+    }
+
     public Task SaveAsync(Session session, long expectedRevision)
     {
+        var storedRevision = storedRevisions.TryGetValue(session.Identity, out var revision)
+            ? revision
+            : (long?)null;
+
+        if (storedRevision != expectedRevision)
+        {
+            throw new ConcurrencyConflictException(
+                session.Identity,
+                expectedRevision,
+                storedRevision
+            );
+        }
+
         sessions[session.Identity] = session;
+        storedRevisions[session.Identity] = session.Revision;
         Saved.Add(session);
+
         return Task.CompletedTask;
     }
 

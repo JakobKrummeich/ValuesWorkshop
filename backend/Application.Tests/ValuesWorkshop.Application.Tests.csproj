@@ -13,10 +13,12 @@
 
   <ItemGroup>
     <Using Include="Shouldly" />
+    <Using Include="ValuesWorkshop.TestSupport" />
     <Using Include="Xunit" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TestSupport\ValuesWorkshop.TestSupport.csproj" />
     <ProjectReference Include="..\Application\ValuesWorkshop.Application.csproj" />
   </ItemGroup>
 </Project>

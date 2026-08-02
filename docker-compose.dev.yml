@@ -11,6 +11,7 @@ services:
       OIDC_AUTHORITY: http://localhost:9000
       OIDC_METADATA_URL: http://oidc:9000/.well-known/openid-configuration
       CORS_ORIGINS: http://localhost:3000
+      FACILITATOR_PASSPHRASE: dev-facilitator-passphrase
     volumes:
       - vw-data:/data
     depends_on:
@@ -27,14 +28,15 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_OIDC_AUTHORITY: http://localhost:9000
+        NEXT_PUBLIC_OIDC_CLIENT_ID: valuesworkshop
+        NEXT_PUBLIC_OIDC_REDIRECT_URI: http://localhost:3000/auth/callback
+        NEXT_PUBLIC_HUB_BASE_URL: http://localhost:5000
     ports:
       - "3000:3000"
     environment:
       BACKEND_URL: http://backend:8080
-      NEXT_PUBLIC_OIDC_AUTHORITY: http://localhost:9000
-      NEXT_PUBLIC_OIDC_CLIENT_ID: valuesworkshop
-      NEXT_PUBLIC_OIDC_REDIRECT_URI: http://localhost:3000/auth/callback
-      NEXT_PUBLIC_HUB_BASE_URL: http://localhost:5000
 
   oidc:
     build:

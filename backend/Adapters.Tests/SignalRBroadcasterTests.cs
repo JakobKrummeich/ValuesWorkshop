@@ -66,7 +66,7 @@ public class SignalRBroadcasterTests
 
     private static Session SessionWith(int participantCount)
     {
-        var session = new Session(KnownSession);
+        var session = TestSessions.Open(KnownSession);
 
         for (var index = 0; index < participantCount; index++)
         {

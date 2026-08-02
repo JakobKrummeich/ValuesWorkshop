@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using ValuesWorkshop.Application.Intents;
+using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Adapters.Web;
@@ -18,6 +19,8 @@ public sealed class FacilitatorHub(
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
         var session = await HubSessionLoader.RequiredAsync(repository, sessionIdentity);
 
+        RequireFacilitator(session);
+
         await Groups.AddToGroupAsync(
             Context.ConnectionId,
             SessionGroups.Facilitator(sessionIdentity)
@@ -32,6 +35,19 @@ public sealed class FacilitatorHub(
         registry.Remove(Context.ConnectionId);
 
         return base.OnDisconnectedAsync(exception);
+    }
+
+    private void RequireFacilitator(Session session)
+    {
+        var subject = CallerSubject.Of(Context.User);
+
+        if (
+            string.IsNullOrWhiteSpace(subject)
+            || !session.IsFacilitatedBy(new FacilitatorSubject(subject))
+        )
+        {
+            throw new HubException("The caller is not the facilitator of this session.");
+        }
     }
 
     public Task<IntentResult> AdvancePhase()

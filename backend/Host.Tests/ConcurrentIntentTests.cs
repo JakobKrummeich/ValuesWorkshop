@@ -22,13 +22,23 @@ public sealed class ConcurrentIntentTests
         using var backend = GatedBackend(origin, gate);
         var sessionIdentity = await SeedJoinPhaseSession(backend);
 
-        await using var facilitator = ConnectionFor(backend, "facilitator", sessionIdentity);
+        await using var facilitator = ConnectionFor(
+            backend,
+            "facilitator",
+            sessionIdentity,
+            TestSessions.Facilitator.Value
+        );
         var facilitatorInbox = new StateInbox<FacilitatorWorkshopState>(facilitator);
         await facilitator.StartAsync();
         await facilitatorInbox.NextAsync();
 
         gate.HoldTheNextSave();
-        await using var participant = ConnectionFor(backend, "participant", sessionIdentity);
+        await using var participant = ConnectionFor(
+            backend,
+            "participant",
+            sessionIdentity,
+            "anna"
+        );
         var participantInbox = new StateInbox<ParticipantWorkshopState>(participant);
         var joining = participant.StartAsync();
         await gate.WaitUntilSaveIsHeldAsync();
@@ -64,7 +74,8 @@ public sealed class ConcurrentIntentTests
                 services.AddScoped<SqliteSessionRepository>();
                 services.AddScoped<ISessionRepository>(provider => new GatedSessionRepository(
                     provider.GetRequiredService<SqliteSessionRepository>(),
-                    gate
+                    gate,
+                    new CreateRace()
                 ));
             })
         );
@@ -79,7 +90,7 @@ public sealed class ConcurrentIntentTests
         using var scope = backend.Services.CreateScope();
         await scope
             .ServiceProvider.GetRequiredService<ISessionRepository>()
-            .SaveAsync(new Session(sessionIdentity), expectedRevision: 0);
+            .CreateAsync(TestSessions.Open(sessionIdentity));
 
         return sessionIdentity;
     }
@@ -100,7 +111,8 @@ public sealed class ConcurrentIntentTests
     private static HubConnection ConnectionFor(
         WebApplicationFactory<AssemblyMarker> backend,
         string role,
-        SessionIdentity sessionIdentity
+        SessionIdentity sessionIdentity,
+        string subject
     )
     {
         var server = backend.Server;
@@ -113,7 +125,7 @@ public sealed class ConcurrentIntentTests
                     options.HttpMessageHandlerFactory = _ => server.CreateHandler();
                     options.Transports = HttpTransportType.LongPolling;
                     options.AccessTokenProvider = () =>
-                        Task.FromResult<string?>(WorkshopTestFactory.TokenFor(role));
+                        Task.FromResult<string?>(WorkshopTestFactory.TokenFor(subject));
                 }
             )
             .Build();

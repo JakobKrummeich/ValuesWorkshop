@@ -205,9 +205,9 @@ rejection when retries are exhausted. Task 9 landed only a defensive
 never client-stored); participant join by `sessionId`; membership persisted;
 tab close/reopen restores facilitator control and participant membership.
 **Acceptance criteria:**
-- [ ] Wrong/absent facilitator PW → creation rejected
-- [ ] Reconnect (both roles) restores role + session view without rejoin
-- [ ] Membership survives backend restart
+- [x] Wrong/absent facilitator PW → creation rejected
+- [x] Reconnect (both roles) restores role + session view without rejoin
+- [x] Membership survives backend restart
 **Verification:** BE tests + Playwright reconnect smoke, including the browser
 loop deferred from Task 9 (participant joins → facilitator advances phase →
 presenter and participant re-render → backend restart → clients reconnect and
@@ -261,6 +261,10 @@ through workshop phase 2.
 - [ ] Bars update without reload as votes arrive
 - [ ] Correct answer highlighted after reveal; learning text togglable
 - [ ] Multi-client e2e now covers phases 1–2 and runs in CI
+- [ ] Playwright wired into CI for the first time: `webServer` (or compose)
+      startup in `playwright.config.ts` plus a job in `.github/workflows/ci.yml`,
+      covering the reconnect/restart smoke written in Task 10 and left
+      local-only there
 **Verification:** FE component/reducer tests; Playwright: 3 participants vote,
 bars reflect tallies.
 **Dependencies:** 12, 13. **Size:** M

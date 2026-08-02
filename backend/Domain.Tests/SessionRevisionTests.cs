@@ -5,7 +5,7 @@ public class SessionRevisionTests
     [Fact]
     public void A_new_session_starts_at_revision_zero()
     {
-        var session = new Session(new SessionIdentity(Guid.NewGuid()));
+        var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
         session.Revision.ShouldBe(0);
     }
@@ -13,7 +13,7 @@ public class SessionRevisionTests
     [Fact]
     public void Bumping_moves_the_revision_forward_by_one()
     {
-        var session = new Session(new SessionIdentity(Guid.NewGuid()));
+        var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
         session.BumpRevision();
         session.BumpRevision();
@@ -26,6 +26,8 @@ public class SessionRevisionTests
     {
         var session = Session.Restore(
             new SessionIdentity(Guid.NewGuid()),
+            TestSessions.Facilitator,
+            TestSessions.Name,
             Roster.Restore([]),
             PhaseProgress.Restore(Phase.Quiz),
             QuizProgress.Restore(null, false, false),
