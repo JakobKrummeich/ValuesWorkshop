@@ -4,9 +4,9 @@ namespace ValuesWorkshop.Domain;
 
 public sealed record PhaseExitGuards
 {
-    private readonly ImmutableDictionary<Phase, PhaseExitGuard> guardsByPhase;
+    private readonly ImmutableDictionary<Phase, IPhaseExitGuard> guardsByPhase;
 
-    public PhaseExitGuards(params PhaseExitGuard[] guards)
+    public PhaseExitGuards(params IPhaseExitGuard[] guards)
     {
         guardsByPhase = guards.ToImmutableDictionary(guard => guard.Phase);
     }

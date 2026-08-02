@@ -1,11 +1,13 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed record QuizExitGuard(int QuizQuestionCount) : PhaseExitGuard(Phase.Quiz)
+public sealed record QuizExitGuard(int QuizQuestionCount) : IPhaseExitGuard
 {
-    public override string Refusal =>
+    public Phase Phase => Phase.Quiz;
+
+    public string Refusal =>
         "The quiz is left once the last question's learning text has been shown.";
 
-    public override bool IsSatisfiedBy(Session session)
+    public bool IsSatisfiedBy(Session session)
     {
         return session.Quiz.IsQuizComplete(QuizQuestionCount);
     }

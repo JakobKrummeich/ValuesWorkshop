@@ -1,12 +1,13 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed record ValuePresentationExitGuard(int PresentedValueCount)
-    : PhaseExitGuard(Phase.ValuePresentation)
+public sealed record ValuePresentationExitGuard(int PresentedValueCount) : IPhaseExitGuard
 {
-    public override string Refusal =>
+    public Phase Phase => Phase.ValuePresentation;
+
+    public string Refusal =>
         "Value presentation is left once every group's every value has been shown.";
 
-    public override bool IsSatisfiedBy(Session session)
+    public bool IsSatisfiedBy(Session session)
     {
         return session.Presentation.IsPresentationComplete(PresentedValueCount);
     }

@@ -163,9 +163,12 @@ benefit — the session is a single-writer aggregate.
 All classes are `sealed` by default. Inheritance requires written
 justification in this document.
 
-| Base type | Subtypes | Justification |
-|---|---|---|
-| `PhaseExitGuard` (abstract record) | `QuizExitGuard`, `GroupWorkExitGuard`, `ValuePresentationExitGuard`, `FinalVotingExitGuard` | Each guard is a closed set of immutable value objects registered in `PhaseExitGuards`. The abstract base carries the `Phase` discriminator and the `IsSatisfiedBy` / `Refusal` contract; subtypes add only their constructor parameters — no fragile-base-class risk, no mutable state. |
+There is no implementation inheritance in the backend. Shared contracts are
+expressed as interfaces implemented by sealed records: `IPhaseExitGuard`
+carries the `Phase` discriminator plus the `Refusal` / `IsSatisfiedBy`
+contract, and `QuizExitGuard`, `GroupWorkExitGuard`,
+`ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly
+and are registered in `PhaseExitGuards`.
 
 **Rationale:** Sealed classes communicate "this is a leaf type — extend
 behavior through composition, not subclassing." This prevents fragile base

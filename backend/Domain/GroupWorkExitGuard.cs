@@ -1,11 +1,12 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed record GroupWorkExitGuard() : PhaseExitGuard(Phase.GroupWork)
+public sealed record GroupWorkExitGuard : IPhaseExitGuard
 {
-    public override string Refusal =>
-        "Group work is left once every group has submitted its result.";
+    public Phase Phase => Phase.GroupWork;
 
-    public override bool IsSatisfiedBy(Session session)
+    public string Refusal => "Group work is left once every group has submitted its result.";
+
+    public bool IsSatisfiedBy(Session session)
     {
         return session.Formation.IsEveryGroupSubmitted;
     }
