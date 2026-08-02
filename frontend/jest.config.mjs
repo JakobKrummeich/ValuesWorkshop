@@ -20,7 +20,7 @@ const createNextJestConfig = nextJest({ dir: "./" })({
 export default async function jestConfig() {
   const nextConfig = await createNextJestConfig();
   const tsEntry = Object.entries(nextConfig.transform).find(([pattern]) =>
-    new RegExp(pattern).test(".tsx"),
+    new RegExp(pattern).test("a.tsx"),
   );
   if (!tsEntry) {
     throw new Error(
