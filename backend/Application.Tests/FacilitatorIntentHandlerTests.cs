@@ -89,7 +89,7 @@ public class FacilitatorIntentHandlerTests
     {
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            WorkshopContentSizes.NotConfigured
+            new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard())
         );
     }
 }

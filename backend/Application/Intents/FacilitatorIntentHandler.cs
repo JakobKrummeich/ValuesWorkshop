@@ -2,10 +2,7 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Intents;
 
-public sealed class FacilitatorIntentHandler(
-    IntentPipeline pipeline,
-    WorkshopContentSizes contentSizes
-)
+public sealed class FacilitatorIntentHandler(IntentPipeline pipeline, PhaseExitGuards exitGuards)
 {
     public Task<IntentResult> HandleAsync(AdvancePhaseCommand command)
     {
@@ -13,7 +10,7 @@ public sealed class FacilitatorIntentHandler(
             command.SessionIdentity,
             session =>
             {
-                session.AdvancePhase(command.Actor, contentSizes);
+                session.AdvancePhase(command.Actor, exitGuards);
                 return true;
             }
         );

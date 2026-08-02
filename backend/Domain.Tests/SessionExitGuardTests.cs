@@ -2,9 +2,16 @@ namespace ValuesWorkshop.Domain.Tests;
 
 public class SessionExitGuardTests
 {
-    private static readonly WorkshopContentSizes ContentSizes = new(
-        QuizQuestionCount: 5,
-        PresentedValueCount: 3
+    private static readonly PhaseExitGuards AllGuards = new(
+        new QuizExitGuard(QuizQuestionCount: 5),
+        new GroupWorkExitGuard(),
+        new ValuePresentationExitGuard(PresentedValueCount: 3),
+        new FinalVotingExitGuard()
+    );
+
+    private static readonly PhaseExitGuards GuardsWithoutAuthoredContent = new(
+        new GroupWorkExitGuard(),
+        new FinalVotingExitGuard()
     );
 
     private static readonly ParticipantId Anna = new(
@@ -38,11 +45,11 @@ public class SessionExitGuardTests
     }
 
     [Fact]
-    public void The_quiz_may_be_left_while_no_question_count_is_configured()
+    public void A_phase_without_a_registered_guard_is_left_freely()
     {
         var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(null, false, false));
 
-        Advance(session, WorkshopContentSizes.NotConfigured);
+        Advance(session, PhaseExitGuards.None);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
     }
@@ -106,14 +113,14 @@ public class SessionExitGuardTests
     }
 
     [Fact]
-    public void Value_presentation_may_be_left_while_no_value_count_is_configured()
+    public void Value_presentation_is_left_freely_while_its_content_is_not_authored_yet()
     {
         var session = SessionInPhase(
             Phase.ValuePresentation,
             presentation: PresentationWalk.Restore(null, null, 0)
         );
 
-        Advance(session, WorkshopContentSizes.NotConfigured);
+        Advance(session, GuardsWithoutAuthoredContent);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.FinalVoting);
     }
@@ -142,9 +149,9 @@ public class SessionExitGuardTests
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.FinalPresentation);
     }
 
-    private static void Advance(Session session, WorkshopContentSizes? contentSizes = null)
+    private static void Advance(Session session, PhaseExitGuards? exitGuards = null)
     {
-        session.AdvancePhase(session.Facilitator, contentSizes ?? ContentSizes);
+        session.AdvancePhase(session.Facilitator, exitGuards ?? AllGuards);
     }
 
     private static void ShouldRefuseToAdvance(Session session, Phase expectedPhase)

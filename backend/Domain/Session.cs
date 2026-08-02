@@ -66,7 +66,7 @@ public sealed class Session
         return true;
     }
 
-    public void AdvancePhase(FacilitatorSubject actor, WorkshopContentSizes contentSizes)
+    public void AdvancePhase(FacilitatorSubject actor, PhaseExitGuards exitGuards)
     {
         if (!IsFacilitatedBy(actor))
         {
@@ -75,7 +75,7 @@ public sealed class Session
             );
         }
 
-        PhaseExitGuard.RequireSatisfied(this, contentSizes);
+        exitGuards.RequireSatisfied(this);
 
         PhaseProgress.Advance();
     }

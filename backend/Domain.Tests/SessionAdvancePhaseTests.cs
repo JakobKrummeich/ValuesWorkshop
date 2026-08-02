@@ -32,10 +32,7 @@ public class SessionAdvancePhaseTests
         var session = SessionInPhase(Phase.Join);
 
         Should.Throw<NotAuthorizedException>(() =>
-            session.AdvancePhase(
-                new FacilitatorSubject("someone-else"),
-                WorkshopContentSizes.NotConfigured
-            )
+            session.AdvancePhase(new FacilitatorSubject("someone-else"), PhaseExitGuards.None)
         );
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);

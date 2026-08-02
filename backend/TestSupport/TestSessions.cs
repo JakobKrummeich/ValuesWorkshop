@@ -44,6 +44,6 @@ public static class TestSessions
 
     public static void AdvanceToNextPhase(Session session)
     {
-        session.AdvancePhase(session.Facilitator, WorkshopContentSizes.NotConfigured);
+        session.AdvancePhase(session.Facilitator, PhaseExitGuards.None);
     }
 }
