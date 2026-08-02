@@ -37,21 +37,21 @@ public sealed class FacilitatorHub(
         return base.OnDisconnectedAsync(exception);
     }
 
-    private FacilitatorSubject CallerFacilitator()
+    private CallerSubject Caller()
     {
-        var subject = CallerSubject.Of(Context.User);
+        var subject = CallerSubjectClaim.Of(Context.User);
 
         if (string.IsNullOrWhiteSpace(subject))
         {
             throw new HubException("The caller is not authenticated.");
         }
 
-        return new FacilitatorSubject(subject);
+        return new CallerSubject(subject);
     }
 
     private void RequireFacilitator(Session session)
     {
-        if (!session.IsFacilitatedBy(CallerFacilitator()))
+        if (!session.IsFacilitatedBy(Caller()))
         {
             throw new HubException("The caller is not the facilitator of this session.");
         }
@@ -60,10 +60,7 @@ public sealed class FacilitatorHub(
     public Task<IntentResult> AdvancePhase()
     {
         return intentHandler.HandleAsync(
-            new AdvancePhaseCommand(
-                HubSessionBinding.SessionIdentityOf(Context),
-                CallerFacilitator()
-            )
+            new AdvancePhaseCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
         );
     }
 }

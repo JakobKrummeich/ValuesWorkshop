@@ -10,7 +10,7 @@ public sealed class FacilitatorIntentHandler(IntentPipeline pipeline, PhaseExitG
             command.SessionIdentity,
             session =>
             {
-                session.AdvancePhase(command.Actor, exitGuards);
+                session.AdvancePhase(command.Caller, exitGuards);
                 return true;
             }
         );

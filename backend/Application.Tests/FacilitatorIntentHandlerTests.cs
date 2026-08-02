@@ -17,7 +17,7 @@ public class FacilitatorIntentHandlerTests
         var repository = FakeSessionRepository.Holding(SessionFixtures.InPhase(Phase.Join));
 
         var result = await HandlerOver(repository)
-            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.Facilitator));
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller));
 
         result.ShouldBe(IntentResult.Accepted());
         repository.Saved.ShouldHaveSingleItem().PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
@@ -32,9 +32,7 @@ public class FacilitatorIntentHandlerTests
         var repository = FakeSessionRepository.Holding(SessionFixtures.InPhase(Phase.Join));
 
         var result = await HandlerOver(repository)
-            .HandleAsync(
-                new AdvancePhaseCommand(KnownSession, new FacilitatorSubject("someone-else"))
-            );
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, new CallerSubject("someone-else")));
 
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
@@ -58,7 +56,7 @@ public class FacilitatorIntentHandlerTests
         );
 
         var result = await HandlerOver(repository)
-            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.Facilitator));
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller));
 
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
@@ -79,7 +77,7 @@ public class FacilitatorIntentHandlerTests
         );
 
         var result = await HandlerOver(repository)
-            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.Facilitator));
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller));
 
         result.Code.ShouldBe(IntentRejectionCode.InvariantViolated);
         repository.Saved.ShouldBeEmpty();

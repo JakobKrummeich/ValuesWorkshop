@@ -78,7 +78,7 @@ public class SessionCreationHandlerTests
         created.Identity.ShouldBe(accepted.SessionIdentity);
         created.Name.Value.ShouldBe("Workshop");
         created.Revision.ShouldBe(0);
-        created.IsFacilitatedBy(Facilitator).ShouldBeTrue();
+        created.IsFacilitatedBy(new CallerSubject(Facilitator.Value)).ShouldBeTrue();
     }
 
     [Fact]

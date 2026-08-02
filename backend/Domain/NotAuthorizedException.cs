@@ -6,7 +6,7 @@ public sealed class NotAuthorizedException : Exception
         : base(message) { }
 
     public NotAuthorizedException()
-        : base("The actor is not allowed to issue this command.") { }
+        : base("The caller is not allowed to issue this command.") { }
 
     public NotAuthorizedException(string message, Exception innerException)
         : base(message, innerException) { }

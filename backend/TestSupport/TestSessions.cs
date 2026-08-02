@@ -5,7 +5,13 @@ namespace ValuesWorkshop.TestSupport;
 public static class TestSessions
 {
     public static readonly FacilitatorSubject Facilitator = new("facilitator-subject");
+    public static readonly CallerSubject FacilitatorCaller = new(Facilitator.Value);
     public static readonly SessionName Name = new("Test workshop");
+
+    public static CallerSubject CallerOf(Session session)
+    {
+        return new CallerSubject(session.Facilitator.Value);
+    }
 
     public static Session Open(SessionIdentity identity)
     {
@@ -44,6 +50,6 @@ public static class TestSessions
 
     public static void AdvanceToNextPhase(Session session)
     {
-        session.AdvancePhase(session.Facilitator, PhaseExitGuards.None);
+        session.AdvancePhase(CallerOf(session), PhaseExitGuards.None);
     }
 }
