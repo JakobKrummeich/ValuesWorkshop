@@ -161,7 +161,11 @@ benefit — the session is a single-writer aggregate.
 ## 5. Sealed by Default — Composition over Inheritance
 
 All classes are `sealed` by default. Inheritance requires written
-justification in this document (none currently).
+justification in this document.
+
+| Base type | Subtypes | Justification |
+|---|---|---|
+| `PhaseExitGuard` (abstract record) | `QuizExitGuard`, `GroupWorkExitGuard`, `ValuePresentationExitGuard`, `FinalVotingExitGuard` | Each guard is a closed set of immutable value objects registered in `PhaseExitGuards`. The abstract base carries the `Phase` discriminator and the `IsSatisfiedBy` / `Refusal` contract; subtypes add only their constructor parameters — no fragile-base-class risk, no mutable state. |
 
 **Rationale:** Sealed classes communicate "this is a leaf type — extend
 behavior through composition, not subclassing." This prevents fragile base
