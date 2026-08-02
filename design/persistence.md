@@ -16,6 +16,12 @@ the compose stack that means `docker compose -f docker-compose.dev.yml down -v`,
 because `EnsureCreated()` leaves an existing file's schema untouched and a
 stale one fails at query time (`no such column: …`).
 
+**This release changes the schema** (`presentation_state.shown_value_count`
+was added). Any database file written by an earlier build must be deleted
+before startup — `rm $DATA_DIR/valuesworkshop.db`, or
+`docker compose -f docker-compose.dev.yml down -v` for the compose stack.
+A kept file starts fine and then fails on the first presentation query.
+
 ---
 
 ## 2. Table Schema
@@ -53,9 +59,10 @@ CREATE TABLE quiz_state (
 );
 
 CREATE TABLE presentation_state (
-    session_identity       TEXT PRIMARY KEY REFERENCES sessions(identity),
+    session_identity       TEXT    PRIMARY KEY REFERENCES sessions(identity),
     presenting_group_name  TEXT,
-    presented_value_id     TEXT
+    presented_value_id     TEXT,
+    shown_value_count      INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE voting_state (
@@ -64,6 +71,15 @@ CREATE TABLE voting_state (
     round_number     INTEGER NOT NULL DEFAULT 0
 );
 ```
+
+`current_question_index` counts questions from zero, and the domain property
+behind it is `QuizProgress.CurrentQuestionIndex` — the whole stack, up to the
+`questionIndex` field of the quiz view on the wire, uses that one 0-based
+convention, so the quiz exit guard (T2c) compares against
+`questionCount - 1` and nothing converts between a number and an index.
+`shown_value_count` counts the values already presented, and the value
+presentation exit guard (T2c) reads it to decide whether the walk is
+complete.
 
 ### Roster
 
