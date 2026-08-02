@@ -44,9 +44,9 @@ public sealed class Session
         return new Session(identity, facilitator, new SessionName(trimmedName));
     }
 
-    public bool IsFacilitatedBy(FacilitatorSubject subject)
+    public bool IsFacilitatedBy(CallerSubject caller)
     {
-        return Facilitator == subject;
+        return string.Equals(Facilitator.Value, caller.Value, StringComparison.Ordinal);
     }
 
     public bool Join(ParticipantId participantId, IRandomness randomness)
@@ -66,8 +66,17 @@ public sealed class Session
         return true;
     }
 
-    public void AdvancePhase()
+    public void AdvancePhase(CallerSubject caller, PhaseExitGuards exitGuards)
     {
+        if (!IsFacilitatedBy(caller))
+        {
+            throw new NotAuthorizedException(
+                "Only the facilitator of this session may advance the phase (I2)."
+            );
+        }
+
+        exitGuards.RequireSatisfied(this);
+
         PhaseProgress.Advance();
     }
 

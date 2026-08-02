@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["esnext"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    "types": ["node", "jest"],
+    "incremental": false,
+    "plugins": []
+  },
+  "include": ["**/*.mts"],
+  "exclude": ["../node_modules"]
+}

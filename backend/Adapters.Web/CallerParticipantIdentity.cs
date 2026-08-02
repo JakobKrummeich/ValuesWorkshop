@@ -14,7 +14,7 @@ internal static class CallerParticipantIdentity
         SessionIdentity sessionIdentity
     )
     {
-        var subject = CallerSubject.Of(context.User);
+        var subject = CallerSubjectClaim.Of(context.User);
 
         if (string.IsNullOrWhiteSpace(subject))
         {

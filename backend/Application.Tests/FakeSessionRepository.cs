@@ -25,7 +25,7 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
             Roster.Restore(session.Roster.Participants),
             PhaseProgress.Restore(session.PhaseProgress.CurrentPhase),
             QuizProgress.Restore(
-                session.Quiz.CurrentQuestion,
+                session.Quiz.CurrentQuestionIndex,
                 session.Quiz.IsRevealed,
                 session.Quiz.IsLearningTextShown
             ),
@@ -36,7 +36,8 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
             ),
             PresentationWalk.Restore(
                 session.Presentation.PresentingGroup,
-                session.Presentation.PresentedValue
+                session.Presentation.PresentedValue,
+                session.Presentation.ShownValueCount
             ),
             VotingRounds.Restore(
                 session.Voting.RoundOpen,

@@ -16,7 +16,7 @@ const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
 const quizViewSchema = z.object({
-  questionNumber: z.int().nullable(),
+  questionIndex: z.int().nullable(),
   subState: z.enum(QuizSubState),
 });
 

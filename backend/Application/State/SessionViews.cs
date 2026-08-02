@@ -6,7 +6,7 @@ internal static class SessionViews
 {
     internal static QuizView Quiz(Session session)
     {
-        return new QuizView(session.Quiz.CurrentQuestion, SubStateOf(session.Quiz));
+        return new QuizView(session.Quiz.CurrentQuestionIndex, SubStateOf(session.Quiz));
     }
 
     internal static IReadOnlyList<string> TopValueIds(Session session)

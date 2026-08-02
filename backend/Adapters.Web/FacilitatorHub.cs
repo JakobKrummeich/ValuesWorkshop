@@ -9,7 +9,7 @@ namespace ValuesWorkshop.Adapters.Web;
 [Authorize]
 public sealed class FacilitatorHub(
     ISessionRepository repository,
-    IntentPipeline pipeline,
+    FacilitatorIntentHandler intentHandler,
     WorkshopStateCache cache,
     SessionConnectionRegistry registry
 ) : Hub<IFacilitatorClient>
@@ -37,14 +37,21 @@ public sealed class FacilitatorHub(
         return base.OnDisconnectedAsync(exception);
     }
 
+    private CallerSubject Caller()
+    {
+        var subject = CallerSubjectClaim.Of(Context.User);
+
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            throw new HubException("The caller is not authenticated.");
+        }
+
+        return new CallerSubject(subject);
+    }
+
     private void RequireFacilitator(Session session)
     {
-        var subject = CallerSubject.Of(Context.User);
-
-        if (
-            string.IsNullOrWhiteSpace(subject)
-            || !session.IsFacilitatedBy(new FacilitatorSubject(subject))
-        )
+        if (!session.IsFacilitatedBy(Caller()))
         {
             throw new HubException("The caller is not the facilitator of this session.");
         }
@@ -52,13 +59,8 @@ public sealed class FacilitatorHub(
 
     public Task<IntentResult> AdvancePhase()
     {
-        return pipeline.ExecuteAsync(
-            HubSessionBinding.SessionIdentityOf(Context),
-            session =>
-            {
-                session.AdvancePhase();
-                return true;
-            }
+        return intentHandler.HandleAsync(
+            new AdvancePhaseCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
         );
     }
 }

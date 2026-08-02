@@ -131,6 +131,7 @@ Records are the default for all new C# types (AGENTS.md hard rule). A mutable
 | `ParticipantId` | `readonly record struct` | Value semantics, identity by value |
 | `ValueId` | `readonly record struct` | Value semantics, identity by value |
 | `FacilitatorSubject` | `readonly record struct` | OIDC `sub` of the facilitator who opened the session |
+| `CallerSubject` | `readonly record struct` | OIDC `sub` of whoever issues an intent, unverified until `Session.IsFacilitatedBy` compares it |
 | `SessionName` | `readonly record struct` | Facilitator-chosen session name (≤ 120 chars) |
 
 Future DTOs, commands, and events → records.
@@ -160,7 +161,14 @@ benefit — the session is a single-writer aggregate.
 ## 5. Sealed by Default — Composition over Inheritance
 
 All classes are `sealed` by default. Inheritance requires written
-justification in this document (none currently).
+justification in this document.
+
+There is no implementation inheritance in the backend. Shared contracts are
+expressed as interfaces implemented by sealed records: `IPhaseExitGuard`
+carries the `Phase` discriminator plus the `Refusal` / `IsSatisfiedBy`
+contract, and `QuizExitGuard`, `GroupWorkExitGuard`,
+`ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly
+and are registered in `PhaseExitGuards`.
 
 **Rationale:** Sealed classes communicate "this is a leaf type — extend
 behavior through composition, not subclassing." This prevents fragile base

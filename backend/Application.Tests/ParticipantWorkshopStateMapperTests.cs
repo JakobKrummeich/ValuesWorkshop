@@ -46,7 +46,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var quiz = Map(session).ShouldBeOfType<ParticipantQuizState>().Quiz;
 
-        quiz.QuestionNumber.ShouldBe(2);
+        quiz.QuestionIndex.ShouldBe(2);
         quiz.SubState.ShouldBe(QuizSubState.Revealed);
     }
 
@@ -141,7 +141,7 @@ public class ParticipantWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.ValuePresentation,
-            presentation: PresentationWalk.Restore("fox", new ValueId("honesty"))
+            presentation: PresentationWalk.Restore("fox", new ValueId("honesty"), 1)
         );
 
         var presentation = Map(session)

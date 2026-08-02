@@ -18,6 +18,14 @@ public sealed class IntentPipeline(SessionCommandHandler commandHandler)
         {
             return IntentResult.Rejected(IntentRejectionCode.UnknownSession, exception.Message);
         }
+        catch (WrongPhaseException exception)
+        {
+            return IntentResult.Rejected(IntentRejectionCode.WrongPhase, exception.Message);
+        }
+        catch (NotAuthorizedException exception)
+        {
+            return IntentResult.Rejected(IntentRejectionCode.NotAuthorized, exception.Message);
+        }
         catch (InvariantViolationException exception)
         {
             return IntentResult.Rejected(IntentRejectionCode.InvariantViolated, exception.Message);

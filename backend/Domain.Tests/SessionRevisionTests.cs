@@ -33,7 +33,7 @@ public class SessionRevisionTests
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 7
         );

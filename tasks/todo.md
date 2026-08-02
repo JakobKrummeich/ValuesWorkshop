@@ -223,14 +223,24 @@ show identical state), which needs `POST /api/sessions` to seed a session.
 **Dependencies:** 7, 8, 9. **Size:** M
 
 ### Task 11: Phase state machine
-**Description:** 9 phases, forward-only, facilitator-only advance; per-phase
-sub-state slots (quiz question index, tiebreak round, presented group); pure
-Domain logic, persisted via Task 7.
+**Spec:** `tasks/specs/11-phase-state-machine.md` (approved via Lavish).
+**Description:** 9 phases, forward-only, facilitator-only advance enforced per
+intent, exit guards T2a–T2c with injected question/value counts, named intent
+records replacing the anonymous lambda, `phases.ts` generated from the C#
+`Phase` enum with a build-time drift check. Sub-state transition mechanics are
+deferred to their phase tasks (13, 21, 22) per review decision Q1.
 **Acceptance criteria:**
-- [ ] Non-facilitator advance intent rejected
-- [ ] Backward transition impossible
-- [ ] Sub-state transitions unit-tested per phase
-**Verification:** `dotnet test backend` (state machine suite).
+- [ ] Non-facilitator advance intent rejected with `NotAuthorized`, state
+      unchanged
+- [ ] Backward transition impossible; past-phase-9 advance rejected
+- [ ] Each exit guard red-then-green tested
+- [ ] Build fails when checked-in `phases.ts` diverges from the C# enum
+- [ ] Phase + guard state survive a store round-trip
+**Note:** phase 8→9 cannot be walked until Task 22 lands the winning values —
+the I15 guard blocks by design and no other producer of winners exists. The
+quiz and value-presentation guards stay unregistered until Tasks 13 and 21
+construct them with the real content counts.
+**Verification:** `dotnet test backend` (state machine suite) + codegen check.
 **Dependencies:** 7, 9. **Size:** M
 
 ### Checkpoint B
@@ -258,6 +268,15 @@ question, live tallies, sub-controls (next question, reveal, learning text).
 **Acceptance criteria:**
 - [ ] Duplicate vote rejected; tally correct
 - [ ] Reveal/learning-text only via facilitator intents
+- [ ] **From Task 11 (Q1 deferral):** quiz sub-state mechanics land here —
+      `PoseNextQuestion` / `RevealAnswer` / `ShowLearningText`, strictly forward
+      `Answering → Revealed → LearningTextShown` per question, illegal order
+      rejected, transitions round-trip through the store
+- [ ] **From Task 11:** turn on the phase exit guard by registering a
+      `QuizExitGuard` with the real question count in the host `PhaseExitGuards`
+- [ ] **From Task 11:** the quiz cursor stays 0-based end to end —
+      `current_question_index`, `QuizProgress.CurrentQuestionIndex`, the
+      `questionIndex` wire field, no number/index conversion anywhere
 **Verification:** BE quiz suite; JSON schema validation test on config.
 **Dependencies:** 11. **Size:** M
 
@@ -367,6 +386,11 @@ shows that group's values + actions; participants see passive view.
 **Acceptance criteria:**
 - [ ] Group switch reflects on presenter without reload
 - [ ] Only submitted content shown
+- [ ] **From Task 11 (Q1 deferral):** presentation walk cursor mechanics land
+      here — `GoToNextValue` over group → value, persisted
+- [ ] **From Task 11:** turn on the phase exit guard by registering a
+      `ValuePresentationExitGuard` with the real presented-value count in the
+      host `PhaseExitGuards`
 - [ ] Multi-client e2e extended through phase 7
 **Verification:** FE tests + Playwright switch check.
 **Dependencies:** 20. **Size:** S
@@ -381,6 +405,12 @@ until exactly 5 survive. Facilitator sub-control starts each tiebreak.
 - [ ] >5 votes rejected; vote data contains no participant identifier
       (asserted by test against DB schema/rows)
 - [ ] Tiebreak detection + round loop unit-tested (incl. repeated ties)
+- [ ] **From Task 11 (Q1 deferral):** voting round mechanics land here —
+      `CloseVoting`, `StartTiebreakRound` bumping `RoundNumber`, tiebreak while
+      a round is open rejected, persisted
+- [ ] **From Task 11:** phase 8→9 cannot be walked until this task lands the
+      winning values — the I15 exit guard blocks every advance out of final
+      voting until `WinnersDetermined` produces exactly five winners
 **Verification:** BE voting suite incl. anonymity assertion.
 **Dependencies:** 21. **Size:** M
 

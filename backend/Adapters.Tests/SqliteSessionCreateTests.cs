@@ -82,7 +82,7 @@ public sealed class SqliteSessionCreateTests : IDisposable
         var session = Session.Open(identity, facilitator, new SessionName("Monday"));
         await CreateSession(session);
 
-        session.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(session);
         session.BumpRevision();
         await SaveSession(session, expectedRevision: 0);
 

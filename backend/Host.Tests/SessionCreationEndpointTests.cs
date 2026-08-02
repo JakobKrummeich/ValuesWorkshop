@@ -167,7 +167,7 @@ public sealed class SessionCreationEndpointTests
         stored.ShouldNotBeNull();
         stored.Revision.ShouldBe(0);
         stored.Name.Value.ShouldBe("Values Workshop");
-        stored.IsFacilitatedBy(new FacilitatorSubject(FacilitatorSubjectClaim)).ShouldBeTrue();
+        stored.IsFacilitatedBy(new CallerSubject(FacilitatorSubjectClaim)).ShouldBeTrue();
     }
 
     [Fact]

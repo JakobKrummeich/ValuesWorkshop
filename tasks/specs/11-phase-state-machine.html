@@ -1,0 +1,97 @@
+<h1>Task 11: Phase state machine</h1>
+
+<h2>Why now</h2>
+<p>Task 10 is merged. In the Domain today only invariant <strong>I1</strong>
+(forward-only) exists: <code>PhaseProgress.Advance</code> does <code>CurrentPhase++</code>
+and throws past phase 9 — that is the whole state machine.
+<code>QuizProgress</code>, <code>PresentationWalk</code> and <code>VotingRounds</code> hold
+their fields but are <code>Restore</code>-only shells with zero transition logic.
+<code>FacilitatorHub.AdvancePhase</code> sends an anonymous
+<code>Func&lt;Session,bool&gt;</code> lambda through the pipeline, so
+<code>WrongPhase</code>, <code>NotAuthorized</code> and <code>MalformedPayload</code>
+are declared rejection codes that nothing ever produces. The 9-phase list is
+re-enumerated 8 times across backend and frontend (enum, three
+<code>JsonDerivedType</code> blocks, three mapper dictionaries, three FE
+<code>discriminatedUnion</code> schemas) with no test tying the two enums together.</p>
+
+<h2>Goal</h2>
+<p>Make <code>design/state-machine.md</code> executable: forward-only phase walk
+<em>with exit guards</em>, facilitator-only advance enforced per intent, and the
+sub-state slots turned into guarded transitions.</p>
+
+<h2>Solution</h2>
+<ol>
+<li><strong>Advance guards.</strong> <code>Session.AdvancePhase</code> rejects when the
+current phase's exit guard fails: 2→3 all questions walked, 6→7 every group
+<code>Submitted</code> (I12), 7→8 all values shown, 8→9 exactly five winners stand
+(I15). Typed rejection <code>WrongPhase</code>, distinct from
+<code>InvariantViolated</code>.</li>
+<li><strong>Facilitator-only advance per intent.</strong> The advance path checks the
+actor, not just the connection; a non-facilitator caller gets
+<code>NotAuthorized</code>.</li>
+<li><strong>Sub-state transitions — mechanics, not content.</strong> Quiz:
+<code>PoseNextQuestion</code> / <code>RevealAnswer</code> / <code>ShowLearningText</code>,
+strictly forward <code>Answering → Revealed → LearningTextShown</code> per question,
+question count injected rather than hardcoded. Presentation walk:
+<code>GoToNextValue</code> cursor over group → value. Voting: <code>CloseVoting</code>,
+<code>StartTiebreakRound</code> bumping <code>RoundNumber</code>. FE ports and screens
+for these stay with their phase tasks (13, 21, 22/23).</li>
+<li><strong>Named intents.</strong> Replace the anonymous lambda in
+<code>FacilitatorHub</code> with named command records routed through
+<code>IntentPipeline</code>, giving the rejection taxonomy real producers.</li>
+<li><strong>Phase-enum parity guard.</strong> One test asserting backend
+<code>Phase</code> and frontend <code>domain/phases.ts</code> agree on names and
+numbers, killing the silent-drift risk of the 8 re-enumerations.</li>
+<li><strong>Persistence.</strong> Every new sub-state mutation round-trips through
+SQLite (columns already exist) under the existing revision check.</li>
+</ol>
+
+<h2>Out of scope</h2>
+<p>Quiz and values content plus tallies (Tasks 13, 15), group work rights
+(19), solver-driven formation (17/18), vote counting and tiebreak
+<em>detection</em> (22) — Task 11 hands those tasks the round and cursor
+mechanics to drive. System entry commands that need computed data
+(<code>DetermineTopValues</code>, <code>FormGroups</code>, <code>AppointScribes</code>,
+<code>WinnersDetermined</code>, <code>WorkshopConcluded</code>) stay with their owning
+tasks; Task 11 only defines the hook where they fire.</p>
+
+<h2>Acceptance criteria</h2>
+<ul>
+<li>Non-facilitator advance intent rejected with <code>NotAuthorized</code>, state unchanged</li>
+<li>Backward transition impossible; past-phase-9 advance rejected</li>
+<li>Each exit guard has a red-then-green test (blocked, then passing once the guard condition holds)</li>
+<li>Sub-state transitions unit-tested per phase, including illegal order (reveal before a question is posed, tiebreak while a round is open)</li>
+<li>Phase-enum parity test fails if backend and frontend diverge</li>
+<li>Sub-state mutations survive a store round-trip</li>
+</ul>
+
+<h2>Slices</h2>
+<ol>
+<li>Named intent records + per-intent facilitator authorization (<code>NotAuthorized</code>)</li>
+<li>Exit guards on <code>AdvancePhase</code> (<code>WrongPhase</code>) + tests</li>
+<li>Quiz cursor transitions (question index, reveal, learning text)</li>
+<li>Presentation walk cursor</li>
+<li>Voting round open / close / tiebreak bump</li>
+<li>Phase-enum parity guard + persistence round-trip tests</li>
+</ol>
+
+<h2>Decisions needed from you</h2>
+
+<h3>Q1 — Do the sub-state mechanics belong to Task 11?</h3>
+<p>Option A (spec's assumption): Task 11 owns the transition mechanics for all
+three slots, so guards and the rejection taxonomy land once, and Tasks 13/21/22
+add only content and tallies. Option B: Task 11 stays at the phase level and
+each phase task builds its own sub-state machine when it needs it — smaller
+task now, taxonomy repeated later.</p>
+
+<h3>Q2 — Exit guards that need content counts (no spec position)</h3>
+<p>Guards 2→3 and 7→8 need to know how many questions / values exist, but the
+content arrives in Tasks 13 and 21. Option A: inject the count into the Domain
+now (a placeholder count until content exists). Option B: leave 2→3 and 7→8
+unguarded in Task 11 — the facilitator may advance freely — and add the guard
+in the task that supplies the content.</p>
+
+<h3>Q3 — Phase parity: test or codegen?</h3>
+<p>Option A: a test that reads both enums and fails on divergence — cheap, no
+build coupling. Option B: generate <code>phases.ts</code> from the C# enum at build
+time — impossible to drift, but adds a codegen step to the frontend build.</p>

@@ -46,7 +46,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         loaded.Identity.ShouldBe(identity);
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
         loaded.Roster.Participants.ShouldBeEmpty();
-        loaded.Quiz.CurrentQuestion.ShouldBeNull();
+        loaded.Quiz.CurrentQuestionIndex.ShouldBeNull();
         loaded.Quiz.IsRevealed.ShouldBeFalse();
         loaded.Quiz.IsLearningTextShown.ShouldBeFalse();
         loaded.Selection.SubmittedBy.ShouldBeEmpty();
@@ -92,7 +92,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(2, true, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -106,7 +106,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         loaded.Roster.Participants.Count.ShouldBe(2);
         loaded.Roster.Participants.ShouldContain(participantOne);
         loaded.Roster.Participants.ShouldContain(participantTwo);
-        loaded.Quiz.CurrentQuestion.ShouldBe(2);
+        loaded.Quiz.CurrentQuestionIndex.ShouldBe(2);
         loaded.Quiz.IsRevealed.ShouldBeTrue();
         loaded.Quiz.IsLearningTextShown.ShouldBeFalse();
     }
@@ -127,7 +127,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(4, true, true),
             SelectionRound.Restore([participant], [topValueOne, topValueTwo]),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -161,7 +161,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(true, [group]),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -199,7 +199,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore("Eagle", new ValueId("courage")),
+            PresentationWalk.Restore("Eagle", new ValueId("courage"), 3),
             VotingRounds.Restore(false, 2, [winnerOne, winnerTwo]),
             revision: 0
         );
@@ -218,6 +218,39 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task Round_trip_preserves_the_state_the_exit_guards_read()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var member = new ParticipantId(Guid.NewGuid());
+        var session = Session.Restore(
+            identity,
+            TestSessions.Facilitator,
+            TestSessions.Name,
+            Roster.Restore([member]),
+            PhaseProgress.Restore(Phase.ValuePresentation),
+            QuizProgress.Restore(5, true, true),
+            SelectionRound.Restore([], []),
+            FormationRecord.Restore(
+                true,
+                [Group.Restore("Otter", [member], [new ValueId("honesty")], member, true)]
+            ),
+            PresentationWalk.Restore("Otter", new ValueId("honesty"), 7),
+            VotingRounds.Restore(false, 1, Winners),
+            revision: 3
+        );
+
+        await CreateSession(session);
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
+        loaded.Quiz.IsQuizComplete(questionCount: 5).ShouldBeTrue();
+        loaded.Formation.IsEveryGroupSubmitted.ShouldBeTrue();
+        loaded.Presentation.ShownValueCount.ShouldBe(7);
+        loaded.Presentation.IsPresentationComplete(presentedValueCount: 7).ShouldBeTrue();
+        loaded.Voting.WinnersStand.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task Save_overwrites_existing_session()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
@@ -233,7 +266,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(1, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision: 0
         );
@@ -326,7 +359,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         );
 
         var retried = (await writers.RepositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
-        retried.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(retried);
         retried.BumpRevision();
         await writers.RepositoryTwo.SaveAsync(retried, expectedRevision: 5);
 
@@ -359,7 +392,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
                 QuizProgress.Restore(null, false, false),
                 SelectionRound.Restore([], []),
                 FormationRecord.Restore(false, []),
-                PresentationWalk.Restore(null, null),
+                PresentationWalk.Restore(null, null, 0),
                 VotingRounds.Restore(false, 0, []),
                 revision: 0
             )
@@ -409,6 +442,15 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         columnNames.ShouldNotContain("vote_count");
     }
 
+    private static IReadOnlyList<ValueId> Winners =>
+        [
+            new ValueId("courage"),
+            new ValueId("integrity"),
+            new ValueId("honesty"),
+            new ValueId("respect"),
+            new ValueId("trust"),
+        ];
+
     private sealed record RacingWriters(
         SqliteSessionRepository RepositoryOne,
         SqliteSessionRepository RepositoryTwo,
@@ -429,7 +471,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
 
         sessionWithJoin.Join(joiner, new FixedRandomness(0));
         sessionWithJoin.BumpRevision();
-        sessionWithAdvance.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(sessionWithAdvance);
         sessionWithAdvance.BumpRevision();
 
         return new RacingWriters(
@@ -465,7 +507,7 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
-            PresentationWalk.Restore(null, null),
+            PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
             revision
         );

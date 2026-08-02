@@ -85,7 +85,7 @@ describe("participant workshop state schema", () => {
       revision: 3,
       phase: 2,
       participantCount: 1,
-      quiz: { questionNumber: null, subState: 1 },
+      quiz: { questionIndex: null, subState: 1 },
     });
 
     if (state.phase !== Phase.Quiz) {

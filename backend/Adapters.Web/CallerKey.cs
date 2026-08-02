@@ -8,7 +8,7 @@ internal static class CallerKey
 
     internal static string Of(HttpContext httpContext)
     {
-        var subject = CallerSubject.Of(httpContext.User);
+        var subject = CallerSubjectClaim.Of(httpContext.User);
 
         if (!string.IsNullOrWhiteSpace(subject))
         {

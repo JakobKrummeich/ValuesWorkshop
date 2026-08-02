@@ -51,7 +51,7 @@ public class FacilitatorWorkshopStateMapperTests
 
         var quiz = Map(session).ShouldBeOfType<FacilitatorQuizState>().Quiz;
 
-        quiz.QuestionNumber.ShouldBe(3);
+        quiz.QuestionIndex.ShouldBe(3);
         quiz.SubState.ShouldBe(QuizSubState.LearningTextShown);
     }
 
@@ -105,7 +105,7 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.ValuePresentation,
-            presentation: PresentationWalk.Restore("owl", new ValueId("courage"))
+            presentation: PresentationWalk.Restore("owl", new ValueId("courage"), 1)
         );
 
         var presentation = Map(session)

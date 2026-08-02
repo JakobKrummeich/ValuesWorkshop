@@ -33,7 +33,7 @@ public static class SessionCreationEndpoint
         ILoggerFactory loggerFactory
     )
     {
-        var subject = CallerSubject.Of(caller);
+        var subject = CallerSubjectClaim.Of(caller);
 
         if (string.IsNullOrWhiteSpace(subject))
         {

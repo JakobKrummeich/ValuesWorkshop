@@ -27,6 +27,10 @@ builder.Services.AddScoped<IBroadcaster, SignalRBroadcaster>();
 builder.Services.AddScoped<SessionCommandHandler>();
 builder.Services.AddScoped<SessionCreationHandler>();
 builder.Services.AddScoped<IntentPipeline>();
+builder.Services.AddScoped<FacilitatorIntentHandler>();
+builder.Services.AddSingleton(
+    new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard())
+);
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
     new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))

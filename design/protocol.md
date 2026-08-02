@@ -92,13 +92,15 @@ never *what role* they hold — role is session state, not a token claim:
 the facilitator is the `sub` recorded when `POST /api/sessions` accepted the
 facilitator passphrase (I3).
 
-The facilitator hub enforces that at **connect** time, not per intent:
+The facilitator hub enforces that at **connect** time:
 `OnConnectedAsync` loads the session and, unless the caller's `sub` is the
 recorded facilitator, aborts the connection with a `HubException` before the
 caller joins any group or is sent any state. A refused caller therefore never
 receives facilitator state and has no connection to invoke an intent on — the
 refusal is a failed connection, not an `IntentResult`, so no rejection code
-travels for it (§ 6.2 applies to intents only). The frontend shows such a
+travels for it (§ 6.2 applies to intents only). Intents that mutate the
+session also verify the actor (I2) in the domain, so the per-intent
+`NotAuthorized` rejection exists as defense-in-depth. The frontend shows such a
 connection as `disconnected`; SignalR's automatic reconnect covers dropped
 connections, not a start that was refused. An unknown `sessionIdentity` fails
 the same way, on every hub.
@@ -243,7 +245,7 @@ the caller's authenticated principal, so no client can act as another.
 
 | # | Method | Payload | Guard (server-checked) | Rejection |
 |---|---|---|---|---|
-| T2 | `AdvancePhase` | — | forward only (I1); phase-exit guards T2a–T2c | `WrongPhase` |
+| T2 | `AdvancePhase` | — | facilitator (I2); forward only (I1); phase-exit guards T2a–T2c | `WrongPhase`, `NotAuthorized` |
 | T6 | `RevealAnswer` | — | phase Quiz; current question unrevealed | `WrongPhase` |
 | T7 | `ShowLearningText` | — | phase Quiz; answer revealed, text unshown | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |

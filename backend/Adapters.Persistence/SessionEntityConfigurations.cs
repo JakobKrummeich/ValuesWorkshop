@@ -56,6 +56,9 @@ internal sealed class PresentationStateEntityConfiguration
             .Property(presentation => presentation.PresentedValueId)
             .HasColumnName("presented_value_id");
         builder
+            .Property(presentation => presentation.ShownValueCount)
+            .HasColumnName("shown_value_count");
+        builder
             .HasOne(presentation => presentation.Session)
             .WithOne(session => session.PresentationState)
             .HasForeignKey<PresentationStateEntity>(presentation => presentation.SessionIdentity);

@@ -92,16 +92,42 @@ public class FacilitatorHubTests
     [Fact]
     public async Task Advancing_the_phase_mutates_persists_and_broadcasts()
     {
-        repository.Add(SessionInPhase(Phase.Quiz));
+        repository.Add(SessionInPhase(Phase.Join));
         var hub = HubBoundTo(KnownSession);
 
         var result = await hub.AdvancePhase();
 
         result.ShouldBe(IntentResult.Accepted());
-        repository
-            .Saved.ShouldHaveSingleItem()
-            .PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
+        repository.Saved.ShouldHaveSingleItem().PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
         broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Advancing_as_a_subject_that_is_not_the_facilitator_is_rejected()
+    {
+        repository.Add(SessionInPhase(Phase.Join));
+        var hub = HubWithContext(
+            new FakeHubCallerContext(KnownSession.Value.ToString(), "another-subject")
+        );
+
+        var result = await hub.AdvancePhase();
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Advancing_without_an_authenticated_subject_is_refused()
+    {
+        repository.Add(SessionInPhase(Phase.Join));
+        var hub = HubWithContext(new FakeHubCallerContext(KnownSession.Value.ToString()));
+
+        await Should.ThrowAsync<HubException>(hub.AdvancePhase);
+
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
     [Fact]
@@ -119,6 +145,20 @@ public class FacilitatorHubTests
     }
 
     [Fact]
+    public async Task Advancing_out_of_voting_without_winners_is_rejected_and_broadcasts_nothing()
+    {
+        repository.Add(SessionInPhase(Phase.FinalVoting));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.AdvancePhase();
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task Advancing_an_unknown_session_is_rejected()
     {
         var hub = HubBoundTo(KnownSession);
@@ -130,12 +170,7 @@ public class FacilitatorHubTests
 
     private static Session SessionInPhase(Phase phase)
     {
-        var session = TestSessions.Open(KnownSession);
-
-        while (session.PhaseProgress.CurrentPhase != phase)
-        {
-            session.AdvancePhase();
-        }
+        var session = TestSessions.InPhase(KnownSession, phase);
 
         session.BumpRevision();
 
@@ -156,7 +191,10 @@ public class FacilitatorHubTests
     {
         return new FacilitatorHub(
             repository,
-            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            new FacilitatorIntentHandler(
+                new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+                new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard())
+            ),
             new WorkshopStateCache(),
             registry
         )

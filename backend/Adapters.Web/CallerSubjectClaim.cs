@@ -2,7 +2,7 @@ using System.Security.Claims;
 
 namespace ValuesWorkshop.Adapters.Web;
 
-internal static class CallerSubject
+internal static class CallerSubjectClaim
 {
     internal static string? Of(ClaimsPrincipal? user)
     {

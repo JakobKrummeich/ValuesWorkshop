@@ -21,7 +21,7 @@ internal static class DomainEntityMapper
             QuizState = new QuizStateEntity
             {
                 SessionIdentity = identityString,
-                CurrentQuestionIndex = session.Quiz.CurrentQuestion,
+                CurrentQuestionIndex = session.Quiz.CurrentQuestionIndex,
                 IsRevealed = session.Quiz.IsRevealed,
                 IsLearningTextShown = session.Quiz.IsLearningTextShown,
             },
@@ -30,6 +30,7 @@ internal static class DomainEntityMapper
                 SessionIdentity = identityString,
                 PresentingGroupName = session.Presentation.PresentingGroup,
                 PresentedValueId = session.Presentation.PresentedValue?.Value,
+                ShownValueCount = session.Presentation.ShownValueCount,
             },
             VotingState = new VotingStateEntity
             {
@@ -122,7 +123,8 @@ internal static class DomainEntityMapper
             entity.PresentationState.PresentingGroupName,
             entity.PresentationState.PresentedValueId is not null
                 ? new ValueId(entity.PresentationState.PresentedValueId)
-                : null
+                : null,
+            entity.PresentationState.ShownValueCount
         );
 
         var voting = VotingRounds.Restore(

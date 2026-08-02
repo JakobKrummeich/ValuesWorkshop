@@ -30,7 +30,7 @@ public class WorkshopStateCacheTests
         session.BumpRevision();
         var first = cache.StatesOf(session);
 
-        session.AdvancePhase();
+        TestSessions.AdvanceToNextPhase(session);
         session.BumpRevision();
         var second = cache.StatesOf(session);
 

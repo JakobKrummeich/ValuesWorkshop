@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "=== FE lint ==="
+echo "=== FE lint (includes phase enum codegen drift) ==="
 pnpm --dir frontend lint
 
 echo "=== FE build ==="
