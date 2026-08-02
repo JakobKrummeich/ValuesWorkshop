@@ -39,14 +39,19 @@ public sealed class FacilitatorHub(
 
     private FacilitatorSubject CallerFacilitator()
     {
-        return new FacilitatorSubject(CallerSubject.Of(Context.User) ?? string.Empty);
+        var subject = CallerSubject.Of(Context.User);
+
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            throw new HubException("The caller is not authenticated.");
+        }
+
+        return new FacilitatorSubject(subject);
     }
 
     private void RequireFacilitator(Session session)
     {
-        var caller = CallerFacilitator();
-
-        if (string.IsNullOrWhiteSpace(caller.Value) || !session.IsFacilitatedBy(caller))
+        if (!session.IsFacilitatedBy(CallerFacilitator()))
         {
             throw new HubException("The caller is not the facilitator of this session.");
         }

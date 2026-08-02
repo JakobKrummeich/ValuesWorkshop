@@ -119,14 +119,13 @@ public class FacilitatorHubTests
     }
 
     [Fact]
-    public async Task Advancing_without_an_authenticated_subject_is_rejected()
+    public async Task Advancing_without_an_authenticated_subject_is_refused()
     {
         repository.Add(SessionInPhase(Phase.Join));
         var hub = HubWithContext(new FakeHubCallerContext(KnownSession.Value.ToString()));
 
-        var result = await hub.AdvancePhase();
+        await Should.ThrowAsync<HubException>(hub.AdvancePhase);
 
-        result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
         repository.Saved.ShouldBeEmpty();
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
@@ -146,9 +145,9 @@ public class FacilitatorHubTests
     }
 
     [Fact]
-    public async Task Advancing_out_of_an_unfinished_quiz_is_rejected_and_broadcasts_nothing()
+    public async Task Advancing_out_of_voting_without_winners_is_rejected_and_broadcasts_nothing()
     {
-        repository.Add(SessionInPhase(Phase.Quiz));
+        repository.Add(SessionInPhase(Phase.FinalVoting));
         var hub = HubBoundTo(KnownSession);
 
         var result = await hub.AdvancePhase();
@@ -194,7 +193,7 @@ public class FacilitatorHubTests
             repository,
             new FacilitatorIntentHandler(
                 new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-                WorkshopContentSizes.Placeholder
+                WorkshopContentSizes.NotConfigured
             ),
             new WorkshopStateCache(),
             registry

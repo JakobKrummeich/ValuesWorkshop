@@ -6,8 +6,7 @@ public sealed class FormationRecord
 
     public bool IsFormed { get; private set; }
     public IReadOnlyList<Group> Groups => _groups;
-    public bool IsEveryGroupSubmitted =>
-        _groups.Count > 0 && _groups.TrueForAll(group => group.IsSubmitted);
+    public bool IsEveryGroupSubmitted => _groups.TrueForAll(group => group.IsSubmitted);
 
     internal void PlaceIntoSmallestGroup(ParticipantId participantId, IRandomness randomness)
     {

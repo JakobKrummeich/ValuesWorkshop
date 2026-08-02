@@ -34,7 +34,7 @@ public class SessionAdvancePhaseTests
         Should.Throw<NotAuthorizedException>(() =>
             session.AdvancePhase(
                 new FacilitatorSubject("someone-else"),
-                WorkshopContentSizes.Placeholder
+                WorkshopContentSizes.NotConfigured
             )
         );
 

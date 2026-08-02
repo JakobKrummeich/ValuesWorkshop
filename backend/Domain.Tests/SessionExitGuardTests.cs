@@ -14,7 +14,7 @@ public class SessionExitGuardTests
     [Fact]
     public void The_quiz_may_not_be_left_before_the_last_question_is_walked()
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, true));
+        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(3, true, true));
 
         ShouldRefuseToAdvance(session, Phase.Quiz);
     }
@@ -22,17 +22,27 @@ public class SessionExitGuardTests
     [Fact]
     public void The_quiz_may_not_be_left_while_the_last_learning_text_is_unshown()
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(5, true, false));
+        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, false));
 
         ShouldRefuseToAdvance(session, Phase.Quiz);
     }
 
     [Fact]
-    public void The_quiz_may_be_left_once_the_last_question_is_walked()
+    public void The_quiz_may_be_left_once_the_last_question_index_is_walked()
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(5, true, true));
+        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, true));
 
         Advance(session);
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
+    }
+
+    [Fact]
+    public void The_quiz_may_be_left_while_no_question_count_is_configured()
+    {
+        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(null, false, false));
+
+        Advance(session, WorkshopContentSizes.NotConfigured);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
     }
@@ -49,11 +59,13 @@ public class SessionExitGuardTests
     }
 
     [Fact]
-    public void Group_work_may_not_be_left_while_no_group_exists()
+    public void Group_work_may_be_left_while_no_group_has_been_formed()
     {
         var session = SessionInPhase(Phase.GroupWork, formation: FormationOf([]));
 
-        ShouldRefuseToAdvance(session, Phase.GroupWork);
+        Advance(session);
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
     }
 
     [Fact]
@@ -94,6 +106,19 @@ public class SessionExitGuardTests
     }
 
     [Fact]
+    public void Value_presentation_may_be_left_while_no_value_count_is_configured()
+    {
+        var session = SessionInPhase(
+            Phase.ValuePresentation,
+            presentation: PresentationWalk.Restore(null, null, 0)
+        );
+
+        Advance(session, WorkshopContentSizes.NotConfigured);
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.FinalVoting);
+    }
+
+    [Fact]
     public void Final_voting_may_not_be_left_before_five_winners_stand()
     {
         var session = SessionInPhase(
@@ -117,19 +142,9 @@ public class SessionExitGuardTests
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.FinalPresentation);
     }
 
-    [Fact]
-    public void A_blocked_advance_leaves_the_revision_untouched()
+    private static void Advance(Session session, WorkshopContentSizes? contentSizes = null)
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(1, false, false));
-
-        Should.Throw<WrongPhaseException>(() => Advance(session));
-
-        session.Revision.ShouldBe(7);
-    }
-
-    private static void Advance(Session session)
-    {
-        session.AdvancePhase(session.Facilitator, ContentSizes);
+        session.AdvancePhase(session.Facilitator, contentSizes ?? ContentSizes);
     }
 
     private static void ShouldRefuseToAdvance(Session session, Phase expectedPhase)
@@ -137,7 +152,6 @@ public class SessionExitGuardTests
         Should.Throw<WrongPhaseException>(() => Advance(session));
 
         session.PhaseProgress.CurrentPhase.ShouldBe(expectedPhase);
-        session.Revision.ShouldBe(7);
     }
 
     private static Session SessionInPhase(

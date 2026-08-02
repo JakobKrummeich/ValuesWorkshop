@@ -16,16 +16,26 @@ internal static class PhaseExitGuard
     {
         return session.PhaseProgress.CurrentPhase switch
         {
-            Phase.Quiz when !session.Quiz.IsWalkComplete(contentSizes.QuizQuestionCount) =>
-                "The quiz is left once the last question's learning text has been shown.",
+            Phase.Quiz
+                when IsWalkUnfinished(
+                    contentSizes.QuizQuestionCount,
+                    session.Quiz.IsWalkComplete
+                ) => "The quiz is left once the last question's learning text has been shown.",
             Phase.GroupWork when !session.Formation.IsEveryGroupSubmitted =>
-                "Group work is left once every group has submitted its result (I12).",
+                "Group work is left once every group has submitted its result.",
             Phase.ValuePresentation
-                when !session.Presentation.IsWalkComplete(contentSizes.PresentedValueCount) =>
-                "Value presentation is left once every group's every value has been shown (I12).",
+                when IsWalkUnfinished(
+                    contentSizes.PresentedValueCount,
+                    session.Presentation.IsWalkComplete
+                ) => "Value presentation is left once every group's every value has been shown.",
             Phase.FinalVoting when !session.Voting.WinnersStand =>
-                "Final voting is left once the winning values stand (I15).",
+                "Final voting is left once the winning values stand.",
             _ => null,
         };
+    }
+
+    private static bool IsWalkUnfinished(int? configuredCount, Func<int, bool> isWalkComplete)
+    {
+        return configuredCount is int count && !isWalkComplete(count);
     }
 }
