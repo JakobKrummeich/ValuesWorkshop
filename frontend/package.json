@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm phases:check && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "pnpm phases:check && eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && depcruise src --config .dependency-cruiser.cjs && pnpm audit --audit-level=high",
     "test": "jest --coverage",
