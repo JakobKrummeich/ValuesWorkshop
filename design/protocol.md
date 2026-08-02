@@ -76,7 +76,7 @@ passphrases cannot lock out every other facilitator. It defaults to 5 attempts
 per 60 seconds and is refused before the passphrase is compared.
 
 The passphrase is compared with `CryptographicOperations.FixedTimeEquals`
-over UTF-8 bytes, **before** the name is validated: a wrong passphrase always
+over SHA-256 digests of the UTF-8 bytes, **before** the name is validated: a wrong passphrase always
 yields `401`, never a `400` that would confirm the passphrase was right. No
 response echoes the passphrase, and a rejected request writes nothing.
 

@@ -32,7 +32,7 @@ failed connection rather than an `IntentRejectionCode`.
 3. **Passphrase** — `FACILITATOR_PASSPHRASE` env var, bound to an options
    record, validated at startup: absent or empty fails the host fast rather
    than silently opening session creation. Comparison is
-   `CryptographicOperations.FixedTimeEquals` over UTF-8 bytes. The value is
+   `CryptographicOperations.FixedTimeEquals` over SHA-256 digests of the UTF-8 bytes. The value is
    never logged, never echoed, never sent to a client.
 4. **Endpoint** — `POST /api/sessions`, bearer-authenticated (the token is
    what supplies the facilitator `sub`), body `{ sessionName, passphrase }`.
