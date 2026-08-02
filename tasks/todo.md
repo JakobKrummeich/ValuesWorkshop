@@ -159,7 +159,7 @@ redirect flow for facilitator + participant; presenter route unauthenticated.
 **Verification:** BE authz unit tests + one Playwright login smoke.
 **Dependencies:** 1, 3. **Size:** M
 
-### Task 9: SignalR hub + resync protocol
+### Task 9: SignalR hub + resync protocol ✅
 **Description:** First write `design/protocol.md` (intent/event catalog with
 payload schemas, per-role snapshots — no anonymity leaks by schema —, error
 model, sequence diagrams for join/vote/reconnect/restart/tiebreak; the FE/BE
@@ -176,12 +176,20 @@ dependency context; screens depend only on their slice. Exact slice list
 derives from the `design/protocol.md` intent catalog. This replaces the
 Task-1 placeholder `<Role>Gateway` interfaces (naming decided then).
 **Acceptance criteria:**
-- [ ] `design/protocol.md` covers every 0.2 transition; per-role snapshots
+- [x] `design/protocol.md` covers every 0.2 transition; per-role snapshots
       specified
-- [ ] Invalid/out-of-phase intent → rejected with typed error, state unchanged
-- [ ] Fresh connection receives complete current state
+- [x] Invalid/out-of-phase intent → rejected with typed error, state unchanged
+- [x] Fresh connection receives complete current state
 **Verification:** BE hub unit tests; FE reducer tests applying snapshot.
 **Dependencies:** 7, 8. **Size:** M
+**Residue (carried by later tasks, not gaps in 9):** only `AdvancePhase`
+exists today, so `WrongPhase` / `NotAuthorized` / `MalformedPayload`
+rejection codes and the payload-validation layer (protocol § 6.3) stay
+unexercised, `enabledIntents` is unpopulated, view blocks are thinner than
+protocol § 5.2–5.4, and the port slices beyond lifecycle + read stream do
+not exist yet. Each lands with the phase task that introduces its intents
+(11, 13, 15, 19, 22). Playwright is still not wired into CI — tracked in
+Task 14.
 
 ### Task 9b: Optimistic concurrency for session mutations
 **Description:** `SessionCommandHandler` writes the whole aggregate without a
@@ -200,7 +208,7 @@ rejection when retries are exhausted. Task 9 landed only a defensive
 **Verification:** BE concurrency tests driving two intents against one session.
 **Dependencies:** 9. **Size:** S
 
-### Task 10: Session lifecycle + reconnect
+### Task 10: Session lifecycle + reconnect ✅
 **Description:** Facilitator-password-gated session creation (PW server-set,
 never client-stored); participant join by `sessionId`; membership persisted;
 tab close/reopen restores facilitator control and participant membership.
