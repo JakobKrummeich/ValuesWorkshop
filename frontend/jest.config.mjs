@@ -7,6 +7,8 @@ export default createJestConfig({
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
+    "scripts/**/*.ts",
+    "!scripts/**/__tests__/**",
     "!src/**/*.test.{ts,tsx}",
     "!src/**/*.d.ts",
   ],
