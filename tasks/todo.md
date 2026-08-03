@@ -122,10 +122,10 @@ startup, after Checkpoint B hit `table presentation_state has no column named
 shown_value_count` on an existing database. Reverses the Task 7 no-migration
 decision.
 **Acceptance criteria:**
-- [ ] Pre-`shown_value_count` database migrates on startup and serves sessions
-- [ ] Model change without a migration fails the build (drift guard)
-- [ ] Tests build their schema through migrations
-- [ ] `design/persistence.md` documents the migration workflow
+- [x] Pre-`shown_value_count` database migrates on startup and serves sessions
+- [x] Model change without a migration fails the build (drift guard)
+- [x] Tests build their schema through migrations
+- [x] `design/persistence.md` documents the migration workflow
 **Verification:** `dotnet test backend` + compose smoke against an old database.
 **Dependencies:** 7. **Size:** S
 

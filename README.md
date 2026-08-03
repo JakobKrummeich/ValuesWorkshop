@@ -38,7 +38,7 @@ wired into CI yet (Task 14 owns that).
 docker compose -f docker-compose.dev.yml up -d --build   # wait for backend healthy
 npx playwright test                                      # whole suite
 npx playwright test sessionLifecycle                     # one spec
-docker compose -f docker-compose.dev.yml down            # add -v to drop the database
+docker compose -f docker-compose.dev.yml down            # add -v to drop the database volume
 ```
 
 `e2e/sessionLifecycle.spec.ts` restarts the backend container mid-suite, so
@@ -46,8 +46,8 @@ Playwright runs with one worker; `retries` stays `0`.
 
 Two things bite when the stack is stale: the frontend image inlines the
 `NEXT_PUBLIC_*` values at build time (compose passes them as build args), so
-changing them needs `up -d --build`; and `EnsureCreated()` never migrates, so
-a schema change needs `down -v` before the next `up`.
+changing them needs `up -d --build`. The database is not one of them: EF Core
+migrations run at startup and evolve an existing volume in place.
 
 ## Backend configuration
 

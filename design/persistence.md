@@ -10,17 +10,40 @@ in the same PR (Ask-first).
 SQLite via EF Core (`Microsoft.EntityFrameworkCore.Sqlite`). Single file
 database at `$DATA_DIR/valuesworkshop.db` (default `DATA_DIR=data`).
 
-No migration framework. Schema created via `EnsureCreated()` on startup.
-During development, drop and recreate the DB file on schema changes — with
-the compose stack that means `docker compose -f docker-compose.dev.yml down -v`,
-because `EnsureCreated()` leaves an existing file's schema untouched and a
-stale one fails at query time (`no such column: …`).
+Schema evolution runs on EF Core Migrations. The migrations live in
+`backend/Adapters.Persistence/Migrations/`, and the host applies every pending
+one at startup (`WorkshopDatabaseSchema.ApplyAsync`, called from
+`Host/Program.cs`). Tests build their databases through the same call, so the
+suite exercises the production schema path. Existing database files are
+evolved in place — no file is ever deleted for a schema change.
 
-**This release changes the schema** (`presentation_state.shown_value_count`
-was added). Any database file written by an earlier build must be deleted
-before startup — `rm $DATA_DIR/valuesworkshop.db`, or
-`docker compose -f docker-compose.dev.yml down -v` for the compose stack.
-A kept file starts fine and then fails on the first presentation query.
+### Adding a migration
+
+1. Change the entity configuration.
+2. `dotnet tool run dotnet-ef migrations add <Name> --project
+   backend/Adapters.Persistence --startup-project backend/Adapters.Persistence`
+   (`WorkshopDbContextDesignTimeFactory` supplies the design-time context, so
+   the Host is not involved).
+3. `dotnet csharpier format backend/` — the generated files ship formatted.
+4. `dotnet test backend/ValuesWorkshop.Tests.slnf`.
+
+A model change without a matching migration fails the build:
+`MigrationsDriftTests` diffs the EF model against the migrations snapshot with
+`IMigrationsModelDiffer` and names the offending table and column plus the
+command that fixes it. Generated migration files are marked
+`generated_code = true` in `backend/.editorconfig` and skipped by jscpd, so the
+maintainability analyzers judge hand-written code only.
+
+### Databases created before migrations existed
+
+Files written by builds that used `EnsureCreated()` carry no
+`__EFMigrationsHistory` table, so `Migrate()` alone would try to create tables
+that are already there. `WorkshopDatabaseSchema` detects that shape (model
+tables present, history table absent), adds every column the model has and the
+file lacks (this is what repairs the `shown_value_count` failure that
+reversed the Task 7 no-migration decision), and records the initial migration
+as applied. Rows are kept. Later migrations then apply normally, and the
+adoption step never runs again on that file.
 
 ---
 
@@ -38,6 +61,7 @@ CREATE TABLE sessions (
     name                 TEXT    NOT NULL,
     current_phase        INTEGER NOT NULL,
     revision             INTEGER NOT NULL DEFAULT 0,
+    is_formed            INTEGER NOT NULL DEFAULT 0,
     created_at           TEXT    NOT NULL
 );
 ```
@@ -290,7 +314,7 @@ stale EF identity-map snapshot can be re-saved.
 
 On startup:
 
-1. `EnsureCreated()` — create tables if DB is new
+1. `WorkshopDatabaseSchema.ApplyAsync()` — apply pending migrations
 2. `ISessionRepository.LoadAllAsync()` — load all stored sessions
 3. Reconstruct domain `Session` objects from EF entities
 4. Register in the in-memory session registry (available for SignalR
