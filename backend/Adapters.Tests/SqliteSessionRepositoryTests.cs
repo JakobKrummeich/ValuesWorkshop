@@ -6,7 +6,7 @@ using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Adapters.Tests;
 
-public sealed class SqliteSessionRepositoryTests : IDisposable
+public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
 {
     private readonly SqliteConnection _connection;
     private readonly DbContextOptions<WorkshopDbContext> _options;
@@ -18,9 +18,17 @@ public sealed class SqliteSessionRepositoryTests : IDisposable
         _connection.Open();
 
         _options = new DbContextOptionsBuilder<WorkshopDbContext>().UseSqlite(_connection).Options;
+    }
 
+    public async Task InitializeAsync()
+    {
         using var context = new WorkshopDbContext(_options);
-        context.Database.EnsureCreated();
+        await WorkshopDatabaseSchema.ApplyAsync(context);
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     public void Dispose()

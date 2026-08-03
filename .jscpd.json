@@ -12,7 +12,8 @@
     "**/*.sln",
     "**/*.slnf",
     "**/tokens*.css",
-    "**/Analyzers/**"
+    "**/Analyzers/**",
+    "**/Migrations/**"
   ],
   "absolute": true
 }

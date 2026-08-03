@@ -6,14 +6,19 @@ using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Adapters.Tests;
 
-public sealed class SqliteFileDatabaseConcurrencyTests : IDisposable
+public sealed class SqliteFileDatabaseConcurrencyTests : IAsyncLifetime, IDisposable
 {
     private readonly string _databaseFile = Path.GetTempFileName();
 
-    public SqliteFileDatabaseConcurrencyTests()
+    public async Task InitializeAsync()
     {
         using var context = new WorkshopDbContext(OptionsFor(waitForTheWriteLock: true));
-        context.Database.EnsureCreated();
+        await WorkshopDatabaseSchema.ApplyAsync(context);
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     public void Dispose()

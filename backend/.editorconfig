@@ -1,3 +1,6 @@
 [*.cs]
 # CA1502 disabled — custom analyzer VW1001 enforces complexity at threshold 7
 dotnet_diagnostic.CA1502.severity = none
+
+[**/Migrations/*.cs]
+generated_code = true
