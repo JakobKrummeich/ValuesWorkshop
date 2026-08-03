@@ -13,7 +13,7 @@ public sealed class PreMigrationsDatabaseTests
     private const string FacilitatorSubjectClaim = "facilitator-from-token";
 
     [Fact]
-    public async Task A_database_written_before_migrations_existed_serves_a_session_write()
+    public async Task A_database_written_before_migrations_existed_is_refused_at_startup()
     {
         var databasePath = WorkshopTestFactory.TemporaryDatabasePath();
         await WritePreMigrationsDatabase(databasePath);
@@ -21,17 +21,31 @@ public sealed class PreMigrationsDatabaseTests
         try
         {
             using var backend = WorkshopTestFactory.On(databasePath);
+
+            var refusal = Should.Throw<InvalidOperationException>(() => backend.CreateClient());
+
+            refusal.Message.ShouldContain(databasePath);
+            refusal.Message.ShouldContain("delete");
+            refusal.Message.ShouldContain("docker compose -f docker-compose.dev.yml down -v");
+        }
+        finally
+        {
+            SqliteConnection.ClearAllPools();
+            File.Delete(databasePath);
+        }
+    }
+
+    [Fact]
+    public async Task A_fresh_database_file_is_migrated_at_startup_and_serves_a_session_write()
+    {
+        var databasePath = WorkshopTestFactory.TemporaryDatabasePath();
+
+        try
+        {
+            using var backend = WorkshopTestFactory.On(databasePath);
             using var client = AuthenticatedClient(backend);
 
-            var response = await client.PostAsJsonAsync(
-                "/api/sessions",
-                new
-                {
-                    sessionName = "Workshop",
-                    passphrase = WorkshopTestFactory.FacilitatorPassphrase,
-                },
-                JsonSerializerOptions.Web
-            );
+            var response = await CreateSession(client);
 
             response.StatusCode.ShouldBe(HttpStatusCode.Created);
             (await ColumnsOf(databasePath, "presentation_state")).ShouldContain(
@@ -46,24 +60,29 @@ public sealed class PreMigrationsDatabaseTests
     }
 
     [Fact]
-    public async Task Sessions_stored_before_migrations_existed_survive_the_migration()
+    public async Task An_already_migrated_database_keeps_its_sessions_across_a_restart()
     {
         var databasePath = WorkshopTestFactory.TemporaryDatabasePath();
-        await WritePreMigrationsDatabase(databasePath);
-        var sessionIdentity = Guid.NewGuid();
-        await InsertPreMigrationsSession(databasePath, sessionIdentity);
 
         try
         {
-            using var backend = WorkshopTestFactory.On(databasePath);
-            using var scope = backend.Services.CreateScope();
+            using (var firstRun = WorkshopTestFactory.On(databasePath))
+            {
+                using var client = AuthenticatedClient(firstRun);
+                (await CreateSession(client)).StatusCode.ShouldBe(HttpStatusCode.Created);
+            }
+
+            SqliteConnection.ClearAllPools();
+
+            using var secondRun = WorkshopTestFactory.On(databasePath);
+            using var scope = secondRun.Services.CreateScope();
 
             var stored = await scope
                 .ServiceProvider.GetRequiredService<ISessionRepository>()
                 .LoadAllAsync();
 
             stored.Count.ShouldBe(1);
-            stored[0].Identity.Value.ShouldBe(sessionIdentity);
+            stored[0].Name.Value.ShouldBe("Workshop");
         }
         finally
         {
@@ -72,40 +91,30 @@ public sealed class PreMigrationsDatabaseTests
         }
     }
 
+    private static Task<HttpResponseMessage> CreateSession(HttpClient client)
+    {
+        return client.PostAsJsonAsync(
+            "/api/sessions",
+            new
+            {
+                sessionName = "Workshop",
+                passphrase = WorkshopTestFactory.FacilitatorPassphrase,
+            },
+            JsonSerializerOptions.Web
+        );
+    }
+
     private static async Task WritePreMigrationsDatabase(string databasePath)
     {
         var schema = await File.ReadAllTextAsync(
             Path.Combine(AppContext.BaseDirectory, "PreMigrationsSchema.sql")
         );
 
-        await ExecuteAsync(databasePath, schema);
-    }
-
-    private static Task InsertPreMigrationsSession(string databasePath, Guid sessionIdentity)
-    {
-        return ExecuteAsync(
-            databasePath,
-            $"""
-            INSERT INTO sessions
-                (identity, facilitator_subject, name, current_phase, revision, is_formed, created_at)
-            VALUES
-                ('{sessionIdentity}', 'facilitator', 'Older Workshop', 0, 3, 0, '2026-01-01T00:00:00Z');
-            INSERT INTO quiz_state (session_identity, is_revealed, is_learning_text_shown)
-            VALUES ('{sessionIdentity}', 0, 0);
-            INSERT INTO presentation_state (session_identity) VALUES ('{sessionIdentity}');
-            INSERT INTO voting_state (session_identity, round_open, round_number)
-            VALUES ('{sessionIdentity}', 0, 0);
-            """
-        );
-    }
-
-    private static async Task ExecuteAsync(string databasePath, string sql)
-    {
         await using var connection = new SqliteConnection($"Data Source={databasePath}");
         await connection.OpenAsync();
 
         var command = connection.CreateCommand();
-        command.CommandText = sql;
+        command.CommandText = schema;
         await command.ExecuteNonQueryAsync();
     }
 

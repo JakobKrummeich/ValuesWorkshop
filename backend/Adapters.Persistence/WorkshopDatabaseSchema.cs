@@ -16,7 +16,7 @@ public static class WorkshopDatabaseSchema
 
         if (IsCreatedBeforeMigrations(database, tables))
         {
-            await AdoptDatabaseCreatedBeforeMigrationsAsync(database, tables, cancellationToken);
+            throw new InvalidOperationException(RefusalMessage(database));
         }
 
         await database.Database.MigrateAsync(cancellationToken);
@@ -31,85 +31,15 @@ public static class WorkshopDatabaseSchema
             && ModelTables(database).Any(table => tables.Contains(table.Name));
     }
 
-    private static async Task AdoptDatabaseCreatedBeforeMigrationsAsync(
-        WorkshopDbContext database,
-        IReadOnlyCollection<string> tables,
-        CancellationToken cancellationToken
-    )
+    private static string RefusalMessage(WorkshopDbContext database)
     {
-        RefuseSchemaMissingTables(database, tables);
-        await AddColumnsMissingFromTablesAsync(database, cancellationToken);
-        await RecordInitialMigrationAsAppliedAsync(database, cancellationToken);
-    }
+        var databaseFile = database.Database.GetDbConnection().DataSource;
 
-    private static void RefuseSchemaMissingTables(
-        WorkshopDbContext database,
-        IReadOnlyCollection<string> tables
-    )
-    {
-        var missing = ModelTables(database)
-            .Select(table => table.Name)
-            .Where(name => !tables.Contains(name))
-            .ToList();
-
-        if (missing.Count > 0)
-        {
-            throw new InvalidOperationException(
-                $"This database was created before migrations existed and is missing the tables "
-                    + $"{string.Join(", ", missing)}. It is too old to adopt: delete the database "
-                    + "file and start again."
-            );
-        }
-    }
-
-    private static async Task AddColumnsMissingFromTablesAsync(
-        WorkshopDbContext database,
-        CancellationToken cancellationToken
-    )
-    {
-        foreach (var table in ModelTables(database))
-        {
-            var columns = await ColumnNamesAsync(database, table.Name, cancellationToken);
-
-            foreach (var column in table.Columns.Where(column => !columns.Contains(column.Name)))
-            {
-                await ExecuteAsync(
-                    database,
-                    AddColumnStatement(table.Name, column),
-                    cancellationToken
-                );
-            }
-        }
-    }
-
-    private static async Task RecordInitialMigrationAsAppliedAsync(
-        WorkshopDbContext database,
-        CancellationToken cancellationToken
-    )
-    {
-        var history = database.GetService<IHistoryRepository>();
-        var initialMigration = database.GetService<IMigrationsAssembly>().Migrations.Keys.First();
-
-        await ExecuteAsync(database, history.GetCreateIfNotExistsScript(), cancellationToken);
-        await ExecuteAsync(
-            database,
-            history.GetInsertScript(new HistoryRow(initialMigration, ProductInfo.GetVersion())),
-            cancellationToken
-        );
-    }
-
-    private static string AddColumnStatement(string table, IColumn column)
-    {
-        var nullability = column.IsNullable
-            ? string.Empty
-            : $" NOT NULL DEFAULT {EmptyValueLiteral(column)}";
-
-        return $"ALTER TABLE \"{table}\" ADD COLUMN \"{column.Name}\" {column.StoreType}{nullability}";
-    }
-
-    private static string EmptyValueLiteral(IColumn column)
-    {
-        return column.StoreType.Equals("TEXT", StringComparison.OrdinalIgnoreCase) ? "''" : "0";
+        return $"The database at '{databaseFile}' was created before migrations existed: it "
+            + $"holds application tables but no {HistoryRepository.DefaultTableName} table, so "
+            + "migrations cannot be applied to it. Delete the database file and start again "
+            + "(with the development compose stack: "
+            + "docker compose -f docker-compose.dev.yml down -v).";
     }
 
     private static IEnumerable<ITable> ModelTables(WorkshopDbContext database)
@@ -127,25 +57,5 @@ public static class WorkshopDatabaseSchema
                 "SELECT name AS \"Value\" FROM sqlite_master WHERE type = 'table'"
             )
             .ToListAsync(cancellationToken);
-    }
-
-    private static Task<List<string>> ColumnNamesAsync(
-        WorkshopDbContext database,
-        string table,
-        CancellationToken cancellationToken
-    )
-    {
-        return database
-            .Database.SqlQuery<string>($"SELECT name AS \"Value\" FROM pragma_table_info({table})")
-            .ToListAsync(cancellationToken);
-    }
-
-    private static Task ExecuteAsync(
-        WorkshopDbContext database,
-        string sql,
-        CancellationToken cancellationToken
-    )
-    {
-        return database.Database.ExecuteSqlRawAsync(sql, cancellationToken);
     }
 }
