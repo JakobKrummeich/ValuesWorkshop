@@ -34,6 +34,18 @@ internal code consumes and returns observables.
 
 - **No `catchError` directly before `subscribe`** — use the `error`
   callback in the `subscribe` block instead.
+- **Never catch only to rethrow.** `catch` is for _handling_. If all you want
+  is a side effect on failure, use `tap({ error })` and let the error flow.
+- **No callback wrapping a callback.** `() => defer(() => x)` is `defer(() =>
+x)`. Delete the outer layer.
+- **One file per third-party client library.** That file is the only place the
+  library name appears; it is a dumb method-for-method mapping from promises
+  to `Single`/`Maybe`/`Completable` with no logic of its own. Everything else
+  imports the domain-named abstraction (`WebsocketConnection`, `http.ts`), so
+  the library is replaceable without touching a second file.
+- **Promises live only in that one wrapper.** `fetch` included — it is wrapped
+  in `http.ts` and adapters consume the observable surface, never `fetch`
+  directly. An adapter that mixes promise and observable style is a defect.
 - **No `$` suffix** — on any name (functions, variables, Subjects). Use
   plain descriptive names. The type system already distinguishes
   `Observable<T>` from `T`.
@@ -103,6 +115,18 @@ the token variables (`var(--space-gutter)`, `var(--color-text-muted)`, etc.).
 One co-located `Component.module.css` per component (restated from
 `AGENTS.md`). No inline `style={}` props — use CSS module classes. No shared
 or global component stylesheets beyond `tokens.css` and `globals.css`.
+
+## Hooks
+
+Reach for plain React state first. `useState` is the default; a `useRef` plus a
+cleanup `useEffect` is the default for holding a subscription. Introduce a
+custom abstraction only when a concrete second use site exists — a hook that
+wraps state in machinery no caller needs is deleted in review.
+
+```typescript
+const subscriptionRef = useRef<Subscription | null>(null);
+useEffect(() => () => subscriptionRef.current?.unsubscribe(), []);
+```
 
 ## Component Structure
 
