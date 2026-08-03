@@ -112,7 +112,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var database = scope.ServiceProvider.GetRequiredService<WorkshopDbContext>();
-    await database.Database.EnsureCreatedAsync();
+    await WorkshopDatabaseSchema.ApplyAsync(database);
 }
 
 LogOrToolsVersion(app);
