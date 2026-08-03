@@ -115,6 +115,20 @@ reload to exact prior state.
 **Verification:** `dotnet test backend` (persistence round-trip suite).
 **Dependencies:** 1. **Files:** `backend/Adapters.Persistence/*`. **Size:** M
 
+### Task 7b: EF Core migrations
+**Spec:** `tasks/specs/07b-schema-migrations.md`.
+**Description:** Replace `EnsureCreated()` with EF Core Migrations applied at
+startup, after Checkpoint B hit `table presentation_state has no column named
+shown_value_count` on an existing database. Reverses the Task 7 no-migration
+decision.
+**Acceptance criteria:**
+- [ ] Pre-`shown_value_count` database migrates on startup and serves sessions
+- [ ] Model change without a migration fails the build (drift guard)
+- [ ] Tests build their schema through migrations
+- [ ] `design/persistence.md` documents the migration workflow
+**Verification:** `dotnet test backend` + compose smoke against an old database.
+**Dependencies:** 7. **Size:** S
+
 ### Refactor note: split Adapters by concern ✅
 **Done.** `backend/Adapters` split into `Adapters.Persistence` (EF Core +
 SQLite) and `Adapters.Web` (SignalR shell). OR-Tools moved to Host.
