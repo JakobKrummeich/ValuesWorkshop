@@ -12,32 +12,54 @@ public static class WorkshopDatabaseSchema
         CancellationToken cancellationToken = default
     )
     {
-        if (await IsCreatedBeforeMigrationsAsync(database, cancellationToken))
+        var tables = await TableNamesAsync(database, cancellationToken);
+
+        if (IsCreatedBeforeMigrations(database, tables))
         {
-            await AdoptDatabaseCreatedBeforeMigrationsAsync(database, cancellationToken);
+            await AdoptDatabaseCreatedBeforeMigrationsAsync(database, tables, cancellationToken);
         }
 
         await database.Database.MigrateAsync(cancellationToken);
     }
 
-    private static async Task<bool> IsCreatedBeforeMigrationsAsync(
+    private static bool IsCreatedBeforeMigrations(
         WorkshopDbContext database,
-        CancellationToken cancellationToken
+        IReadOnlyCollection<string> tables
     )
     {
-        var tables = await TableNamesAsync(database, cancellationToken);
-
         return !tables.Contains(HistoryRepository.DefaultTableName)
             && ModelTables(database).Any(table => tables.Contains(table.Name));
     }
 
     private static async Task AdoptDatabaseCreatedBeforeMigrationsAsync(
         WorkshopDbContext database,
+        IReadOnlyCollection<string> tables,
         CancellationToken cancellationToken
     )
     {
+        RefuseSchemaMissingTables(database, tables);
         await AddColumnsMissingFromTablesAsync(database, cancellationToken);
         await RecordInitialMigrationAsAppliedAsync(database, cancellationToken);
+    }
+
+    private static void RefuseSchemaMissingTables(
+        WorkshopDbContext database,
+        IReadOnlyCollection<string> tables
+    )
+    {
+        var missing = ModelTables(database)
+            .Select(table => table.Name)
+            .Where(name => !tables.Contains(name))
+            .ToList();
+
+        if (missing.Count > 0)
+        {
+            throw new InvalidOperationException(
+                $"This database was created before migrations existed and is missing the tables "
+                    + $"{string.Join(", ", missing)}. It is too old to adopt: delete the database "
+                    + "file and start again."
+            );
+        }
     }
 
     private static async Task AddColumnsMissingFromTablesAsync(
@@ -48,10 +70,6 @@ public static class WorkshopDatabaseSchema
         foreach (var table in ModelTables(database))
         {
             var columns = await ColumnNamesAsync(database, table.Name, cancellationToken);
-            if (columns.Count == 0)
-            {
-                continue;
-            }
 
             foreach (var column in table.Columns.Where(column => !columns.Contains(column.Name)))
             {

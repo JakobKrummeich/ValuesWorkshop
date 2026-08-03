@@ -65,6 +65,22 @@ public sealed class WorkshopDatabaseSchemaTests : IDisposable
         (await context.Sessions.CountAsync()).ShouldBe(1);
     }
 
+    [Fact]
+    public async Task A_database_too_old_to_adopt_is_refused_with_the_tables_it_lacks()
+    {
+        using var context = NewContext();
+        await context.Database.ExecuteSqlRawAsync(
+            "CREATE TABLE sessions (identity TEXT PRIMARY KEY)"
+        );
+
+        var refusal = await Should.ThrowAsync<InvalidOperationException>(
+            WorkshopDatabaseSchema.ApplyAsync(context)
+        );
+
+        refusal.Message.ShouldContain("participants");
+        refusal.Message.ShouldContain("delete the database file");
+    }
+
     private WorkshopDbContext NewContext()
     {
         return new WorkshopDbContext(

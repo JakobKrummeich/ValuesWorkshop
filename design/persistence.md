@@ -43,7 +43,9 @@ tables present, history table absent), adds every column the model has and the
 file lacks (this is what repairs the `shown_value_count` failure that
 reversed the Task 7 no-migration decision), and records the initial migration
 as applied. Rows are kept. Later migrations then apply normally, and the
-adoption step never runs again on that file.
+adoption step never runs again on that file. A file so old that it lacks a
+whole table cannot be adopted — startup refuses it by name and asks for the
+file to be deleted, rather than leaving a half-schema behind.
 
 ---
 
