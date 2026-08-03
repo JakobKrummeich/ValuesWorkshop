@@ -4,10 +4,6 @@ Design preferences the repo owner has stated in review. Read before writing
 code; each rule below already cost at least one review round, and ⟲ marks the
 ones the reviewer had to repeat.
 
-Provenance: mined from the Lightspeed feedback ledger. Re-mine with
-`lightspeed feedback list --repo . --format md` (and
-`--verdict repeated` for the ones that came back).
-
 Frontend-specific consequences of these same preferences live in
 `frontend/FE-IMPLEMENTATION-RULES.md`.
 
@@ -52,8 +48,3 @@ auth and token types live in their own namespace, not in the host.
 
 An incidental change to tooling, scripts or config is either its own commit
 with a stated reason, or it does not ship.
-
-## Spec promises come due with the screen that shows them
-
-de+en strings ship with the first screen that renders text, rather than being
-deferred to a later i18n task.
