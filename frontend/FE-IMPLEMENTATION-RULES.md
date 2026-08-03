@@ -36,8 +36,9 @@ internal code consumes and returns observables.
   callback in the `subscribe` block instead.
 - **Never catch only to rethrow.** `catch` is for _handling_. If all you want
   is a side effect on failure, use `tap({ error })` and let the error flow.
-- **No callback wrapping a callback.** `() => defer(() => x)` is `defer(() =>
-x)`. Delete the outer layer.
+- **No arrow wrapping a `defer`.** `() => defer(() => x)` is just
+  `defer(() => x)` — `defer` already defers the work to subscribe time, so the
+  outer factory buys nothing.
 - **One file per third-party client library.** That file is the only place the
   library name appears; it is a dumb method-for-method mapping from promises
   to `Single`/`Maybe`/`Completable` with no logic of its own. Everything else
