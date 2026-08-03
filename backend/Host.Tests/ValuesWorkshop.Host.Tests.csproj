@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="PreMigrationsSchema.sql" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TestSupport\ValuesWorkshop.TestSupport.csproj" />
     <ProjectReference Include="..\Host\ValuesWorkshop.Host.csproj" />
   </ItemGroup>
