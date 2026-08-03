@@ -1,8 +1,5 @@
 {
   "model": "anthropic/claude-haiku-4-5",
   "thinking": "off",
-  "port": 4390,
-  "providers": {
-    "anthropic": { "baseUrl": "http://localhost:3001" }
-  }
+  "port": 4388
 }
