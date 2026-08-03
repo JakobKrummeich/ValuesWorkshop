@@ -17,6 +17,15 @@ one at startup (`WorkshopDatabaseSchema.ApplyAsync`, called from
 suite exercises the production schema path. Existing database files are
 evolved in place — no file is ever deleted for a schema change.
 
+### Single writer per database file
+
+Migrations run at startup with no advisory lock — SQLite has none to take —
+so the design assumes exactly one backend instance per database file. Two
+instances starting against the same file may migrate concurrently, and
+nothing detects it. Deployment therefore runs a single backend container per
+`$DATA_DIR/valuesworkshop.db`; horizontal scaling would need a storage engine
+with real migration locking before it is safe.
+
 ### Adding a migration
 
 1. Change the entity configuration.
@@ -39,13 +48,15 @@ maintainability analyzers judge hand-written code only.
 Files written by builds that used `EnsureCreated()` carry no
 `__EFMigrationsHistory` table, so `Migrate()` alone would try to create tables
 that are already there. `WorkshopDatabaseSchema` detects that shape (model
-tables present, history table absent), adds every column the model has and the
-file lacks (this is what repairs the `shown_value_count` failure that
-reversed the Task 7 no-migration decision), and records the initial migration
-as applied. Rows are kept. Later migrations then apply normally, and the
-adoption step never runs again on that file. A file so old that it lacks a
-whole table cannot be adopted — startup refuses it by name and asks for the
-file to be deleted, rather than leaving a half-schema behind.
+tables present, history table absent) and refuses to start, naming the
+database file and asking for it to be deleted (`docker compose -f
+docker-compose.dev.yml down -v` for the development stack). These files only
+ever existed on development machines before Task 7b, and adopting them was
+tried and dropped: an adoption step is written against the current model but
+can only stamp the first migration, so a genuinely old file is either falsely
+refused or pre-patched and then hit again by the next migration's `ADD
+COLUMN`. A loud refusal is honest; a hand-rolled repair that back-fills `NOT
+NULL` columns with `''` or `0` is not.
 
 ---
 
@@ -53,6 +64,10 @@ file to be deleted, rather than leaving a half-schema behind.
 
 One table per concern — no "god tables". Session table holds only identity,
 phase, and timestamp. Per-phase state gets its own table.
+
+The SQL below states the intended shape. The migrations in
+`backend/Adapters.Persistence/Migrations/` are authoritative for the schema
+that is actually created.
 
 ### Core
 
@@ -62,8 +77,8 @@ CREATE TABLE sessions (
     facilitator_subject  TEXT    NOT NULL,
     name                 TEXT    NOT NULL,
     current_phase        INTEGER NOT NULL,
-    revision             INTEGER NOT NULL DEFAULT 0,
-    is_formed            INTEGER NOT NULL DEFAULT 0,
+    revision             INTEGER NOT NULL,
+    is_formed            INTEGER NOT NULL,
     created_at           TEXT    NOT NULL
 );
 ```
@@ -80,21 +95,21 @@ name the facilitator typed, persisted for consumers that arrive later.
 CREATE TABLE quiz_state (
     session_identity         TEXT    PRIMARY KEY REFERENCES sessions(identity),
     current_question_index   INTEGER,
-    is_revealed              INTEGER NOT NULL DEFAULT 0,
-    is_learning_text_shown   INTEGER NOT NULL DEFAULT 0
+    is_revealed              INTEGER NOT NULL,
+    is_learning_text_shown   INTEGER NOT NULL
 );
 
 CREATE TABLE presentation_state (
     session_identity       TEXT    PRIMARY KEY REFERENCES sessions(identity),
     presenting_group_name  TEXT,
     presented_value_id     TEXT,
-    shown_value_count      INTEGER NOT NULL DEFAULT 0
+    shown_value_count      INTEGER NOT NULL
 );
 
 CREATE TABLE voting_state (
     session_identity TEXT    PRIMARY KEY REFERENCES sessions(identity),
-    round_open       INTEGER NOT NULL DEFAULT 0,
-    round_number     INTEGER NOT NULL DEFAULT 0
+    round_open       INTEGER NOT NULL,
+    round_number     INTEGER NOT NULL
 );
 ```
 
@@ -159,7 +174,7 @@ CREATE TABLE groups (
     session_identity       TEXT    NOT NULL REFERENCES sessions(identity),
     name                   TEXT    NOT NULL,
     scribe_participant_id  TEXT    REFERENCES participants(id),
-    is_submitted           INTEGER NOT NULL DEFAULT 0
+    is_submitted           INTEGER NOT NULL
 );
 
 CREATE TABLE group_members (
@@ -190,7 +205,7 @@ CREATE TABLE vote_tallies (
     session_identity TEXT    NOT NULL REFERENCES sessions(identity),
     round_number     INTEGER NOT NULL,
     value_id         TEXT    NOT NULL,
-    vote_count       INTEGER NOT NULL DEFAULT 0,
+    vote_count       INTEGER NOT NULL,
     PRIMARY KEY (session_identity, round_number, value_id)
 );
 
