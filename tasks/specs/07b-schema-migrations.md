@@ -32,9 +32,9 @@ multi-database support; SQLite stays the store.
 - [x] A pre-migrations database is detected and refused at startup with an
       actionable message naming the file (fresh and already-migrated databases
       are migrated normally)
-- [ ] Model change without a migration fails the build via the drift guard
-- [ ] Round-trip and restart suites green against a migrated database
-- [ ] `design/persistence.md` documents the migration workflow
+- [x] Model change without a migration fails the build via the drift guard
+- [x] Round-trip and restart suites green against a migrated database
+- [x] `design/persistence.md` documents the migration workflow
 
 ## Slices
 
