@@ -44,7 +44,7 @@ public class WorkshopStateCacheTests
     {
         var session = TestSessions.Open(KnownSession);
         var anna = new ParticipantId(Guid.NewGuid());
-        session.Join(anna, new FixedRandomness(0));
+        session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
         session.BumpRevision();
 
         var states = cache.StatesOf(session);

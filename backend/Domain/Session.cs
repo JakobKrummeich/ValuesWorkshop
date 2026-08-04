@@ -49,18 +49,18 @@ public sealed class Session
         return string.Equals(Facilitator.Value, caller.Value, StringComparison.Ordinal);
     }
 
-    public bool Join(ParticipantId participantId, IRandomness randomness)
+    public bool Join(Participant participant, IRandomness randomness)
     {
-        if (Roster.Contains(participantId))
+        if (Roster.Contains(participant.Id))
         {
             return false;
         }
 
-        Roster.Add(participantId);
+        Roster.Add(participant);
 
         if (Formation.IsFormed)
         {
-            Formation.PlaceIntoSmallestGroup(participantId, randomness);
+            Formation.PlaceIntoSmallestGroup(participant.Id, randomness);
         }
 
         return true;

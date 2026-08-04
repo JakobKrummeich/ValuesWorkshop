@@ -91,6 +91,8 @@ internal sealed class ParticipantEntityConfiguration : IEntityTypeConfiguration<
         builder
             .Property(participant => participant.SessionIdentity)
             .HasColumnName("session_identity");
+        builder.Property(participant => participant.DisplayName).HasColumnName("display_name");
+        builder.Property(participant => participant.JoinOrder).HasColumnName("join_order");
         builder
             .HasOne(participant => participant.Session)
             .WithMany(session => session.Participants)

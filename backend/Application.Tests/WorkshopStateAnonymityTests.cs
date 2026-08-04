@@ -7,16 +7,25 @@ namespace ValuesWorkshop.Application.Tests;
 
 public class WorkshopStateAnonymityTests
 {
+    private static readonly string[] IdentifyingNameSuffixes =
+    [
+        "DisplayName",
+        "DisplayNames",
+        "ParticipantName",
+    ];
+
     [Fact]
-    public void Participant_state_identifies_no_participant_at_all()
+    public void Participant_state_identifies_nobody_but_the_caller_themselves()
     {
-        ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState)).ShouldBeEmpty();
+        ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState))
+            .ShouldBe(["OwnDisplayName"], ignoreOrder: false);
     }
 
     [Fact]
-    public void Presenter_state_identifies_no_participant_at_all()
+    public void Presenter_state_identifies_participants_only_in_the_join_lobby()
     {
-        ParticipantIdentifyingPathsOf(typeof(PresenterWorkshopState)).ShouldBeEmpty();
+        ParticipantIdentifyingPathsOf(typeof(PresenterWorkshopState))
+            .ShouldBe(["ParticipantDisplayNames[]"], ignoreOrder: false);
     }
 
     [Fact]
@@ -27,7 +36,8 @@ public class WorkshopStateAnonymityTests
                 [
                     "Groups[].MemberParticipantIds[]",
                     "Groups[].ScribeParticipantId",
-                    "Roster.ParticipantIds[]",
+                    "Roster.Participants[].DisplayName",
+                    "Roster.Participants[].ParticipantId",
                 ],
                 ignoreOrder: false
             );
@@ -58,7 +68,7 @@ public class WorkshopStateAnonymityTests
             var (propertyType, suffix) = Unwrap(property.PropertyType);
             var path = prefix.Length == 0 ? property.Name : $"{prefix}.{property.Name}";
 
-            if (propertyType == typeof(Guid))
+            if (propertyType == typeof(Guid) || IsDisplayName(propertyType, property.Name))
             {
                 paths.Add(path + suffix);
             }
@@ -88,5 +98,13 @@ public class WorkshopStateAnonymityTests
     private static bool IsWireState(Type type)
     {
         return type.Namespace == typeof(ParticipantWorkshopState).Namespace;
+    }
+
+    private static bool IsDisplayName(Type propertyType, string propertyName)
+    {
+        return propertyType == typeof(string)
+            && IdentifyingNameSuffixes.Any(suffix =>
+                propertyName.EndsWith(suffix, StringComparison.Ordinal)
+            );
     }
 }

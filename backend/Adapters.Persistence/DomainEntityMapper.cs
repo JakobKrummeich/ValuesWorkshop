@@ -39,11 +39,16 @@ internal static class DomainEntityMapper
                 RoundNumber = session.Voting.RoundNumber,
             },
             Participants = session
-                .Roster.Participants.Select(participantId => new ParticipantEntity
-                {
-                    Id = participantId.Value.ToString(),
-                    SessionIdentity = identityString,
-                })
+                .Roster.Participants.Select(
+                    (participant, index) =>
+                        new ParticipantEntity
+                        {
+                            Id = participant.Id.Value.ToString(),
+                            SessionIdentity = identityString,
+                            DisplayName = participant.Name.Value,
+                            JoinOrder = index + 1,
+                        }
+                )
                 .ToList(),
             SelectionSubmissions = session
                 .Selection.SubmittedBy.Select(participantId => new SelectionSubmissionEntity
@@ -79,7 +84,7 @@ internal static class DomainEntityMapper
     internal static Session ToDomain(SessionEntity entity)
     {
         var roster = Roster.Restore(
-            entity.Participants.Select(participant => new ParticipantId(Guid.Parse(participant.Id)))
+            entity.Participants.OrderBy(participant => participant.JoinOrder).Select(ToParticipant)
         );
 
         var state = PhaseProgress.Restore((Phase)entity.CurrentPhase);
@@ -149,6 +154,16 @@ internal static class DomainEntityMapper
             presentation,
             voting,
             entity.Revision
+        );
+    }
+
+    private static Participant ToParticipant(ParticipantEntity entity)
+    {
+        var participantId = new ParticipantId(Guid.Parse(entity.Id));
+
+        return new Participant(
+            participantId,
+            ParticipantName.Of(entity.DisplayName, participantId)
         );
     }
 

@@ -15,6 +15,26 @@ public class ParticipantWorkshopStateMapperTests
         state.ParticipantCount.ShouldBe(3);
     }
 
+    [Fact]
+    public void Join_state_carries_the_callers_own_name_and_nobody_elses()
+    {
+        var state = Map(SessionFixtures.InPhase(Phase.Join), caller: SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantJoinState>();
+
+        state.OwnDisplayName.ShouldBe("Anna Schmidt");
+    }
+
+    [Fact]
+    public void A_caller_the_roster_does_not_know_yet_gets_the_fallback_label()
+    {
+        var caller = new ParticipantId(Guid.Parse("abcdef12-0000-4000-8000-000000000009"));
+
+        var state = Map(SessionFixtures.InPhase(Phase.Join), caller)
+            .ShouldBeOfType<ParticipantJoinState>();
+
+        state.OwnDisplayName.ShouldBe("#abcdef");
+    }
+
     [Theory]
     [InlineData(Phase.Join, typeof(ParticipantJoinState))]
     [InlineData(Phase.Quiz, typeof(ParticipantQuizState))]

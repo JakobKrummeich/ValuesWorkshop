@@ -157,7 +157,11 @@ internal sealed class FakeHubCallerContext : HubCallerContext
 {
     private readonly FeatureCollection features = new();
 
-    internal FakeHubCallerContext(string? sessionIdentityQuery = null, string? subject = null)
+    internal FakeHubCallerContext(
+        string? sessionIdentityQuery = null,
+        string? subject = null,
+        params Claim[] additionalClaims
+    )
     {
         var httpContext = new DefaultHttpContext();
 
@@ -171,9 +175,14 @@ internal sealed class FakeHubCallerContext : HubCallerContext
 
         features.Set<IHttpContextFeature>(new HttpContextFeature { HttpContext = httpContext });
 
-        User = subject is null
-            ? new ClaimsPrincipal(new ClaimsIdentity())
-            : new ClaimsPrincipal(new ClaimsIdentity([new Claim("sub", subject)], "test"));
+        List<Claim> claims = subject is null
+            ? [.. additionalClaims]
+            : [new Claim("sub", subject), .. additionalClaims];
+
+        User =
+            claims.Count == 0
+                ? new ClaimsPrincipal(new ClaimsIdentity())
+                : new ClaimsPrincipal(new ClaimsIdentity(claims, "test"));
     }
 
     public override string ConnectionId => "connection-1";

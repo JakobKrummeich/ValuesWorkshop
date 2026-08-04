@@ -13,6 +13,7 @@ function participantStatePayload(revision: number): unknown {
     revision,
     phase: 1,
     participantCount: 2,
+    ownDisplayName: "Anna Schmidt",
   };
 }
 

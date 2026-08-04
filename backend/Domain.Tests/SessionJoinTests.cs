@@ -19,13 +19,13 @@ public class SessionJoinTests
     );
 
     [Fact]
-    public void Joining_puts_the_participant_on_the_roster()
+    public void Joining_puts_the_participant_on_the_roster_under_their_name()
     {
         var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
-        session.Join(Anna, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Anna, "Anna"), Randomness.Fixed(0));
 
-        session.Roster.Participants.ShouldBe([Anna]);
+        session.Roster.Participants.ShouldBe([TestParticipants.Named(Anna, "Anna")]);
     }
 
     [Fact]
@@ -33,10 +33,21 @@ public class SessionJoinTests
     {
         var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
-        session.Join(Anna, Randomness.Fixed(0));
-        session.Join(Anna, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Anna, "Anna"), Randomness.Fixed(0)).ShouldBeTrue();
+        session.Join(TestParticipants.Named(Anna, "Anna"), Randomness.Fixed(0)).ShouldBeFalse();
 
-        session.Roster.Participants.ShouldBe([Anna]);
+        session.Roster.Participants.ShouldBe([TestParticipants.Named(Anna, "Anna")]);
+    }
+
+    [Fact]
+    public void Rejoining_under_a_different_name_keeps_the_name_of_the_first_join()
+    {
+        var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
+
+        session.Join(TestParticipants.Named(Anna, "Anna"), Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Anna, "Someone else"), Randomness.Fixed(0));
+
+        session.Roster.Find(Anna).ShouldBe(TestParticipants.Named(Anna, "Anna"));
     }
 
     [Theory]
@@ -50,9 +61,9 @@ public class SessionJoinTests
     {
         var session = SessionInPhase(phase, new FormationRecord());
 
-        session.Join(Latecomer, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Latecomer, "Late Lucy"), Randomness.Fixed(0));
 
-        session.Roster.Participants.ShouldContain(Latecomer);
+        session.Roster.Contains(Latecomer).ShouldBeTrue();
     }
 
     [Fact]
@@ -60,7 +71,7 @@ public class SessionJoinTests
     {
         var session = SessionInPhase(Phase.Quiz, new FormationRecord());
 
-        session.Join(Latecomer, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Latecomer, "Late Lucy"), Randomness.Fixed(0));
 
         session.Formation.Groups.ShouldBeEmpty();
     }
@@ -70,7 +81,7 @@ public class SessionJoinTests
     {
         var session = SessionInPhase(Phase.GroupWork, TwoGroups());
 
-        session.Join(Latecomer, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Latecomer, "Late Lucy"), Randomness.Fixed(0));
 
         GroupNamed(session, "owl").Members.ShouldBe([Ben, Latecomer]);
         GroupNamed(session, "fox").Members.ShouldNotContain(Latecomer);
@@ -81,7 +92,7 @@ public class SessionJoinTests
     {
         var session = SessionInPhase(Phase.GroupWork, TwoGroupsOfEqualSize());
 
-        session.Join(Latecomer, Randomness.Fixed(1));
+        session.Join(TestParticipants.Named(Latecomer, "Late Lucy"), Randomness.Fixed(1));
 
         GroupNamed(session, "owl").Members.ShouldContain(Latecomer);
         GroupNamed(session, "fox").Members.ShouldNotContain(Latecomer);
@@ -92,7 +103,7 @@ public class SessionJoinTests
     {
         var session = SessionInPhase(Phase.GroupWork, TwoGroups());
 
-        session.Join(Latecomer, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Latecomer, "Late Lucy"), Randomness.Fixed(0));
 
         GroupNamed(session, "owl").Scribe.ShouldBe(Ben);
     }
@@ -102,7 +113,7 @@ public class SessionJoinTests
     {
         var session = SessionInPhase(Phase.GroupWork, TwoGroups());
 
-        session.Join(Latecomer, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Latecomer, "Late Lucy"), Randomness.Fixed(0));
 
         GroupNamed(session, "owl").IsSubmitted.ShouldBeTrue();
     }
@@ -112,7 +123,7 @@ public class SessionJoinTests
     {
         var session = SessionInPhase(Phase.GroupWork, TwoGroups());
 
-        session.Join(Ben, Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Ben, "Ben"), Randomness.Fixed(0));
 
         GroupNamed(session, "owl").Members.ShouldBe([Ben]);
     }
@@ -150,7 +161,10 @@ public class SessionJoinTests
             new SessionIdentity(Guid.NewGuid()),
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore([Anna, Ben]),
+            Roster.Restore([
+                TestParticipants.Named(Anna, "Anna"),
+                TestParticipants.Named(Ben, "Ben"),
+            ]),
             PhaseProgress.Restore(phase),
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),

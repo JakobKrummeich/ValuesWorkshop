@@ -40,17 +40,17 @@ public class SignalRBroadcasterTests
 
         participantClients.AddressedGroups.ShouldBe(
             session
-                .Roster.Participants.Select(participantId =>
-                    SessionGroups.Participant(KnownSession, participantId)
+                .Roster.Participants.Select(participant =>
+                    SessionGroups.Participant(KnownSession, participant.Id)
                 )
                 .ToList(),
             ignoreOrder: true
         );
 
-        foreach (var participantId in session.Roster.Participants)
+        foreach (var participant in session.Roster.Participants)
         {
             participantClients
-                .GroupClient(SessionGroups.Participant(KnownSession, participantId))
+                .GroupClient(SessionGroups.Participant(KnownSession, participant.Id))
                 .Single<ParticipantWorkshopState>()
                 .ParticipantCount.ShouldBe(3);
         }
@@ -70,7 +70,10 @@ public class SignalRBroadcasterTests
 
         for (var index = 0; index < participantCount; index++)
         {
-            session.Join(new ParticipantId(Guid.NewGuid()), new FixedRandomness(0));
+            session.Join(
+                TestParticipants.Unnamed(new ParticipantId(Guid.NewGuid())),
+                new FixedRandomness(0)
+            );
         }
 
         session.BumpRevision();
