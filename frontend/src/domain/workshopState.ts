@@ -262,3 +262,15 @@ export type FacilitatorWorkshopState = z.infer<
 export type PresenterWorkshopState = z.infer<
   typeof presenterWorkshopStateSchema
 >;
+
+type InPhase<TState, TPhase extends Phase> = Extract<TState, { phase: TPhase }>;
+
+export type ParticipantJoinState = InPhase<
+  ParticipantWorkshopState,
+  Phase.Join
+>;
+export type FacilitatorJoinState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.Join
+>;
+export type PresenterJoinState = InPhase<PresenterWorkshopState, Phase.Join>;

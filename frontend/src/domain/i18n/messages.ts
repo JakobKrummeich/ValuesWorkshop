@@ -36,6 +36,9 @@ export enum MessageKey {
   IntentUnknownParticipant = "intent.unknownParticipant",
   IntentConcurrencyConflict = "intent.concurrencyConflict",
   IntentFailed = "intent.failed",
+  JoinYouAreIn = "join.youAreIn",
+  JoinWaitingForStart = "join.waitingForStart",
+  JoinParticipantCount = "join.participantCount",
   FacilitatorHeading = "facilitator.heading",
   ParticipantHeading = "participant.heading",
   PresenterHeading = "presenter.heading",
@@ -194,6 +197,18 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
   [MessageKey.IntentFailed]: {
     [Language.German]: "Die Aktion ist fehlgeschlagen. Bitte erneut versuchen.",
     [Language.English]: "That action failed. Please try again.",
+  },
+  [MessageKey.JoinYouAreIn]: {
+    [Language.German]: "Du bist dabei, {name}.",
+    [Language.English]: "You are in, {name}.",
+  },
+  [MessageKey.JoinWaitingForStart]: {
+    [Language.German]: "Warten auf den Start des Workshops\u2026",
+    [Language.English]: "Waiting for the workshop to start\u2026",
+  },
+  [MessageKey.JoinParticipantCount]: {
+    [Language.German]: "Teilnehmende: {count}",
+    [Language.English]: "Participants: {count}",
   },
   [MessageKey.FacilitatorHeading]: {
     [Language.German]: "Moderation",

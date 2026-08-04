@@ -77,6 +77,26 @@ describe("participant screen group", () => {
     expect(screen.getByTestId("connection")).toHaveTextContent("Connected");
   });
 
+  it("shows the lobby while the workshop is in the join phase", async () => {
+    await renderScreen();
+
+    act(() => {
+      workshopState.next({
+        revision: 1,
+        phase: Phase.Join,
+        participantCount: 3,
+        ownDisplayName: "Ada Lovelace",
+      });
+    });
+
+    expect(screen.getByTestId("own-display-name")).toHaveTextContent(
+      "Ada Lovelace",
+    );
+    expect(screen.getByTestId("participant-count")).toHaveTextContent(
+      "Participants: 3",
+    );
+  });
+
   it("explains a link that carries no session", async () => {
     sessionIdentity.mockReturnValue(null);
 
