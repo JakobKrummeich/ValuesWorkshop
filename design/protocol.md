@@ -130,6 +130,13 @@ is two unrelated participants, one per session (`design/persistence.md`:
 `participants.id` is globally unique, and a participant belongs to exactly one
 session).
 
+The display name comes from the token's `name` claim, read at connect time and
+never from a payload — nobody can name themselves something they are not.
+Azure AD puts `name` on the access token of a user; the dev provider does the
+same through `extraTokenClaims`. A missing or blank claim falls back to a
+deterministic `#`-prefixed label derived from the `participantId`, so a token
+without a profile still joins.
+
 On the participant hub, `OnConnectedAsync` runs the join intent through the
 pipeline and then pushes the current state to the caller directly — the same
 pattern the facilitator and presenter hubs use. For a newcomer (T4) the join

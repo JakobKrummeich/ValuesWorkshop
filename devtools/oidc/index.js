@@ -52,6 +52,12 @@ const provider = new Provider(issuer, {
     IdToken: 3600,
   },
 
+  async extraTokenClaims(_context, token) {
+    const account = testAccounts[token.accountId];
+
+    return account ? { name: account.name } : undefined;
+  },
+
   async findAccount(_context, id) {
     const account = testAccounts[id];
     if (!account) {
