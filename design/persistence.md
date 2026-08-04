@@ -126,8 +126,10 @@ complete.
 
 ```sql
 CREATE TABLE participants (
-    id                 TEXT PRIMARY KEY,
-    session_identity   TEXT NOT NULL REFERENCES sessions(identity)
+    id                 TEXT    PRIMARY KEY,
+    session_identity   TEXT    NOT NULL REFERENCES sessions(identity),
+    display_name       TEXT    NOT NULL,
+    join_order         INTEGER NOT NULL
 );
 ```
 

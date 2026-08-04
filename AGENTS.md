@@ -66,7 +66,7 @@ Run all quality gates locally using the same commands CI uses:
 - `./scripts/ci-lint.sh` — all lint gates (FE lint, FE build, BE build/analyzers,
   CSharpier, vulnerability scan, jscpd duplication)
 - `./scripts/ci-test.sh` — all test gates (FE jest + coverage, BE dotnet
-  test + coverage)
+  test + coverage, e2e)
 - `./scripts/test-backend-with-coverage.sh` — BE test + coverage gate standalone
 - `./scripts/check-backend-vulnerabilities.sh` — BE vulnerability scan standalone
 
