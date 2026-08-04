@@ -257,9 +257,22 @@ construct them with the real content counts.
 **Verification:** `dotnet test backend` (state machine suite) + codegen check.
 **Dependencies:** 7, 9. **Size:** M
 
-### Checkpoint B
-- [ ] E2E smoke: create session (PW), join via OIDC, presenter shows session;
+### Checkpoint B ✅
+- [x] E2E smoke: create session (PW), join via OIDC, presenter shows session;
       kill+restart backend → facilitator, participant, presenter all resume
+      (16/16 Playwright, twice consecutively, on a clean compose stack)
+
+**Learnings folded into Phase C:**
+1. The checkpoint run exposed a real defect — `EnsureCreated()` never evolves a
+   schema, so the Task 11 column broke every existing database. Fixed by Task
+   7b (EF Core migrations + drift guard). Any future schema change now ships
+   its migration in the same PR.
+2. Playwright is still not in CI, and it is now the only thing that catches
+   this class of defect — moved from Task 14 up to Task 12.
+3. de+en is a SPEC promise the reviewer already asked about; screens now ship
+   both languages from the first screen rather than deferring to Task 26.
+4. A live session walks phases 1→8 today and stops at 8 until Task 22 supplies
+   the winners; quiz and presentation guards go live with Tasks 13 and 21.
 
 ---
 
@@ -272,6 +285,11 @@ list and advances.
 **Acceptance criteria:**
 - [ ] QR encodes working join URL
 - [ ] Participant list updates live on join
+- [ ] Screens ship de+en from the start (no English-only placeholder text)
+- [ ] **Moved up from Task 14:** Playwright wired into CI — compose (or
+      `webServer`) startup in `playwright.config.ts` plus a job in
+      `.github/workflows/ci.yml`, covering the Task 10 reconnect/restart smoke
+      that is still local-only
 **Verification:** FE component tests + Playwright join flow.
 **Dependencies:** 10, 11. **Size:** M
 
@@ -301,11 +319,8 @@ through workshop phase 2.
 **Acceptance criteria:**
 - [ ] Bars update without reload as votes arrive
 - [ ] Correct answer highlighted after reveal; learning text togglable
-- [ ] Multi-client e2e now covers phases 1–2 and runs in CI
-- [ ] Playwright wired into CI for the first time: `webServer` (or compose)
-      startup in `playwright.config.ts` plus a job in `.github/workflows/ci.yml`,
-      covering the reconnect/restart smoke written in Task 10 and left
-      local-only there
+- [ ] Multi-client e2e now covers phases 1–2 and runs in CI (the CI wiring
+      itself moved to Task 12)
 **Verification:** FE component/reducer tests; Playwright: 3 participants vote,
 bars reflect tallies.
 **Dependencies:** 12, 13. **Size:** M

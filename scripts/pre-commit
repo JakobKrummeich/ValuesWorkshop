@@ -10,7 +10,7 @@ backend_files=$(echo "${staged_files}" | { grep '^backend/.*\.cs$' || true; })
 
 if [[ -n "${frontend_files}" ]]; then
   echo "[1/2] Prettier (FE)..."
-  echo "${frontend_files}" | sed 's|^frontend/||' | xargs pnpm --dir frontend exec prettier --write --ignore-unknown
+  echo "${frontend_files}" | sed 's|^frontend/||' | xargs pnpm --config.verify-deps-before-run=false --dir frontend exec prettier --write --ignore-unknown
   echo "${frontend_files}" | xargs git add
 else
   echo "[1/2] Prettier (FE): no staged frontend files"

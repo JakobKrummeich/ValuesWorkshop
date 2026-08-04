@@ -2,7 +2,8 @@
 
 Key files: `SPEC.md` (product spec) · `tasks/plan.md` (macro plan, locked
 decisions) · `tasks/todo.md` (ordered backlog) · `CLEANROOM.md` (never look
-at the old repo).
+at the old repo) · `CODE-PREFERENCES.md` (review-derived design preferences;
+read before writing code).
 
 ## Hard rules
 
