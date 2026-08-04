@@ -6,3 +6,5 @@ pnpm --dir frontend test
 
 echo "=== BE tests + coverage ==="
 scripts/test-backend-with-coverage.sh
+
+scripts/ci-e2e.sh
