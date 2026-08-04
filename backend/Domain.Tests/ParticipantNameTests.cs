@@ -36,6 +36,14 @@ public class ParticipantNameTests
         ParticipantName.Of(new string('a', 80), Anna).Value.ShouldBe(new string('a', 80));
     }
 
+    [Fact]
+    public void Truncation_never_splits_a_character_made_of_several_code_units()
+    {
+        var name = ParticipantName.Of(string.Concat(Enumerable.Repeat("\U0001F600", 200)), Anna);
+
+        name.Value.ShouldBe(string.Concat(Enumerable.Repeat("\U0001F600", 80)));
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]

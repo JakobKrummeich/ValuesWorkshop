@@ -30,6 +30,7 @@ export function useFacilitatorJoinScreen(): FacilitatorJoinScreenResult {
     }
 
     inFlightCopy.current?.unsubscribe();
+    setCopyOutcome(null);
     inFlightCopy.current = copyToClipboard(joinUrl).subscribe({
       error() {
         setCopyOutcome(MessageKey.JoinUrlCopyFailed);

@@ -4,12 +4,6 @@
   align-items: center;
 }
 
-.label {
-  color: var(--color-text-muted);
-  font-family: var(--font-sans);
-  font-size: var(--text-small);
-}
-
 .choice {
   min-height: var(--control-height);
   padding: var(--space-tight) var(--space-gap);

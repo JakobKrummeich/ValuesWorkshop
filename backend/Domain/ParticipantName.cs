@@ -23,9 +23,16 @@ public sealed record ParticipantName
             return new ParticipantName(FallbackLabelFor(participantId));
         }
 
-        return new ParticipantName(
-            trimmed.Length <= MaximumLength ? trimmed : trimmed[..MaximumLength]
-        );
+        return new ParticipantName(TruncatedToTextElements(trimmed));
+    }
+
+    private static string TruncatedToTextElements(string trimmed)
+    {
+        var textElements = new StringInfo(trimmed);
+
+        return textElements.LengthInTextElements <= MaximumLength
+            ? trimmed
+            : textElements.SubstringByTextElements(0, MaximumLength);
     }
 
     private static string FallbackLabelFor(ParticipantId participantId)

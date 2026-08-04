@@ -51,14 +51,24 @@ test.describe.serial("session lifecycle and reconnect", () => {
     await openSignedIn(facilitatorPage, "/facilitator", FACILITATOR_ACCOUNT);
 
     const creationResponse = waitForSessionCreationResponse(facilitatorPage);
-    await submitOpenSessionForm(facilitatorPage, SESSION_NAME, WRONG_PASSPHRASE);
+    await submitOpenSessionForm(
+      facilitatorPage,
+      SESSION_NAME,
+      WRONG_PASSPHRASE,
+    );
 
     expect((await creationResponse).status()).toBe(HTTP_UNAUTHORIZED);
     await expect(
-      facilitatorPage.getByText("That facilitator passphrase was not accepted."),
+      facilitatorPage.getByText(
+        "That facilitator passphrase was not accepted.",
+      ),
     ).toBeVisible();
-    await expect(facilitatorPage).toHaveURL("http://localhost:3000/facilitator");
-    await expect(facilitatorPage.getByLabel("Facilitator passphrase")).toBeVisible();
+    await expect(facilitatorPage).toHaveURL(
+      "http://localhost:3000/facilitator",
+    );
+    await expect(
+      facilitatorPage.getByLabel("Facilitator passphrase"),
+    ).toBeVisible();
   });
 
   test("the correct passphrase opens a session and lands on the facilitator screen", async () => {
@@ -89,7 +99,9 @@ test.describe.serial("session lifecycle and reconnect", () => {
     await markPage(participantPage);
     await markPage(presenterPage);
 
-    await facilitatorPage.getByRole("button", { name: "Advance phase" }).click();
+    await facilitatorPage
+      .getByRole("button", { name: "Advance phase" })
+      .click();
 
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 2");
     await expect(participantPage.getByTestId("phase")).toHaveText("Phase 2");

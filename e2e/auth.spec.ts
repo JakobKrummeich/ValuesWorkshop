@@ -45,9 +45,7 @@ test.describe("OIDC authentication", () => {
   test("backend rejects unauthenticated request to API route", async ({
     request,
   }) => {
-    const response = await request.get(
-      "http://localhost:5000/api/anything",
-    );
+    const response = await request.get("http://localhost:5000/api/anything");
 
     expect(response.status()).toBe(HTTP_UNAUTHORIZED);
   });

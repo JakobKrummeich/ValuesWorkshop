@@ -1,15 +1,16 @@
 "use client";
 
-import { participantJoinUrl } from "../../../../adapters/browserLocation";
 import { QrCodeImage } from "../../../../adapters/qrCodeImage";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { PresenterJoinState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./PresenterJoinScreen.module.css";
+import { usePresenterJoinScreen } from "./usePresenterJoinScreen";
 
 export function PresenterJoinScreen({ state }: { state: PresenterJoinState }) {
   const { translate } = useTranslation();
-  const joinUrl = participantJoinUrl();
+  const { joinUrl, displayNames, participantCount } =
+    usePresenterJoinScreen(state);
 
   return (
     <section className={styles.join}>
@@ -28,14 +29,14 @@ export function PresenterJoinScreen({ state }: { state: PresenterJoinState }) {
       <div className={styles.lobby}>
         <p className={styles.count} data-testid="participant-count">
           {translate(MessageKey.JoinParticipantCount, {
-            count: state.participantCount,
+            count: participantCount,
           })}
         </p>
-        {state.participantDisplayNames.length === 0 ? (
+        {displayNames.length === 0 ? (
           <p className={styles.empty}>{translate(MessageKey.JoinNobodyYet)}</p>
         ) : (
           <ul className={styles.names} data-testid="joined-names">
-            {state.participantDisplayNames.map((displayName, position) => (
+            {displayNames.map((displayName, position) => (
               <li className={styles.name} key={`${position}-${displayName}`}>
                 {displayName}
               </li>

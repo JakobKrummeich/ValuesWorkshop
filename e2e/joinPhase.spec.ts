@@ -41,15 +41,21 @@ test.describe.serial("phase 1 join", () => {
   });
 
   test("the presenter invites with a QR code and an empty lobby", async () => {
-    await expect(presenterPage.getByRole("img", { name: "Scan to join" })).toBeVisible();
-    await expect(presenterPage.getByText("Nobody has joined yet")).toBeVisible();
+    await expect(
+      presenterPage.getByRole("img", { name: "Scan to join" }),
+    ).toBeVisible();
+    await expect(
+      presenterPage.getByText("Nobody has joined yet"),
+    ).toBeVisible();
     await expect(presenterPage.getByTestId("participant-count")).toHaveText(
       "Participants: 0",
     );
   });
 
   test("scanning the QR code leads into the lobby of this session", async () => {
-    const scanned = await decodeQrCode(presenterPage.getByRole("img", { name: "Scan to join" }));
+    const scanned = await decodeQrCode(
+      presenterPage.getByRole("img", { name: "Scan to join" }),
+    );
 
     expect(scanned).toBe(
       `http://localhost:3000/participant?sessionIdentity=${sessionIdentity}`,
@@ -73,6 +79,20 @@ test.describe.serial("phase 1 join", () => {
     await expect(presenterPage.getByTestId("participant-count")).toHaveText(
       "Participants: 1",
     );
+  });
+
+  test("switching the language keeps the url and the live session", async () => {
+    const urlBeforeSwitch = participantPage.url();
+
+    await participantPage.getByRole("button", { name: "German" }).click();
+
+    await expect(participantPage.getByTestId("own-display-name")).toHaveText(
+      `Du bist dabei, ${PARTICIPANT_DISPLAY_NAME}.`,
+    );
+    await expect(participantPage.getByTestId("connection")).toHaveText(
+      "Verbunden",
+    );
+    expect(participantPage.url()).toBe(urlBeforeSwitch);
   });
 
   test("the facilitator shows the same roster and can copy the join url", async () => {

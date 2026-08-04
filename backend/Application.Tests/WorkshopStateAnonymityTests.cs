@@ -18,14 +18,14 @@ public class WorkshopStateAnonymityTests
     public void Participant_state_identifies_nobody_but_the_caller_themselves()
     {
         ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState))
-            .ShouldBe(["OwnDisplayName"], ignoreOrder: false);
+            .ShouldBe(["ParticipantJoinState.OwnDisplayName"], ignoreOrder: false);
     }
 
     [Fact]
     public void Presenter_state_identifies_participants_only_in_the_join_lobby()
     {
         ParticipantIdentifyingPathsOf(typeof(PresenterWorkshopState))
-            .ShouldBe(["ParticipantDisplayNames[]"], ignoreOrder: false);
+            .ShouldBe(["PresenterJoinState.ParticipantDisplayNames[]"], ignoreOrder: false);
     }
 
     [Fact]
@@ -34,10 +34,30 @@ public class WorkshopStateAnonymityTests
         ParticipantIdentifyingPathsOf(typeof(FacilitatorWorkshopState))
             .ShouldBe(
                 [
-                    "Groups[].MemberParticipantIds[]",
-                    "Groups[].ScribeParticipantId",
-                    "Roster.Participants[].DisplayName",
-                    "Roster.Participants[].ParticipantId",
+                    "FacilitatorFinalPresentationState.Roster.Participants[].DisplayName",
+                    "FacilitatorFinalPresentationState.Roster.Participants[].ParticipantId",
+                    "FacilitatorFinalVotingState.Roster.Participants[].DisplayName",
+                    "FacilitatorFinalVotingState.Roster.Participants[].ParticipantId",
+                    "FacilitatorGroupFormationState.Groups[].MemberParticipantIds[]",
+                    "FacilitatorGroupFormationState.Groups[].ScribeParticipantId",
+                    "FacilitatorGroupFormationState.Roster.Participants[].DisplayName",
+                    "FacilitatorGroupFormationState.Roster.Participants[].ParticipantId",
+                    "FacilitatorGroupWorkState.Groups[].MemberParticipantIds[]",
+                    "FacilitatorGroupWorkState.Groups[].ScribeParticipantId",
+                    "FacilitatorGroupWorkState.Roster.Participants[].DisplayName",
+                    "FacilitatorGroupWorkState.Roster.Participants[].ParticipantId",
+                    "FacilitatorJoinState.Roster.Participants[].DisplayName",
+                    "FacilitatorJoinState.Roster.Participants[].ParticipantId",
+                    "FacilitatorQuizState.Roster.Participants[].DisplayName",
+                    "FacilitatorQuizState.Roster.Participants[].ParticipantId",
+                    "FacilitatorSelectionResultsState.Roster.Participants[].DisplayName",
+                    "FacilitatorSelectionResultsState.Roster.Participants[].ParticipantId",
+                    "FacilitatorValuePresentationState.Groups[].MemberParticipantIds[]",
+                    "FacilitatorValuePresentationState.Groups[].ScribeParticipantId",
+                    "FacilitatorValuePresentationState.Roster.Participants[].DisplayName",
+                    "FacilitatorValuePresentationState.Roster.Participants[].ParticipantId",
+                    "FacilitatorValueSelectionState.Roster.Participants[].DisplayName",
+                    "FacilitatorValueSelectionState.Roster.Participants[].ParticipantId",
                 ],
                 ignoreOrder: false
             );
@@ -55,7 +75,7 @@ public class WorkshopStateAnonymityTests
         var paths = new List<string>();
         foreach (var variant in variants)
         {
-            CollectIdentifyingPaths(variant, prefix: string.Empty, paths);
+            CollectIdentifyingPaths(variant, variant.Name, paths);
         }
 
         return paths.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();

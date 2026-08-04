@@ -1,32 +1,26 @@
 import { render, screen } from "@testing-library/react";
-import { participantJoinUrl } from "../../../../../adapters/browserLocation";
 import { Phase } from "../../../../../domain/phases";
 import type { PresenterJoinState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { PresenterJoinScreen } from "../PresenterJoinScreen";
+import { usePresenterJoinScreen } from "../usePresenterJoinScreen";
 
-jest.mock("../../../../../adapters/browserLocation", () => ({
-  participantJoinUrl: jest.fn(),
+jest.mock("../usePresenterJoinScreen", () => ({
+  usePresenterJoinScreen: jest.fn(),
 }));
 
-const joinUrl = participantJoinUrl as jest.MockedFunction<
-  typeof participantJoinUrl
+const joinScreen = usePresenterJoinScreen as jest.MockedFunction<
+  typeof usePresenterJoinScreen
 >;
 
-function joinState(displayNames: string[]): PresenterJoinState {
-  return {
-    revision: 2,
-    phase: Phase.Join,
-    participantCount: displayNames.length,
-    participantDisplayNames: displayNames,
-  };
-}
+const JOIN_URL = "https://workshop.test/participant?sessionIdentity=abc-123";
 
-beforeEach(() => {
-  joinUrl.mockReturnValue(
-    "https://workshop.test/participant?sessionIdentity=abc-123",
-  );
-});
+const state: PresenterJoinState = {
+  revision: 2,
+  phase: Phase.Join,
+  participantCount: 0,
+  participantDisplayNames: [],
+};
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -34,7 +28,13 @@ afterEach(() => {
 
 describe("presenter join screen", () => {
   it("shows a QR code of the participant join url and no readable url", () => {
-    render(<PresenterJoinScreen state={joinState([])} />, {
+    joinScreen.mockReturnValue({
+      joinUrl: JOIN_URL,
+      displayNames: [],
+      participantCount: 0,
+    });
+
+    render(<PresenterJoinScreen state={state} />, {
       wrapper: languageWrapper(),
     });
 
@@ -43,12 +43,15 @@ describe("presenter join screen", () => {
   });
 
   it("lists everyone who has joined so far", () => {
-    render(
-      <PresenterJoinScreen
-        state={joinState(["Ada Lovelace", "Alan Turing"])}
-      />,
-      { wrapper: languageWrapper() },
-    );
+    joinScreen.mockReturnValue({
+      joinUrl: JOIN_URL,
+      displayNames: ["Ada Lovelace", "Alan Turing"],
+      participantCount: 2,
+    });
+
+    render(<PresenterJoinScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
 
     const names = screen.getByTestId("joined-names");
     expect(names).toHaveTextContent("Ada Lovelace");
@@ -59,7 +62,13 @@ describe("presenter join screen", () => {
   });
 
   it("says so while nobody has joined", () => {
-    render(<PresenterJoinScreen state={joinState([])} />, {
+    joinScreen.mockReturnValue({
+      joinUrl: JOIN_URL,
+      displayNames: [],
+      participantCount: 0,
+    });
+
+    render(<PresenterJoinScreen state={state} />, {
       wrapper: languageWrapper(),
     });
 
@@ -68,9 +77,13 @@ describe("presenter join screen", () => {
   });
 
   it("shows no QR code while the link carries no session", () => {
-    joinUrl.mockReturnValue(null);
+    joinScreen.mockReturnValue({
+      joinUrl: null,
+      displayNames: [],
+      participantCount: 0,
+    });
 
-    render(<PresenterJoinScreen state={joinState([])} />, {
+    render(<PresenterJoinScreen state={state} />, {
       wrapper: languageWrapper(),
     });
 
