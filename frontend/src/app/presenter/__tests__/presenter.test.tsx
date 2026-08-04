@@ -5,6 +5,7 @@ import { Phase } from "../../../domain/phases";
 import type { PresenterWorkshopState } from "../../../domain/workshopState";
 import { currentSessionIdentity } from "../../../adapters/browserLocation";
 import { createPresenterSession } from "../../../adapters/workshopSessions";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import PresenterLayout from "../layout";
 import PresenterHome from "../page";
 
@@ -47,6 +48,7 @@ describe("presenter screen group", () => {
         <PresenterLayout>
           <PresenterHome />
         </PresenterLayout>,
+        { wrapper: languageWrapper() },
       );
     });
 
@@ -58,6 +60,6 @@ describe("presenter screen group", () => {
     });
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 1");
-    expect(screen.getByTestId("connection")).toHaveTextContent("reconnecting");
+    expect(screen.getByTestId("connection")).toHaveTextContent("Reconnecting");
   });
 });

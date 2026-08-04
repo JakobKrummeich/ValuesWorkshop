@@ -1,7 +1,5 @@
 import { render, screen } from "@testing-library/react";
 import { NEVER } from "rxjs";
-import { ConnectionState } from "../../domain/connectionState";
-import { Phase } from "../../domain/phases";
 import { SessionStatusBanner } from "../SessionStatusBanner";
 import { useSessionStatusBanner } from "../useSessionStatusBanner";
 
@@ -18,20 +16,20 @@ const port = { workshopState: NEVER, connectionState: NEVER };
 describe("session status banner", () => {
   it("renders the phase and the connection state", () => {
     banner.mockReturnValue({
-      connectionState: ConnectionState.Connected,
-      phase: Phase.Quiz,
+      connectionText: "Connected",
+      phaseText: "Phase 2",
     });
 
     render(<SessionStatusBanner sessionState={port} />);
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 2");
-    expect(screen.getByTestId("connection")).toHaveTextContent("connected");
+    expect(screen.getByTestId("connection")).toHaveTextContent("Connected");
   });
 
   it("waits visibly until the first state arrives", () => {
     banner.mockReturnValue({
-      connectionState: ConnectionState.Connecting,
-      phase: null,
+      connectionText: "Connecting",
+      phaseText: "Waiting for the workshop\u2026",
     });
 
     render(<SessionStatusBanner sessionState={port} />);

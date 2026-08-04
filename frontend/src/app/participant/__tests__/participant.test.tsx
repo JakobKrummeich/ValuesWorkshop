@@ -5,6 +5,7 @@ import { Phase } from "../../../domain/phases";
 import type { ParticipantWorkshopState } from "../../../domain/workshopState";
 import { currentSessionIdentity } from "../../../adapters/browserLocation";
 import { createParticipantSession } from "../../../adapters/workshopSessions";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import ParticipantLayout from "../layout";
 import ParticipantHome from "../page";
 
@@ -55,6 +56,7 @@ async function renderScreen() {
       <ParticipantLayout>
         <ParticipantHome />
       </ParticipantLayout>,
+      { wrapper: languageWrapper() },
     );
   });
 }
@@ -72,7 +74,7 @@ describe("participant screen group", () => {
 
     expect(createSession).toHaveBeenCalledWith("session-7");
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 2");
-    expect(screen.getByTestId("connection")).toHaveTextContent("connected");
+    expect(screen.getByTestId("connection")).toHaveTextContent("Connected");
   });
 
   it("explains a link that carries no session", async () => {

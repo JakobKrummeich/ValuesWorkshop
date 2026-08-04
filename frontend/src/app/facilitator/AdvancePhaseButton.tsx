@@ -1,11 +1,14 @@
 "use client";
 
+import { MessageKey } from "../../domain/i18n/messages";
+import { useTranslation } from "../i18n/useTranslation";
 import styles from "./AdvancePhaseButton.module.css";
 import { useAdvancePhaseButton } from "./useAdvancePhaseButton";
 
 export function AdvancePhaseButton() {
-  const { isAdvancing, rejectionDetail, advancePhase } =
+  const { isAdvancing, rejectionMessage, advancePhase } =
     useAdvancePhaseButton();
+  const { translate } = useTranslation();
 
   return (
     <div className={styles.container}>
@@ -15,10 +18,10 @@ export function AdvancePhaseButton() {
         disabled={isAdvancing}
         onClick={advancePhase}
       >
-        Advance phase
+        {translate(MessageKey.AdvancePhase)}
       </button>
-      {rejectionDetail !== null && (
-        <p className={styles.rejection}>{rejectionDetail}</p>
+      {rejectionMessage !== null && (
+        <p className={styles.rejection}>{translate(rejectionMessage)}</p>
       )}
     </div>
   );

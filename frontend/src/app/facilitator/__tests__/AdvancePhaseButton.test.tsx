@@ -1,4 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MessageKey } from "../../../domain/i18n/messages";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import { AdvancePhaseButton } from "../AdvancePhaseButton";
 import { useAdvancePhaseButton } from "../useAdvancePhaseButton";
 
@@ -15,10 +17,10 @@ describe("advance phase button", () => {
     const advancePhase = jest.fn();
     button.mockReturnValue({
       isAdvancing: false,
-      rejectionDetail: null,
+      rejectionMessage: null,
       advancePhase,
     });
-    render(<AdvancePhaseButton />);
+    render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
 
     fireEvent.click(screen.getByRole("button", { name: "Advance phase" }));
 
@@ -28,26 +30,26 @@ describe("advance phase button", () => {
   it("is disabled while an intent is in flight", () => {
     button.mockReturnValue({
       isAdvancing: true,
-      rejectionDetail: null,
+      rejectionMessage: null,
       advancePhase: jest.fn(),
     });
 
-    render(<AdvancePhaseButton />);
+    render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
 
     expect(
       screen.getByRole("button", { name: "Advance phase" }),
     ).toBeDisabled();
   });
 
-  it("shows the rejection detail", () => {
+  it("shows the rejection message", () => {
     button.mockReturnValue({
       isAdvancing: false,
-      rejectionDetail: "the workshop is already in its last phase",
+      rejectionMessage: MessageKey.IntentWrongPhase,
       advancePhase: jest.fn(),
     });
 
-    render(<AdvancePhaseButton />);
+    render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
 
-    screen.getByText("the workshop is already in its last phase");
+    screen.getByText("That is not possible in this phase.");
   });
 });

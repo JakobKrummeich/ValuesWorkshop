@@ -3,13 +3,16 @@
 import { useEffect, useState } from "react";
 import { Subscription } from "rxjs";
 import { ConnectionState } from "../domain/connectionState";
+import { connectionStateMessage } from "../domain/i18n/connectionStateMessage";
+import { MessageKey } from "../domain/i18n/messages";
 import type { SessionStatePort } from "../domain/ports/sessionStatePort";
 import type { Phase } from "../domain/phases";
 import type { PhasedWorkshopState } from "../domain/workshopState";
+import { useTranslation } from "./i18n/useTranslation";
 
 export interface SessionStatusBannerResult {
-  connectionState: ConnectionState;
-  phase: Phase | null;
+  connectionText: string;
+  phaseText: string;
 }
 
 export function useSessionStatusBanner(
@@ -19,6 +22,7 @@ export function useSessionStatusBanner(
     ConnectionState.Connecting,
   );
   const [phase, setPhase] = useState<Phase | null>(null);
+  const { translate } = useTranslation();
 
   useEffect(() => {
     const subscriptions = new Subscription();
@@ -34,5 +38,11 @@ export function useSessionStatusBanner(
     };
   }, [sessionState]);
 
-  return { connectionState, phase };
+  return {
+    connectionText: translate(connectionStateMessage(connectionState)),
+    phaseText:
+      phase === null
+        ? translate(MessageKey.SessionWaiting)
+        : translate(MessageKey.SessionPhase, { phase }),
+  };
 }

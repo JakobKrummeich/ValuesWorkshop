@@ -8,6 +8,7 @@ import {
   sessionCreationRejected,
   type SessionCreationOutcome,
 } from "../../../domain/sessionCreation";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import { useOpenSessionForm } from "../useOpenSessionForm";
 
 const mockNavigateTo = jest.fn();
@@ -41,7 +42,9 @@ function submitEvent(): FormEvent<HTMLFormElement> & {
 }
 
 function renderForm() {
-  const form = renderHook(() => useOpenSessionForm(sessionCreation));
+  const form = renderHook(() => useOpenSessionForm(sessionCreation), {
+    wrapper: languageWrapper(),
+  });
 
   const fill = (sessionName: string, passphrase: string) => {
     act(() => {

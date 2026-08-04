@@ -4,24 +4,25 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { Subscription } from "rxjs";
 import { navigateTo, sessionUrl } from "../../adapters/browserLocation";
+import { MessageKey } from "../../domain/i18n/messages";
 import type { FacilitatorSessionCreationPort } from "../../domain/ports/facilitator/sessionCreationPort";
 import {
   maximumSessionNameLength,
   SessionCreationFailure,
   type SessionCreationOutcome,
 } from "../../domain/sessionCreation";
+import { useTranslation } from "../i18n/useTranslation";
 
 const FACILITATOR_PATH = "/facilitator";
-const BLANK_SESSION_NAME_MESSAGE = "Enter a session name.";
 
-const messageByFailure: Record<SessionCreationFailure, string> = {
+const messageByFailure: Readonly<Record<SessionCreationFailure, MessageKey>> = {
   [SessionCreationFailure.NotAuthenticated]:
-    "Your sign-in has expired. Sign in again to open a session.",
+    MessageKey.OpenSessionSignInExpired,
   [SessionCreationFailure.PassphraseRejected]:
-    "That facilitator passphrase was not accepted.",
-  [SessionCreationFailure.SessionNameRejected]: `That session name was not accepted. Use up to ${maximumSessionNameLength} characters.`,
-  [SessionCreationFailure.Unexpected]:
-    "The session could not be opened. Please try again.",
+    MessageKey.OpenSessionPassphraseRejected,
+  [SessionCreationFailure.SessionNameRejected]:
+    MessageKey.OpenSessionNameRejected,
+  [SessionCreationFailure.Unexpected]: MessageKey.OpenSessionUnexpected,
 };
 
 export interface OpenSessionFormResult {
@@ -42,6 +43,15 @@ export function useOpenSessionForm(
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const inFlightCreation = useRef<Subscription | null>(null);
+  const { translate } = useTranslation();
+
+  const failureMessage = useCallback(
+    (failure: SessionCreationFailure) =>
+      translate(messageByFailure[failure], {
+        limit: maximumSessionNameLength,
+      }),
+    [translate],
+  );
 
   useEffect(
     () => () => {
@@ -67,7 +77,7 @@ export function useOpenSessionForm(
 
       const requestedName = sessionName.trim();
       if (requestedName === "") {
-        setErrorMessage(BLANK_SESSION_NAME_MESSAGE);
+        setErrorMessage(translate(MessageKey.OpenSessionNameRequired));
         return;
       }
 
@@ -82,7 +92,7 @@ export function useOpenSessionForm(
             setPassphrase("");
 
             if (!outcome.isCreated) {
-              setErrorMessage(messageByFailure[outcome.failure]);
+              setErrorMessage(failureMessage(outcome.failure));
               setSubmitting(false);
               return;
             }
@@ -90,15 +100,13 @@ export function useOpenSessionForm(
             navigateTo(sessionUrl(FACILITATOR_PATH, outcome.sessionIdentity));
           },
           error() {
-            setErrorMessage(
-              messageByFailure[SessionCreationFailure.Unexpected],
-            );
+            setErrorMessage(failureMessage(SessionCreationFailure.Unexpected));
             setPassphrase("");
             setSubmitting(false);
           },
         });
     },
-    [sessionCreation, sessionName, passphrase],
+    [sessionCreation, sessionName, passphrase, translate, failureMessage],
   );
 
   return {

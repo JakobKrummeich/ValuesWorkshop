@@ -10,15 +10,13 @@ export function SessionStatusBanner({
 }: {
   sessionState: SessionStatePort<PhasedWorkshopState>;
 }) {
-  const { connectionState, phase } = useSessionStatusBanner(sessionState);
+  const { connectionText, phaseText } = useSessionStatusBanner(sessionState);
 
   return (
     <p className={styles.banner}>
-      <span data-testid="phase">
-        {phase === null ? "Waiting for the workshop\u2026" : `Phase ${phase}`}
-      </span>
+      <span data-testid="phase">{phaseText}</span>
       <span className={styles.connection} data-testid="connection">
-        {connectionState}
+        {connectionText}
       </span>
     </p>
   );
