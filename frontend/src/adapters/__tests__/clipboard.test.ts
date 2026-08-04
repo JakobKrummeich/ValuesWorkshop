@@ -1,3 +1,5 @@
+import { lastValueFrom } from "rxjs";
+
 import { copyToClipboard } from "../clipboard";
 
 const writeText = jest.fn();
@@ -22,28 +24,18 @@ describe("clipboard", () => {
   });
 
   it("completes once the text is on the clipboard", async () => {
-    const completed = jest.fn();
-
-    await new Promise<void>((resolve) => {
-      copyToClipboard("https://example.test/participant").subscribe({
-        complete() {
-          completed();
-          resolve();
-        },
-      });
+    await lastValueFrom(copyToClipboard("https://example.test/participant"), {
+      defaultValue: undefined,
     });
 
     expect(writeText).toHaveBeenCalledWith("https://example.test/participant");
-    expect(completed).toHaveBeenCalled();
   });
 
   it("reports a clipboard the browser refused", async () => {
     writeText.mockRejectedValue(new Error("denied"));
 
-    const failure = await new Promise<Error>((resolve) => {
-      copyToClipboard("anything").subscribe({ error: resolve });
-    });
-
-    expect(failure.message).toBe("denied");
+    await expect(
+      lastValueFrom(copyToClipboard("anything"), { defaultValue: undefined }),
+    ).rejects.toThrow("denied");
   });
 });

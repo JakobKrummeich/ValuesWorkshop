@@ -9,8 +9,8 @@ import { usePresenterJoinScreen } from "./usePresenterJoinScreen";
 
 export function PresenterJoinScreen({ state }: { state: PresenterJoinState }) {
   const { translate } = useTranslation();
-  const { joinUrl, displayNames, participantCount } =
-    usePresenterJoinScreen(state);
+  const { joinUrl } = usePresenterJoinScreen();
+  const displayNames = state.participantDisplayNames;
 
   return (
     <section className={styles.join}>
@@ -29,7 +29,7 @@ export function PresenterJoinScreen({ state }: { state: PresenterJoinState }) {
       <div className={styles.lobby}>
         <p className={styles.count} data-testid="participant-count">
           {translate(MessageKey.JoinParticipantCount, {
-            count: participantCount,
+            count: state.participantCount,
           })}
         </p>
         {displayNames.length === 0 ? (

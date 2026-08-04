@@ -15,12 +15,18 @@ const joinScreen = usePresenterJoinScreen as jest.MockedFunction<
 
 const JOIN_URL = "https://workshop.test/participant?sessionIdentity=abc-123";
 
-const state: PresenterJoinState = {
-  revision: 2,
-  phase: Phase.Join,
-  participantCount: 0,
-  participantDisplayNames: [],
-};
+function lobby(displayNames: string[]): PresenterJoinState {
+  return {
+    revision: 2,
+    phase: Phase.Join,
+    participantCount: displayNames.length,
+    participantDisplayNames: displayNames,
+  };
+}
+
+beforeEach(() => {
+  joinScreen.mockReturnValue({ joinUrl: JOIN_URL });
+});
 
 afterEach(() => {
   jest.clearAllMocks();
@@ -28,13 +34,7 @@ afterEach(() => {
 
 describe("presenter join screen", () => {
   it("shows a QR code of the participant join url and no readable url", () => {
-    joinScreen.mockReturnValue({
-      joinUrl: JOIN_URL,
-      displayNames: [],
-      participantCount: 0,
-    });
-
-    render(<PresenterJoinScreen state={state} />, {
+    render(<PresenterJoinScreen state={lobby([])} />, {
       wrapper: languageWrapper(),
     });
 
@@ -43,15 +43,10 @@ describe("presenter join screen", () => {
   });
 
   it("lists everyone who has joined so far", () => {
-    joinScreen.mockReturnValue({
-      joinUrl: JOIN_URL,
-      displayNames: ["Ada Lovelace", "Alan Turing"],
-      participantCount: 2,
-    });
-
-    render(<PresenterJoinScreen state={state} />, {
-      wrapper: languageWrapper(),
-    });
+    render(
+      <PresenterJoinScreen state={lobby(["Ada Lovelace", "Alan Turing"])} />,
+      { wrapper: languageWrapper() },
+    );
 
     const names = screen.getByTestId("joined-names");
     expect(names).toHaveTextContent("Ada Lovelace");
@@ -62,13 +57,7 @@ describe("presenter join screen", () => {
   });
 
   it("says so while nobody has joined", () => {
-    joinScreen.mockReturnValue({
-      joinUrl: JOIN_URL,
-      displayNames: [],
-      participantCount: 0,
-    });
-
-    render(<PresenterJoinScreen state={state} />, {
+    render(<PresenterJoinScreen state={lobby([])} />, {
       wrapper: languageWrapper(),
     });
 
@@ -77,13 +66,9 @@ describe("presenter join screen", () => {
   });
 
   it("shows no QR code while the link carries no session", () => {
-    joinScreen.mockReturnValue({
-      joinUrl: null,
-      displayNames: [],
-      participantCount: 0,
-    });
+    joinScreen.mockReturnValue({ joinUrl: null });
 
-    render(<PresenterJoinScreen state={state} />, {
+    render(<PresenterJoinScreen state={lobby([])} />, {
       wrapper: languageWrapper(),
     });
 

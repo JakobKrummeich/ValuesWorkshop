@@ -8,6 +8,10 @@ const PARTICIPANT_ACCOUNT = "participant1";
 const PARTICIPANT_DISPLAY_NAME = "Alice";
 const SESSION_NAME = "Playwright join session";
 
+function participantJoinUrl(sessionIdentity: string): string {
+  return `http://localhost:3000/participant?sessionIdentity=${sessionIdentity}`;
+}
+
 test.describe.serial("phase 1 join", () => {
   let facilitatorContext: BrowserContext;
   let participantContext: BrowserContext;
@@ -57,9 +61,7 @@ test.describe.serial("phase 1 join", () => {
       presenterPage.getByRole("img", { name: "Scan to join" }),
     );
 
-    expect(scanned).toBe(
-      `http://localhost:3000/participant?sessionIdentity=${sessionIdentity}`,
-    );
+    expect(scanned).toBe(participantJoinUrl(sessionIdentity));
 
     await participantPage.goto(scanned);
     await signInThroughOidcProvider(participantPage, PARTICIPANT_ACCOUNT);
@@ -114,8 +116,6 @@ test.describe.serial("phase 1 join", () => {
     await expect(facilitatorPage.getByText("Link copied")).toBeVisible();
     expect(
       await facilitatorPage.evaluate(() => navigator.clipboard.readText()),
-    ).toBe(
-      `http://localhost:3000/participant?sessionIdentity=${sessionIdentity}`,
-    );
+    ).toBe(participantJoinUrl(sessionIdentity));
   });
 });
