@@ -39,6 +39,12 @@ export enum MessageKey {
   JoinYouAreIn = "join.youAreIn",
   JoinWaitingForStart = "join.waitingForStart",
   JoinParticipantCount = "join.participantCount",
+  JoinScanToJoin = "join.scanToJoin",
+  JoinAlreadyHere = "join.alreadyHere",
+  JoinNobodyYet = "join.nobodyYet",
+  JoinCopyUrl = "join.copyUrl",
+  JoinUrlCopied = "join.urlCopied",
+  JoinUrlCopyFailed = "join.urlCopyFailed",
   FacilitatorHeading = "facilitator.heading",
   ParticipantHeading = "participant.heading",
   PresenterHeading = "presenter.heading",
@@ -209,6 +215,30 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
   [MessageKey.JoinParticipantCount]: {
     [Language.German]: "Teilnehmende: {count}",
     [Language.English]: "Participants: {count}",
+  },
+  [MessageKey.JoinScanToJoin]: {
+    [Language.German]: "Zum Mitmachen scannen",
+    [Language.English]: "Scan to join",
+  },
+  [MessageKey.JoinAlreadyHere]: {
+    [Language.German]: "Schon dabei",
+    [Language.English]: "Already here",
+  },
+  [MessageKey.JoinNobodyYet]: {
+    [Language.German]: "Noch niemand dabei",
+    [Language.English]: "Nobody has joined yet",
+  },
+  [MessageKey.JoinCopyUrl]: {
+    [Language.German]: "Beitrittslink kopieren",
+    [Language.English]: "Copy join link",
+  },
+  [MessageKey.JoinUrlCopied]: {
+    [Language.German]: "Link kopiert",
+    [Language.English]: "Link copied",
+  },
+  [MessageKey.JoinUrlCopyFailed]: {
+    [Language.German]: "Der Link konnte nicht kopiert werden.",
+    [Language.English]: "The link could not be copied.",
   },
   [MessageKey.FacilitatorHeading]: {
     [Language.German]: "Moderation",

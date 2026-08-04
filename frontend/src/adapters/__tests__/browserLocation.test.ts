@@ -1,6 +1,7 @@
 import {
   currentReturnUrl,
   currentSessionIdentity,
+  participantJoinUrl,
   sessionUrl,
 } from "../browserLocation";
 
@@ -37,5 +38,21 @@ describe("return url after login", () => {
     window.history.replaceState({}, "", "/facilitator?sessionIdentity=abc-123");
 
     expect(currentReturnUrl()).toBe("/facilitator?sessionIdentity=abc-123");
+  });
+});
+
+describe("join url for participants", () => {
+  it("points at the participant screen of the current session", () => {
+    window.history.replaceState({}, "", "/presenter?sessionIdentity=abc-123");
+
+    expect(participantJoinUrl()).toBe(
+      `${window.location.origin}/participant?sessionIdentity=abc-123`,
+    );
+  });
+
+  it("has no join url when the link carries no session", () => {
+    window.history.replaceState({}, "", "/presenter");
+
+    expect(participantJoinUrl()).toBeNull();
   });
 });

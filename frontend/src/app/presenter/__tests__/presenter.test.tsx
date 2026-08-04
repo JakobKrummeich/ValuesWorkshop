@@ -10,6 +10,7 @@ import PresenterLayout from "../layout";
 import PresenterHome from "../page";
 
 jest.mock("../../../adapters/browserLocation", () => ({
+  ...jest.requireActual("../../../adapters/browserLocation"),
   currentSessionIdentity: jest.fn(),
 }));
 jest.mock("../../../adapters/workshopSessions", () => ({
@@ -56,10 +57,15 @@ describe("presenter screen group", () => {
       workshopState.next({
         revision: 2,
         phase: Phase.Join,
-      } as PresenterWorkshopState);
+        participantCount: 1,
+        participantDisplayNames: ["Ada Lovelace"],
+      });
     });
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 1");
     expect(screen.getByTestId("connection")).toHaveTextContent("Reconnecting");
+    expect(screen.getByTestId("joined-names")).toHaveTextContent(
+      "Ada Lovelace",
+    );
   });
 });

@@ -1,0 +1,61 @@
+.join {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  align-items: flex-start;
+}
+
+.invitation {
+  display: flex;
+  gap: var(--space-gap);
+  align-items: center;
+}
+
+.copyButton {
+  min-height: var(--control-height);
+  padding: var(--space-tight) var(--space-gutter);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+}
+
+.copyButton:disabled {
+  color: var(--color-text-muted);
+}
+
+.copyOutcome {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+
+.rosterHeading {
+  color: var(--color-text);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+}
+
+.count {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+}
+
+.empty {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
+  padding: 0;
+  list-style: none;
+}
+
+.name {
+  color: var(--color-text);
+  font-size: var(--text-body);
+}
