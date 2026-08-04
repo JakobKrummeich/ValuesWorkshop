@@ -1,8 +1,10 @@
 import { act, renderHook } from "@testing-library/react";
 import { NEVER, Subject, throwError } from "rxjs";
 import type { ChangeEvent, FormEvent } from "react";
+import { MessageKey } from "../../../domain/i18n/messages";
 import type { FacilitatorSessionCreationPort } from "../../../domain/ports/facilitator/sessionCreationPort";
 import {
+  maximumSessionNameLength,
   SessionCreationFailure,
   sessionCreated,
   sessionCreationRejected,
@@ -96,7 +98,7 @@ describe("useOpenSessionForm", () => {
 
     expect(result.current.sessionName).toBe("");
     expect(result.current.passphrase).toBe("");
-    expect(result.current.errorMessage).toBeNull();
+    expect(result.current.error).toBeNull();
     expect(result.current.isSubmitting).toBe(false);
   });
 
@@ -116,7 +118,9 @@ describe("useOpenSessionForm", () => {
     form.submit();
 
     expect(openSession).not.toHaveBeenCalled();
-    expect(form.result.current.errorMessage).toBe("Enter a session name.");
+    expect(form.result.current.error).toEqual({
+      key: MessageKey.OpenSessionNameRequired,
+    });
     expect(form.result.current.isSubmitting).toBe(false);
   });
 
@@ -148,7 +152,7 @@ describe("useOpenSessionForm", () => {
     const { result } = filledAndSubmitted();
 
     expect(result.current.isSubmitting).toBe(true);
-    expect(result.current.errorMessage).toBeNull();
+    expect(result.current.error).toBeNull();
   });
 
   it("navigates to the created session", () => {
@@ -163,7 +167,7 @@ describe("useOpenSessionForm", () => {
     const { result } = answerWith(sessionCreated(SESSION_IDENTITY));
 
     expect(result.current.isSubmitting).toBe(true);
-    expect(result.current.errorMessage).toBeNull();
+    expect(result.current.error).toBeNull();
   });
 
   it("reports a refused passphrase without revealing anything else", () => {
@@ -171,9 +175,10 @@ describe("useOpenSessionForm", () => {
       sessionCreationRejected(SessionCreationFailure.PassphraseRejected),
     );
 
-    expect(result.current.errorMessage).toBe(
-      "That facilitator passphrase was not accepted.",
-    );
+    expect(result.current.error).toEqual({
+      key: MessageKey.OpenSessionPassphraseRejected,
+      params: { limit: maximumSessionNameLength },
+    });
     expect(mockNavigateTo).not.toHaveBeenCalled();
     expect(result.current.isSubmitting).toBe(false);
   });
@@ -183,9 +188,10 @@ describe("useOpenSessionForm", () => {
       sessionCreationRejected(SessionCreationFailure.SessionNameRejected),
     );
 
-    expect(result.current.errorMessage).toBe(
-      "That session name was not accepted. Use up to 120 characters.",
-    );
+    expect(result.current.error).toEqual({
+      key: MessageKey.OpenSessionNameRejected,
+      params: { limit: maximumSessionNameLength },
+    });
   });
 
   it("asks the facilitator to sign in again when the token is gone", () => {
@@ -193,9 +199,10 @@ describe("useOpenSessionForm", () => {
       sessionCreationRejected(SessionCreationFailure.NotAuthenticated),
     );
 
-    expect(result.current.errorMessage).toBe(
-      "Your sign-in has expired. Sign in again to open a session.",
-    );
+    expect(result.current.error).toEqual({
+      key: MessageKey.OpenSessionSignInExpired,
+      params: { limit: maximumSessionNameLength },
+    });
     expect(mockNavigateTo).not.toHaveBeenCalled();
   });
 
@@ -204,9 +211,10 @@ describe("useOpenSessionForm", () => {
       sessionCreationRejected(SessionCreationFailure.Unexpected),
     );
 
-    expect(result.current.errorMessage).toBe(
-      "The session could not be opened. Please try again.",
-    );
+    expect(result.current.error).toEqual({
+      key: MessageKey.OpenSessionUnexpected,
+      params: { limit: maximumSessionNameLength },
+    });
   });
 
   it("reports a request that fails outright", () => {
@@ -214,9 +222,9 @@ describe("useOpenSessionForm", () => {
 
     const { result } = filledAndSubmitted();
 
-    expect(result.current.errorMessage).toBe(
-      "The session could not be opened. Please try again.",
-    );
+    expect(result.current.error).toEqual({
+      key: MessageKey.OpenSessionUnexpected,
+    });
     expect(result.current.isSubmitting).toBe(false);
   });
 
@@ -252,7 +260,7 @@ describe("useOpenSessionForm", () => {
     form.fill("Herbst 2024", "second try");
     form.submit();
 
-    expect(form.result.current.errorMessage).toBeNull();
+    expect(form.result.current.error).toBeNull();
   });
 
   it("abandons an in-flight request when the form goes away", () => {

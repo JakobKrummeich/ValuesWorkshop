@@ -5,13 +5,13 @@ import type { ChangeEvent, FormEvent } from "react";
 import type { Subscription } from "rxjs";
 import { navigateTo, sessionUrl } from "../../adapters/browserLocation";
 import { MessageKey } from "../../domain/i18n/messages";
+import type { MessageParameters } from "../../domain/i18n/translate";
 import type { FacilitatorSessionCreationPort } from "../../domain/ports/facilitator/sessionCreationPort";
 import {
   maximumSessionNameLength,
   SessionCreationFailure,
   type SessionCreationOutcome,
 } from "../../domain/sessionCreation";
-import { useTranslation } from "../i18n/useTranslation";
 
 const FACILITATOR_PATH = "/facilitator";
 
@@ -25,10 +25,15 @@ const messageByFailure: Readonly<Record<SessionCreationFailure, MessageKey>> = {
   [SessionCreationFailure.Unexpected]: MessageKey.OpenSessionUnexpected,
 };
 
+export interface FormError {
+  key: MessageKey;
+  params?: MessageParameters;
+}
+
 export interface OpenSessionFormResult {
   sessionName: string;
   passphrase: string;
-  errorMessage: string | null;
+  error: FormError | null;
   isSubmitting: boolean;
   changeSessionName: (event: ChangeEvent<HTMLInputElement>) => void;
   changePassphrase: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -40,18 +45,9 @@ export function useOpenSessionForm(
 ): OpenSessionFormResult {
   const [sessionName, setSessionName] = useState("");
   const [passphrase, setPassphrase] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<FormError | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const inFlightCreation = useRef<Subscription | null>(null);
-  const { translate } = useTranslation();
-
-  const failureMessage = useCallback(
-    (failure: SessionCreationFailure) =>
-      translate(messageByFailure[failure], {
-        limit: maximumSessionNameLength,
-      }),
-    [translate],
-  );
 
   useEffect(
     () => () => {
@@ -77,11 +73,11 @@ export function useOpenSessionForm(
 
       const requestedName = sessionName.trim();
       if (requestedName === "") {
-        setErrorMessage(translate(MessageKey.OpenSessionNameRequired));
+        setError({ key: MessageKey.OpenSessionNameRequired });
         return;
       }
 
-      setErrorMessage(null);
+      setError(null);
       setSubmitting(true);
       inFlightCreation.current?.unsubscribe();
 
@@ -92,7 +88,10 @@ export function useOpenSessionForm(
             setPassphrase("");
 
             if (!outcome.isCreated) {
-              setErrorMessage(failureMessage(outcome.failure));
+              setError({
+                key: messageByFailure[outcome.failure],
+                params: { limit: maximumSessionNameLength },
+              });
               setSubmitting(false);
               return;
             }
@@ -100,19 +99,21 @@ export function useOpenSessionForm(
             navigateTo(sessionUrl(FACILITATOR_PATH, outcome.sessionIdentity));
           },
           error() {
-            setErrorMessage(failureMessage(SessionCreationFailure.Unexpected));
+            setError({
+              key: messageByFailure[SessionCreationFailure.Unexpected],
+            });
             setPassphrase("");
             setSubmitting(false);
           },
         });
     },
-    [sessionCreation, sessionName, passphrase, translate, failureMessage],
+    [sessionCreation, sessionName, passphrase],
   );
 
   return {
     sessionName,
     passphrase,
-    errorMessage,
+    error,
     isSubmitting,
     changeSessionName,
     changePassphrase,

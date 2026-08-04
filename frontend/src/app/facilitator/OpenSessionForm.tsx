@@ -16,7 +16,7 @@ export function OpenSessionForm({
   const {
     sessionName,
     passphrase,
-    errorMessage,
+    error,
     isSubmitting,
     changeSessionName,
     changePassphrase,
@@ -61,9 +61,9 @@ export function OpenSessionForm({
               onChange={changePassphrase}
             />
           </div>
-          {errorMessage !== null && (
+          {error !== null && (
             <p className={styles.error} role="alert">
-              {errorMessage}
+              {translate(error.key, error.params)}
             </p>
           )}
           <div className={styles.actions}>

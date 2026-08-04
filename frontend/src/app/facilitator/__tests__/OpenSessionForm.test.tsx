@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MessageKey } from "../../../domain/i18n/messages";
 import type { FacilitatorSessionCreationPort } from "../../../domain/ports/facilitator/sessionCreationPort";
 import { maximumSessionNameLength } from "../../../domain/sessionCreation";
 import { languageWrapper } from "../../../testing/languageWrapper";
@@ -22,7 +23,7 @@ function formShowing(state: Partial<OpenSessionFormResult>) {
   const result: OpenSessionFormResult = {
     sessionName: "",
     passphrase: "",
-    errorMessage: null,
+    error: null,
     isSubmitting: false,
     changeSessionName: jest.fn(),
     changePassphrase: jest.fn(),
@@ -131,7 +132,7 @@ describe("open session form", () => {
 
   it("announces the error the hook reports", () => {
     formShowing({
-      errorMessage: "That facilitator passphrase was not accepted.",
+      error: { key: MessageKey.OpenSessionPassphraseRejected },
     });
 
     render(<OpenSessionForm sessionCreation={sessionCreation} />, {
@@ -140,6 +141,23 @@ describe("open session form", () => {
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "That facilitator passphrase was not accepted.",
+    );
+  });
+
+  it("translates error params at render time", () => {
+    formShowing({
+      error: {
+        key: MessageKey.OpenSessionNameRejected,
+        params: { limit: maximumSessionNameLength },
+      },
+    });
+
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      `That session name was not accepted. Use up to ${maximumSessionNameLength} characters.`,
     );
   });
 });
