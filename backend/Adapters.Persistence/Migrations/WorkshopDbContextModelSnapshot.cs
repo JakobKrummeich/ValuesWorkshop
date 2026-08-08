@@ -116,6 +116,15 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("id");
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("display_name");
+
+                    b.Property<int>("JoinOrder")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("join_order");
+
                     b.Property<string>("SessionIdentity")
                         .IsRequired()
                         .HasColumnType("TEXT")

@@ -4,6 +4,23 @@ namespace ValuesWorkshop.Application.State;
 
 internal static class SessionViews
 {
+    internal static RosterView Roster(Session session)
+    {
+        var participants = session
+            .Roster.Participants.Select(participant => new RosterParticipantView(
+                participant.Id.Value,
+                participant.Name.Value
+            ))
+            .ToList();
+
+        return new RosterView(participants, participants.Count);
+    }
+
+    internal static IReadOnlyList<string> ParticipantDisplayNames(Session session)
+    {
+        return session.Roster.Participants.Select(participant => participant.Name.Value).ToList();
+    }
+
     internal static QuizView Quiz(Session session)
     {
         return new QuizView(session.Quiz.CurrentQuestionIndex, SubStateOf(session.Quiz));

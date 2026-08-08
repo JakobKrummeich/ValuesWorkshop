@@ -130,6 +130,13 @@ is two unrelated participants, one per session (`design/persistence.md`:
 `participants.id` is globally unique, and a participant belongs to exactly one
 session).
 
+The display name comes from the token's `name` claim, read at connect time and
+never from a payload — nobody can name themselves something they are not.
+Azure AD puts `name` on the access token of a user; the dev provider does the
+same through `extraTokenClaims`. A missing or blank claim falls back to a
+deterministic `#`-prefixed label derived from the `participantId`, so a token
+without a profile still joins.
+
 On the participant hub, `OnConnectedAsync` runs the join intent through the
 pipeline and then pushes the current state to the caller directly — the same
 pattern the facilitator and presenter hubs use. For a newcomer (T4) the join
@@ -321,7 +328,7 @@ the facilitator, `participantCount` for participant and presenter.
 
 | Phase | Participant blocks | Facilitator blocks | Presenter blocks |
 |---|---|---|---|
-| 1 Join | — | — | — |
+| 1 Join | `ownDisplayName` | — | `participantDisplayNames` |
 | 2 Quiz | `quiz` | `quiz` | `quiz` |
 | 3 ValueSelection | `selection` | `selection` | `selection` |
 | 4 SelectionResults | `selection` | `selection` | `selection` |
@@ -351,7 +358,8 @@ variant carries it.
 
 Deliberately absent: any other participant's answer, selection, or votes;
 any tally during an open voting round; any participant identifier other than
-group member display names.
+group member display names and the caller's own `ownDisplayName`, which the
+join lobby shows back to the person who just signed in.
 
 ### 5.3 `FacilitatorWorkshopState`
 
@@ -369,7 +377,9 @@ group member display names.
 present on every variant, because every phase offers controls.
 
 `participantId` appears only for scribe reassignment (T13) and roster
-display. It is never paired with an answer, a selection, or a vote.
+display. It is never paired with an answer, a selection, or a vote. The
+roster's `displayName` is the same: it identifies who is in the room, never
+what they answered, selected, or voted for.
 
 ### 5.4 `PresenterWorkshopState`
 
@@ -382,9 +392,13 @@ display. It is never paired with an answer, a selection, or a vote.
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
 
-Deliberately absent: every participant identifier, every per-person fact, and
-all vote tallies before the winners are revealed. Groups are counted, not
-named by member.
+`participantDisplayNames` is the join lobby only (phase 1): the projection
+shows who has arrived while the room fills. It carries names without
+identifiers, and no later variant carries either.
+
+Deliberately absent: every participant identifier, every per-person fact
+beyond the phase 1 lobby names, and all vote tallies before the winners are
+revealed. Groups are counted, not named by member.
 
 ### 5.5 Anonymity argument
 
@@ -400,10 +414,12 @@ named by member.
    presenter connection cannot be sent a participant's own block even by
    mistake — it is not part of the type it receives.
 4. Tests: each mapper is asserted against the full domain state, and a
-   reflection test walks every variant of each union and asserts that
-   neither `ParticipantWorkshopState` nor `PresenterWorkshopState` carries a
-   participant identifier at all, and that `FacilitatorWorkshopState` carries
-   one only in the roster and in group membership.
+   reflection test walks every variant of each union and asserts, per
+   variant, exactly where a person can be identified: `ownDisplayName` on
+   `ParticipantJoinState`, `participantDisplayNames` on
+   `PresenterJoinState`, the roster on every facilitator variant, and group
+   membership on the facilitator variants that carry groups. A name or an
+   identifier appearing on any other variant fails that test.
 
 ---
 

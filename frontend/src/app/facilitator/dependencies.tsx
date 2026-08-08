@@ -5,7 +5,7 @@ import type { FacilitatorLifecyclePort } from "../../domain/ports/facilitator/li
 import type { FacilitatorSessionStatePort } from "../../domain/ports/facilitator/sessionStatePort";
 
 export interface FacilitatorDependencies {
-  sessionState: FacilitatorSessionStatePort;
+  sessionStatePort: FacilitatorSessionStatePort;
   lifecycle: FacilitatorLifecyclePort;
 }
 

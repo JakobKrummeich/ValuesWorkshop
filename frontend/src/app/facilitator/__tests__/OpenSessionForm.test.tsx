@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MessageKey } from "../../../domain/i18n/messages";
 import type { FacilitatorSessionCreationPort } from "../../../domain/ports/facilitator/sessionCreationPort";
 import { maximumSessionNameLength } from "../../../domain/sessionCreation";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import { OpenSessionForm } from "../OpenSessionForm";
 import {
   useOpenSessionForm,
@@ -21,7 +23,7 @@ function formShowing(state: Partial<OpenSessionFormResult>) {
   const result: OpenSessionFormResult = {
     sessionName: "",
     passphrase: "",
-    errorMessage: null,
+    error: null,
     isSubmitting: false,
     changeSessionName: jest.fn(),
     changePassphrase: jest.fn(),
@@ -45,7 +47,9 @@ describe("open session form", () => {
   it("shows what the hook holds", () => {
     formShowing({ sessionName: "Herbst 2024", passphrase: "secret" });
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
 
     screen.getByRole("heading", { name: "ValuesWorkshop · Open a session" });
     expect(sessionNameInput()).toHaveValue("Herbst 2024");
@@ -55,7 +59,9 @@ describe("open session form", () => {
   it("masks the passphrase", () => {
     formShowing({});
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
 
     expect(passphraseInput()).toHaveAttribute("type", "password");
   });
@@ -63,7 +69,9 @@ describe("open session form", () => {
   it("keeps the passphrase out of any native form submission", () => {
     formShowing({});
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
 
     expect(passphraseInput()).not.toHaveAttribute("name");
     expect(sessionNameInput()).not.toHaveAttribute("name");
@@ -72,7 +80,9 @@ describe("open session form", () => {
   it("caps the session name at the length the backend accepts", () => {
     formShowing({});
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
 
     expect(sessionNameInput()).toHaveAttribute(
       "maxlength",
@@ -83,7 +93,9 @@ describe("open session form", () => {
   it("reports typing back to the hook", () => {
     const { changeSessionName, changePassphrase } = formShowing({});
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
     fireEvent.change(sessionNameInput(), { target: { value: "Herbst" } });
     fireEvent.change(passphraseInput(), { target: { value: "secret" } });
 
@@ -96,6 +108,7 @@ describe("open session form", () => {
 
     const { container } = render(
       <OpenSessionForm sessionCreation={sessionCreation} />,
+      { wrapper: languageWrapper() },
     );
     fireEvent.submit(container.querySelector("form") as HTMLFormElement);
 
@@ -108,7 +121,9 @@ describe("open session form", () => {
   it("locks the form while the session is being opened", () => {
     formShowing({ isSubmitting: true });
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
 
     expect(screen.getByRole("button", { name: "Opening…" })).toBeDisabled();
     expect(sessionNameInput()).toBeDisabled();
@@ -117,13 +132,32 @@ describe("open session form", () => {
 
   it("announces the error the hook reports", () => {
     formShowing({
-      errorMessage: "That facilitator passphrase was not accepted.",
+      error: { key: MessageKey.OpenSessionPassphraseRejected },
     });
 
-    render(<OpenSessionForm sessionCreation={sessionCreation} />);
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
 
     expect(screen.getByRole("alert")).toHaveTextContent(
       "That facilitator passphrase was not accepted.",
+    );
+  });
+
+  it("translates error params at render time", () => {
+    formShowing({
+      error: {
+        key: MessageKey.OpenSessionNameRejected,
+        params: { limit: maximumSessionNameLength },
+      },
+    });
+
+    render(<OpenSessionForm sessionCreation={sessionCreation} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      `That session name was not accepted. Use up to ${maximumSessionNameLength} characters.`,
     );
   });
 });

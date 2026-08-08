@@ -2,21 +2,26 @@ namespace ValuesWorkshop.Domain;
 
 public sealed class Roster
 {
-    private readonly List<ParticipantId> _participants = [];
+    private readonly List<Participant> _participants = [];
 
-    public IReadOnlyList<ParticipantId> Participants => _participants;
+    public IReadOnlyList<Participant> Participants => _participants;
 
     public bool Contains(ParticipantId participantId)
     {
-        return _participants.Contains(participantId);
+        return Find(participantId) is not null;
     }
 
-    internal void Add(ParticipantId participantId)
+    public Participant? Find(ParticipantId participantId)
     {
-        _participants.Add(participantId);
+        return _participants.SingleOrDefault(participant => participant.Id == participantId);
     }
 
-    internal static Roster Restore(IEnumerable<ParticipantId> participants)
+    internal void Add(Participant participant)
+    {
+        _participants.Add(participant);
+    }
+
+    internal static Roster Restore(IEnumerable<Participant> participants)
     {
         var roster = new Roster();
         roster._participants.AddRange(participants);

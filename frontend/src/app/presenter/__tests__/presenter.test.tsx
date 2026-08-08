@@ -5,10 +5,12 @@ import { Phase } from "../../../domain/phases";
 import type { PresenterWorkshopState } from "../../../domain/workshopState";
 import { currentSessionIdentity } from "../../../adapters/browserLocation";
 import { createPresenterSession } from "../../../adapters/workshopSessions";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import PresenterLayout from "../layout";
 import PresenterHome from "../page";
 
 jest.mock("../../../adapters/browserLocation", () => ({
+  ...jest.requireActual("../../../adapters/browserLocation"),
   currentSessionIdentity: jest.fn(),
 }));
 jest.mock("../../../adapters/workshopSessions", () => ({
@@ -27,7 +29,7 @@ const workshopState = new Subject<PresenterWorkshopState>();
 beforeEach(() => {
   sessionIdentity.mockReturnValue("session-7");
   createSession.mockReturnValue({
-    sessionState: {
+    sessionStatePort: {
       workshopState,
       connectionState: of(ConnectionState.Reconnecting),
     },
@@ -47,6 +49,7 @@ describe("presenter screen group", () => {
         <PresenterLayout>
           <PresenterHome />
         </PresenterLayout>,
+        { wrapper: languageWrapper() },
       );
     });
 
@@ -54,10 +57,15 @@ describe("presenter screen group", () => {
       workshopState.next({
         revision: 2,
         phase: Phase.Join,
-      } as PresenterWorkshopState);
+        participantCount: 1,
+        participantDisplayNames: ["Ada Lovelace"],
+      });
     });
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 1");
-    expect(screen.getByTestId("connection")).toHaveTextContent("reconnecting");
+    expect(screen.getByTestId("connection")).toHaveTextContent("Reconnecting");
+    expect(screen.getByTestId("joined-names")).toHaveTextContent(
+      "Ada Lovelace",
+    );
   });
 });

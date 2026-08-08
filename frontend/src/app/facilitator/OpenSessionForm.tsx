@@ -1,7 +1,10 @@
 "use client";
 
+import { MessageKey } from "../../domain/i18n/messages";
 import type { FacilitatorSessionCreationPort } from "../../domain/ports/facilitator/sessionCreationPort";
 import { maximumSessionNameLength } from "../../domain/sessionCreation";
+import { LanguageSwitcher } from "../i18n/LanguageSwitcher";
+import { useTranslation } from "../i18n/useTranslation";
 import styles from "./OpenSessionForm.module.css";
 import { useOpenSessionForm } from "./useOpenSessionForm";
 
@@ -13,21 +16,25 @@ export function OpenSessionForm({
   const {
     sessionName,
     passphrase,
-    errorMessage,
+    error,
     isSubmitting,
     changeSessionName,
     changePassphrase,
     submit,
   } = useOpenSessionForm(sessionCreation);
+  const { translate } = useTranslation();
 
   return (
     <div className={styles.screen}>
       <section className={styles.card}>
-        <h1 className={styles.title}>ValuesWorkshop · Open a session</h1>
+        <LanguageSwitcher />
+        <h1 className={styles.title}>
+          {translate(MessageKey.OpenSessionTitle)}
+        </h1>
         <form className={styles.form} method="post" onSubmit={submit}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="sessionName">
-              Session name
+              {translate(MessageKey.OpenSessionName)}
             </label>
             <input
               id="sessionName"
@@ -42,7 +49,7 @@ export function OpenSessionForm({
           </div>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="facilitatorPassphrase">
-              Facilitator passphrase
+              {translate(MessageKey.OpenSessionPassphrase)}
             </label>
             <input
               id="facilitatorPassphrase"
@@ -54,9 +61,9 @@ export function OpenSessionForm({
               onChange={changePassphrase}
             />
           </div>
-          {errorMessage !== null && (
+          {error !== null && (
             <p className={styles.error} role="alert">
-              {errorMessage}
+              {translate(error.key, error.params)}
             </p>
           )}
           <div className={styles.actions}>
@@ -65,7 +72,11 @@ export function OpenSessionForm({
               className={styles.submit}
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Opening…" : "Open session"}
+              {translate(
+                isSubmitting
+                  ? MessageKey.OpenSessionSubmitting
+                  : MessageKey.OpenSessionSubmit,
+              )}
             </button>
           </div>
         </form>

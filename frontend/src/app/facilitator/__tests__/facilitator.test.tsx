@@ -5,6 +5,7 @@ import { Phase } from "../../../domain/phases";
 import type { FacilitatorWorkshopState } from "../../../domain/workshopState";
 import { currentSessionIdentity } from "../../../adapters/browserLocation";
 import { createFacilitatorSession } from "../../../adapters/workshopSessions";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import FacilitatorLayout from "../layout";
 import FacilitatorHome from "../page";
 
@@ -38,7 +39,7 @@ const advancePhase = jest.fn(() => EMPTY);
 beforeEach(() => {
   sessionIdentity.mockReturnValue("session-7");
   createSession.mockReturnValue({
-    sessionState: {
+    sessionStatePort: {
       workshopState,
       connectionState: of(ConnectionState.Connected),
     },
@@ -59,6 +60,7 @@ describe("facilitator screen group", () => {
         <FacilitatorLayout>
           <FacilitatorHome />
         </FacilitatorLayout>,
+        { wrapper: languageWrapper() },
       );
     });
 
@@ -81,6 +83,7 @@ describe("facilitator screen group", () => {
         <FacilitatorLayout>
           <FacilitatorHome />
         </FacilitatorLayout>,
+        { wrapper: languageWrapper() },
       );
     });
 

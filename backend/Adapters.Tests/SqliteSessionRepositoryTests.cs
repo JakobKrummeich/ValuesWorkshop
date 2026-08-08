@@ -95,7 +95,10 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             identity,
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore([participantOne, participantTwo]),
+            Roster.Restore([
+                TestParticipants.Named(participantOne, "Anna Schmidt"),
+                TestParticipants.Named(participantTwo, "Ben"),
+            ]),
             PhaseProgress.Restore(Phase.Quiz),
             QuizProgress.Restore(2, true, false),
             SelectionRound.Restore([], []),
@@ -111,12 +114,32 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         loaded.ShouldNotBeNull();
         loaded.Identity.ShouldBe(identity);
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
-        loaded.Roster.Participants.Count.ShouldBe(2);
-        loaded.Roster.Participants.ShouldContain(participantOne);
-        loaded.Roster.Participants.ShouldContain(participantTwo);
+        loaded.Roster.Participants.ShouldBe(
+            [
+                TestParticipants.Named(participantOne, "Anna Schmidt"),
+                TestParticipants.Named(participantTwo, "Ben"),
+            ],
+            ignoreOrder: false
+        );
         loaded.Quiz.CurrentQuestionIndex.ShouldBe(2);
         loaded.Quiz.IsRevealed.ShouldBeTrue();
         loaded.Quiz.IsLearningTextShown.ShouldBeFalse();
+    }
+
+    [Fact]
+    public async Task A_stored_participant_without_a_display_name_loads_under_the_fallback_label()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var participant = new ParticipantId(Guid.Parse("abcdef12-0000-4000-8000-000000000009"));
+        var session = TestSessions.Open(identity);
+        session.Join(TestParticipants.Named(participant, "Anna Schmidt"), new FixedRandomness(0));
+        await CreateSession(session);
+        await BlankOutDisplayNames();
+
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+
+        loaded.Roster.Participants.ShouldBe([TestParticipants.Unnamed(participant)]);
+        loaded.Roster.Find(participant).ShouldNotBeNull().Name.Value.ShouldBe("#abcdef");
     }
 
     [Fact]
@@ -130,7 +153,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             identity,
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore([participant]),
+            Roster.Restore([TestParticipants.Unnamed(participant)]),
             PhaseProgress.Restore(Phase.SelectionResults),
             QuizProgress.Restore(4, true, true),
             SelectionRound.Restore([participant], [topValueOne, topValueTwo]),
@@ -164,7 +187,10 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             identity,
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore([memberOne, memberTwo]),
+            Roster.Restore([
+                TestParticipants.Unnamed(memberOne),
+                TestParticipants.Unnamed(memberTwo),
+            ]),
             PhaseProgress.Restore(Phase.GroupWork),
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
@@ -234,7 +260,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             identity,
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore([member]),
+            Roster.Restore([TestParticipants.Unnamed(member)]),
             PhaseProgress.Restore(Phase.ValuePresentation),
             QuizProgress.Restore(5, true, true),
             SelectionRound.Restore([], []),
@@ -269,7 +295,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             identity,
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore([new ParticipantId(Guid.NewGuid())]),
+            Roster.Restore([TestParticipants.Unnamed(new ParticipantId(Guid.NewGuid()))]),
             PhaseProgress.Restore(Phase.Quiz),
             QuizProgress.Restore(1, false, false),
             SelectionRound.Restore([], []),
@@ -317,7 +343,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         var loaded = await LoadSession(identity);
         loaded.ShouldNotBeNull();
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
-        loaded.Roster.Participants.ShouldBe([survivor]);
+        loaded.Roster.Participants.ShouldBe([TestParticipants.Unnamed(survivor)]);
         loaded.Revision.ShouldBe(4);
     }
 
@@ -346,14 +372,16 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
 
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
-        loaded.Roster.Participants.ShouldBe([writers.Joiner]);
+        loaded.Roster.Participants.ShouldBe([TestParticipants.Named(writers.Joiner, "Late Lucy")]);
         loaded.Revision.ShouldBe(5);
 
         var reloadedByTheLoser = (
             await writers.RepositoryTwo.LoadAsync(identity)
         ).ShouldNotBeNull();
         reloadedByTheLoser.Revision.ShouldBe(5);
-        reloadedByTheLoser.Roster.Participants.ShouldBe([writers.Joiner]);
+        reloadedByTheLoser.Roster.Participants.ShouldBe([
+            TestParticipants.Named(writers.Joiner, "Late Lucy"),
+        ]);
     }
 
     [Fact]
@@ -374,7 +402,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
         loaded.Revision.ShouldBe(6);
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
-        loaded.Roster.Participants.ShouldBe([writers.Joiner]);
+        loaded.Roster.Participants.ShouldBe([TestParticipants.Named(writers.Joiner, "Late Lucy")]);
     }
 
     [Fact]
@@ -395,7 +423,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
                 identityB,
                 TestSessions.Facilitator,
                 TestSessions.Name,
-                Roster.Restore([new ParticipantId(Guid.NewGuid())]),
+                Roster.Restore([TestParticipants.Unnamed(new ParticipantId(Guid.NewGuid()))]),
                 PhaseProgress.Restore(Phase.ValueSelection),
                 QuizProgress.Restore(null, false, false),
                 SelectionRound.Restore([], []),
@@ -477,7 +505,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         var sessionWithJoin = (await repositoryOne.LoadAsync(identity)).ShouldNotBeNull();
         var sessionWithAdvance = (await repositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
 
-        sessionWithJoin.Join(joiner, new FixedRandomness(0));
+        sessionWithJoin.Join(TestParticipants.Named(joiner, "Late Lucy"), new FixedRandomness(0));
         sessionWithJoin.BumpRevision();
         TestSessions.AdvanceToNextPhase(sessionWithAdvance);
         sessionWithAdvance.BumpRevision();
@@ -510,7 +538,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             identity,
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore(participants),
+            Roster.Restore(participants.Select(TestParticipants.Unnamed)),
             PhaseProgress.Restore(phase),
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),
@@ -533,6 +561,12 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         using var context = new WorkshopDbContext(_options);
         var repository = new SqliteSessionRepository(context);
         await repository.SaveAsync(session, expectedRevision);
+    }
+
+    private async Task BlankOutDisplayNames()
+    {
+        using var context = new WorkshopDbContext(_options);
+        await context.Database.ExecuteSqlRawAsync("UPDATE participants SET display_name = ''");
     }
 
     private async Task<Session?> LoadSession(SessionIdentity identity)

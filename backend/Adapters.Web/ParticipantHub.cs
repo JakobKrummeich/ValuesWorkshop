@@ -27,9 +27,14 @@ public sealed class ParticipantHub(
         );
         registry.Add(sessionIdentity, Context.ConnectionId);
 
+        var participant = new Participant(
+            participantId,
+            CallerDisplayName.Of(Context, participantId)
+        );
+
         var joinResult = await pipeline.ExecuteAsync(
             sessionIdentity,
-            session => session.Join(participantId, randomness)
+            session => session.Join(participant, randomness)
         );
 
         if (!joinResult.IsAccepted)

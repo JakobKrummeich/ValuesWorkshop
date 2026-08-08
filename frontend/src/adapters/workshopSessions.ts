@@ -23,16 +23,16 @@ export interface WorkshopSession {
 }
 
 export interface ParticipantSession extends WorkshopSession {
-  readonly sessionState: ParticipantSessionStatePort;
+  readonly sessionStatePort: ParticipantSessionStatePort;
 }
 
 export interface FacilitatorSession extends WorkshopSession {
-  readonly sessionState: FacilitatorSessionStatePort;
+  readonly sessionStatePort: FacilitatorSessionStatePort;
   readonly lifecycle: FacilitatorLifecyclePort;
 }
 
 export interface PresenterSession extends WorkshopSession {
-  readonly sessionState: PresenterSessionStatePort;
+  readonly sessionStatePort: PresenterSessionStatePort;
 }
 
 export function createParticipantSession(
@@ -44,7 +44,7 @@ export function createParticipantSession(
   );
 
   return {
-    sessionState: createSessionStatePort(
+    sessionStatePort: createSessionStatePort(
       connection,
       participantWorkshopStateSchema,
     ),
@@ -61,7 +61,7 @@ export function createFacilitatorSession(
   );
 
   return {
-    sessionState: createSessionStatePort(
+    sessionStatePort: createSessionStatePort(
       connection,
       facilitatorWorkshopStateSchema,
     ),
@@ -76,7 +76,7 @@ export function createPresenterSession(
   const connection = connect(WorkshopRole.Presenter, sessionIdentity);
 
   return {
-    sessionState: createSessionStatePort(
+    sessionStatePort: createSessionStatePort(
       connection,
       presenterWorkshopStateSchema,
     ),

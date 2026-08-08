@@ -21,7 +21,12 @@ const quizViewSchema = z.object({
 });
 
 const rosterViewSchema = z.object({
-  participantIds: z.array(participantIdSchema),
+  participants: z.array(
+    z.object({
+      participantId: participantIdSchema,
+      displayName: z.string(),
+    }),
+  ),
   participantCount: z.int(),
 });
 
@@ -99,7 +104,11 @@ const facilitatorEnvelope = {
 const presenterEnvelope = participantEnvelope;
 
 export const participantWorkshopStateSchema = z.discriminatedUnion("phase", [
-  z.object({ phase: z.literal(Phase.Join), ...participantEnvelope }),
+  z.object({
+    phase: z.literal(Phase.Join),
+    ...participantEnvelope,
+    ownDisplayName: z.string(),
+  }),
   z.object({
     phase: z.literal(Phase.Quiz),
     ...participantEnvelope,
@@ -190,7 +199,11 @@ export const facilitatorWorkshopStateSchema = z.discriminatedUnion("phase", [
 ]);
 
 export const presenterWorkshopStateSchema = z.discriminatedUnion("phase", [
-  z.object({ phase: z.literal(Phase.Join), ...presenterEnvelope }),
+  z.object({
+    phase: z.literal(Phase.Join),
+    ...presenterEnvelope,
+    participantDisplayNames: z.array(z.string()),
+  }),
   z.object({
     phase: z.literal(Phase.Quiz),
     ...presenterEnvelope,
@@ -249,3 +262,15 @@ export type FacilitatorWorkshopState = z.infer<
 export type PresenterWorkshopState = z.infer<
   typeof presenterWorkshopStateSchema
 >;
+
+type InPhase<TState, TPhase extends Phase> = Extract<TState, { phase: TPhase }>;
+
+export type ParticipantJoinState = InPhase<
+  ParticipantWorkshopState,
+  Phase.Join
+>;
+export type FacilitatorJoinState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.Join
+>;
+export type PresenterJoinState = InPhase<PresenterWorkshopState, Phase.Join>;

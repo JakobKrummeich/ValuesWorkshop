@@ -1,0 +1,123 @@
+<h1>Task 12: Phase 1 — Join</h1>
+
+<h2>Why now</h2>
+<p>Checkpoint B is closed and Phase C is groomed. The phase machine walks 1→8
+in a live session, but every screen is still a placeholder shell
+(<code>&lt;h1&gt;Presenter&lt;/h1&gt;</code> plus a status banner) — there is no
+phase switch anywhere in the frontend. Joining already works invisibly:
+<code>ParticipantHub.OnConnectedAsync</code> runs <code>Session.Join</code>, the
+roster persists, and the facilitator state carries
+<code>RosterView(participantIds, participantCount)</code>. What is missing is
+everything a human in the room sees: the QR to scan, their own name on the
+wall, the roster filling up. Task 12 is the first task that ships a screen a
+workshop participant would recognise.</p>
+
+<h2>Goal</h2>
+<p>A real screen trio for Phase 1: the presenter shows a large QR of the join
+URL and the live lobby, the participant lands in a lobby after login, the
+facilitator watches the roster fill and advances. Ships <strong>de+en</strong>
+from the first screen, and puts <strong>Playwright into CI</strong>.</p>
+
+<h2>Solution</h2>
+<ol>
+<li><strong>Phase routing shell.</strong> One per-role map from
+<code>Phase</code> to component, so Tasks 13–22 slot their screens in instead of
+rebuilding this. Join is the first entry; every other phase keeps today's
+shell.</li>
+<li><strong>Display names.</strong> The participant name comes from the OIDC
+<code>name</code> claim, captured at hub connect and carried through
+<code>Session.Join</code> → <code>Roster</code> → <code>ParticipantEntity</code>
+(+ migration) → <code>RosterView</code> → presenter state. Today no display name
+exists anywhere in Domain, persistence or wire state, although
+<code>design/screens.md</code> and <code>design/protocol.md</code> both assume it.
+<code>WorkshopStateAnonymityTests</code> gets a deliberate, reviewed widening:
+names are visible in the Phase 1 roster, never in a state that also carries a
+vote or an answer. A missing or blank claim falls back to a deterministic
+label instead of crashing.</li>
+<li><strong>Presenter join screen.</strong> Large QR encoding
+<code>${origin}/participant?sessionIdentity=&lt;guid&gt;</code>, the URL in
+readable text below it, participant count, names appearing live as people
+join.</li>
+<li><strong>Participant lobby.</strong> Post-login confirmation: own display
+name, "waiting for the workshop to start", participant count.</li>
+<li><strong>Facilitator join screen.</strong> Live roster list plus count, and
+the existing advance control.</li>
+<li><strong>i18n foundation.</strong> de+en for every string on these screens
+<em>and</em> for the shared shells that exist today
+(<code>AuthGuard</code>, <code>MissingSession</code>, <code>OpenSessionForm</code>,
+<code>SessionStatusBanner</code>). Language is per-client and switchable, and it
+must not change the URL — the join URL inside the QR has to stay stable.
+Existing e2e selectors that assert English text get pinned to a locale.</li>
+<li><strong>Playwright in CI.</strong> A CI job that builds and starts the
+compose stack, installs chromium, runs the e2e specs (including the
+backend-restart reconnect smoke) and uploads the report on failure. Mirrored
+in <code>scripts/ci-test.sh</code>. This moved up from Task 14 because the
+reconnect suite is the exact class of defect that only e2e catches, and it is
+local-only today.</li>
+</ol>
+
+<h2>Out of scope</h2>
+<p>Quiz content and sub-controls (13/14), any screen for a phase ≥ 2, group
+formation, presenter animation beyond a plain live list, reading the bilingual
+content JSON (<code>config/*.json</code> is already de+en and is loaded from Task
+13 onward), anonymous participants (login stays mandatory), and short session
+codes — the QR carries the <code>sessionIdentity</code> GUID, as
+<code>design/domain-model.md</code> already assumes.</p>
+
+<h2>Acceptance criteria</h2>
+<ul>
+<li>Scanning the QR (or opening its payload) reaches login and returns to the
+participant lobby of that exact session</li>
+<li>A participant joining makes their name appear on presenter and facilitator
+without reload; the count matches roster size</li>
+<li>Names round-trip through the store (a restart keeps them) and appear in no
+state that also carries votes or answers</li>
+<li>Every string on the three join screens plus the shared shells renders in
+both de and en; switching language changes neither the URL nor the session</li>
+<li>The phase map renders the Join screens for Phase 1 and today's shell for
+every other phase, per role</li>
+<li>CI runs the Playwright suite and fails the build when an e2e test fails</li>
+</ul>
+
+<h2>Slices</h2>
+<ol>
+<li>i18n foundation + translate the existing shared shells (+ pin e2e selectors)</li>
+<li>Playwright job in CI, green on today's 16 tests</li>
+<li>Display name end-to-end: claim → <code>Session.Join</code> → entity + migration
+→ <code>RosterView</code> + presenter state, anonymity test widened deliberately</li>
+<li>Per-role phase map + participant lobby</li>
+<li>Presenter QR + live roster; facilitator roster + advance</li>
+<li>Playwright: a participant joins, the name appears on presenter and facilitator</li>
+</ol>
+
+<h2>Decisions needed from you</h2>
+
+<h3>Q1 — i18n mechanism</h3>
+<p>Option A: an in-house typed dictionary in <code>src/domain/i18n</code> plus a
+context hook — zero new dependency, choice persisted in a cookie. Option B:
+<code>next-intl</code> with cookie-based locale (not locale-prefixed routes,
+which would change the join URL and break the existing e2e URL assertions).
+<strong>Recommendation: A</strong> — the string volume is small and it leaves
+URLs, e2e and the QR payload untouched.</p>
+
+<h3>Q2 — Does the presenter screen show names?</h3>
+<p><code>design/screens.md</code> says yes, but it widens what the
+<em>unauthenticated</em> presenter connection may display. Option A: names on
+presenter and facilitator. Option B: names on facilitator only, presenter shows
+the count. This is a privacy call, not a technical one.
+<strong>Recommendation: A</strong> — the presenter screen is the shared room
+projection, and people expect to see themselves appear on it.</p>
+
+<h3>Q3 — QR generation</h3>
+<p>Option A: client-side SVG via a maintained dependency
+(<code>qrcode</code> / <code>react-qr-code</code>). Option B: hand-rolled
+generator, no dependency. <strong>Recommendation: A</strong> — QR encoding is
+spec-heavy and not worth owning; it adds a dependency, so it needs an explicit
+yes from you.</p>
+
+<h3>Q4 — How much e2e runs in CI</h3>
+<p>The reconnect spec restarts the backend container and budgets 180 s.
+Option A: run the whole suite in CI. Option B: run everything except the
+restart spec in CI and keep that one local.
+<strong>Recommendation: A</strong> — it is precisely the defect class Task 10
+shipped for, and it is worthless if nothing runs it.</p>

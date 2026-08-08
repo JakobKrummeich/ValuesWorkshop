@@ -12,8 +12,12 @@ public static class ParticipantWorkshopStateMapper
         Func<Session, ParticipantId, long, ParticipantWorkshopState>
     >
     {
-        [Phase.Join] = (session, _, revision) =>
-            new ParticipantJoinState(revision, ParticipantCount(session)),
+        [Phase.Join] = (session, caller, revision) =>
+            new ParticipantJoinState(
+                revision,
+                ParticipantCount(session),
+                OwnDisplayName(session, caller)
+            ),
         [Phase.Quiz] = (session, _, revision) =>
             new ParticipantQuizState(
                 revision,
@@ -77,6 +81,13 @@ public static class ParticipantWorkshopStateMapper
     private static int ParticipantCount(Session session)
     {
         return session.Roster.Participants.Count;
+    }
+
+    private static string OwnDisplayName(Session session, ParticipantId caller)
+    {
+        var name = session.Roster.Find(caller)?.Name ?? ParticipantName.Of(null, caller);
+
+        return name.Value;
     }
 
     private static OwnSelectionView OwnSelection(Session session, ParticipantId caller)

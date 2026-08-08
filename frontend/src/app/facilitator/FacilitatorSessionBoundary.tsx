@@ -24,7 +24,7 @@ export function FacilitatorSessionBoundary({
       {(session) => (
         <FacilitatorDependencyProvider
           dependencies={{
-            sessionState: session.sessionState,
+            sessionStatePort: session.sessionStatePort,
             lifecycle: session.lifecycle,
           }}
         >

@@ -46,9 +46,9 @@ public sealed class WorkshopStateCache
     private static SessionRoleStates MapAllRoles(Session session)
     {
         var participantStates = session.Roster.Participants.ToDictionary(
-            participantId => participantId,
-            participantId =>
-                ParticipantWorkshopStateMapper.MapFor(session, participantId, session.Revision)
+            participant => participant.Id,
+            participant =>
+                ParticipantWorkshopStateMapper.MapFor(session, participant.Id, session.Revision)
         );
 
         return new SessionRoleStates(

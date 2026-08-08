@@ -6,19 +6,18 @@ import styles from "./SessionStatusBanner.module.css";
 import { useSessionStatusBanner } from "./useSessionStatusBanner";
 
 export function SessionStatusBanner({
-  sessionState,
+  sessionStatePort,
 }: {
-  sessionState: SessionStatePort<PhasedWorkshopState>;
+  sessionStatePort: SessionStatePort<PhasedWorkshopState>;
 }) {
-  const { connectionState, phase } = useSessionStatusBanner(sessionState);
+  const { connectionText, phaseText } =
+    useSessionStatusBanner(sessionStatePort);
 
   return (
     <p className={styles.banner}>
-      <span data-testid="phase">
-        {phase === null ? "Waiting for the workshop\u2026" : `Phase ${phase}`}
-      </span>
+      <span data-testid="phase">{phaseText}</span>
       <span className={styles.connection} data-testid="connection">
-        {connectionState}
+        {connectionText}
       </span>
     </p>
   );

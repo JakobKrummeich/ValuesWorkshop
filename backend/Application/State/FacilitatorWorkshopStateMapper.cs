@@ -9,47 +9,52 @@ public static class FacilitatorWorkshopStateMapper
         Func<Session, long, FacilitatorWorkshopState>
     > StateOfPhase = new Dictionary<Phase, Func<Session, long, FacilitatorWorkshopState>>
     {
-        [Phase.Join] = (session, revision) => new FacilitatorJoinState(revision, Roster(session)),
+        [Phase.Join] = (session, revision) =>
+            new FacilitatorJoinState(revision, SessionViews.Roster(session)),
         [Phase.Quiz] = (session, revision) =>
-            new FacilitatorQuizState(revision, Roster(session), SessionViews.Quiz(session)),
+            new FacilitatorQuizState(
+                revision,
+                SessionViews.Roster(session),
+                SessionViews.Quiz(session)
+            ),
         [Phase.ValueSelection] = (session, revision) =>
             new FacilitatorValueSelectionState(
                 revision,
-                Roster(session),
+                SessionViews.Roster(session),
                 SessionViews.SelectionProgress(session)
             ),
         [Phase.SelectionResults] = (session, revision) =>
             new FacilitatorSelectionResultsState(
                 revision,
-                Roster(session),
+                SessionViews.Roster(session),
                 SessionViews.SelectionProgress(session)
             ),
         [Phase.GroupFormation] = (session, revision) =>
             new FacilitatorGroupFormationState(
                 revision,
-                Roster(session),
+                SessionViews.Roster(session),
                 SessionViews.SelectionProgress(session),
                 Groups(session)
             ),
         [Phase.GroupWork] = (session, revision) =>
-            new FacilitatorGroupWorkState(revision, Roster(session), Groups(session)),
+            new FacilitatorGroupWorkState(revision, SessionViews.Roster(session), Groups(session)),
         [Phase.ValuePresentation] = (session, revision) =>
             new FacilitatorValuePresentationState(
                 revision,
-                Roster(session),
+                SessionViews.Roster(session),
                 Groups(session),
                 SessionViews.Presentation(session)
             ),
         [Phase.FinalVoting] = (session, revision) =>
             new FacilitatorFinalVotingState(
                 revision,
-                Roster(session),
+                SessionViews.Roster(session),
                 SessionViews.Voting(session)
             ),
         [Phase.FinalPresentation] = (session, revision) =>
             new FacilitatorFinalPresentationState(
                 revision,
-                Roster(session),
+                SessionViews.Roster(session),
                 SessionViews.Conclusion(session)
             ),
     };
@@ -57,15 +62,6 @@ public static class FacilitatorWorkshopStateMapper
     public static FacilitatorWorkshopState Map(Session session, long revision)
     {
         return StateOfPhase[session.PhaseProgress.CurrentPhase](session, revision);
-    }
-
-    private static RosterView Roster(Session session)
-    {
-        var participantIds = session
-            .Roster.Participants.Select(participant => participant.Value)
-            .ToList();
-
-        return new RosterView(participantIds, participantIds.Count);
     }
 
     private static IReadOnlyList<FacilitatorGroupView> Groups(Session session)

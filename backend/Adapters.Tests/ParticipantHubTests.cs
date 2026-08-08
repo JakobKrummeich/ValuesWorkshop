@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
@@ -35,7 +36,7 @@ public class ParticipantHubTests
 
         await hub.OnConnectedAsync();
 
-        session.Roster.Participants.ShouldBe([Anna]);
+        session.Roster.Participants.ShouldBe([TestParticipants.Named(Anna, "Anna Schmidt")]);
         broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(1);
     }
 
@@ -43,13 +44,13 @@ public class ParticipantHubTests
     public async Task A_returning_participant_resumes_instead_of_joining_twice()
     {
         var session = TestSessions.Open(KnownSession);
-        session.Join(Anna, new FixedRandomness(0));
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
         repository.Add(session);
         var hub = HubBoundTo(KnownSession, Subject);
 
         await hub.OnConnectedAsync();
 
-        session.Roster.Participants.ShouldBe([Anna]);
+        session.Roster.Participants.ShouldBe([TestParticipants.Named(Anna, "Anna Schmidt")]);
         session.Revision.ShouldBe(0);
         repository.Saved.ShouldBeEmpty();
         broadcaster.Broadcasts.ShouldBeEmpty();
@@ -59,7 +60,7 @@ public class ParticipantHubTests
     public async Task A_reconnecting_participant_is_pushed_its_state_immediately()
     {
         var session = TestSessions.Open(KnownSession);
-        session.Join(Anna, new FixedRandomness(0));
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
         repository.Add(session);
         var hub = HubBoundTo(KnownSession, Subject);
 
@@ -118,7 +119,13 @@ public class ParticipantHubTests
 
     private ParticipantHub HubBoundTo(SessionIdentity sessionIdentity, string subject)
     {
-        return HubWithContext(new FakeHubCallerContext(sessionIdentity.Value.ToString(), subject));
+        return HubWithContext(
+            new FakeHubCallerContext(
+                sessionIdentity.Value.ToString(),
+                subject,
+                new Claim("name", "Anna Schmidt")
+            )
+        );
     }
 
     private ParticipantHub HubWithContext(FakeHubCallerContext context)

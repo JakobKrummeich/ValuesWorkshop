@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { NEVER, Observable, of, throwError } from "rxjs";
+import { MessageKey } from "../../../domain/i18n/messages";
 import type { IntentResult } from "../../../domain/intentResult";
 import { IntentRejectionCode } from "../../../domain/intentResult";
 import type { Single } from "../../../shared/reactiveTypes";
@@ -16,7 +17,7 @@ const dependencies = useFacilitatorDependencies as jest.MockedFunction<
 
 function withAdvancePhase(advancePhase: () => Single<IntentResult>) {
   dependencies.mockReturnValue({
-    sessionState: { workshopState: NEVER, connectionState: NEVER },
+    sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
     lifecycle: { advancePhase },
   });
 }
@@ -28,7 +29,7 @@ describe("advance phase button logic", () => {
     const { result } = renderHook(() => useAdvancePhaseButton());
 
     expect(result.current).toEqual(
-      expect.objectContaining({ isAdvancing: false, rejectionDetail: null }),
+      expect.objectContaining({ isAdvancing: false, rejectionMessage: null }),
     );
   });
 
@@ -40,11 +41,11 @@ describe("advance phase button logic", () => {
 
     act(() => result.current.advancePhase());
 
-    expect(result.current.rejectionDetail).toBeNull();
+    expect(result.current.rejectionMessage).toBeNull();
     expect(result.current.isAdvancing).toBe(false);
   });
 
-  it("shows the detail of a rejected intent", () => {
+  it("shows the message of a rejected intent", () => {
     withAdvancePhase(() =>
       of({
         isAccepted: false,
@@ -56,18 +57,16 @@ describe("advance phase button logic", () => {
 
     act(() => result.current.advancePhase());
 
-    expect(result.current.rejectionDetail).toBe(
-      "the workshop is already in its last phase",
-    );
+    expect(result.current.rejectionMessage).toBe(MessageKey.IntentWrongPhase);
   });
 
-  it("shows a transport failure as its message", () => {
+  it("shows a transport failure as a generic failure message", () => {
     withAdvancePhase(() => throwError(() => new Error("connection is closed")));
     const { result } = renderHook(() => useAdvancePhaseButton());
 
     act(() => result.current.advancePhase());
 
-    expect(result.current.rejectionDetail).toBe("connection is closed");
+    expect(result.current.rejectionMessage).toBe(MessageKey.IntentFailed);
   });
 
   it("disables itself while the intent is in flight", () => {

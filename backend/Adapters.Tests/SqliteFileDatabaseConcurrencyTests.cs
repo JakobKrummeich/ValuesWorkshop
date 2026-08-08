@@ -54,7 +54,10 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IAsyncLifetime, IDispos
         var stored = await LoadThrough(identity);
         stored.ShouldNotBeNull();
         stored.Revision.ShouldBe(5);
-        var storedJoiners = stored.PhaseProgress.CurrentPhase == Phase.Join ? new[] { joiner } : [];
+        var storedJoiners =
+            stored.PhaseProgress.CurrentPhase == Phase.Join
+                ? new[] { TestParticipants.Unnamed(joiner) }
+                : [];
         stored.Roster.Participants.ShouldBe(storedJoiners);
     }
 
@@ -222,7 +225,7 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IAsyncLifetime, IDispos
             identity,
             TestSessions.Facilitator,
             TestSessions.Name,
-            Roster.Restore(participants),
+            Roster.Restore(participants.Select(TestParticipants.Unnamed)),
             PhaseProgress.Restore(phase),
             QuizProgress.Restore(null, false, false),
             SelectionRound.Restore([], []),

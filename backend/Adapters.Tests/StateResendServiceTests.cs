@@ -35,7 +35,7 @@ public class StateResendServiceTests
             .Single<PresenterWorkshopState>()
             .Revision.ShouldBe(session.Revision);
         participantClients
-            .GroupClient(SessionGroups.Participant(KnownSession, session.Roster.Participants[0]))
+            .GroupClient(SessionGroups.Participant(KnownSession, session.Roster.Participants[0].Id))
             .Single<ParticipantWorkshopState>()
             .Revision.ShouldBe(session.Revision);
     }
@@ -77,7 +77,10 @@ public class StateResendServiceTests
     private static Session SessionWithOneParticipant()
     {
         var session = TestSessions.Open(KnownSession);
-        session.Join(new ParticipantId(Guid.NewGuid()), new FixedRandomness(0));
+        session.Join(
+            TestParticipants.Unnamed(new ParticipantId(Guid.NewGuid())),
+            new FixedRandomness(0)
+        );
         session.BumpRevision();
 
         return session;

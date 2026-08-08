@@ -51,14 +51,24 @@ test.describe.serial("session lifecycle and reconnect", () => {
     await openSignedIn(facilitatorPage, "/facilitator", FACILITATOR_ACCOUNT);
 
     const creationResponse = waitForSessionCreationResponse(facilitatorPage);
-    await submitOpenSessionForm(facilitatorPage, SESSION_NAME, WRONG_PASSPHRASE);
+    await submitOpenSessionForm(
+      facilitatorPage,
+      SESSION_NAME,
+      WRONG_PASSPHRASE,
+    );
 
     expect((await creationResponse).status()).toBe(HTTP_UNAUTHORIZED);
     await expect(
-      facilitatorPage.getByText("That facilitator passphrase was not accepted."),
+      facilitatorPage.getByText(
+        "That facilitator passphrase was not accepted.",
+      ),
     ).toBeVisible();
-    await expect(facilitatorPage).toHaveURL("http://localhost:3000/facilitator");
-    await expect(facilitatorPage.getByLabel("Facilitator passphrase")).toBeVisible();
+    await expect(facilitatorPage).toHaveURL(
+      "http://localhost:3000/facilitator",
+    );
+    await expect(
+      facilitatorPage.getByLabel("Facilitator passphrase"),
+    ).toBeVisible();
   });
 
   test("the correct passphrase opens a session and lands on the facilitator screen", async () => {
@@ -69,7 +79,7 @@ test.describe.serial("session lifecycle and reconnect", () => {
 
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 1");
     await expect(facilitatorPage.getByTestId("connection")).toHaveText(
-      "connected",
+      "Connected",
     );
   });
 
@@ -89,7 +99,9 @@ test.describe.serial("session lifecycle and reconnect", () => {
     await markPage(participantPage);
     await markPage(presenterPage);
 
-    await facilitatorPage.getByRole("button", { name: "Advance phase" }).click();
+    await facilitatorPage
+      .getByRole("button", { name: "Advance phase" })
+      .click();
 
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 2");
     await expect(participantPage.getByTestId("phase")).toHaveText("Phase 2");
@@ -111,7 +123,7 @@ test.describe.serial("session lifecycle and reconnect", () => {
       page.waitForFunction(
         () =>
           document.querySelector('[data-testid="connection"]')?.textContent !==
-          "connected",
+          "Connected",
         undefined,
         { timeout: RECONNECT_TIMEOUT_MILLISECONDS },
       ),
@@ -124,7 +136,7 @@ test.describe.serial("session lifecycle and reconnect", () => {
     }
 
     for (const page of pages) {
-      await expect(page.getByTestId("connection")).toHaveText("connected", {
+      await expect(page.getByTestId("connection")).toHaveText("Connected", {
         timeout: RECONNECT_TIMEOUT_MILLISECONDS,
       });
       await expect(page.getByTestId("phase")).toHaveText("Phase 2", {
@@ -145,7 +157,7 @@ test.describe.serial("session lifecycle and reconnect", () => {
     ).toBeVisible();
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 2");
     await expect(facilitatorPage.getByTestId("connection")).toHaveText(
-      "connected",
+      "Connected",
     );
     await expect(
       facilitatorPage.getByLabel("Facilitator passphrase"),
@@ -164,7 +176,7 @@ test.describe.serial("session lifecycle and reconnect", () => {
       await signInThroughOidcProvider(intruderPage, OTHER_FACILITATOR_ACCOUNT);
 
       await expect(intruderPage.getByTestId("connection")).toHaveText(
-        "disconnected",
+        "Disconnected",
       );
       await expect(intruderPage.getByTestId("phase")).toHaveText(
         "Waiting for the workshop\u2026",

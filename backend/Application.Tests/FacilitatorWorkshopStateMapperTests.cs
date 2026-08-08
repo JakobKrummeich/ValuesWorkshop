@@ -12,10 +12,10 @@ public class FacilitatorWorkshopStateMapperTests
 
         state.Revision.ShouldBe(12);
         state.Phase.ShouldBe(Phase.Join);
-        state.Roster.ParticipantIds.ShouldBe([
-            SessionFixtures.Anna.Value,
-            SessionFixtures.Ben.Value,
-            SessionFixtures.Chris.Value,
+        state.Roster.Participants.ShouldBe([
+            new RosterParticipantView(SessionFixtures.Anna.Value, "Anna Schmidt"),
+            new RosterParticipantView(SessionFixtures.Ben.Value, "Ben"),
+            new RosterParticipantView(SessionFixtures.Chris.Value, "#c3c3c3"),
         ]);
         state.Roster.ParticipantCount.ShouldBe(3);
     }

@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { EMPTY } from "rxjs";
 import { currentSessionIdentity } from "../../adapters/browserLocation";
 import type { WorkshopSession } from "../../adapters/workshopSessions";
+import { languageWrapper } from "../../testing/languageWrapper";
 import { SessionBoundary } from "../SessionBoundary";
 
 jest.mock("../../adapters/browserLocation", () => ({
@@ -28,6 +29,7 @@ describe("SessionBoundary", () => {
       <SessionBoundary createSession={createFakeSession}>
         {(session) => <p>{session.identity}</p>}
       </SessionBoundary>,
+      { wrapper: languageWrapper() },
     );
 
     expect(screen.getByText(/no workshop session/i)).toBeInTheDocument();
@@ -43,6 +45,7 @@ describe("SessionBoundary", () => {
       >
         {(session) => <p>{session.identity}</p>}
       </SessionBoundary>,
+      { wrapper: languageWrapper() },
     );
 
     expect(screen.getByText("Open a session")).toBeInTheDocument();
@@ -56,6 +59,7 @@ describe("SessionBoundary", () => {
       <SessionBoundary createSession={createFakeSession}>
         {(session) => <p>{session.identity}</p>}
       </SessionBoundary>,
+      { wrapper: languageWrapper() },
     );
 
     expect(screen.getByText("abc-123")).toBeInTheDocument();

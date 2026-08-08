@@ -15,6 +15,15 @@ public class PresenterWorkshopStateMapperTests
         state.ParticipantCount.ShouldBe(3);
     }
 
+    [Fact]
+    public void Join_state_lists_everyone_who_already_joined_by_name()
+    {
+        var state = Map(SessionFixtures.InPhase(Phase.Join)).ShouldBeOfType<PresenterJoinState>();
+
+        state.ParticipantDisplayNames.ShouldBe(["Anna Schmidt", "Ben", "#c3c3c3"]);
+        state.ParticipantCount.ShouldBe(3);
+    }
+
     [Theory]
     [InlineData(Phase.Join, typeof(PresenterJoinState))]
     [InlineData(Phase.Quiz, typeof(PresenterQuizState))]

@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { languageWrapper } from "../../testing/languageWrapper";
 import { AuthGuard } from "../AuthGuard";
 import { AuthGuardState } from "../useAuthGuard";
 
@@ -26,6 +27,7 @@ describe("AuthGuard", () => {
       <AuthGuard>
         <p>Protected content</p>
       </AuthGuard>,
+      { wrapper: languageWrapper() },
     );
 
     screen.getByText("Checking authentication…");
@@ -39,6 +41,7 @@ describe("AuthGuard", () => {
       <AuthGuard>
         <p>Protected content</p>
       </AuthGuard>,
+      { wrapper: languageWrapper() },
     );
 
     screen.getByText("Protected content");
@@ -51,6 +54,7 @@ describe("AuthGuard", () => {
       <AuthGuard>
         <p>Protected content</p>
       </AuthGuard>,
+      { wrapper: languageWrapper() },
     );
 
     screen.getByText("Redirecting to login…");
@@ -64,6 +68,7 @@ describe("AuthGuard", () => {
       <AuthGuard>
         <p>Protected content</p>
       </AuthGuard>,
+      { wrapper: languageWrapper() },
     );
 
     screen.getByText(

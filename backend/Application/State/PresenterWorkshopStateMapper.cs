@@ -10,7 +10,11 @@ public static class PresenterWorkshopStateMapper
     > StateOfPhase = new Dictionary<Phase, Func<Session, long, PresenterWorkshopState>>
     {
         [Phase.Join] = (session, revision) =>
-            new PresenterJoinState(revision, ParticipantCount(session)),
+            new PresenterJoinState(
+                revision,
+                ParticipantCount(session),
+                SessionViews.ParticipantDisplayNames(session)
+            ),
         [Phase.Quiz] = (session, revision) =>
             new PresenterQuizState(revision, ParticipantCount(session), SessionViews.Quiz(session)),
         [Phase.ValueSelection] = (session, revision) =>

@@ -25,14 +25,19 @@ node devtools/oidc                         # OIDC discovery on :9000
 docker compose -f docker-compose.dev.yml up  # all services (backend :5000, frontend :3000, oidc :9000)
 scripts/verify-startup.sh                  # native start + health check gate
 scripts/ci-lint.sh                         # all lint gates
-scripts/ci-test.sh                         # all test gates
+scripts/ci-test.sh                         # all test gates, e2e included
+scripts/ci-e2e.sh                          # compose stack + Playwright, standalone
 ```
 
 ## End-to-end tests
 
 Playwright drives real browsers against the compose stack. The config has no
-`webServer` block, so bring the stack up first; the suite is deliberately not
-wired into CI yet (Task 14 owns that).
+`webServer` block, so bring the stack up first — or run `scripts/ci-e2e.sh`,
+which brings the stack up, runs the suite and tears the stack down again. CI
+runs that same script in its own `e2e` job.
+
+The suite asserts on visible text, so `playwright.config.ts` pins the browser
+locale to English; the app otherwise follows the browser's `Accept-Language`.
 
 ```sh
 docker compose -f docker-compose.dev.yml up -d --build   # wait for backend healthy

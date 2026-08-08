@@ -1,0 +1,23 @@
+.switcher {
+  display: flex;
+  gap: var(--space-tight);
+  align-items: center;
+}
+
+.choice {
+  min-height: var(--control-height);
+  padding: var(--space-tight) var(--space-gap);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+}
+
+.choice[aria-pressed="true"] {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-weight: var(--weight-bold);
+}

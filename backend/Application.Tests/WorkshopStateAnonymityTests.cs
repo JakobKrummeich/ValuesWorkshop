@@ -7,16 +7,25 @@ namespace ValuesWorkshop.Application.Tests;
 
 public class WorkshopStateAnonymityTests
 {
+    private static readonly string[] IdentifyingNameSuffixes =
+    [
+        "DisplayName",
+        "DisplayNames",
+        "ParticipantName",
+    ];
+
     [Fact]
-    public void Participant_state_identifies_no_participant_at_all()
+    public void Participant_state_identifies_nobody_but_the_caller_themselves()
     {
-        ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState)).ShouldBeEmpty();
+        ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState))
+            .ShouldBe(["ParticipantJoinState.OwnDisplayName"], ignoreOrder: false);
     }
 
     [Fact]
-    public void Presenter_state_identifies_no_participant_at_all()
+    public void Presenter_state_identifies_participants_only_in_the_join_lobby()
     {
-        ParticipantIdentifyingPathsOf(typeof(PresenterWorkshopState)).ShouldBeEmpty();
+        ParticipantIdentifyingPathsOf(typeof(PresenterWorkshopState))
+            .ShouldBe(["PresenterJoinState.ParticipantDisplayNames[]"], ignoreOrder: false);
     }
 
     [Fact]
@@ -25,9 +34,30 @@ public class WorkshopStateAnonymityTests
         ParticipantIdentifyingPathsOf(typeof(FacilitatorWorkshopState))
             .ShouldBe(
                 [
-                    "Groups[].MemberParticipantIds[]",
-                    "Groups[].ScribeParticipantId",
-                    "Roster.ParticipantIds[]",
+                    "FacilitatorFinalPresentationState.Roster.Participants[].DisplayName",
+                    "FacilitatorFinalPresentationState.Roster.Participants[].ParticipantId",
+                    "FacilitatorFinalVotingState.Roster.Participants[].DisplayName",
+                    "FacilitatorFinalVotingState.Roster.Participants[].ParticipantId",
+                    "FacilitatorGroupFormationState.Groups[].MemberParticipantIds[]",
+                    "FacilitatorGroupFormationState.Groups[].ScribeParticipantId",
+                    "FacilitatorGroupFormationState.Roster.Participants[].DisplayName",
+                    "FacilitatorGroupFormationState.Roster.Participants[].ParticipantId",
+                    "FacilitatorGroupWorkState.Groups[].MemberParticipantIds[]",
+                    "FacilitatorGroupWorkState.Groups[].ScribeParticipantId",
+                    "FacilitatorGroupWorkState.Roster.Participants[].DisplayName",
+                    "FacilitatorGroupWorkState.Roster.Participants[].ParticipantId",
+                    "FacilitatorJoinState.Roster.Participants[].DisplayName",
+                    "FacilitatorJoinState.Roster.Participants[].ParticipantId",
+                    "FacilitatorQuizState.Roster.Participants[].DisplayName",
+                    "FacilitatorQuizState.Roster.Participants[].ParticipantId",
+                    "FacilitatorSelectionResultsState.Roster.Participants[].DisplayName",
+                    "FacilitatorSelectionResultsState.Roster.Participants[].ParticipantId",
+                    "FacilitatorValuePresentationState.Groups[].MemberParticipantIds[]",
+                    "FacilitatorValuePresentationState.Groups[].ScribeParticipantId",
+                    "FacilitatorValuePresentationState.Roster.Participants[].DisplayName",
+                    "FacilitatorValuePresentationState.Roster.Participants[].ParticipantId",
+                    "FacilitatorValueSelectionState.Roster.Participants[].DisplayName",
+                    "FacilitatorValueSelectionState.Roster.Participants[].ParticipantId",
                 ],
                 ignoreOrder: false
             );
@@ -45,7 +75,7 @@ public class WorkshopStateAnonymityTests
         var paths = new List<string>();
         foreach (var variant in variants)
         {
-            CollectIdentifyingPaths(variant, prefix: string.Empty, paths);
+            CollectIdentifyingPaths(variant, variant.Name, paths);
         }
 
         return paths.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
@@ -58,7 +88,7 @@ public class WorkshopStateAnonymityTests
             var (propertyType, suffix) = Unwrap(property.PropertyType);
             var path = prefix.Length == 0 ? property.Name : $"{prefix}.{property.Name}";
 
-            if (propertyType == typeof(Guid))
+            if (propertyType == typeof(Guid) || IsDisplayName(propertyType, property.Name))
             {
                 paths.Add(path + suffix);
             }
@@ -88,5 +118,13 @@ public class WorkshopStateAnonymityTests
     private static bool IsWireState(Type type)
     {
         return type.Namespace == typeof(ParticipantWorkshopState).Namespace;
+    }
+
+    private static bool IsDisplayName(Type propertyType, string propertyName)
+    {
+        return propertyType == typeof(string)
+            && IdentifyingNameSuffixes.Any(suffix =>
+                propertyName.EndsWith(suffix, StringComparison.Ordinal)
+            );
     }
 }

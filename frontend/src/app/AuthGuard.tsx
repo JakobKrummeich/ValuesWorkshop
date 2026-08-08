@@ -1,11 +1,22 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { MessageKey } from "../domain/i18n/messages";
+import { useTranslation } from "./i18n/useTranslation";
 import { useAuthGuard, AuthGuardState } from "./useAuthGuard";
 import styles from "./AuthGuard.module.css";
 
+type PendingAuthState = Exclude<AuthGuardState, AuthGuardState.Authenticated>;
+
+const noticeByState: Readonly<Record<PendingAuthState, MessageKey>> = {
+  [AuthGuardState.Checking]: MessageKey.AuthChecking,
+  [AuthGuardState.Redirecting]: MessageKey.AuthRedirecting,
+  [AuthGuardState.Error]: MessageKey.AuthProviderUnavailable,
+};
+
 export function AuthGuard({ children }: { children: ReactNode }) {
   const { state } = useAuthGuard();
+  const { translate } = useTranslation();
 
   if (state === AuthGuardState.Authenticated) {
     return <>{children}</>;
@@ -13,13 +24,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
 
   return (
     <div className={styles.container}>
-      <p>
-        {state === AuthGuardState.Error
-          ? "Unable to connect to the login provider. Please try again later."
-          : state === AuthGuardState.Checking
-            ? "Checking authentication\u2026"
-            : "Redirecting to login\u2026"}
-      </p>
+      <p>{translate(noticeByState[state])}</p>
     </div>
   );
 }

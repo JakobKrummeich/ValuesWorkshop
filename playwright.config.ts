@@ -9,6 +9,8 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3000",
     headless: true,
+    // The suite asserts on visible text, so it pins the browser to English.
+    locale: "en-US",
   },
   projects: [
     {

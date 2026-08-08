@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { Subscription } from "rxjs";
 import { navigateTo, sessionUrl } from "../../adapters/browserLocation";
+import { MessageKey } from "../../domain/i18n/messages";
+import type { MessageParameters } from "../../domain/i18n/translate";
 import type { FacilitatorSessionCreationPort } from "../../domain/ports/facilitator/sessionCreationPort";
 import {
   maximumSessionNameLength,
@@ -12,22 +14,26 @@ import {
 } from "../../domain/sessionCreation";
 
 const FACILITATOR_PATH = "/facilitator";
-const BLANK_SESSION_NAME_MESSAGE = "Enter a session name.";
 
-const messageByFailure: Record<SessionCreationFailure, string> = {
+const messageByFailure: Readonly<Record<SessionCreationFailure, MessageKey>> = {
   [SessionCreationFailure.NotAuthenticated]:
-    "Your sign-in has expired. Sign in again to open a session.",
+    MessageKey.OpenSessionSignInExpired,
   [SessionCreationFailure.PassphraseRejected]:
-    "That facilitator passphrase was not accepted.",
-  [SessionCreationFailure.SessionNameRejected]: `That session name was not accepted. Use up to ${maximumSessionNameLength} characters.`,
-  [SessionCreationFailure.Unexpected]:
-    "The session could not be opened. Please try again.",
+    MessageKey.OpenSessionPassphraseRejected,
+  [SessionCreationFailure.SessionNameRejected]:
+    MessageKey.OpenSessionNameRejected,
+  [SessionCreationFailure.Unexpected]: MessageKey.OpenSessionUnexpected,
 };
+
+export interface FormError {
+  key: MessageKey;
+  params?: MessageParameters;
+}
 
 export interface OpenSessionFormResult {
   sessionName: string;
   passphrase: string;
-  errorMessage: string | null;
+  error: FormError | null;
   isSubmitting: boolean;
   changeSessionName: (event: ChangeEvent<HTMLInputElement>) => void;
   changePassphrase: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -39,7 +45,7 @@ export function useOpenSessionForm(
 ): OpenSessionFormResult {
   const [sessionName, setSessionName] = useState("");
   const [passphrase, setPassphrase] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [error, setError] = useState<FormError | null>(null);
   const [isSubmitting, setSubmitting] = useState(false);
   const inFlightCreation = useRef<Subscription | null>(null);
 
@@ -67,11 +73,11 @@ export function useOpenSessionForm(
 
       const requestedName = sessionName.trim();
       if (requestedName === "") {
-        setErrorMessage(BLANK_SESSION_NAME_MESSAGE);
+        setError({ key: MessageKey.OpenSessionNameRequired });
         return;
       }
 
-      setErrorMessage(null);
+      setError(null);
       setSubmitting(true);
       inFlightCreation.current?.unsubscribe();
 
@@ -82,7 +88,10 @@ export function useOpenSessionForm(
             setPassphrase("");
 
             if (!outcome.isCreated) {
-              setErrorMessage(messageByFailure[outcome.failure]);
+              setError({
+                key: messageByFailure[outcome.failure],
+                params: { limit: maximumSessionNameLength },
+              });
               setSubmitting(false);
               return;
             }
@@ -90,9 +99,9 @@ export function useOpenSessionForm(
             navigateTo(sessionUrl(FACILITATOR_PATH, outcome.sessionIdentity));
           },
           error() {
-            setErrorMessage(
-              messageByFailure[SessionCreationFailure.Unexpected],
-            );
+            setError({
+              key: messageByFailure[SessionCreationFailure.Unexpected],
+            });
             setPassphrase("");
             setSubmitting(false);
           },
@@ -104,7 +113,7 @@ export function useOpenSessionForm(
   return {
     sessionName,
     passphrase,
-    errorMessage,
+    error,
     isSubmitting,
     changeSessionName,
     changePassphrase,

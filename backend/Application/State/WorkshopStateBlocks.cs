@@ -15,7 +15,12 @@ public enum GroupWorkStatus
 
 public sealed record QuizView(int? QuestionIndex, QuizSubState SubState);
 
-public sealed record RosterView(IReadOnlyList<Guid> ParticipantIds, int ParticipantCount);
+public sealed record RosterParticipantView(Guid ParticipantId, string DisplayName);
+
+public sealed record RosterView(
+    IReadOnlyList<RosterParticipantView> Participants,
+    int ParticipantCount
+);
 
 public sealed record OwnSelectionView(bool IsOwnSubmitted, IReadOnlyList<string> TopValueIds);
 

@@ -19,8 +19,11 @@ public abstract record PresenterWorkshopState(long Revision, int ParticipantCoun
     public abstract Phase Phase { get; }
 }
 
-public sealed record PresenterJoinState(long Revision, int ParticipantCount)
-    : PresenterWorkshopState(Revision, ParticipantCount)
+public sealed record PresenterJoinState(
+    long Revision,
+    int ParticipantCount,
+    IReadOnlyList<string> ParticipantDisplayNames
+) : PresenterWorkshopState(Revision, ParticipantCount)
 {
     [JsonIgnore]
     public override Phase Phase => Phase.Join;
