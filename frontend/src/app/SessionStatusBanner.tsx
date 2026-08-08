@@ -6,11 +6,12 @@ import styles from "./SessionStatusBanner.module.css";
 import { useSessionStatusBanner } from "./useSessionStatusBanner";
 
 export function SessionStatusBanner({
-  sessionState,
+  sessionStatePort,
 }: {
-  sessionState: SessionStatePort<PhasedWorkshopState>;
+  sessionStatePort: SessionStatePort<PhasedWorkshopState>;
 }) {
-  const { connectionText, phaseText } = useSessionStatusBanner(sessionState);
+  const { connectionText, phaseText } =
+    useSessionStatusBanner(sessionStatePort);
 
   return (
     <p className={styles.banner}>

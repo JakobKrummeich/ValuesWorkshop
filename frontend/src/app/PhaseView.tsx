@@ -13,13 +13,13 @@ export type PhaseComponents<TState extends PhasedWorkshopState> = Readonly<{
 }>;
 
 export function PhaseView<TState extends PhasedWorkshopState>({
-  sessionState,
+  sessionStatePort,
   components,
 }: {
-  sessionState: SessionStatePort<TState>;
+  sessionStatePort: SessionStatePort<TState>;
   components: PhaseComponents<TState>;
 }) {
-  const state = usePhaseView(sessionState);
+  const state = usePhaseView(sessionStatePort);
 
   if (state === null) {
     return null;

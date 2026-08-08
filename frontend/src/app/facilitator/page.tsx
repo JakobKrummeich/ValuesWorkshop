@@ -11,7 +11,7 @@ import { facilitatorPhaseView } from "./phases/phaseView";
 import styles from "./page.module.css";
 
 export default function FacilitatorHome() {
-  const { sessionState } = useFacilitatorDependencies();
+  const { sessionStatePort } = useFacilitatorDependencies();
   const { translate } = useTranslation();
 
   return (
@@ -20,9 +20,9 @@ export default function FacilitatorHome() {
       <h1 className={styles.heading}>
         {translate(MessageKey.FacilitatorHeading)}
       </h1>
-      <SessionStatusBanner sessionState={sessionState} />
+      <SessionStatusBanner sessionStatePort={sessionStatePort} />
       <PhaseView
-        sessionState={sessionState}
+        sessionStatePort={sessionStatePort}
         components={facilitatorPhaseView}
       />
       <AdvancePhaseButton />

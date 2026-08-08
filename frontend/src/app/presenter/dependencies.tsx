@@ -4,7 +4,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import type { PresenterSessionStatePort } from "../../domain/ports/presenter/sessionStatePort";
 
 export interface PresenterDependencies {
-  sessionState: PresenterSessionStatePort;
+  sessionStatePort: PresenterSessionStatePort;
 }
 
 const PresenterDependencyContext = createContext<PresenterDependencies | null>(

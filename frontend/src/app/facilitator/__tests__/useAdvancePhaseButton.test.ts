@@ -17,7 +17,7 @@ const dependencies = useFacilitatorDependencies as jest.MockedFunction<
 
 function withAdvancePhase(advancePhase: () => Single<IntentResult>) {
   dependencies.mockReturnValue({
-    sessionState: { workshopState: NEVER, connectionState: NEVER },
+    sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
     lifecycle: { advancePhase },
   });
 }

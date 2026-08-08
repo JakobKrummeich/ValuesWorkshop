@@ -10,7 +10,7 @@ import { presenterPhaseView } from "./phases/phaseView";
 import styles from "./page.module.css";
 
 export default function PresenterHome() {
-  const { sessionState } = usePresenterDependencies();
+  const { sessionStatePort } = usePresenterDependencies();
   const { translate } = useTranslation();
 
   return (
@@ -19,8 +19,11 @@ export default function PresenterHome() {
       <h1 className={styles.heading}>
         {translate(MessageKey.PresenterHeading)}
       </h1>
-      <SessionStatusBanner sessionState={sessionState} />
-      <PhaseView sessionState={sessionState} components={presenterPhaseView} />
+      <SessionStatusBanner sessionStatePort={sessionStatePort} />
+      <PhaseView
+        sessionStatePort={sessionStatePort}
+        components={presenterPhaseView}
+      />
     </main>
   );
 }

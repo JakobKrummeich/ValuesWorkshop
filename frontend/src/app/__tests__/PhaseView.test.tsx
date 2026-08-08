@@ -37,7 +37,7 @@ describe("phase view", () => {
     phaseState.mockReturnValue(null);
 
     const { container } = render(
-      <PhaseView sessionState={port} components={components} />,
+      <PhaseView sessionStatePort={port} components={components} />,
     );
 
     expect(container).toBeEmptyDOMElement();
@@ -51,7 +51,7 @@ describe("phase view", () => {
       ownDisplayName: "Ada Lovelace",
     });
 
-    render(<PhaseView sessionState={port} components={components} />);
+    render(<PhaseView sessionStatePort={port} components={components} />);
 
     screen.getByText("lobby of Ada Lovelace");
   });
@@ -65,7 +65,7 @@ describe("phase view", () => {
     });
 
     const { container } = render(
-      <PhaseView sessionState={port} components={components} />,
+      <PhaseView sessionStatePort={port} components={components} />,
     );
 
     expect(container).toBeEmptyDOMElement();

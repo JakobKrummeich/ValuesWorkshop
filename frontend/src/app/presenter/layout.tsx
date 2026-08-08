@@ -11,7 +11,7 @@ export default function PresenterLayout({ children }: { children: ReactNode }) {
     <SessionBoundary createSession={createPresenterSession}>
       {(session) => (
         <PresenterDependencyProvider
-          dependencies={{ sessionState: session.sessionState }}
+          dependencies={{ sessionStatePort: session.sessionStatePort }}
         >
           <div className="screenPresenter">{children}</div>
         </PresenterDependencyProvider>

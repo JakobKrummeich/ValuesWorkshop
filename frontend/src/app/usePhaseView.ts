@@ -5,17 +5,17 @@ import type { SessionStatePort } from "../domain/ports/sessionStatePort";
 import type { PhasedWorkshopState } from "../domain/workshopState";
 
 export function usePhaseView<TState extends PhasedWorkshopState>(
-  sessionState: SessionStatePort<TState>,
+  sessionStatePort: SessionStatePort<TState>,
 ): TState | null {
   const [state, setState] = useState<TState | null>(null);
 
   useEffect(() => {
-    const subscription = sessionState.workshopState.subscribe(setState);
+    const subscription = sessionStatePort.workshopState.subscribe(setState);
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [sessionState]);
+  }, [sessionStatePort]);
 
   return state;
 }

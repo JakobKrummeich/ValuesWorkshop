@@ -37,7 +37,7 @@ const workshopState = new Subject<ParticipantWorkshopState>();
 beforeEach(() => {
   sessionIdentity.mockReturnValue("session-7");
   createSession.mockReturnValue({
-    sessionState: {
+    sessionStatePort: {
       workshopState,
       connectionState: of(ConnectionState.Connected),
     },

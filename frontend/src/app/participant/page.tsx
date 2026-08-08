@@ -10,7 +10,7 @@ import { participantPhaseView } from "./phases/phaseView";
 import styles from "./page.module.css";
 
 export default function ParticipantHome() {
-  const { sessionState } = useParticipantDependencies();
+  const { sessionStatePort } = useParticipantDependencies();
   const { translate } = useTranslation();
 
   return (
@@ -19,9 +19,9 @@ export default function ParticipantHome() {
       <h1 className={styles.heading}>
         {translate(MessageKey.ParticipantHeading)}
       </h1>
-      <SessionStatusBanner sessionState={sessionState} />
+      <SessionStatusBanner sessionStatePort={sessionStatePort} />
       <PhaseView
-        sessionState={sessionState}
+        sessionStatePort={sessionStatePort}
         components={participantPhaseView}
       />
     </main>

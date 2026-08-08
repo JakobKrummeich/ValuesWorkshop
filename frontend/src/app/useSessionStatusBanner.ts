@@ -16,7 +16,7 @@ export interface SessionStatusBannerResult {
 }
 
 export function useSessionStatusBanner(
-  sessionState: SessionStatePort<PhasedWorkshopState>,
+  sessionStatePort: SessionStatePort<PhasedWorkshopState>,
 ): SessionStatusBannerResult {
   const [connectionState, setConnectionState] = useState(
     ConnectionState.Connecting,
@@ -27,16 +27,18 @@ export function useSessionStatusBanner(
   useEffect(() => {
     const subscriptions = new Subscription();
     subscriptions.add(
-      sessionState.connectionState.subscribe(setConnectionState),
+      sessionStatePort.connectionState.subscribe(setConnectionState),
     );
     subscriptions.add(
-      sessionState.workshopState.subscribe((state) => setPhase(state.phase)),
+      sessionStatePort.workshopState.subscribe((state) =>
+        setPhase(state.phase),
+      ),
     );
 
     return () => {
       subscriptions.unsubscribe();
     };
-  }, [sessionState]);
+  }, [sessionStatePort]);
 
   return {
     connectionText: translate(connectionStateMessage(connectionState)),

@@ -20,7 +20,7 @@ describe("session status banner", () => {
       phaseText: "Phase 2",
     });
 
-    render(<SessionStatusBanner sessionState={port} />);
+    render(<SessionStatusBanner sessionStatePort={port} />);
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 2");
     expect(screen.getByTestId("connection")).toHaveTextContent("Connected");
@@ -32,7 +32,7 @@ describe("session status banner", () => {
       phaseText: "Waiting for the workshop\u2026",
     });
 
-    render(<SessionStatusBanner sessionState={port} />);
+    render(<SessionStatusBanner sessionStatePort={port} />);
 
     expect(screen.getByTestId("phase")).toHaveTextContent(
       "Waiting for the workshop",
