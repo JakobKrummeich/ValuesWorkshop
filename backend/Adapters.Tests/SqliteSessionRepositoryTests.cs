@@ -252,6 +252,27 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
     }
 
     [Fact]
+    public async Task Round_trip_preserves_a_quiz_walked_with_the_domain_mutators()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var session = TestSessions.InPhase(identity, Phase.Join);
+        var facilitator = TestSessions.CallerOf(session);
+        TestSessions.AdvanceToNextPhase(session);
+        session.RevealAnswer(facilitator);
+        session.ShowLearningText(facilitator);
+        session.PoseNextQuestion(facilitator, questionCount: 5);
+        session.RevealAnswer(facilitator);
+
+        await CreateSession(session);
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
+        loaded.Quiz.CurrentQuestionIndex.ShouldBe(1);
+        loaded.Quiz.IsRevealed.ShouldBeTrue();
+        loaded.Quiz.IsLearningTextShown.ShouldBeFalse();
+    }
+
+    [Fact]
     public async Task Round_trip_preserves_the_state_the_exit_guards_read()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
