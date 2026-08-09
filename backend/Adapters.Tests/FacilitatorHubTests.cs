@@ -168,6 +168,84 @@ public class FacilitatorHubTests
         result.Code.ShouldBe(IntentRejectionCode.UnknownSession);
     }
 
+    [Fact]
+    public async Task Revealing_the_answer_mutates_persists_and_broadcasts()
+    {
+        repository.Add(SessionInQuiz(QuizProgress.Restore(0, false, false, [])));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.RevealAnswer();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Quiz.IsRevealed.ShouldBeTrue();
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Showing_the_learning_text_mutates_persists_and_broadcasts()
+    {
+        repository.Add(SessionInQuiz(QuizProgress.Restore(0, true, false, [])));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.ShowLearningText();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Quiz.IsLearningTextShown.ShouldBeTrue();
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Posing_the_next_question_mutates_persists_and_broadcasts()
+    {
+        repository.Add(SessionInQuiz(QuizProgress.Restore(0, true, true, [])));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.PoseNextQuestion();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Quiz.CurrentQuestionIndex.ShouldBe(1);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Walking_the_quiz_as_a_subject_that_is_not_the_facilitator_is_rejected()
+    {
+        repository.Add(SessionInQuiz(QuizProgress.Restore(0, false, false, [])));
+        var hub = HubWithContext(
+            new FakeHubCallerContext(KnownSession.Value.ToString(), "another-subject")
+        );
+
+        var result = await hub.RevealAnswer();
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Revealing_an_already_revealed_answer_is_rejected_and_broadcasts_nothing()
+    {
+        repository.Add(SessionInQuiz(QuizProgress.Restore(0, true, false, [])));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.RevealAnswer();
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    private static Session SessionInQuiz(QuizProgress quiz)
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.Quiz, quiz);
+
+        session.BumpRevision();
+
+        return session;
+    }
+
     private static Session SessionInPhase(Phase phase)
     {
         var session = TestSessions.InPhase(KnownSession, phase);
@@ -193,7 +271,8 @@ public class FacilitatorHubTests
             repository,
             new FacilitatorIntentHandler(
                 new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-                new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard())
+                new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard()),
+                new TestQuizCatalog(5)
             ),
             new WorkshopStateCache(),
             registry

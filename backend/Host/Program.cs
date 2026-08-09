@@ -31,6 +31,7 @@ builder.Services.AddScoped<SessionCommandHandler>();
 builder.Services.AddScoped<SessionCreationHandler>();
 builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddScoped<FacilitatorIntentHandler>();
+builder.Services.AddScoped<ParticipantIntentHandler>();
 builder.Services.AddSingleton<IQuizCatalog>(quizCatalog);
 builder.Services.AddSingleton(
     new PhaseExitGuards(

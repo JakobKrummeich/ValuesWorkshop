@@ -83,11 +83,86 @@ public class FacilitatorIntentHandlerTests
         repository.Saved.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task The_facilitator_reveals_the_answer_of_the_current_question()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, false, false, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new RevealAnswerCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Quiz.IsRevealed.ShouldBeTrue();
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Quiz.IsRevealed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task The_facilitator_shows_the_learning_text_once_the_answer_is_revealed()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, true, false, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new ShowLearningTextCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Quiz.IsLearningTextShown.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task The_facilitator_poses_the_next_question_from_the_catalog()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, true, true, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new PoseNextQuestionCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Quiz.CurrentQuestionIndex.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Posing_past_the_last_catalog_question_is_rejected_as_a_wrong_phase()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, true, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new PoseNextQuestionCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Another_subject_may_not_walk_the_quiz()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, false, false, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new RevealAnswerCommand(KnownSession, new CallerSubject("someone-else")));
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
     private FacilitatorIntentHandler HandlerOver(FakeSessionRepository repository)
     {
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard())
+            new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard()),
+            new TestQuizCatalog(5)
         );
     }
 }

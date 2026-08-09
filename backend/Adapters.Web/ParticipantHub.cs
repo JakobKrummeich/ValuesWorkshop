@@ -11,6 +11,7 @@ namespace ValuesWorkshop.Adapters.Web;
 public sealed class ParticipantHub(
     ISessionRepository repository,
     IntentPipeline pipeline,
+    ParticipantIntentHandler intentHandler,
     WorkshopStateCache cache,
     IRandomness randomness,
     SessionConnectionRegistry registry
@@ -55,5 +56,15 @@ public sealed class ParticipantHub(
         registry.Remove(Context.ConnectionId);
 
         return base.OnDisconnectedAsync(exception);
+    }
+
+    public Task<IntentResult> ChooseQuizAnswer(int questionIndex, int answerIndex)
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        return intentHandler.HandleAsync(
+            new ChooseQuizAnswerCommand(sessionIdentity, participantId, questionIndex, answerIndex)
+        );
     }
 }

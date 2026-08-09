@@ -63,4 +63,25 @@ public sealed class FacilitatorHub(
             new AdvancePhaseCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
         );
     }
+
+    public Task<IntentResult> RevealAnswer()
+    {
+        return intentHandler.HandleAsync(
+            new RevealAnswerCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
+        );
+    }
+
+    public Task<IntentResult> ShowLearningText()
+    {
+        return intentHandler.HandleAsync(
+            new ShowLearningTextCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
+        );
+    }
+
+    public Task<IntentResult> PoseNextQuestion()
+    {
+        return intentHandler.HandleAsync(
+            new PoseNextQuestionCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
+        );
+    }
 }

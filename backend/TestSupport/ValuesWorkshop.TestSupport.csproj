@@ -4,6 +4,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application\ValuesWorkshop.Application.csproj" />
     <ProjectReference Include="..\Domain\ValuesWorkshop.Domain.csproj" />
   </ItemGroup>
 </Project>
