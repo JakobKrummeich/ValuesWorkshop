@@ -59,6 +59,7 @@ migrations run at startup and evolve an existing volume in place.
 | Variable | Required | Dev value |
 |---|---|---|
 | `FACILITATOR_PASSPHRASE` | yes — the host refuses to start without it | `dev-facilitator-passphrase` |
+| `CONFIG_DIR` | no (`config`) | `/config` in compose (mounted from `./config`) |
 | `DATA_DIR` | no (`data`) | `/data` in compose |
 | `OIDC_AUTHORITY` / `OIDC_METADATA_URL` | no | `http://localhost:9000` |
 | `CORS_ORIGINS` | no | `http://localhost:3000` |
