@@ -278,15 +278,15 @@ construct them with the real content counts.
 
 ## Phase C: Workshop Phases 1–4
 
-### Task 12: Phase 1 — Join
+### Task 12: Phase 1 — Join ✅
 **Description:** Presenter shows large QR (join URL with sessionId);
 participant lands in lobby after login; facilitator sees live participant
 list and advances.
 **Acceptance criteria:**
-- [ ] QR encodes working join URL
-- [ ] Participant list updates live on join
-- [ ] Screens ship de+en from the start (no English-only placeholder text)
-- [ ] **Moved up from Task 14:** Playwright wired into CI — compose (or
+- [x] QR encodes working join URL
+- [x] Participant list updates live on join
+- [x] Screens ship de+en from the start (no English-only placeholder text)
+- [x] **Moved up from Task 14:** Playwright wired into CI — compose (or
       `webServer`) startup in `playwright.config.ts` plus a job in
       `.github/workflows/ci.yml`, covering the Task 10 reconnect/restart smoke
       that is still local-only
