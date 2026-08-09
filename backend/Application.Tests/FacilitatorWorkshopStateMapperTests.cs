@@ -78,6 +78,7 @@ public class FacilitatorWorkshopStateMapperTests
         quiz.AnswerTallies.ShouldBe([2, 0, 0]);
         quiz.AnsweredCount.ShouldBe(2);
         quiz.CorrectAnswerIndex.ShouldBe(TestQuizCatalog.CorrectAnswerIndex);
+        quiz.LearningText.ShouldBe(new LocalizedTextView("Lerntext 1", "Learning text 1"));
     }
 
     [Fact]

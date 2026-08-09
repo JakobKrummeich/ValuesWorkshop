@@ -31,6 +31,7 @@ const participantQuizViewSchema = z.object({
   ...quizViewBase,
   ownAnswerIndex: z.int().nullable(),
   correctAnswerIndex: z.int().optional(),
+  learningText: localizedTextSchema.optional(),
 });
 
 const facilitatorQuizViewSchema = z.object({
@@ -38,12 +39,14 @@ const facilitatorQuizViewSchema = z.object({
   answerTallies: z.array(z.int()),
   answeredCount: z.int(),
   correctAnswerIndex: z.int(),
+  learningText: localizedTextSchema,
 });
 
 const presenterQuizViewSchema = z.object({
   ...quizViewBase,
   answerTallies: z.array(z.int()),
   correctAnswerIndex: z.int().optional(),
+  learningText: localizedTextSchema.optional(),
 });
 
 const rosterViewSchema = z.object({

@@ -127,6 +127,24 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Quiz_state_hides_the_learning_text_until_it_is_shown()
+    {
+        var revealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, false, [])
+        );
+        var shown = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, true, [])
+        );
+
+        Map(revealed).ShouldBeOfType<ParticipantQuizState>().Quiz.LearningText.ShouldBeNull();
+        Map(shown)
+            .ShouldBeOfType<ParticipantQuizState>()
+            .Quiz.LearningText.ShouldBe(new LocalizedTextView("Lerntext 0", "Learning text 0"));
+    }
+
+    [Fact]
     public void Quiz_state_carries_the_callers_own_answer_and_nobody_elses()
     {
         var session = SessionFixtures.InPhase(

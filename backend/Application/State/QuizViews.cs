@@ -21,7 +21,8 @@ internal static class QuizViews
             ViewOf(question.Question),
             AnswerViewsOf(question),
             quiz.AnswerIndexOf(caller),
-            quiz.IsRevealed ? question.CorrectAnswerIndex : null
+            quiz.IsRevealed ? question.CorrectAnswerIndex : null,
+            quiz.IsLearningTextShown ? ViewOf(question.LearningText) : null
         );
     }
 
@@ -38,7 +39,8 @@ internal static class QuizViews
             AnswerViewsOf(question),
             quiz.AnswerTallies,
             quiz.AnsweredCount,
-            question.CorrectAnswerIndex
+            question.CorrectAnswerIndex,
+            ViewOf(question.LearningText)
         );
     }
 
@@ -54,7 +56,8 @@ internal static class QuizViews
             ViewOf(question.Question),
             AnswerViewsOf(question),
             quiz.AnswerTallies,
-            quiz.IsRevealed ? question.CorrectAnswerIndex : null
+            quiz.IsRevealed ? question.CorrectAnswerIndex : null,
+            quiz.IsLearningTextShown ? ViewOf(question.LearningText) : null
         );
     }
 

@@ -76,11 +76,13 @@ content from the catalog (question + answer texts, both locales) so Task 14
 never reads `config/` from the frontend:
 
 - participant: `questionIndex, subState, question, answers, ownAnswerIndex?,
-  correctAnswerIndex?` (correct index only once revealed — no pre-reveal leak)
+  correctAnswerIndex?, learningText?` (correct index only once revealed — no
+  pre-reveal leak; learning text only once shown)
 - facilitator: `questionIndex, subState, question, answers, answerTallies,
-  answeredCount, correctAnswerIndex` (facilitator may always see it)
+  answeredCount, correctAnswerIndex, learningText` (facilitator may always
+  see both)
 - presenter: `questionIndex, subState, question, answers, answerTallies,
-  correctAnswerIndex?` (once revealed)
+  correctAnswerIndex?, learningText?` (once revealed / once shown)
 
 ## Deviation from protocol.md (update doc in same PR)
 
@@ -134,3 +136,8 @@ Each slice: TDD, lands green on the feature branch before the next starts.
 2. Facilitator always sees `correctAnswerIndex`, even pre-reveal — confirmed.
 3. `MalformedPayloadException` lives in Domain next to the other exception
    types.
+4. Found in review: the quiz views also carry `learningText` — the
+   facilitator always, participant and presenter only once
+   `subState = learningTextShown` (omitted from the JSON before that, like
+   the pre-reveal `correctAnswerIndex`). Without it Task 14 could not render
+   the learning-text sub-state.

@@ -23,7 +23,9 @@ public sealed record ParticipantQuizView(
     LocalizedTextView Question,
     IReadOnlyList<LocalizedTextView> Answers,
     int? OwnAnswerIndex,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CorrectAnswerIndex
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CorrectAnswerIndex,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        LocalizedTextView? LearningText
 );
 
 public sealed record FacilitatorQuizView(
@@ -33,7 +35,8 @@ public sealed record FacilitatorQuizView(
     IReadOnlyList<LocalizedTextView> Answers,
     IReadOnlyList<int> AnswerTallies,
     int AnsweredCount,
-    int CorrectAnswerIndex
+    int CorrectAnswerIndex,
+    LocalizedTextView LearningText
 );
 
 public sealed record PresenterQuizView(
@@ -42,7 +45,9 @@ public sealed record PresenterQuizView(
     LocalizedTextView Question,
     IReadOnlyList<LocalizedTextView> Answers,
     IReadOnlyList<int> AnswerTallies,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CorrectAnswerIndex
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CorrectAnswerIndex,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        LocalizedTextView? LearningText
 );
 
 public sealed record RosterParticipantView(Guid ParticipantId, string DisplayName);

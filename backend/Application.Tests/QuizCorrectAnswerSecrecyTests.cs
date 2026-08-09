@@ -23,6 +23,30 @@ public class QuizCorrectAnswerSecrecyTests
     }
 
     [Fact]
+    public void Participant_and_presenter_json_never_mention_the_learning_text_before_it_is_shown()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, false, [])
+        );
+
+        ParticipantJsonOf(session).ShouldNotContain("learningText");
+        PresenterJsonOf(session).ShouldNotContain("learningText");
+    }
+
+    [Fact]
+    public void Once_shown_participant_and_presenter_json_carry_the_learning_text()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, true, [])
+        );
+
+        ParticipantJsonOf(session).ShouldContain("\"learningText\"");
+        PresenterJsonOf(session).ShouldContain("\"learningText\"");
+    }
+
+    [Fact]
     public void Once_revealed_participant_and_presenter_json_carry_the_correct_answer()
     {
         var session = SessionFixtures.InPhase(
@@ -48,6 +72,7 @@ public class QuizCorrectAnswerSecrecyTests
         );
 
         json.ShouldContain("\"correctAnswerIndex\":1");
+        json.ShouldContain("\"learningText\"");
     }
 
     private static string ParticipantJsonOf(Session session)

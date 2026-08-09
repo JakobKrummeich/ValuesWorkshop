@@ -352,7 +352,7 @@ variant carries it.
 
 | Block | Fields |
 |---|---|
-| quiz | `questionIndex`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed) |
+| quiz | `questionIndex`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?`, `topValueIds?` |
 | ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
@@ -369,7 +369,7 @@ join lobby shows back to the person who just signed in.
 | Block | Fields |
 |---|---|
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
-| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex` (always — the facilitator may see it before the reveal) |
+| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
 | groups | `[{ name, memberParticipantIds, assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
@@ -388,7 +388,7 @@ what they answered, selected, or voted for.
 
 | Block | Fields |
 |---|---|
-| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed) |
+| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
 | groups | `[{ name, memberCount, assignedValueIds, workStatus }]` |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
