@@ -27,7 +27,8 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
             QuizProgress.Restore(
                 session.Quiz.CurrentQuestionIndex,
                 session.Quiz.IsRevealed,
-                session.Quiz.IsLearningTextShown
+                session.Quiz.IsLearningTextShown,
+                session.Quiz.CastAnswers
             ),
             SelectionRound.Restore(session.Selection.SubmittedBy, session.Selection.TopValues),
             FormationRecord.Restore(

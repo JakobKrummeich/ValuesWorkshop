@@ -2,9 +2,35 @@ namespace ValuesWorkshop.Domain;
 
 public sealed class QuizProgress
 {
+    public const int AnswersPerQuestion = 3;
+
+    private readonly List<CastAnswer> castAnswers = [];
+
     public int? CurrentQuestionIndex { get; private set; }
     public bool IsRevealed { get; private set; }
     public bool IsLearningTextShown { get; private set; }
+    public IReadOnlyList<CastAnswer> CastAnswers => castAnswers;
+
+    public IReadOnlyList<int> AnswerTallies
+    {
+        get
+        {
+            var tallies = new int[AnswersPerQuestion];
+
+            foreach (var cast in castAnswers)
+            {
+                if (cast.QuestionIndex == CurrentQuestionIndex)
+                {
+                    tallies[cast.AnswerIndex]++;
+                }
+            }
+
+            return tallies;
+        }
+    }
+
+    public int AnsweredCount =>
+        castAnswers.Count(cast => cast.QuestionIndex == CurrentQuestionIndex);
 
     public bool IsQuizComplete(int questionCount)
     {
@@ -54,6 +80,36 @@ public sealed class QuizProgress
         IsLearningTextShown = true;
     }
 
+    internal void ChooseAnswer(ParticipantId participantId, int questionIndex, int answerIndex)
+    {
+        if (CurrentQuestionIndex != questionIndex || IsRevealed)
+        {
+            throw new WrongPhaseException(
+                "An answer is cast on the current question while it is unrevealed."
+            );
+        }
+
+        if (answerIndex is < 0 or >= AnswersPerQuestion)
+        {
+            throw new MalformedPayloadException(
+                $"The answer index must lie between 0 and {AnswersPerQuestion - 1}."
+            );
+        }
+
+        if (
+            castAnswers.Any(cast =>
+                cast.QuestionIndex == questionIndex && cast.ParticipantId == participantId
+            )
+        )
+        {
+            throw new InvariantViolationException(
+                "Each participant answers each quiz question exactly once (I5)."
+            );
+        }
+
+        castAnswers.Add(new CastAnswer(questionIndex, participantId, answerIndex));
+    }
+
     internal void PoseNextQuestion(int questionCount)
     {
         if (!IsLearningTextShown)
@@ -76,14 +132,18 @@ public sealed class QuizProgress
     internal static QuizProgress Restore(
         int? currentQuestionIndex,
         bool isRevealed,
-        bool isLearningTextShown
+        bool isLearningTextShown,
+        IEnumerable<CastAnswer> castAnswers
     )
     {
-        return new QuizProgress
+        var progress = new QuizProgress
         {
             CurrentQuestionIndex = currentQuestionIndex,
             IsRevealed = isRevealed,
             IsLearningTextShown = isLearningTextShown,
         };
+        progress.castAnswers.AddRange(castAnswers);
+
+        return progress;
     }
 }

@@ -21,7 +21,7 @@ public class SessionExitGuardTests
     [Fact]
     public void The_quiz_may_not_be_left_before_the_last_question_is_walked()
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(3, true, true));
+        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(3, true, true, []));
 
         ShouldRefuseToAdvance(session, Phase.Quiz);
     }
@@ -29,7 +29,7 @@ public class SessionExitGuardTests
     [Fact]
     public void The_quiz_may_not_be_left_while_the_last_learning_text_is_unshown()
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, false));
+        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, false, []));
 
         ShouldRefuseToAdvance(session, Phase.Quiz);
     }
@@ -37,7 +37,7 @@ public class SessionExitGuardTests
     [Fact]
     public void The_quiz_may_be_left_once_the_last_question_index_is_walked()
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, true));
+        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(4, true, true, []));
 
         Advance(session);
 
@@ -47,7 +47,10 @@ public class SessionExitGuardTests
     [Fact]
     public void A_phase_without_a_registered_guard_is_left_freely()
     {
-        var session = SessionInPhase(Phase.Quiz, quiz: QuizProgress.Restore(null, false, false));
+        var session = SessionInPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(null, false, false, [])
+        );
 
         Advance(session, PhaseExitGuards.None);
 

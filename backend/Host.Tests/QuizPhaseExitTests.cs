@@ -15,7 +15,7 @@ public sealed class QuizPhaseExitTests : IClassFixture<WorkshopTestFactory>
     [Fact]
     public void The_host_refuses_to_leave_the_quiz_before_it_is_complete()
     {
-        var session = SessionInQuizPhase(QuizProgress.Restore(0, false, false));
+        var session = SessionInQuizPhase(QuizProgress.Restore(0, false, false, []));
 
         Should.Throw<WrongPhaseException>(() =>
             session.AdvancePhase(TestSessions.CallerOf(session), RegisteredExitGuards())
@@ -27,7 +27,7 @@ public sealed class QuizPhaseExitTests : IClassFixture<WorkshopTestFactory>
     [Fact]
     public void The_host_lets_the_quiz_be_left_once_the_last_learning_text_was_shown()
     {
-        var session = SessionInQuizPhase(QuizProgress.Restore(4, true, true));
+        var session = SessionInQuizPhase(QuizProgress.Restore(4, true, true, []));
 
         session.AdvancePhase(TestSessions.CallerOf(session), RegisteredExitGuards());
 

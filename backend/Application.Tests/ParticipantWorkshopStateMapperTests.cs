@@ -61,7 +61,7 @@ public class ParticipantWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
-            quiz: QuizProgress.Restore(2, true, false)
+            quiz: QuizProgress.Restore(2, true, false, [])
         );
 
         var quiz = Map(session).ShouldBeOfType<ParticipantQuizState>().Quiz;
@@ -82,7 +82,7 @@ public class ParticipantWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
-            quiz: QuizProgress.Restore(1, isRevealed, isLearningTextShown)
+            quiz: QuizProgress.Restore(1, isRevealed, isLearningTextShown, [])
         );
 
         Map(session).ShouldBeOfType<ParticipantQuizState>().Quiz.SubState.ShouldBe(expected);

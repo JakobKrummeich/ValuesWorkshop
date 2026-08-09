@@ -21,7 +21,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void The_facilitator_reveals_the_answer_of_the_posed_question()
     {
-        var session = QuizSession(QuizProgress.Restore(0, false, false));
+        var session = QuizSession(QuizProgress.Restore(0, false, false, []));
 
         session.RevealAnswer(TestSessions.CallerOf(session));
 
@@ -32,7 +32,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void An_already_revealed_answer_cannot_be_revealed_again()
     {
-        var session = QuizSession(QuizProgress.Restore(0, true, false));
+        var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
         Should.Throw<WrongPhaseException>(() =>
             session.RevealAnswer(TestSessions.CallerOf(session))
@@ -45,7 +45,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void Nothing_can_be_revealed_while_no_question_is_posed()
     {
-        var session = QuizSession(QuizProgress.Restore(null, false, false));
+        var session = QuizSession(QuizProgress.Restore(null, false, false, []));
 
         Should.Throw<WrongPhaseException>(() =>
             session.RevealAnswer(TestSessions.CallerOf(session))
@@ -58,7 +58,7 @@ public class SessionQuizWalkTests
         var session = TestSessions.InPhase(
             new SessionIdentity(Guid.NewGuid()),
             Phase.ValueSelection,
-            QuizProgress.Restore(4, true, true)
+            QuizProgress.Restore(4, true, true, [])
         );
 
         Should.Throw<WrongPhaseException>(() =>
@@ -69,7 +69,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void Only_the_facilitator_reveals_the_answer()
     {
-        var session = QuizSession(QuizProgress.Restore(0, false, false));
+        var session = QuizSession(QuizProgress.Restore(0, false, false, []));
 
         Should.Throw<NotAuthorizedException>(() => session.RevealAnswer(Stranger));
 
@@ -79,7 +79,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void The_facilitator_shows_the_learning_text_once_the_answer_is_revealed()
     {
-        var session = QuizSession(QuizProgress.Restore(0, true, false));
+        var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
         session.ShowLearningText(TestSessions.CallerOf(session));
 
@@ -89,7 +89,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void The_learning_text_stays_hidden_while_the_answer_is_unrevealed()
     {
-        var session = QuizSession(QuizProgress.Restore(0, false, false));
+        var session = QuizSession(QuizProgress.Restore(0, false, false, []));
 
         Should.Throw<WrongPhaseException>(() =>
             session.ShowLearningText(TestSessions.CallerOf(session))
@@ -101,7 +101,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void An_already_shown_learning_text_cannot_be_shown_again()
     {
-        var session = QuizSession(QuizProgress.Restore(0, true, true));
+        var session = QuizSession(QuizProgress.Restore(0, true, true, []));
 
         Should.Throw<WrongPhaseException>(() =>
             session.ShowLearningText(TestSessions.CallerOf(session))
@@ -111,7 +111,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void Only_the_facilitator_shows_the_learning_text()
     {
-        var session = QuizSession(QuizProgress.Restore(0, true, false));
+        var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
         Should.Throw<NotAuthorizedException>(() => session.ShowLearningText(Stranger));
 
@@ -121,7 +121,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void The_facilitator_poses_the_next_question_once_the_learning_text_was_shown()
     {
-        var session = QuizSession(QuizProgress.Restore(0, true, true));
+        var session = QuizSession(QuizProgress.Restore(0, true, true, []));
 
         session.PoseNextQuestion(TestSessions.CallerOf(session), QuestionCount);
 
@@ -133,7 +133,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void The_next_question_waits_until_the_learning_text_was_shown()
     {
-        var session = QuizSession(QuizProgress.Restore(0, true, false));
+        var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
         Should.Throw<WrongPhaseException>(() =>
             session.PoseNextQuestion(TestSessions.CallerOf(session), QuestionCount)
@@ -146,7 +146,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void No_question_can_be_posed_beyond_the_last_one()
     {
-        var session = QuizSession(QuizProgress.Restore(QuestionCount - 1, true, true));
+        var session = QuizSession(QuizProgress.Restore(QuestionCount - 1, true, true, []));
 
         Should.Throw<WrongPhaseException>(() =>
             session.PoseNextQuestion(TestSessions.CallerOf(session), QuestionCount)
@@ -159,7 +159,7 @@ public class SessionQuizWalkTests
     [Fact]
     public void Only_the_facilitator_poses_the_next_question()
     {
-        var session = QuizSession(QuizProgress.Restore(0, true, true));
+        var session = QuizSession(QuizProgress.Restore(0, true, true, []));
 
         Should.Throw<NotAuthorizedException>(() =>
             session.PoseNextQuestion(Stranger, QuestionCount)

@@ -227,7 +227,7 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IAsyncLifetime, IDispos
             TestSessions.Name,
             Roster.Restore(participants.Select(TestParticipants.Unnamed)),
             PhaseProgress.Restore(phase),
-            QuizProgress.Restore(null, false, false),
+            QuizProgress.Restore(null, false, false, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),

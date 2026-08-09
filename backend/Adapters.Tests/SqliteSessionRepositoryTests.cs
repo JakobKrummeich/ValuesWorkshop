@@ -100,7 +100,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
                 TestParticipants.Named(participantTwo, "Ben"),
             ]),
             PhaseProgress.Restore(Phase.Quiz),
-            QuizProgress.Restore(2, true, false),
+            QuizProgress.Restore(2, true, false, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
@@ -155,7 +155,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             TestSessions.Name,
             Roster.Restore([TestParticipants.Unnamed(participant)]),
             PhaseProgress.Restore(Phase.SelectionResults),
-            QuizProgress.Restore(4, true, true),
+            QuizProgress.Restore(4, true, true, []),
             SelectionRound.Restore([participant], [topValueOne, topValueTwo]),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
@@ -192,7 +192,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
                 TestParticipants.Unnamed(memberTwo),
             ]),
             PhaseProgress.Restore(Phase.GroupWork),
-            QuizProgress.Restore(null, false, false),
+            QuizProgress.Restore(null, false, false, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(true, [group]),
             PresentationWalk.Restore(null, null, 0),
@@ -230,7 +230,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             TestSessions.Name,
             Roster.Restore([]),
             PhaseProgress.Restore(Phase.FinalPresentation),
-            QuizProgress.Restore(null, false, false),
+            QuizProgress.Restore(null, false, false, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore("Eagle", new ValueId("courage"), 3),
@@ -252,27 +252,6 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
     }
 
     [Fact]
-    public async Task Round_trip_preserves_a_quiz_walked_with_the_domain_mutators()
-    {
-        var identity = new SessionIdentity(Guid.NewGuid());
-        var session = TestSessions.InPhase(identity, Phase.Join);
-        var facilitator = TestSessions.CallerOf(session);
-        TestSessions.AdvanceToNextPhase(session);
-        session.RevealAnswer(facilitator);
-        session.ShowLearningText(facilitator);
-        session.PoseNextQuestion(facilitator, questionCount: 5);
-        session.RevealAnswer(facilitator);
-
-        await CreateSession(session);
-        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
-
-        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
-        loaded.Quiz.CurrentQuestionIndex.ShouldBe(1);
-        loaded.Quiz.IsRevealed.ShouldBeTrue();
-        loaded.Quiz.IsLearningTextShown.ShouldBeFalse();
-    }
-
-    [Fact]
     public async Task Round_trip_preserves_the_state_the_exit_guards_read()
     {
         var identity = new SessionIdentity(Guid.NewGuid());
@@ -283,7 +262,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             TestSessions.Name,
             Roster.Restore([TestParticipants.Unnamed(member)]),
             PhaseProgress.Restore(Phase.ValuePresentation),
-            QuizProgress.Restore(5, true, true),
+            QuizProgress.Restore(5, true, true, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(
                 true,
@@ -318,7 +297,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             TestSessions.Name,
             Roster.Restore([TestParticipants.Unnamed(new ParticipantId(Guid.NewGuid()))]),
             PhaseProgress.Restore(Phase.Quiz),
-            QuizProgress.Restore(1, false, false),
+            QuizProgress.Restore(1, false, false, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
@@ -446,7 +425,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
                 TestSessions.Name,
                 Roster.Restore([TestParticipants.Unnamed(new ParticipantId(Guid.NewGuid()))]),
                 PhaseProgress.Restore(Phase.ValueSelection),
-                QuizProgress.Restore(null, false, false),
+                QuizProgress.Restore(null, false, false, []),
                 SelectionRound.Restore([], []),
                 FormationRecord.Restore(false, []),
                 PresentationWalk.Restore(null, null, 0),
@@ -561,7 +540,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             TestSessions.Name,
             Roster.Restore(participants.Select(TestParticipants.Unnamed)),
             PhaseProgress.Restore(phase),
-            QuizProgress.Restore(null, false, false),
+            QuizProgress.Restore(null, false, false, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),

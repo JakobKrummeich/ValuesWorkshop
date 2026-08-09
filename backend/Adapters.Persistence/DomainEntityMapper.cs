@@ -25,6 +25,15 @@ internal static class DomainEntityMapper
                 IsRevealed = session.Quiz.IsRevealed,
                 IsLearningTextShown = session.Quiz.IsLearningTextShown,
             },
+            QuizAnswers = session
+                .Quiz.CastAnswers.Select(cast => new QuizAnswerEntity
+                {
+                    SessionIdentity = identityString,
+                    QuestionIndex = cast.QuestionIndex,
+                    ParticipantId = cast.ParticipantId.Value.ToString(),
+                    AnswerIndex = cast.AnswerIndex,
+                })
+                .ToList(),
             PresentationState = new PresentationStateEntity
             {
                 SessionIdentity = identityString,
@@ -92,7 +101,12 @@ internal static class DomainEntityMapper
         var quiz = QuizProgress.Restore(
             entity.QuizState.CurrentQuestionIndex,
             entity.QuizState.IsRevealed,
-            entity.QuizState.IsLearningTextShown
+            entity.QuizState.IsLearningTextShown,
+            entity.QuizAnswers.Select(answer => new CastAnswer(
+                answer.QuestionIndex,
+                new ParticipantId(Guid.Parse(answer.ParticipantId)),
+                answer.AnswerIndex
+            ))
         );
 
         var selection = SelectionRound.Restore(

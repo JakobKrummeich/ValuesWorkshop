@@ -34,7 +34,7 @@ internal static class SessionFixtures
                 TestParticipants.Unnamed(Chris),
             ]),
             PhaseProgress.Restore(phase),
-            quiz ?? QuizProgress.Restore(null, false, false),
+            quiz ?? QuizProgress.Restore(null, false, false, []),
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),

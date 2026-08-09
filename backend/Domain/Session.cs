@@ -99,6 +99,20 @@ public sealed class Session
         Quiz.ShowLearningText();
     }
 
+    public void ChooseQuizAnswer(ParticipantId participantId, int questionIndex, int answerIndex)
+    {
+        if (!Roster.Contains(participantId))
+        {
+            throw new NotAuthorizedException(
+                "Only a joined participant may answer a quiz question."
+            );
+        }
+
+        RequireQuizPhase();
+
+        Quiz.ChooseAnswer(participantId, questionIndex, answerIndex);
+    }
+
     public void PoseNextQuestion(CallerSubject caller, int questionCount)
     {
         RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz (I2).");

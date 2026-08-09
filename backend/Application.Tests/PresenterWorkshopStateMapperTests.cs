@@ -50,7 +50,7 @@ public class PresenterWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
-            quiz: QuizProgress.Restore(1, false, false)
+            quiz: QuizProgress.Restore(1, false, false, [])
         );
 
         var quiz = Map(session).ShouldBeOfType<PresenterQuizState>().Quiz;
