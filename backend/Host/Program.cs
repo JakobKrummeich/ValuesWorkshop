@@ -15,6 +15,9 @@ using ValuesWorkshop.Host.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var configDirectory = Environment.GetEnvironmentVariable("CONFIG_DIR") ?? "config";
+var quizCatalog = QuizCatalogFile.LoadFrom(Path.Combine(configDirectory, "quiz.json"));
+
 var dataDirectory = Environment.GetEnvironmentVariable("DATA_DIR") ?? "data";
 Directory.CreateDirectory(dataDirectory);
 var databasePath = Path.Combine(dataDirectory, "valuesworkshop.db");
@@ -28,8 +31,13 @@ builder.Services.AddScoped<SessionCommandHandler>();
 builder.Services.AddScoped<SessionCreationHandler>();
 builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddScoped<FacilitatorIntentHandler>();
+builder.Services.AddSingleton<IQuizCatalog>(quizCatalog);
 builder.Services.AddSingleton(
-    new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard())
+    new PhaseExitGuards(
+        new QuizExitGuard(quizCatalog.Questions.Count),
+        new GroupWorkExitGuard(),
+        new FinalVotingExitGuard()
+    )
 );
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
