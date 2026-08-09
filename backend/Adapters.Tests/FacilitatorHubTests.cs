@@ -224,17 +224,16 @@ public class FacilitatorHubTests
     }
 
     [Fact]
-    public async Task Revealing_an_already_revealed_answer_is_rejected_and_broadcasts_nothing()
+    public async Task Revealing_an_already_revealed_answer_is_accepted_and_changes_nothing()
     {
         repository.Add(SessionInQuiz(QuizProgress.Restore(0, true, false, [])));
         var hub = HubBoundTo(KnownSession);
 
         var result = await hub.RevealAnswer();
 
-        result.IsAccepted.ShouldBeFalse();
-        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
-        repository.Saved.ShouldBeEmpty();
-        broadcaster.Broadcasts.ShouldBeEmpty();
+        result.IsAccepted.ShouldBeTrue();
+        repository.Saved.ShouldHaveSingleItem();
+        repository.Saved.Single().Quiz.IsRevealed.ShouldBeTrue();
     }
 
     private static Session SessionInQuiz(QuizProgress quiz)

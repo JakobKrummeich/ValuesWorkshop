@@ -30,13 +30,11 @@ public class SessionQuizWalkTests
     }
 
     [Fact]
-    public void An_already_revealed_answer_cannot_be_revealed_again()
+    public void Revealing_an_already_revealed_answer_changes_nothing()
     {
         var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
-        Should.Throw<WrongPhaseException>(() =>
-            session.RevealAnswer(TestSessions.CallerOf(session))
-        );
+        session.RevealAnswer(TestSessions.CallerOf(session));
 
         session.Quiz.IsRevealed.ShouldBeTrue();
         session.Quiz.IsLearningTextShown.ShouldBeFalse();
@@ -99,13 +97,13 @@ public class SessionQuizWalkTests
     }
 
     [Fact]
-    public void An_already_shown_learning_text_cannot_be_shown_again()
+    public void Showing_an_already_shown_learning_text_changes_nothing()
     {
         var session = QuizSession(QuizProgress.Restore(0, true, true, []));
 
-        Should.Throw<WrongPhaseException>(() =>
-            session.ShowLearningText(TestSessions.CallerOf(session))
-        );
+        session.ShowLearningText(TestSessions.CallerOf(session));
+
+        session.Quiz.IsLearningTextShown.ShouldBeTrue();
     }
 
     [Fact]

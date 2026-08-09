@@ -256,8 +256,8 @@ the caller's authenticated principal, so no client can act as another.
 | # | Method | Payload | Guard (server-checked) | Rejection |
 |---|---|---|---|---|
 | T2 | `AdvancePhase` | — | facilitator (I2); forward only (I1); phase-exit guards T2a–T2c | `WrongPhase`, `NotAuthorized` |
-| T6 | `RevealAnswer` | — | phase Quiz; current question unrevealed | `WrongPhase` |
-| T7 | `ShowLearningText` | — | phase Quiz; answer revealed, text unshown | `WrongPhase` |
+| T6 | `RevealAnswer` | — | phase Quiz; a question is posed (repeat reveal is a no-op) | `WrongPhase` |
+| T7 | `ShowLearningText` | — | phase Quiz; answer revealed (repeat show is a no-op) | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
 | T13 | `ReassignScribe` | `{ groupName, participantId }` | phase Group work; target is a member of that group (I9) | `WrongPhase`, `InvariantViolated`, `UnknownParticipant` |
 | T17 | `GoToNextValue` | — | phase Value presentation; values remain (I12) | `WrongPhase` |

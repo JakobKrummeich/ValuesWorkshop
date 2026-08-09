@@ -68,10 +68,7 @@ public sealed class Session
 
     public void AdvancePhase(CallerSubject caller, PhaseExitGuards exitGuards)
     {
-        RequireFacilitator(
-            caller,
-            "Only the facilitator of this session may advance the phase (I2)."
-        );
+        RequireFacilitator(caller, "Only the facilitator of this session may advance the phase.");
 
         exitGuards.RequireSatisfied(this);
 
@@ -85,7 +82,7 @@ public sealed class Session
 
     public void RevealAnswer(CallerSubject caller)
     {
-        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz (I2).");
+        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
         RequireQuizPhase();
 
         Quiz.RevealAnswer();
@@ -93,7 +90,7 @@ public sealed class Session
 
     public void ShowLearningText(CallerSubject caller)
     {
-        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz (I2).");
+        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
         RequireQuizPhase();
 
         Quiz.ShowLearningText();
@@ -115,7 +112,7 @@ public sealed class Session
 
     public void PoseNextQuestion(CallerSubject caller, int questionCount)
     {
-        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz (I2).");
+        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
         RequireQuizPhase();
 
         Quiz.PoseNextQuestion(questionCount);

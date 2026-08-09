@@ -60,13 +60,6 @@ public sealed class QuizProgress
             throw new WrongPhaseException("No quiz question is posed.");
         }
 
-        if (IsRevealed)
-        {
-            throw new WrongPhaseException(
-                "The answer of the current question is already revealed."
-            );
-        }
-
         IsRevealed = true;
     }
 
@@ -76,13 +69,6 @@ public sealed class QuizProgress
         {
             throw new WrongPhaseException(
                 "The learning text is shown once the answer is revealed."
-            );
-        }
-
-        if (IsLearningTextShown)
-        {
-            throw new WrongPhaseException(
-                "The learning text of the current question is already shown."
             );
         }
 
