@@ -15,9 +15,35 @@ export enum GroupWorkStatus {
 const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
-const quizViewSchema = z.object({
-  questionIndex: z.int().nullable(),
+const localizedTextSchema = z.object({
+  de: z.string(),
+  en: z.string(),
+});
+
+const quizViewBase = {
+  questionIndex: z.int().nonnegative(),
   subState: z.enum(QuizSubState),
+  question: localizedTextSchema,
+  answers: z.array(localizedTextSchema),
+};
+
+const participantQuizViewSchema = z.object({
+  ...quizViewBase,
+  ownAnswerIndex: z.int().nullable(),
+  correctAnswerIndex: z.int().optional(),
+});
+
+const facilitatorQuizViewSchema = z.object({
+  ...quizViewBase,
+  answerTallies: z.array(z.int()),
+  answeredCount: z.int(),
+  correctAnswerIndex: z.int(),
+});
+
+const presenterQuizViewSchema = z.object({
+  ...quizViewBase,
+  answerTallies: z.array(z.int()),
+  correctAnswerIndex: z.int().optional(),
 });
 
 const rosterViewSchema = z.object({
@@ -112,7 +138,7 @@ export const participantWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.Quiz),
     ...participantEnvelope,
-    quiz: quizViewSchema,
+    quiz: participantQuizViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.ValueSelection),
@@ -157,7 +183,7 @@ export const facilitatorWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.Quiz),
     ...facilitatorEnvelope,
-    quiz: quizViewSchema,
+    quiz: facilitatorQuizViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.ValueSelection),
@@ -207,7 +233,7 @@ export const presenterWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.Quiz),
     ...presenterEnvelope,
-    quiz: quizViewSchema,
+    quiz: presenterQuizViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.ValueSelection),

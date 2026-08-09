@@ -92,6 +92,6 @@ public class SignalRBroadcasterTests
 
     private SignalRBroadcaster BroadcasterUnderTest()
     {
-        return new SignalRBroadcaster(new WorkshopStateCache(), DispatcherUnderTest());
+        return new SignalRBroadcaster(TestWorkshopStateCache.Create(), DispatcherUnderTest());
     }
 }

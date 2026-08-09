@@ -60,6 +60,33 @@ public class PresenterWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Quiz_state_reports_tallies_but_hides_the_correct_answer_until_revealed()
+    {
+        var unrevealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(
+                0,
+                false,
+                false,
+                [new CastAnswer(0, SessionFixtures.Anna, 1)]
+            )
+        );
+        var revealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, false, [new CastAnswer(0, SessionFixtures.Anna, 1)])
+        );
+
+        var quiz = Map(unrevealed).ShouldBeOfType<PresenterQuizState>().Quiz;
+
+        quiz.Question.ShouldBe(new LocalizedTextView("Frage 0", "Question 0"));
+        quiz.AnswerTallies.ShouldBe([0, 1, 0]);
+        quiz.CorrectAnswerIndex.ShouldBeNull();
+        Map(revealed)
+            .ShouldBeOfType<PresenterQuizState>()
+            .Quiz.CorrectAnswerIndex.ShouldBe(TestQuizCatalog.CorrectAnswerIndex);
+    }
+
+    [Fact]
     public void Value_selection_state_reports_how_many_participants_submitted()
     {
         var session = SessionFixtures.InPhase(
@@ -138,6 +165,6 @@ public class PresenterWorkshopStateMapperTests
 
     private static PresenterWorkshopState Map(Session session, long revision = 1)
     {
-        return PresenterWorkshopStateMapper.Map(session, revision);
+        return new PresenterWorkshopStateMapper(new TestQuizCatalog(5)).Map(session, revision);
     }
 }

@@ -12,6 +12,7 @@ public sealed class ParticipantHub(
     ISessionRepository repository,
     IntentPipeline pipeline,
     ParticipantIntentHandler intentHandler,
+    ParticipantWorkshopStateMapper stateMapper,
     WorkshopStateCache cache,
     IRandomness randomness,
     SessionConnectionRegistry registry
@@ -47,7 +48,7 @@ public sealed class ParticipantHub(
         var states = cache.StatesOf(session);
         var participantState = states.Participants.TryGetValue(participantId, out var cached)
             ? cached
-            : ParticipantWorkshopStateMapper.MapFor(session, participantId, session.Revision);
+            : stateMapper.MapFor(session, participantId, session.Revision);
         await Clients.Caller.ReceiveWorkshopState(participantState);
     }
 

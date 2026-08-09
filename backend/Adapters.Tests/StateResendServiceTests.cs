@@ -11,7 +11,7 @@ public class StateResendServiceTests
         Guid.Parse("00000000-0000-0000-0000-00000000f00d")
     );
 
-    private readonly WorkshopStateCache cache = new();
+    private readonly WorkshopStateCache cache = TestWorkshopStateCache.Create();
     private readonly SessionConnectionRegistry registry = new();
     private readonly RecordingHubClients<IFacilitatorClient> facilitatorClients = new();
     private readonly RecordingHubClients<IParticipantClient> participantClients = new();

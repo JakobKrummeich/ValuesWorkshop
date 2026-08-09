@@ -29,6 +29,15 @@ public sealed class QuizProgress
         }
     }
 
+    public int? AnswerIndexOf(ParticipantId participantId)
+    {
+        return castAnswers
+            .SingleOrDefault(cast =>
+                cast.QuestionIndex == CurrentQuestionIndex && cast.ParticipantId == participantId
+            )
+            ?.AnswerIndex;
+    }
+
     public int AnsweredCount =>
         castAnswers.Count(cast => cast.QuestionIndex == CurrentQuestionIndex);
 

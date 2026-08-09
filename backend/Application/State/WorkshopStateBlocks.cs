@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace ValuesWorkshop.Application.State;
 
 public enum QuizSubState
@@ -13,7 +15,35 @@ public enum GroupWorkStatus
     Submitted = 2,
 }
 
-public sealed record QuizView(int? QuestionIndex, QuizSubState SubState);
+public sealed record LocalizedTextView(string De, string En);
+
+public sealed record ParticipantQuizView(
+    int QuestionIndex,
+    QuizSubState SubState,
+    LocalizedTextView Question,
+    IReadOnlyList<LocalizedTextView> Answers,
+    int? OwnAnswerIndex,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CorrectAnswerIndex
+);
+
+public sealed record FacilitatorQuizView(
+    int QuestionIndex,
+    QuizSubState SubState,
+    LocalizedTextView Question,
+    IReadOnlyList<LocalizedTextView> Answers,
+    IReadOnlyList<int> AnswerTallies,
+    int AnsweredCount,
+    int CorrectAnswerIndex
+);
+
+public sealed record PresenterQuizView(
+    int QuestionIndex,
+    QuizSubState SubState,
+    LocalizedTextView Question,
+    IReadOnlyList<LocalizedTextView> Answers,
+    IReadOnlyList<int> AnswerTallies,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CorrectAnswerIndex
+);
 
 public sealed record RosterParticipantView(Guid ParticipantId, string DisplayName);
 

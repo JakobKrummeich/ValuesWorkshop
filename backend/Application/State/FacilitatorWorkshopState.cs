@@ -26,8 +26,11 @@ public sealed record FacilitatorJoinState(long Revision, RosterView Roster)
     public override Phase Phase => Phase.Join;
 }
 
-public sealed record FacilitatorQuizState(long Revision, RosterView Roster, QuizView Quiz)
-    : FacilitatorWorkshopState(Revision, Roster)
+public sealed record FacilitatorQuizState(
+    long Revision,
+    RosterView Roster,
+    FacilitatorQuizView Quiz
+) : FacilitatorWorkshopState(Revision, Roster)
 {
     [JsonIgnore]
     public override Phase Phase => Phase.Quiz;

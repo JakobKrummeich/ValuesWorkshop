@@ -8,6 +8,7 @@ using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.Intents;
 using ValuesWorkshop.Application.Ports.Driven;
+using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 using ValuesWorkshop.Host;
@@ -44,6 +45,9 @@ builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
     new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))
 );
+builder.Services.AddSingleton<FacilitatorWorkshopStateMapper>();
+builder.Services.AddSingleton<ParticipantWorkshopStateMapper>();
+builder.Services.AddSingleton<PresenterWorkshopStateMapper>();
 builder.Services.AddSingleton<WorkshopStateCache>();
 builder.Services.AddSingleton<SessionConnectionRegistry>();
 builder.Services.AddSingleton<RoleStateDispatcher>();

@@ -95,18 +95,61 @@ describe("participant workshop state schema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts a quiz state before the first question is posed", () => {
+  it("accepts a posed quiz question with bilingual content and no revealed answer", () => {
     const state = participantWorkshopStateSchema.parse({
       revision: 3,
       phase: 2,
       participantCount: 1,
-      quiz: { questionIndex: null, subState: 1 },
+      quiz: {
+        questionIndex: 0,
+        subState: 1,
+        question: { de: "Frage", en: "Question" },
+        answers: [
+          { de: "Falsch", en: "Wrong" },
+          { de: "Richtig", en: "Right" },
+          { de: "Witzig", en: "Funny" },
+        ],
+        ownAnswerIndex: null,
+      },
     });
 
     if (state.phase !== Phase.Quiz) {
       throw new Error("expected a quiz state");
     }
     expect(state.quiz.subState).toBe(QuizSubState.Answering);
+    expect(state.quiz.correctAnswerIndex).toBeUndefined();
+  });
+
+  it("accepts a revealed quiz question that carries the correct answer", () => {
+    const state = participantWorkshopStateSchema.parse({
+      revision: 4,
+      phase: 2,
+      participantCount: 1,
+      quiz: {
+        questionIndex: 2,
+        subState: 2,
+        question: { de: "Frage", en: "Question" },
+        answers: [{ de: "Richtig", en: "Right" }],
+        ownAnswerIndex: 0,
+        correctAnswerIndex: 0,
+      },
+    });
+
+    if (state.phase !== Phase.Quiz) {
+      throw new Error("expected a quiz state");
+    }
+    expect(state.quiz.correctAnswerIndex).toBe(0);
+  });
+
+  it("rejects a quiz state without a posed question", () => {
+    const result = participantWorkshopStateSchema.safeParse({
+      revision: 3,
+      phase: 2,
+      participantCount: 1,
+      quiz: { questionIndex: null, subState: 1 },
+    });
+
+    expect(result.success).toBe(false);
   });
 });
 
@@ -196,7 +239,13 @@ describe("presenter workshop state schema", () => {
       revision: 3,
       phase: 2,
       participantCount: 1,
-      quiz: { questionIndex: 0, subState: 1 },
+      quiz: {
+        questionIndex: 0,
+        subState: 1,
+        question: { de: "Frage", en: "Question" },
+        answers: [{ de: "Richtig", en: "Right" }],
+        answerTallies: [1, 0, 0],
+      },
       participantDisplayNames: ["Anna Schmidt"],
     });
 

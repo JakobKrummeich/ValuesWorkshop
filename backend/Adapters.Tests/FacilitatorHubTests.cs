@@ -274,7 +274,7 @@ public class FacilitatorHubTests
                 new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard()),
                 new TestQuizCatalog(5)
             ),
-            new WorkshopStateCache(),
+            TestWorkshopStateCache.Create(),
             registry
         )
         {

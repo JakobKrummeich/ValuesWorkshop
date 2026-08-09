@@ -196,7 +196,8 @@ public class ParticipantHubTests
             repository,
             pipeline,
             new ParticipantIntentHandler(pipeline),
-            new WorkshopStateCache(),
+            new ParticipantWorkshopStateMapper(new TestQuizCatalog(5)),
+            TestWorkshopStateCache.Create(),
             new FixedRandomness(0),
             registry
         )

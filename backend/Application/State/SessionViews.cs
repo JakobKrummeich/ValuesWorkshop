@@ -21,11 +21,6 @@ internal static class SessionViews
         return session.Roster.Participants.Select(participant => participant.Name.Value).ToList();
     }
 
-    internal static QuizView Quiz(Session session)
-    {
-        return new QuizView(session.Quiz.CurrentQuestionIndex, SubStateOf(session.Quiz));
-    }
-
     internal static IReadOnlyList<string> TopValueIds(Session session)
     {
         return ValueIdsOf(session.Selection.TopValues);
@@ -72,15 +67,5 @@ internal static class SessionViews
     internal static IReadOnlyList<string> ValueIdsOf(IEnumerable<ValueId> values)
     {
         return values.Select(value => value.Value).ToList();
-    }
-
-    private static QuizSubState SubStateOf(QuizProgress quiz)
-    {
-        if (quiz.IsLearningTextShown)
-        {
-            return QuizSubState.LearningTextShown;
-        }
-
-        return quiz.IsRevealed ? QuizSubState.Revealed : QuizSubState.Answering;
     }
 }

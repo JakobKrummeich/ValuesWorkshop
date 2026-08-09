@@ -39,7 +39,7 @@ public static class TestSessions
             Name,
             Roster.Restore([]),
             PhaseProgress.Restore(phase),
-            quiz ?? QuizProgress.Restore(null, false, false, []),
+            quiz ?? QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []),
             SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),

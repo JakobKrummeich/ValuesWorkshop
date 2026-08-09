@@ -10,6 +10,11 @@ namespace ValuesWorkshop.Adapters.Tests;
 
 public class WireFormatTests
 {
+    private static readonly TestQuizCatalog Catalog = new(5);
+    private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(Catalog);
+    private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(Catalog);
+    private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(Catalog);
+
     [Fact]
     public void Workshop_state_travels_as_camel_case_json_with_numeric_enums()
     {
@@ -17,7 +22,7 @@ public class WireFormatTests
         TestSessions.AdvanceToNextPhase(session);
         session.BumpRevision();
 
-        var json = SerializeStateMessage(FacilitatorWorkshopStateMapper.Map(session, 1));
+        var json = SerializeStateMessage(FacilitatorStateMapper.Map(session, 1));
 
         using var document = JsonDocument.Parse(json);
         var state = document.RootElement.GetProperty("arguments")[0];
@@ -31,7 +36,7 @@ public class WireFormatTests
     {
         var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
-        var json = SerializeStateMessage(FacilitatorWorkshopStateMapper.Map(session, 0));
+        var json = SerializeStateMessage(FacilitatorStateMapper.Map(session, 0));
 
         using var document = JsonDocument.Parse(json);
         var state = document.RootElement.GetProperty("arguments")[0];
@@ -48,10 +53,9 @@ public class WireFormatTests
         var session = SessionInPhase(phase);
         var caller = new ParticipantId(Guid.NewGuid());
 
-        DiscriminatorOf(FacilitatorWorkshopStateMapper.Map(session, 1)).ShouldBe((int)phase);
-        DiscriminatorOf(ParticipantWorkshopStateMapper.MapFor(session, caller, 1))
-            .ShouldBe((int)phase);
-        DiscriminatorOf(PresenterWorkshopStateMapper.Map(session, 1)).ShouldBe((int)phase);
+        DiscriminatorOf(FacilitatorStateMapper.Map(session, 1)).ShouldBe((int)phase);
+        DiscriminatorOf(ParticipantStateMapper.MapFor(session, caller, 1)).ShouldBe((int)phase);
+        DiscriminatorOf(PresenterStateMapper.Map(session, 1)).ShouldBe((int)phase);
     }
 
     public static TheoryData<Phase> EveryPhase()

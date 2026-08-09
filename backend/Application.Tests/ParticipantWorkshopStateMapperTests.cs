@@ -89,6 +89,68 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Quiz_state_carries_the_bilingual_content_of_the_posed_question()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(2, false, false, [])
+        );
+
+        var quiz = Map(session).ShouldBeOfType<ParticipantQuizState>().Quiz;
+
+        quiz.Question.ShouldBe(new LocalizedTextView("Frage 2", "Question 2"));
+        quiz.Answers.ShouldBe([
+            new LocalizedTextView("Falsch 2", "Wrong 2"),
+            new LocalizedTextView("Richtig 2", "Right 2"),
+            new LocalizedTextView("Witzig 2", "Funny 2"),
+        ]);
+    }
+
+    [Fact]
+    public void Quiz_state_hides_the_correct_answer_until_it_is_revealed()
+    {
+        var unrevealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, false, false, [])
+        );
+        var revealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, false, [])
+        );
+
+        Map(unrevealed)
+            .ShouldBeOfType<ParticipantQuizState>()
+            .Quiz.CorrectAnswerIndex.ShouldBeNull();
+        Map(revealed)
+            .ShouldBeOfType<ParticipantQuizState>()
+            .Quiz.CorrectAnswerIndex.ShouldBe(TestQuizCatalog.CorrectAnswerIndex);
+    }
+
+    [Fact]
+    public void Quiz_state_carries_the_callers_own_answer_and_nobody_elses()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(
+                0,
+                false,
+                false,
+                [
+                    new CastAnswer(0, SessionFixtures.Anna, 2),
+                    new CastAnswer(0, SessionFixtures.Ben, 0),
+                ]
+            )
+        );
+
+        Map(session, caller: SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantQuizState>()
+            .Quiz.OwnAnswerIndex.ShouldBe(2);
+        Map(session, caller: SessionFixtures.Chris)
+            .ShouldBeOfType<ParticipantQuizState>()
+            .Quiz.OwnAnswerIndex.ShouldBeNull();
+    }
+
+    [Fact]
     public void Selection_results_state_reports_the_callers_own_submission_and_the_top_values()
     {
         var session = SessionFixtures.InPhase(
@@ -205,7 +267,7 @@ public class ParticipantWorkshopStateMapperTests
         long revision = 1
     )
     {
-        return ParticipantWorkshopStateMapper.MapFor(
+        return new ParticipantWorkshopStateMapper(new TestQuizCatalog(5)).MapFor(
             session,
             caller ?? SessionFixtures.Anna,
             revision

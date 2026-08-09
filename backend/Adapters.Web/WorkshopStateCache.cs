@@ -4,7 +4,11 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Adapters.Web;
 
-public sealed class WorkshopStateCache
+public sealed class WorkshopStateCache(
+    FacilitatorWorkshopStateMapper facilitatorStateMapper,
+    PresenterWorkshopStateMapper presenterStateMapper,
+    ParticipantWorkshopStateMapper participantStateMapper
+)
 {
     private readonly ConcurrentDictionary<SessionIdentity, SessionRoleStates> statesBySession =
         new();
@@ -43,18 +47,17 @@ public sealed class WorkshopStateCache
         }
     }
 
-    private static SessionRoleStates MapAllRoles(Session session)
+    private SessionRoleStates MapAllRoles(Session session)
     {
         var participantStates = session.Roster.Participants.ToDictionary(
             participant => participant.Id,
-            participant =>
-                ParticipantWorkshopStateMapper.MapFor(session, participant.Id, session.Revision)
+            participant => participantStateMapper.MapFor(session, participant.Id, session.Revision)
         );
 
         return new SessionRoleStates(
             session.Revision,
-            FacilitatorWorkshopStateMapper.Map(session, session.Revision),
-            PresenterWorkshopStateMapper.Map(session, session.Revision),
+            facilitatorStateMapper.Map(session, session.Revision),
+            presenterStateMapper.Map(session, session.Revision),
             participantStates
         );
     }
