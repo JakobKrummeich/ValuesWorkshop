@@ -1,11 +1,12 @@
 using System.Text.Json;
 using ValuesWorkshop.Application.Ports.Driven;
+using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Host;
 
 public sealed class QuizCatalogFile : IQuizCatalog
 {
-    private const int AnswersPerQuestion = 3;
+    private const int AnswersPerQuestion = QuizProgress.AnswersPerQuestion;
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
