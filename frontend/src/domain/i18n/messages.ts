@@ -45,6 +45,14 @@ export enum MessageKey {
   JoinCopyUrl = "join.copyUrl",
   JoinUrlCopied = "join.urlCopied",
   JoinUrlCopyFailed = "join.urlCopyFailed",
+  QuizQuestionHeading = "quiz.questionHeading",
+  QuizAnsweredCount = "quiz.answeredCount",
+  QuizVoteCount = "quiz.voteCount",
+  QuizCorrectAnswer = "quiz.correctAnswer",
+  QuizLearningTextHeading = "quiz.learningTextHeading",
+  QuizRevealAnswer = "quiz.revealAnswer",
+  QuizShowLearningText = "quiz.showLearningText",
+  QuizNextQuestion = "quiz.nextQuestion",
   FacilitatorHeading = "facilitator.heading",
   ParticipantHeading = "participant.heading",
   PresenterHeading = "presenter.heading",
@@ -239,6 +247,38 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
   [MessageKey.JoinUrlCopyFailed]: {
     [Language.German]: "Der Link konnte nicht kopiert werden.",
     [Language.English]: "The link could not be copied.",
+  },
+  [MessageKey.QuizQuestionHeading]: {
+    [Language.German]: "Frage {n} von {total}",
+    [Language.English]: "Question {n} of {total}",
+  },
+  [MessageKey.QuizAnsweredCount]: {
+    [Language.German]: "{answered} von {total} haben geantwortet",
+    [Language.English]: "{answered} of {total} have answered",
+  },
+  [MessageKey.QuizVoteCount]: {
+    [Language.German]: "Stimmen: {count}",
+    [Language.English]: "Votes: {count}",
+  },
+  [MessageKey.QuizCorrectAnswer]: {
+    [Language.German]: "Richtige Antwort",
+    [Language.English]: "Correct answer",
+  },
+  [MessageKey.QuizLearningTextHeading]: {
+    [Language.German]: "Lerntext",
+    [Language.English]: "Learning text",
+  },
+  [MessageKey.QuizRevealAnswer]: {
+    [Language.German]: "Antwort aufdecken",
+    [Language.English]: "Reveal answer",
+  },
+  [MessageKey.QuizShowLearningText]: {
+    [Language.German]: "Lerntext zeigen",
+    [Language.English]: "Show learning text",
+  },
+  [MessageKey.QuizNextQuestion]: {
+    [Language.German]: "Nächste Frage",
+    [Language.English]: "Next question",
   },
   [MessageKey.FacilitatorHeading]: {
     [Language.German]: "Moderation",
