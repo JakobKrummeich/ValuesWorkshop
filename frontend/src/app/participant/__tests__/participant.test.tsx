@@ -41,6 +41,7 @@ beforeEach(() => {
       workshopState,
       connectionState: of(ConnectionState.Connected),
     },
+    quiz: { chooseAnswer: jest.fn(() => EMPTY) },
     start: EMPTY,
     close: EMPTY,
   });
