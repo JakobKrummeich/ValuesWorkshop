@@ -1,0 +1,101 @@
+.quiz {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-gap);
+  justify-content: center;
+  padding: var(--space-gutter);
+}
+
+.heading {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  text-align: center;
+}
+
+.question {
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  text-align: center;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  margin-top: var(--space-gap);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 2fr auto;
+  gap: var(--space-gap);
+  align-items: center;
+}
+
+.answerText {
+  color: var(--color-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-tight);
+  text-align: right;
+}
+
+.correctAnswerText {
+  color: var(--color-primary-strong);
+  font-weight: var(--weight-bold);
+}
+
+.track {
+  height: var(--base-space-32);
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+}
+
+.bar {
+  width: calc(var(--vote-fraction, 0) * 100%);
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  transition: width 400ms ease;
+}
+
+.correctBar {
+  background: var(--color-success);
+}
+
+.dimmedBar {
+  background: var(--color-text-muted);
+}
+
+.voteCount {
+  min-width: 2ch;
+  color: var(--color-text);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.learningText {
+  margin-top: var(--space-gap);
+  padding: var(--space-gap) var(--space-gutter);
+  border-left: var(--base-space-8) solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+}
+
+.learningTextHeading {
+  color: var(--color-accent);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+}
+
+.learningTextBody {
+  color: var(--color-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}

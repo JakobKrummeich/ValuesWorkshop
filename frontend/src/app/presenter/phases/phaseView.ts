@@ -3,10 +3,11 @@ import type { PresenterWorkshopState } from "../../../domain/workshopState";
 import { EmptyPhase } from "../../EmptyPhase";
 import type { PhaseComponents } from "../../PhaseView";
 import { PresenterJoinScreen } from "./join/PresenterJoinScreen";
+import { PresenterQuizScreen } from "./quiz/PresenterQuizScreen";
 
 export const presenterPhaseView: PhaseComponents<PresenterWorkshopState> = {
   [Phase.Join]: PresenterJoinScreen,
-  [Phase.Quiz]: EmptyPhase,
+  [Phase.Quiz]: PresenterQuizScreen,
   [Phase.ValueSelection]: EmptyPhase,
   [Phase.SelectionResults]: EmptyPhase,
   [Phase.GroupFormation]: EmptyPhase,
