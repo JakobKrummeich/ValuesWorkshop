@@ -19,6 +19,10 @@ export enum FacilitatorIntent {
   PoseNextQuestion = "PoseNextQuestion",
 }
 
+export enum ParticipantIntent {
+  ChooseQuizAnswer = "ChooseQuizAnswer",
+}
+
 const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
