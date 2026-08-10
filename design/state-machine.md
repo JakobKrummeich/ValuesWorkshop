@@ -276,8 +276,8 @@ facilitator sub-controls are marked ◆.
 | T4 | any | Join | Participant | not already on the roster (I4) | ParticipantJoined |
 | T4a | 5–9 | — joiner placed into a group | System | groups exist; group with the fewest members, ties random (I8) | ParticipantAddedToGroup |
 | T5 | 2 | Choose quiz answer | Participant | not yet answered this question (I5) | QuizAnswerChosen |
-| T6 | 2 | Reveal answer ◆ | Facilitator | current question unrevealed | AnswerRevealed |
-| T7 | 2 | Show learning text ◆ | Facilitator | answer revealed, text unshown | LearningTextShown |
+| T6 | 2 | Reveal answer ◆ | Facilitator | a question is posed (repeat is a no-op) | AnswerRevealed |
+| T7 | 2 | Show learning text ◆ | Facilitator | answer revealed (repeat is a no-op) | LearningTextShown |
 | T8 | 2 | Pose next question ◆ | Facilitator | learning text shown; questions remain | QuestionPosed |
 | T9 | 3 | Submit value selection | Participant | exactly ten distinct; not yet submitted (I6) | ValuesSelected |
 | T10 | →4 | Determine top values | System | on phase entry; widen on tenth-place tie (I7) | TopValuesDetermined |
