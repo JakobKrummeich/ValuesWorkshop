@@ -12,6 +12,17 @@ export enum GroupWorkStatus {
   Submitted = 2,
 }
 
+export enum FacilitatorIntent {
+  AdvancePhase = "AdvancePhase",
+  RevealAnswer = "RevealAnswer",
+  ShowLearningText = "ShowLearningText",
+  PoseNextQuestion = "PoseNextQuestion",
+}
+
+export enum ParticipantIntent {
+  ChooseQuizAnswer = "ChooseQuizAnswer",
+}
+
 const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
@@ -22,6 +33,7 @@ const localizedTextSchema = z.object({
 
 const quizViewBase = {
   questionIndex: z.int().nonnegative(),
+  questionCount: z.int().positive(),
   subState: z.enum(QuizSubState),
   question: localizedTextSchema,
   answers: z.array(localizedTextSchema),
@@ -128,6 +140,7 @@ const participantEnvelope = {
 const facilitatorEnvelope = {
   revision: revisionSchema,
   roster: rosterViewSchema,
+  enabledIntents: z.array(z.enum(FacilitatorIntent)),
 };
 
 const presenterEnvelope = participantEnvelope;
@@ -303,3 +316,17 @@ export type FacilitatorJoinState = InPhase<
   Phase.Join
 >;
 export type PresenterJoinState = InPhase<PresenterWorkshopState, Phase.Join>;
+
+export type ParticipantQuizState = InPhase<
+  ParticipantWorkshopState,
+  Phase.Quiz
+>;
+export type FacilitatorQuizState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.Quiz
+>;
+export type PresenterQuizState = InPhase<PresenterWorkshopState, Phase.Quiz>;
+
+export type ParticipantQuizView = ParticipantQuizState["quiz"];
+export type FacilitatorQuizView = FacilitatorQuizState["quiz"];
+export type PresenterQuizView = PresenterQuizState["quiz"];

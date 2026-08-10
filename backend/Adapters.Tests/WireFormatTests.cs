@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.Options;
+using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
@@ -11,7 +12,10 @@ namespace ValuesWorkshop.Adapters.Tests;
 public class WireFormatTests
 {
     private static readonly TestQuizCatalog Catalog = new(5);
-    private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(Catalog);
+    private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(
+        Catalog,
+        RegisteredExitGuards.For(Catalog)
+    );
     private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(Catalog);
     private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(Catalog);
 
@@ -29,6 +33,7 @@ public class WireFormatTests
         state.GetProperty("revision").GetInt64().ShouldBe(1);
         state.GetProperty("phase").GetInt32().ShouldBe((int)Phase.Quiz);
         state.GetProperty("roster").GetProperty("participantCount").GetInt32().ShouldBe(0);
+        state.GetProperty("enabledIntents")[0].GetString().ShouldBe("RevealAnswer");
     }
 
     [Fact]
@@ -43,7 +48,7 @@ public class WireFormatTests
         state
             .EnumerateObject()
             .Select(property => property.Name)
-            .ShouldBe(["phase", "revision", "roster"], ignoreOrder: true);
+            .ShouldBe(["phase", "revision", "roster", "enabledIntents"], ignoreOrder: true);
     }
 
     [Theory]

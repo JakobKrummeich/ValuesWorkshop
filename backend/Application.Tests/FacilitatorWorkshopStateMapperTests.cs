@@ -1,3 +1,4 @@
+using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
@@ -52,6 +53,7 @@ public class FacilitatorWorkshopStateMapperTests
         var quiz = Map(session).ShouldBeOfType<FacilitatorQuizState>().Quiz;
 
         quiz.QuestionIndex.ShouldBe(3);
+        quiz.QuestionCount.ShouldBe(5);
         quiz.SubState.ShouldBe(QuizSubState.LearningTextShown);
     }
 
@@ -171,6 +173,11 @@ public class FacilitatorWorkshopStateMapperTests
 
     private static FacilitatorWorkshopState Map(Session session, long revision = 1)
     {
-        return new FacilitatorWorkshopStateMapper(new TestQuizCatalog(5)).Map(session, revision);
+        var catalog = new TestQuizCatalog(5);
+
+        return new FacilitatorWorkshopStateMapper(catalog, RegisteredExitGuards.For(catalog)).Map(
+            session,
+            revision
+        );
     }
 }

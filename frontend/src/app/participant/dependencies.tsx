@@ -1,10 +1,12 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
+import type { ParticipantQuizPort } from "../../domain/ports/participant/quizPort";
 import type { ParticipantSessionStatePort } from "../../domain/ports/participant/sessionStatePort";
 
 export interface ParticipantDependencies {
   sessionStatePort: ParticipantSessionStatePort;
+  quiz: ParticipantQuizPort;
 }
 
 const ParticipantDependencyContext =

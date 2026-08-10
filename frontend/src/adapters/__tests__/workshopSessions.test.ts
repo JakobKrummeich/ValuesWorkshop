@@ -66,11 +66,12 @@ describe("session-bound role connections", () => {
   });
 
   it("binds the participant hub url to the session identity", () => {
-    createParticipantSession(SESSION_IDENTITY);
+    const session = createParticipantSession(SESSION_IDENTITY);
 
     expect(urlOfLastConnection()).toBe(
       `http://localhost:5000/hub/participant?sessionIdentity=${SESSION_IDENTITY}`,
     );
+    expect(session.quiz.chooseAnswer).toBeInstanceOf(Function);
   });
 
   it("binds the facilitator hub url and exposes the lifecycle slice", () => {
@@ -78,6 +79,7 @@ describe("session-bound role connections", () => {
 
     expect(urlOfLastConnection()).toContain("/hub/facilitator");
     expect(session.lifecycle.advancePhase).toBeInstanceOf(Function);
+    expect(session.quizControl.revealAnswer).toBeInstanceOf(Function);
   });
 
   it("connects the presenter anonymously", () => {

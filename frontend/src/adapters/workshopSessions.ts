@@ -1,4 +1,6 @@
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
+import type { FacilitatorQuizControlPort } from "../domain/ports/facilitator/quizControlPort";
+import type { ParticipantQuizPort } from "../domain/ports/participant/quizPort";
 import type { FacilitatorSessionStatePort } from "../domain/ports/facilitator/sessionStatePort";
 import type { ParticipantSessionStatePort } from "../domain/ports/participant/sessionStatePort";
 import type { PresenterSessionStatePort } from "../domain/ports/presenter/sessionStatePort";
@@ -12,6 +14,8 @@ import { hubBaseUrl } from "../config/environment";
 import type { Completable, Single } from "../shared/reactiveTypes";
 import { getAccessToken } from "./authAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
+import { createFacilitatorQuizControlPort } from "./facilitatorQuizControlAdapter";
+import { createParticipantQuizPort } from "./participantQuizAdapter";
 import { withSerializedLifecycle } from "./serializedLifecycle";
 import { createSessionStatePort } from "./sessionStateAdapter";
 import { createSignalRConnection } from "./signalRConnection";
@@ -24,11 +28,13 @@ export interface WorkshopSession {
 
 export interface ParticipantSession extends WorkshopSession {
   readonly sessionStatePort: ParticipantSessionStatePort;
+  readonly quiz: ParticipantQuizPort;
 }
 
 export interface FacilitatorSession extends WorkshopSession {
   readonly sessionStatePort: FacilitatorSessionStatePort;
   readonly lifecycle: FacilitatorLifecyclePort;
+  readonly quizControl: FacilitatorQuizControlPort;
 }
 
 export interface PresenterSession extends WorkshopSession {
@@ -48,6 +54,7 @@ export function createParticipantSession(
       connection,
       participantWorkshopStateSchema,
     ),
+    quiz: createParticipantQuizPort(connection),
     ...lifetimeOf(connection),
   };
 }
@@ -66,6 +73,7 @@ export function createFacilitatorSession(
       facilitatorWorkshopStateSchema,
     ),
     lifecycle: createFacilitatorLifecyclePort(connection),
+    quizControl: createFacilitatorQuizControlPort(connection),
     ...lifetimeOf(connection),
   };
 }

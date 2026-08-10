@@ -14,7 +14,10 @@ export function ParticipantSessionBoundary({
     <SessionBoundary createSession={createParticipantSession}>
       {(session) => (
         <ParticipantDependencyProvider
-          dependencies={{ sessionStatePort: session.sessionStatePort }}
+          dependencies={{
+            sessionStatePort: session.sessionStatePort,
+            quiz: session.quiz,
+          }}
         >
           <div className="screenParticipant">{children}</div>
         </ParticipantDependencyProvider>

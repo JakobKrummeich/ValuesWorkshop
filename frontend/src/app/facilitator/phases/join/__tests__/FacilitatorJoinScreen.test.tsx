@@ -1,7 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MessageKey } from "../../../../../domain/i18n/messages";
 import { Phase } from "../../../../../domain/phases";
-import type { FacilitatorJoinState } from "../../../../../domain/workshopState";
+import {
+  FacilitatorIntent,
+  type FacilitatorJoinState,
+} from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { FacilitatorJoinScreen } from "../FacilitatorJoinScreen";
 import { useFacilitatorJoinScreen } from "../useFacilitatorJoinScreen";
@@ -21,6 +24,7 @@ function joinState(
     revision: 5,
     phase: Phase.Join,
     roster: { participants, participantCount: participants.length },
+    enabledIntents: [FacilitatorIntent.AdvancePhase],
   };
 }
 

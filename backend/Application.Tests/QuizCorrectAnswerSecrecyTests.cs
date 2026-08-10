@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
@@ -67,7 +68,10 @@ public class QuizCorrectAnswerSecrecyTests
         );
 
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(Catalog).Map(session, 1),
+            new FacilitatorWorkshopStateMapper(Catalog, RegisteredExitGuards.For(Catalog)).Map(
+                session,
+                1
+            ),
             WireOptions
         );
 

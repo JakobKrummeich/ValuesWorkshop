@@ -2,11 +2,13 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 import type { FacilitatorLifecyclePort } from "../../domain/ports/facilitator/lifecyclePort";
+import type { FacilitatorQuizControlPort } from "../../domain/ports/facilitator/quizControlPort";
 import type { FacilitatorSessionStatePort } from "../../domain/ports/facilitator/sessionStatePort";
 
 export interface FacilitatorDependencies {
   sessionStatePort: FacilitatorSessionStatePort;
   lifecycle: FacilitatorLifecyclePort;
+  quizControl: FacilitatorQuizControlPort;
 }
 
 const FacilitatorDependencyContext =

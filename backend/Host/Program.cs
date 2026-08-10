@@ -34,13 +34,7 @@ builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddScoped<FacilitatorIntentHandler>();
 builder.Services.AddScoped<ParticipantIntentHandler>();
 builder.Services.AddSingleton<IQuizCatalog>(quizCatalog);
-builder.Services.AddSingleton(
-    new PhaseExitGuards(
-        new QuizExitGuard(quizCatalog.Questions.Count),
-        new GroupWorkExitGuard(),
-        new FinalVotingExitGuard()
-    )
-);
+builder.Services.AddSingleton(RegisteredExitGuards.For(quizCatalog));
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
     new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))

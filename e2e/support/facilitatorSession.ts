@@ -28,12 +28,17 @@ export async function openSessionAsFacilitator(
   page: Page,
   sessionName: string,
 ): Promise<string> {
+  const creationResponse = waitForSessionCreationResponse(page);
   await submitOpenSessionForm(
     page,
     sessionName,
     DEVELOPMENT_FACILITATOR_PASSPHRASE,
   );
 
+  expect(
+    (await creationResponse).status(),
+    "session creation was refused",
+  ).toBe(201);
   await expect(page).toHaveURL(OPENED_SESSION_URL, {
     timeout: SESSION_CREATION_TIMEOUT_MILLISECONDS,
   });

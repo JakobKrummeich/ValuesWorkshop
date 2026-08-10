@@ -352,7 +352,7 @@ variant carries it.
 
 | Block | Fields |
 |---|---|
-| quiz | `questionIndex`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
+| quiz | `questionIndex`, `questionCount`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?`, `topValueIds?` |
 | ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
@@ -369,14 +369,14 @@ join lobby shows back to the person who just signed in.
 | Block | Fields |
 |---|---|
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
-| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
+| quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
 | groups | `[{ name, memberParticipantIds, assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
 | conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
 
-`enabledIntents: string[]` (§ 6.4) joins the facilitator envelope — it is
+`enabledIntents: string[]` (§ 6.4) sits on the facilitator envelope — it is
 present on every variant, because every phase offers controls.
 
 `participantId` appears only for scribe reassignment (T13) and roster
@@ -388,7 +388,7 @@ what they answered, selected, or voted for.
 
 | Block | Fields |
 |---|---|
-| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
+| quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
 | groups | `[{ name, memberCount, assignedValueIds, workStatus }]` |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
@@ -473,8 +473,14 @@ The facilitator screen must disable “Advance” exactly when the state machine
 would refuse it (T2a–T2c) and morph its quiz sub-control button (T6→T7→T8).
 Duplicating those guards in the frontend would mean two implementations of
 the same rules. Instead the server evaluates them once and ships the answer:
-`enabledIntents` lists the facilitator intents that would be accepted right
-now. Buttons render from that list.
+`enabledIntents` names the facilitator hub methods that would be accepted
+**and change state** right now. An idempotently accepted no-op (a repeat
+`RevealAnswer` or `ShowLearningText`) is not listed, so exactly one quiz
+sub-control is enabled at a time: `RevealAnswer` while answering,
+`ShowLearningText` once revealed, `PoseNextQuestion` once the learning text
+is shown and questions remain. `AdvancePhase` is listed exactly when a next
+phase exists and the current phase's exit guard passes — after the last
+learning text it is the one enabled intent. Buttons render from that list.
 
 ### 6.5 Rejection round-trip
 
@@ -507,13 +513,13 @@ Screens depend only on their slice — never on a connection, never on
 | Role | Slice | Intents / stream | Task |
 |---|---|---|---|
 | participant | `sessionStatePort` | state stream + connection state | **9** |
-| participant | `quizPort` | `ChooseQuizAnswer` | 12 |
+| participant | `quizPort` | `ChooseQuizAnswer` | 14 |
 | participant | `selectionPort` | `SubmitValueSelection` | 13 |
 | participant | `groupWorkPort` | `AddAction`, `EditAction`, `RemoveAction`, `SubmitGroupWork`, `ReopenGroupWork` | 16 |
 | participant | `votingPort` | `SubmitFinalVotes` | 17 |
 | facilitator | `sessionStatePort` | state stream + connection state | **9** |
 | facilitator | `lifecyclePort` | `AdvancePhase` | **9** |
-| facilitator | `quizControlPort` | `RevealAnswer`, `ShowLearningText`, `PoseNextQuestion` | 12 |
+| facilitator | `quizControlPort` | `RevealAnswer`, `ShowLearningText`, `PoseNextQuestion` | 14 |
 | facilitator | `formationPort` | `ReassignScribe` | 16 |
 | facilitator | `walkControlPort` | `GoToNextValue`, `CorrectActionWording`, `RevealNextValue` | 18 |
 | facilitator | `votingControlPort` | `CloseVoting`, `StartTiebreakRound` | 17 |
