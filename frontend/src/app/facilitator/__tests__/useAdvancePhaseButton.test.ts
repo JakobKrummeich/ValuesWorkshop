@@ -3,6 +3,9 @@ import { NEVER, Observable, of, throwError } from "rxjs";
 import { MessageKey } from "../../../domain/i18n/messages";
 import type { IntentResult } from "../../../domain/intentResult";
 import { IntentRejectionCode } from "../../../domain/intentResult";
+import { Phase } from "../../../domain/phases";
+import type { FacilitatorWorkshopState } from "../../../domain/workshopState";
+import { FacilitatorIntent } from "../../../domain/workshopState";
 import type { Single } from "../../../shared/reactiveTypes";
 import { useFacilitatorDependencies } from "../dependencies";
 import { useAdvancePhaseButton } from "../useAdvancePhaseButton";
@@ -15,10 +18,29 @@ const dependencies = useFacilitatorDependencies as jest.MockedFunction<
   typeof useFacilitatorDependencies
 >;
 
-function withAdvancePhase(advancePhase: () => Single<IntentResult>) {
+function stateListing(
+  enabledIntents: FacilitatorIntent[],
+): FacilitatorWorkshopState {
+  return {
+    phase: Phase.Join,
+    revision: 1,
+    roster: { participants: [], participantCount: 0 },
+    enabledIntents,
+  };
+}
+
+function withAdvancePhase(
+  advancePhase: () => Single<IntentResult>,
+  workshopState: Observable<FacilitatorWorkshopState> = NEVER,
+) {
   dependencies.mockReturnValue({
-    sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
+    sessionStatePort: { workshopState, connectionState: NEVER },
     lifecycle: { advancePhase },
+    quizControl: {
+      revealAnswer: () => NEVER,
+      showLearningText: () => NEVER,
+      poseNextQuestion: () => NEVER,
+    },
   });
 }
 
@@ -92,6 +114,36 @@ describe("advance phase button logic", () => {
     act(() => result.current.advancePhase());
 
     expect(abandonedCount).toBe(1);
+  });
+
+  it("keeps advancing disabled until a state has arrived", () => {
+    withAdvancePhase(() => NEVER);
+
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    expect(result.current.isAdvanceEnabled).toBe(false);
+  });
+
+  it("enables advancing when the workshop lists the intent", () => {
+    withAdvancePhase(
+      () => NEVER,
+      of(stateListing([FacilitatorIntent.AdvancePhase])),
+    );
+
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    expect(result.current.isAdvanceEnabled).toBe(true);
+  });
+
+  it("disables advancing when the state machine would refuse it", () => {
+    withAdvancePhase(
+      () => NEVER,
+      of(stateListing([FacilitatorIntent.RevealAnswer])),
+    );
+
+    const { result } = renderHook(() => useAdvancePhaseButton());
+
+    expect(result.current.isAdvanceEnabled).toBe(false);
   });
 
   it("abandons an in-flight intent when the screen is left", () => {

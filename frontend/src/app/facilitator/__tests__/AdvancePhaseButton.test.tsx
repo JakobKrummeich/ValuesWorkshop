@@ -17,6 +17,7 @@ describe("advance phase button", () => {
     const advancePhase = jest.fn();
     button.mockReturnValue({
       isAdvancing: false,
+      isAdvanceEnabled: true,
       rejectionMessage: null,
       advancePhase,
     });
@@ -30,6 +31,22 @@ describe("advance phase button", () => {
   it("is disabled while an intent is in flight", () => {
     button.mockReturnValue({
       isAdvancing: true,
+      isAdvanceEnabled: true,
+      rejectionMessage: null,
+      advancePhase: jest.fn(),
+    });
+
+    render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
+
+    expect(
+      screen.getByRole("button", { name: "Advance phase" }),
+    ).toBeDisabled();
+  });
+
+  it("is disabled while the workshop does not allow advancing", () => {
+    button.mockReturnValue({
+      isAdvancing: false,
+      isAdvanceEnabled: false,
       rejectionMessage: null,
       advancePhase: jest.fn(),
     });
@@ -44,6 +61,7 @@ describe("advance phase button", () => {
   it("shows the rejection message", () => {
     button.mockReturnValue({
       isAdvancing: false,
+      isAdvanceEnabled: true,
       rejectionMessage: MessageKey.IntentWrongPhase,
       advancePhase: jest.fn(),
     });

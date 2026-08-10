@@ -6,7 +6,7 @@ import styles from "./AdvancePhaseButton.module.css";
 import { useAdvancePhaseButton } from "./useAdvancePhaseButton";
 
 export function AdvancePhaseButton() {
-  const { isAdvancing, rejectionMessage, advancePhase } =
+  const { isAdvancing, isAdvanceEnabled, rejectionMessage, advancePhase } =
     useAdvancePhaseButton();
   const { translate } = useTranslation();
 
@@ -15,7 +15,7 @@ export function AdvancePhaseButton() {
       <button
         type="button"
         className={styles.button}
-        disabled={isAdvancing}
+        disabled={isAdvancing || !isAdvanceEnabled}
         onClick={advancePhase}
       >
         {translate(MessageKey.AdvancePhase)}

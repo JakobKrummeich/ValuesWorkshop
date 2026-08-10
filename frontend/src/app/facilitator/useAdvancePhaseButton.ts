@@ -2,22 +2,33 @@
 
 import { useCallback } from "react";
 import type { MessageKey } from "../../domain/i18n/messages";
+import { FacilitatorIntent } from "../../domain/workshopState";
 import { useIntentSender } from "../useIntentSender";
+import { usePhaseView } from "../usePhaseView";
 import { useFacilitatorDependencies } from "./dependencies";
 
 export interface AdvancePhaseButtonResult {
   isAdvancing: boolean;
+  isAdvanceEnabled: boolean;
   rejectionMessage: MessageKey | null;
   advancePhase: () => void;
 }
 
 export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
-  const { lifecycle } = useFacilitatorDependencies();
+  const { lifecycle, sessionStatePort } = useFacilitatorDependencies();
+  const state = usePhaseView(sessionStatePort);
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
 
   const advancePhase = useCallback(() => {
     sendIntent(lifecycle.advancePhase());
   }, [lifecycle, sendIntent]);
 
-  return { isAdvancing: isSending, rejectionMessage, advancePhase };
+  return {
+    isAdvancing: isSending,
+    isAdvanceEnabled:
+      state !== null &&
+      state.enabledIntents.includes(FacilitatorIntent.AdvancePhase),
+    rejectionMessage,
+    advancePhase,
+  };
 }

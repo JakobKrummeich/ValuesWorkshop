@@ -1,4 +1,5 @@
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
+import type { FacilitatorQuizControlPort } from "../domain/ports/facilitator/quizControlPort";
 import type { ParticipantQuizPort } from "../domain/ports/participant/quizPort";
 import type { FacilitatorSessionStatePort } from "../domain/ports/facilitator/sessionStatePort";
 import type { ParticipantSessionStatePort } from "../domain/ports/participant/sessionStatePort";
@@ -13,6 +14,7 @@ import { hubBaseUrl } from "../config/environment";
 import type { Completable, Single } from "../shared/reactiveTypes";
 import { getAccessToken } from "./authAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
+import { createFacilitatorQuizControlPort } from "./facilitatorQuizControlAdapter";
 import { createParticipantQuizPort } from "./participantQuizAdapter";
 import { withSerializedLifecycle } from "./serializedLifecycle";
 import { createSessionStatePort } from "./sessionStateAdapter";
@@ -32,6 +34,7 @@ export interface ParticipantSession extends WorkshopSession {
 export interface FacilitatorSession extends WorkshopSession {
   readonly sessionStatePort: FacilitatorSessionStatePort;
   readonly lifecycle: FacilitatorLifecyclePort;
+  readonly quizControl: FacilitatorQuizControlPort;
 }
 
 export interface PresenterSession extends WorkshopSession {
@@ -70,6 +73,7 @@ export function createFacilitatorSession(
       facilitatorWorkshopStateSchema,
     ),
     lifecycle: createFacilitatorLifecyclePort(connection),
+    quizControl: createFacilitatorQuizControlPort(connection),
     ...lifetimeOf(connection),
   };
 }

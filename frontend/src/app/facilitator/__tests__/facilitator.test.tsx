@@ -3,6 +3,7 @@ import { EMPTY, Subject, of } from "rxjs";
 import { ConnectionState } from "../../../domain/connectionState";
 import { Phase } from "../../../domain/phases";
 import type { FacilitatorWorkshopState } from "../../../domain/workshopState";
+import { FacilitatorIntent } from "../../../domain/workshopState";
 import { currentSessionIdentity } from "../../../adapters/browserLocation";
 import { createFacilitatorSession } from "../../../adapters/workshopSessions";
 import { languageWrapper } from "../../../testing/languageWrapper";
@@ -44,6 +45,11 @@ beforeEach(() => {
       connectionState: of(ConnectionState.Connected),
     },
     lifecycle: { advancePhase },
+    quizControl: {
+      revealAnswer: jest.fn(() => EMPTY),
+      showLearningText: jest.fn(() => EMPTY),
+      poseNextQuestion: jest.fn(() => EMPTY),
+    },
     start: EMPTY,
     close: EMPTY,
   });
@@ -68,7 +74,10 @@ describe("facilitator screen group", () => {
       workshopState.next({
         revision: 4,
         phase: Phase.GroupWork,
-      } as FacilitatorWorkshopState);
+        roster: { participants: [], participantCount: 0 },
+        enabledIntents: [FacilitatorIntent.AdvancePhase],
+        groups: [],
+      });
     });
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 6");

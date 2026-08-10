@@ -79,6 +79,7 @@ describe("session-bound role connections", () => {
 
     expect(urlOfLastConnection()).toContain("/hub/facilitator");
     expect(session.lifecycle.advancePhase).toBeInstanceOf(Function);
+    expect(session.quizControl.revealAnswer).toBeInstanceOf(Function);
   });
 
   it("connects the presenter anonymously", () => {
