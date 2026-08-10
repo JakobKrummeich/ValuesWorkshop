@@ -28,6 +28,7 @@ export enum FacilitatorIntent {
 
 export enum ParticipantIntent {
   ChooseQuizAnswer = "ChooseQuizAnswer",
+  SubmitValueSelection = "SubmitValueSelection",
 }
 
 const revisionSchema = z.int().nonnegative();
@@ -230,3 +231,18 @@ export type PresenterQuizState = InPhase<PresenterWorkshopState, Phase.Quiz>;
 export type ParticipantQuizView = ParticipantQuizState["quiz"];
 export type FacilitatorQuizView = FacilitatorQuizState["quiz"];
 export type PresenterQuizView = PresenterQuizState["quiz"];
+
+export type ParticipantSelectionState = InPhase<
+  ParticipantWorkshopState,
+  Phase.ValueSelection
+>;
+export type FacilitatorSelectionState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.ValueSelection
+>;
+export type PresenterSelectionState = InPhase<
+  PresenterWorkshopState,
+  Phase.ValueSelection
+>;
+
+export type OwnSelectionView = ParticipantSelectionState["selection"];

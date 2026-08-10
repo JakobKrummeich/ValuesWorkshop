@@ -72,6 +72,7 @@ describe("session-bound role connections", () => {
       `http://localhost:5000/hub/participant?sessionIdentity=${SESSION_IDENTITY}`,
     );
     expect(session.quiz.chooseAnswer).toBeInstanceOf(Function);
+    expect(session.selection.submitSelection).toBeInstanceOf(Function);
   });
 
   it("binds the facilitator hub url and exposes the lifecycle slice", () => {

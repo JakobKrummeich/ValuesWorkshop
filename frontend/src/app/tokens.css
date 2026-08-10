@@ -56,6 +56,8 @@
   --base-shadow-sm: 0 1px 2px rgb(28 25 23 / 10%);
   --base-shadow-md: 0 4px 12px rgb(28 25 23 / 15%);
 
+  --base-scrim: rgb(28 25 23 / 40%);
+
   --color-bg: var(--base-gray-100);
   --color-surface: var(--base-white);
   --color-border: var(--base-gray-300);
@@ -70,6 +72,7 @@
   --color-danger-soft: var(--base-red-100);
   --color-success: var(--base-green-500);
   --color-on-primary: var(--base-white);
+  --color-scrim: var(--base-scrim);
 
   --font-sans: var(--base-font-sans);
   --weight-regular: var(--base-weight-regular);

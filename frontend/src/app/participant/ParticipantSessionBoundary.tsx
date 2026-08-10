@@ -17,6 +17,7 @@ export function ParticipantSessionBoundary({
           dependencies={{
             sessionStatePort: session.sessionStatePort,
             quiz: session.quiz,
+            selection: session.selection,
           }}
         >
           <div className="screenParticipant">{children}</div>
