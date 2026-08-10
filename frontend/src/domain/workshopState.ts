@@ -312,3 +312,17 @@ export type FacilitatorJoinState = InPhase<
   Phase.Join
 >;
 export type PresenterJoinState = InPhase<PresenterWorkshopState, Phase.Join>;
+
+export type ParticipantQuizState = InPhase<
+  ParticipantWorkshopState,
+  Phase.Quiz
+>;
+export type FacilitatorQuizState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.Quiz
+>;
+export type PresenterQuizState = InPhase<PresenterWorkshopState, Phase.Quiz>;
+
+export type ParticipantQuizView = ParticipantQuizState["quiz"];
+export type FacilitatorQuizView = FacilitatorQuizState["quiz"];
+export type PresenterQuizView = PresenterQuizState["quiz"];
