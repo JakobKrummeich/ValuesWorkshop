@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, type KeyboardEvent } from "react";
 import { localizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantSelectionState } from "../../../../domain/workshopState";
@@ -12,6 +13,20 @@ import {
 
 function focusOnMount(button: HTMLButtonElement | null) {
   button?.focus();
+}
+
+function cycleTabFocus(event: KeyboardEvent<HTMLDivElement>) {
+  const buttons = event.currentTarget.querySelectorAll("button");
+  const first = buttons[0];
+  const last = buttons[buttons.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
 }
 
 export function ParticipantSelectionScreen({
@@ -32,6 +47,17 @@ export function ParticipantSelectionScreen({
     confirmSubmission,
     rejectionMessage,
   } = useParticipantSelectionScreen(state.selection);
+  const submitButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const cancelAndRefocus = () => {
+    cancelSubmission();
+    submitButtonRef.current?.focus();
+  };
+
+  const confirmAndRefocus = () => {
+    confirmSubmission();
+    submitButtonRef.current?.focus();
+  };
 
   return (
     <section className={styles.selection}>
@@ -76,6 +102,7 @@ export function ParticipantSelectionScreen({
           type="button"
           className={styles.submitButton}
           data-testid="submit-selection-button"
+          ref={submitButtonRef}
           disabled={!canSubmit}
           onClick={requestSubmission}
         >
@@ -96,7 +123,9 @@ export function ParticipantSelectionScreen({
             className={styles.dialog}
             onKeyDown={(event) => {
               if (event.key === "Escape") {
-                cancelSubmission();
+                cancelAndRefocus();
+              } else if (event.key === "Tab") {
+                cycleTabFocus(event);
               }
             }}
           >
@@ -112,7 +141,7 @@ export function ParticipantSelectionScreen({
                 className={styles.cancelButton}
                 data-testid="confirm-cancel-button"
                 ref={focusOnMount}
-                onClick={cancelSubmission}
+                onClick={cancelAndRefocus}
               >
                 {translate(MessageKey.SelectionConfirmCancel)}
               </button>
@@ -120,7 +149,7 @@ export function ParticipantSelectionScreen({
                 type="button"
                 className={styles.confirmButton}
                 data-testid="confirm-submit-button"
-                onClick={confirmSubmission}
+                onClick={confirmAndRefocus}
               >
                 {translate(MessageKey.SelectionConfirmSubmit)}
               </button>

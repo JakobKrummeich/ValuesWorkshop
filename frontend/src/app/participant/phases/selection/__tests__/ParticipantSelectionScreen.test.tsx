@@ -193,6 +193,33 @@ describe("participant selection screen", () => {
     expect(cancelSubmission).toHaveBeenCalled();
   });
 
+  it("keeps tab focus cycling between the dialog buttons", () => {
+    screenHook.mockReturnValue(model({ isConfirming: true }));
+
+    render(<ParticipantSelectionScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+    const dialog = screen.getByRole("dialog");
+
+    screen.getByTestId("confirm-submit-button").focus();
+    fireEvent.keyDown(dialog, { key: "Tab" });
+    expect(screen.getByTestId("confirm-cancel-button")).toHaveFocus();
+
+    fireEvent.keyDown(dialog, { key: "Tab", shiftKey: true });
+    expect(screen.getByTestId("confirm-submit-button")).toHaveFocus();
+  });
+
+  it("returns the focus to the submit button when the dialog closes", () => {
+    screenHook.mockReturnValue(model({ canSubmit: true, isConfirming: true }));
+
+    render(<ParticipantSelectionScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+    fireEvent.click(screen.getByTestId("confirm-cancel-button"));
+
+    expect(screen.getByTestId("submit-selection-button")).toHaveFocus();
+  });
+
   it("replaces the submit button with a notice once submitted", () => {
     screenHook.mockReturnValue(model({ isSubmitted: true }));
 
