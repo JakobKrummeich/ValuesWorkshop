@@ -318,15 +318,27 @@ only once revealed/shown; facilitator always sees both.
 **Verification:** BE quiz suite; JSON schema validation test on config.
 **Dependencies:** 11. **Size:** M
 
-### Task 14: Quiz frontend
+### Task 14: Quiz frontend ✅
+**Spec:** `tasks/specs/14-quiz-frontend.md` (approved via Lavish).
 **Description:** Participant answer buttons; presenter live bar charts
 animating as votes arrive; facilitator sub-controls. Extend multi-client e2e
 through workshop phase 2.
 **Acceptance criteria:**
-- [ ] Bars update without reload as votes arrive
-- [ ] Correct answer highlighted after reveal; learning text togglable
-- [ ] Multi-client e2e now covers phases 1–2 and runs in CI (the CI wiring
+- [x] Bars update without reload as votes arrive
+- [x] Correct answer highlighted after reveal; learning text togglable
+- [x] Multi-client e2e now covers phases 1–2 and runs in CI (the CI wiring
       itself moved to Task 12)
+- [x] **Protocol §6.4 gap closed here:** facilitator envelope now ships
+      `enabledIntents` (accepted-and-state-changing only, idempotent no-ops
+      excluded), computed via `RegisteredExitGuards.For` — the same guard
+      registration Host and tests share; all quiz views carry `questionCount`
+**Learnings for Task 15:** participant intent wiring now has a full template
+(`ParticipantQuizPort` → adapter → `workshopSessions` → boundary →
+dependencies → `useIntentSender`); every new facilitator intent must be added
+to BE `FacilitatorIntent` + `FacilitatorEnabledIntents` and the FE enum in the
+same PR (zod hard-fails on unknown intent names); e2e reruns need the raised
+dev-compose session-creation rate limit; presenter wall never scrolls — check
+tall states against 1080p.
 **Verification:** FE component/reducer tests; Playwright: 3 participants vote,
 bars reflect tallies.
 **Dependencies:** 12, 13. **Size:** M
