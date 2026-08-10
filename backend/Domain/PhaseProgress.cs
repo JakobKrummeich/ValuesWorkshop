@@ -4,9 +4,11 @@ public sealed class PhaseProgress
 {
     public Phase CurrentPhase { get; private set; } = Phase.Join;
 
+    public bool HasNextPhase => CurrentPhase != Phase.FinalPresentation;
+
     internal void Advance()
     {
-        if (CurrentPhase == Phase.FinalPresentation)
+        if (!HasNextPhase)
         {
             throw new InvariantViolationException(
                 "The workshop is in its last phase; phases move forward only (I1)."

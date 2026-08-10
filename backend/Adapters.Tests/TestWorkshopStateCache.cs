@@ -10,7 +10,7 @@ internal static class TestWorkshopStateCache
         var catalog = new TestQuizCatalog(5);
 
         return new WorkshopStateCache(
-            new FacilitatorWorkshopStateMapper(catalog),
+            new FacilitatorWorkshopStateMapper(catalog, TestExitGuards.RegisteredFor(catalog)),
             new PresenterWorkshopStateMapper(catalog),
             new ParticipantWorkshopStateMapper(catalog)
         );

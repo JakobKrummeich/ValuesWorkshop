@@ -13,14 +13,25 @@ public sealed record PhaseExitGuards
 
     public static PhaseExitGuards None { get; } = new();
 
+    public bool PermitsExitOf(Session session)
+    {
+        return BlockingGuardFor(session) is null;
+    }
+
     internal void RequireSatisfied(Session session)
     {
-        if (
+        if (BlockingGuardFor(session) is { } blockingGuard)
+        {
+            throw new WrongPhaseException(blockingGuard.Refusal);
+        }
+    }
+
+    private IPhaseExitGuard? BlockingGuardFor(Session session)
+    {
+        return
             guardsByPhase.TryGetValue(session.PhaseProgress.CurrentPhase, out var guard)
             && !guard.IsSatisfiedBy(session)
-        )
-        {
-            throw new WrongPhaseException(guard.Refusal);
-        }
+            ? guard
+            : null;
     }
 }

@@ -67,7 +67,10 @@ public class QuizCorrectAnswerSecrecyTests
         );
 
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(Catalog).Map(session, 1),
+            new FacilitatorWorkshopStateMapper(Catalog, TestExitGuards.RegisteredFor(Catalog)).Map(
+                session,
+                1
+            ),
             WireOptions
         );
 

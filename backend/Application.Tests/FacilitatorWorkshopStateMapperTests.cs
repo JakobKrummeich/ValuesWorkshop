@@ -172,6 +172,11 @@ public class FacilitatorWorkshopStateMapperTests
 
     private static FacilitatorWorkshopState Map(Session session, long revision = 1)
     {
-        return new FacilitatorWorkshopStateMapper(new TestQuizCatalog(5)).Map(session, revision);
+        var catalog = new TestQuizCatalog(5);
+
+        return new FacilitatorWorkshopStateMapper(
+            catalog,
+            TestExitGuards.RegisteredFor(catalog)
+        ).Map(session, revision);
     }
 }
