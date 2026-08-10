@@ -48,13 +48,15 @@ export function useParticipantSelectionScreen(
     !isLocked && selectedValueIds.length === requiredSelectionCount;
 
   const toggleValue = useCallback((valueId: string) => {
-    setChosenValueIds((current) =>
-      current.includes(valueId)
-        ? current.filter((chosenId) => chosenId !== valueId)
-        : current.length < requiredSelectionCount
-          ? [...current, valueId]
-          : current,
-    );
+    setChosenValueIds((current) => {
+      if (current.includes(valueId)) {
+        return current.filter((chosenId) => chosenId !== valueId);
+      }
+      if (current.length >= requiredSelectionCount) {
+        return current;
+      }
+      return [...current, valueId];
+    });
   }, []);
 
   const requestSubmission = useCallback(() => {
