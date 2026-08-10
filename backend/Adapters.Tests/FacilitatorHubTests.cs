@@ -232,8 +232,8 @@ public class FacilitatorHubTests
         var result = await hub.RevealAnswer();
 
         result.IsAccepted.ShouldBeTrue();
-        repository.Saved.ShouldHaveSingleItem();
-        repository.Saved.Single().Quiz.IsRevealed.ShouldBeTrue();
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
     private static Session SessionInQuiz(QuizProgress quiz)

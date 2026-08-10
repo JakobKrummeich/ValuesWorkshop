@@ -27,8 +27,9 @@ public sealed class FacilitatorIntentHandler(
             command.SessionIdentity,
             session =>
             {
+                var was = session.Quiz.IsRevealed;
                 session.RevealAnswer(command.Caller);
-                return true;
+                return !was;
             }
         );
     }
@@ -39,8 +40,9 @@ public sealed class FacilitatorIntentHandler(
             command.SessionIdentity,
             session =>
             {
+                var was = session.Quiz.IsLearningTextShown;
                 session.ShowLearningText(command.Caller);
-                return true;
+                return !was;
             }
         );
     }
