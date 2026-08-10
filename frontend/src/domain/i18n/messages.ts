@@ -225,6 +225,10 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
     [Language.German]: "Nächste Frage",
     [Language.English]: "Next question",
   },
+  [MessageKey.SelectionPrompt]: {
+    [Language.German]: "Wählt eure 10 Werte",
+    [Language.English]: "Pick your 10 values",
+  },
   [MessageKey.SelectionChoosePrompt]: {
     [Language.German]: "Wähle genau 10 Werte",
     [Language.English]: "Pick exactly 10 values",
@@ -256,6 +260,10 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
   [MessageKey.SelectionSubmittedNotice]: {
     [Language.German]: "Deine Auswahl ist abgegeben.",
     [Language.English]: "Your selection has been submitted.",
+  },
+  [MessageKey.SelectionSubmittedCount]: {
+    [Language.German]: "{submitted} von {total} haben abgegeben",
+    [Language.English]: "{submitted} of {total} have submitted",
   },
   [MessageKey.FacilitatorHeading]: {
     [Language.German]: "Moderation",
