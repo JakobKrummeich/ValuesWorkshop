@@ -174,7 +174,10 @@ public class ParticipantWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.SelectionResults,
-            selection: SelectionRound.Restore([SessionFixtures.Anna], [new ValueId("honesty")])
+            selection: SelectionRound.Restore(
+                [new SelectedValue(SessionFixtures.Anna, new ValueId("honesty"))],
+                [new ValueId("honesty")]
+            )
         );
 
         var selection = Map(session, caller: SessionFixtures.Anna)

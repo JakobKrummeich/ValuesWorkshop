@@ -89,7 +89,10 @@ public class FacilitatorWorkshopStateMapperTests
         var session = SessionFixtures.InPhase(
             Phase.SelectionResults,
             selection: SelectionRound.Restore(
-                [SessionFixtures.Anna, SessionFixtures.Ben],
+                [
+                    new SelectedValue(SessionFixtures.Anna, new ValueId("honesty")),
+                    new SelectedValue(SessionFixtures.Ben, new ValueId("trust")),
+                ],
                 [new ValueId("honesty")]
             )
         );

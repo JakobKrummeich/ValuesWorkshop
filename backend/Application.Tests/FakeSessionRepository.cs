@@ -30,7 +30,7 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
                 session.Quiz.IsLearningTextShown,
                 session.Quiz.CastAnswers
             ),
-            SelectionRound.Restore(session.Selection.SubmittedBy, session.Selection.TopValues),
+            SelectionRound.Restore(session.Selection.SelectedValues, session.Selection.TopValues),
             FormationRecord.Restore(
                 session.Formation.IsFormed,
                 session.Formation.Groups.Select(SnapshotOf)

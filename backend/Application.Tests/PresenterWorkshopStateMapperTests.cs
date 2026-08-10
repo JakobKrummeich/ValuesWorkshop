@@ -110,7 +110,10 @@ public class PresenterWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.ValueSelection,
-            selection: SelectionRound.Restore([SessionFixtures.Chris], [])
+            selection: SelectionRound.Restore(
+                [new SelectedValue(SessionFixtures.Chris, new ValueId("trust"))],
+                []
+            )
         );
 
         var selection = Map(session).ShouldBeOfType<PresenterValueSelectionState>().Selection;

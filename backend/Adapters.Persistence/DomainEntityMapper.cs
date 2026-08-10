@@ -59,6 +59,14 @@ internal static class DomainEntityMapper
                         }
                 )
                 .ToList(),
+            ValueSelections = session
+                .Selection.SelectedValues.Select(selected => new ValueSelectionEntity
+                {
+                    SessionIdentity = identityString,
+                    ParticipantId = selected.ParticipantId.Value.ToString(),
+                    ValueId = selected.ValueId.Value,
+                })
+                .ToList(),
             SelectionSubmissions = session
                 .Selection.SubmittedBy.Select(participantId => new SelectionSubmissionEntity
                 {
@@ -110,8 +118,9 @@ internal static class DomainEntityMapper
         );
 
         var selection = SelectionRound.Restore(
-            entity.SelectionSubmissions.Select(submission => new ParticipantId(
-                Guid.Parse(submission.ParticipantId)
+            entity.ValueSelections.Select(selected => new SelectedValue(
+                new ParticipantId(Guid.Parse(selected.ParticipantId)),
+                new ValueId(selected.ValueId)
             )),
             entity.TopValues.Select(topValue => new ValueId(topValue.ValueId))
         );
