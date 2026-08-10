@@ -36,6 +36,154 @@
         "de": "Werte wirken dort, wo Regeln enden: Sie helfen Teams, im Alltag konsistent zu entscheiden.",
         "en": "Values work where rules end: they help teams decide consistently in everyday situations."
       }
+    },
+    {
+      "id": "q2",
+      "question": {
+        "de": "Wie entstehen Unternehmenswerte am wirkungsvollsten?",
+        "en": "How do company values come about most effectively?"
+      },
+      "answers": [
+        {
+          "id": "q2-correct",
+          "kind": "correct",
+          "text": {
+            "de": "Wenn Mitarbeitende sie gemeinsam erarbeiten und im Alltag anwenden.",
+            "en": "When employees develop them together and apply them in everyday work."
+          }
+        },
+        {
+          "id": "q2-wrong",
+          "kind": "wrong",
+          "text": {
+            "de": "Wenn die Geschäftsführung sie beschließt und per E-Mail verschickt.",
+            "en": "When management decides them and sends them out by email."
+          }
+        },
+        {
+          "id": "q2-funny",
+          "kind": "funnyWrong",
+          "text": {
+            "de": "Wenn eine KI sie generiert und als Poster ins Foyer hängt.",
+            "en": "When an AI generates them and hangs them as a poster in the lobby."
+          }
+        }
+      ],
+      "learningText": {
+        "de": "Werte tragen nur, wenn die Menschen sie mitentwickeln – Beteiligung schafft Verbindlichkeit.",
+        "en": "Values only carry weight when people help shape them — participation creates commitment."
+      }
+    },
+    {
+      "id": "q3",
+      "question": {
+        "de": "Woran erkennt man, dass ein Wert wirklich gelebt wird?",
+        "en": "How can you tell that a value is truly lived?"
+      },
+      "answers": [
+        {
+          "id": "q3-correct",
+          "kind": "correct",
+          "text": {
+            "de": "Er zeigt sich in Entscheidungen – auch wenn es unbequem ist.",
+            "en": "It shows in decisions — even when it is inconvenient."
+          }
+        },
+        {
+          "id": "q3-wrong",
+          "kind": "wrong",
+          "text": {
+            "de": "Er steht in jeder Stellenausschreibung.",
+            "en": "It appears in every job posting."
+          }
+        },
+        {
+          "id": "q3-funny",
+          "kind": "funnyWrong",
+          "text": {
+            "de": "Er ist auf Tassen und Kugelschreibern gedruckt.",
+            "en": "It is printed on mugs and ballpoint pens."
+          }
+        }
+      ],
+      "learningText": {
+        "de": "Ein Wert ist erst dann echt, wenn er auch dann gilt, wenn er etwas kostet.",
+        "en": "A value only becomes real when it still holds even when it costs something."
+      }
+    },
+    {
+      "id": "q4",
+      "question": {
+        "de": "Was passiert, wenn verkündete Werte und tatsächliches Verhalten auseinanderfallen?",
+        "en": "What happens when proclaimed values and actual behavior drift apart?"
+      },
+      "answers": [
+        {
+          "id": "q4-correct",
+          "kind": "correct",
+          "text": {
+            "de": "Vertrauen und Glaubwürdigkeit sinken, Zynismus entsteht.",
+            "en": "Trust and credibility drop, and cynicism grows."
+          }
+        },
+        {
+          "id": "q4-wrong",
+          "kind": "wrong",
+          "text": {
+            "de": "Nichts – Hauptsache, die Werte sind dokumentiert.",
+            "en": "Nothing — as long as the values are documented."
+          }
+        },
+        {
+          "id": "q4-funny",
+          "kind": "funnyWrong",
+          "text": {
+            "de": "Die Werte beschweren sich beim Betriebsrat.",
+            "en": "The values file a complaint with the works council."
+          }
+        }
+      ],
+      "learningText": {
+        "de": "Widerspruch zwischen Wort und Tat wirkt stärker als jedes Leitbild – Vorleben schlägt Verkünden.",
+        "en": "A gap between words and actions outweighs any mission statement — living values beats announcing them."
+      }
+    },
+    {
+      "id": "q5",
+      "question": {
+        "de": "Wie viele Werte kann eine Organisation glaubwürdig gleichzeitig leben?",
+        "en": "How many values can an organization credibly live at the same time?"
+      },
+      "answers": [
+        {
+          "id": "q5-correct",
+          "kind": "correct",
+          "text": {
+            "de": "Wenige, klar priorisierte – nur so bleiben sie handlungsleitend.",
+            "en": "A few, clearly prioritized — only then do they keep guiding action."
+          }
+        },
+        {
+          "id": "q5-wrong",
+          "kind": "wrong",
+          "text": {
+            "de": "Je mehr, desto besser – Vielfalt zeigt Ambition.",
+            "en": "The more the better — variety shows ambition."
+          }
+        },
+        {
+          "id": "q5-funny",
+          "kind": "funnyWrong",
+          "text": {
+            "de": "Exakt 42 – das ist schließlich die Antwort auf alles.",
+            "en": "Exactly 42 — after all, that is the answer to everything."
+          }
+        }
+      ],
+      "learningText": {
+        "de": "Fokus macht Werte wirksam: Eine Handvoll gemeinsam getragener Werte verändert mehr als ein langer Katalog.",
+        "en": "Focus makes values effective: a handful of shared values changes more than a long catalog."
+      }
     }
   ]
 }

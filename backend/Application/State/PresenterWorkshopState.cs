@@ -29,7 +29,7 @@ public sealed record PresenterJoinState(
     public override Phase Phase => Phase.Join;
 }
 
-public sealed record PresenterQuizState(long Revision, int ParticipantCount, QuizView Quiz)
+public sealed record PresenterQuizState(long Revision, int ParticipantCount, PresenterQuizView Quiz)
     : PresenterWorkshopState(Revision, ParticipantCount)
 {
     [JsonIgnore]

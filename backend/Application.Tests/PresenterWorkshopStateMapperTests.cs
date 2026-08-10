@@ -50,13 +50,58 @@ public class PresenterWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
-            quiz: QuizProgress.Restore(1, false, false)
+            quiz: QuizProgress.Restore(1, false, false, [])
         );
 
         var quiz = Map(session).ShouldBeOfType<PresenterQuizState>().Quiz;
 
         quiz.QuestionIndex.ShouldBe(1);
         quiz.SubState.ShouldBe(QuizSubState.Answering);
+    }
+
+    [Fact]
+    public void Quiz_state_reports_tallies_but_hides_the_correct_answer_until_revealed()
+    {
+        var unrevealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(
+                0,
+                false,
+                false,
+                [new CastAnswer(0, SessionFixtures.Anna, 1)]
+            )
+        );
+        var revealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, false, [new CastAnswer(0, SessionFixtures.Anna, 1)])
+        );
+
+        var quiz = Map(unrevealed).ShouldBeOfType<PresenterQuizState>().Quiz;
+
+        quiz.Question.ShouldBe(new LocalizedTextView("Frage 0", "Question 0"));
+        quiz.AnswerTallies.ShouldBe([0, 1, 0]);
+        quiz.CorrectAnswerIndex.ShouldBeNull();
+        Map(revealed)
+            .ShouldBeOfType<PresenterQuizState>()
+            .Quiz.CorrectAnswerIndex.ShouldBe(TestQuizCatalog.CorrectAnswerIndex);
+    }
+
+    [Fact]
+    public void Quiz_state_hides_the_learning_text_until_it_is_shown()
+    {
+        var revealed = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, false, [])
+        );
+        var shown = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, true, true, [])
+        );
+
+        Map(revealed).ShouldBeOfType<PresenterQuizState>().Quiz.LearningText.ShouldBeNull();
+        Map(shown)
+            .ShouldBeOfType<PresenterQuizState>()
+            .Quiz.LearningText.ShouldBe(new LocalizedTextView("Lerntext 0", "Learning text 0"));
     }
 
     [Fact]
@@ -138,6 +183,6 @@ public class PresenterWorkshopStateMapperTests
 
     private static PresenterWorkshopState Map(Session session, long revision = 1)
     {
-        return PresenterWorkshopStateMapper.Map(session, revision);
+        return new PresenterWorkshopStateMapper(new TestQuizCatalog(5)).Map(session, revision);
     }
 }

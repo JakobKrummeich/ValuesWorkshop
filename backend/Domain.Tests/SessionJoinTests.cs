@@ -166,7 +166,7 @@ public class SessionJoinTests
                 TestParticipants.Named(Ben, "Ben"),
             ]),
             PhaseProgress.Restore(phase),
-            QuizProgress.Restore(null, false, false),
+            QuizProgress.Restore(null, false, false, []),
             SelectionRound.Restore([], []),
             formation,
             PresentationWalk.Restore(null, null, 0),

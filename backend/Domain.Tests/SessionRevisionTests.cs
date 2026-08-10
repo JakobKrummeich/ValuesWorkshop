@@ -30,7 +30,7 @@ public class SessionRevisionTests
             TestSessions.Name,
             Roster.Restore([]),
             PhaseProgress.Restore(Phase.Quiz),
-            QuizProgress.Restore(null, false, false),
+            QuizProgress.Restore(null, false, false, []),
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),

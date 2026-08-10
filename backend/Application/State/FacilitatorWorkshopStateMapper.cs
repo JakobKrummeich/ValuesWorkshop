@@ -1,13 +1,14 @@
+using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.State;
 
-public static class FacilitatorWorkshopStateMapper
+public sealed class FacilitatorWorkshopStateMapper(IQuizCatalog quizCatalog)
 {
-    private static readonly IReadOnlyDictionary<
+    private readonly IReadOnlyDictionary<
         Phase,
         Func<Session, long, FacilitatorWorkshopState>
-    > StateOfPhase = new Dictionary<Phase, Func<Session, long, FacilitatorWorkshopState>>
+    > stateOfPhase = new Dictionary<Phase, Func<Session, long, FacilitatorWorkshopState>>
     {
         [Phase.Join] = (session, revision) =>
             new FacilitatorJoinState(revision, SessionViews.Roster(session)),
@@ -15,7 +16,7 @@ public static class FacilitatorWorkshopStateMapper
             new FacilitatorQuizState(
                 revision,
                 SessionViews.Roster(session),
-                SessionViews.Quiz(session)
+                QuizViews.ForFacilitator(session, quizCatalog)
             ),
         [Phase.ValueSelection] = (session, revision) =>
             new FacilitatorValueSelectionState(
@@ -59,9 +60,9 @@ public static class FacilitatorWorkshopStateMapper
             ),
     };
 
-    public static FacilitatorWorkshopState Map(Session session, long revision)
+    public FacilitatorWorkshopState Map(Session session, long revision)
     {
-        return StateOfPhase[session.PhaseProgress.CurrentPhase](session, revision);
+        return stateOfPhase[session.PhaseProgress.CurrentPhase](session, revision);
     }
 
     private static IReadOnlyList<FacilitatorGroupView> Groups(Session session)

@@ -143,6 +143,25 @@ public class IntentPipelineTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task An_intent_with_a_malformed_payload_persists_nothing_and_broadcasts_nothing()
+    {
+        var repository = RepositoryWith(SessionFixtures.InPhase(Phase.Quiz));
+        var broadcaster = new RecordingBroadcaster();
+        var pipeline = PipelineOver(repository, broadcaster);
+
+        var result = await pipeline.ExecuteAsync(
+            KnownSession,
+            session => throw new MalformedPayloadException("The payload is malformed.")
+        );
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
     private static IntentPipeline PipelineOver(
         FakeSessionRepository repository,
         RecordingBroadcaster broadcaster

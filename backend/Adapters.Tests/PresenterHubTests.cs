@@ -54,7 +54,7 @@ public class PresenterHubTests
 
     private PresenterHub HubBoundTo(SessionIdentity sessionIdentity)
     {
-        return new PresenterHub(repository, new WorkshopStateCache(), registry)
+        return new PresenterHub(repository, TestWorkshopStateCache.Create(), registry)
         {
             Clients = clients,
             Groups = groups,

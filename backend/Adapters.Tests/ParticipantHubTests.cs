@@ -117,6 +117,66 @@ public class ParticipantHubTests
         repository.Saved.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task Choosing_an_answer_mutates_persists_and_broadcasts()
+    {
+        var session = TestSessions.InPhase(
+            KnownSession,
+            Phase.Quiz,
+            QuizProgress.Restore(0, false, false, [])
+        );
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.ChooseQuizAnswer(0, 2);
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Quiz.CastAnswers.ShouldBe([new CastAnswer(0, Anna, 2)]);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Choosing_an_out_of_range_answer_is_rejected_as_a_malformed_payload()
+    {
+        var session = TestSessions.InPhase(
+            KnownSession,
+            Phase.Quiz,
+            QuizProgress.Restore(0, false, false, [])
+        );
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.ChooseQuizAnswer(0, 3);
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Choosing_an_answer_without_an_authenticated_subject_is_refused()
+    {
+        repository.Add(
+            TestSessions.InPhase(
+                KnownSession,
+                Phase.Quiz,
+                QuizProgress.Restore(0, false, false, [])
+            )
+        );
+        var hub = HubWithContext(
+            new FakeHubCallerContext(KnownSession.Value.ToString(), subject: null)
+        );
+
+        await Should.ThrowAsync<HubException>(() => hub.ChooseQuizAnswer(0, 0));
+
+        repository.Saved.ShouldBeEmpty();
+    }
+
     private ParticipantHub HubBoundTo(SessionIdentity sessionIdentity, string subject)
     {
         return HubWithContext(
@@ -130,10 +190,14 @@ public class ParticipantHubTests
 
     private ParticipantHub HubWithContext(FakeHubCallerContext context)
     {
+        var pipeline = new IntentPipeline(new SessionCommandHandler(repository, broadcaster));
+
         return new ParticipantHub(
             repository,
-            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            new WorkshopStateCache(),
+            pipeline,
+            new ParticipantIntentHandler(pipeline),
+            new ParticipantWorkshopStateMapper(new TestQuizCatalog(5)),
+            TestWorkshopStateCache.Create(),
             new FixedRandomness(0),
             registry
         )

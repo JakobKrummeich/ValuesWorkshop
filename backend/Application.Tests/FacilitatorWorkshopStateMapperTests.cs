@@ -46,13 +46,39 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
-            quiz: QuizProgress.Restore(3, true, true)
+            quiz: QuizProgress.Restore(3, true, true, [])
         );
 
         var quiz = Map(session).ShouldBeOfType<FacilitatorQuizState>().Quiz;
 
         quiz.QuestionIndex.ShouldBe(3);
         quiz.SubState.ShouldBe(QuizSubState.LearningTextShown);
+    }
+
+    [Fact]
+    public void Quiz_state_reports_tallies_answered_count_and_always_the_correct_answer()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(
+                1,
+                false,
+                false,
+                [
+                    new CastAnswer(1, SessionFixtures.Anna, 0),
+                    new CastAnswer(1, SessionFixtures.Ben, 0),
+                    new CastAnswer(0, SessionFixtures.Chris, 2),
+                ]
+            )
+        );
+
+        var quiz = Map(session).ShouldBeOfType<FacilitatorQuizState>().Quiz;
+
+        quiz.Question.ShouldBe(new LocalizedTextView("Frage 1", "Question 1"));
+        quiz.AnswerTallies.ShouldBe([2, 0, 0]);
+        quiz.AnsweredCount.ShouldBe(2);
+        quiz.CorrectAnswerIndex.ShouldBe(TestQuizCatalog.CorrectAnswerIndex);
+        quiz.LearningText.ShouldBe(new LocalizedTextView("Lerntext 1", "Learning text 1"));
     }
 
     [Fact]
@@ -145,6 +171,6 @@ public class FacilitatorWorkshopStateMapperTests
 
     private static FacilitatorWorkshopState Map(Session session, long revision = 1)
     {
-        return FacilitatorWorkshopStateMapper.Map(session, revision);
+        return new FacilitatorWorkshopStateMapper(new TestQuizCatalog(5)).Map(session, revision);
     }
 }

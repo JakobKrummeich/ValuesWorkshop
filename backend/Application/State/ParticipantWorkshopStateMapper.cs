@@ -1,13 +1,14 @@
+using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.State;
 
-public static class ParticipantWorkshopStateMapper
+public sealed class ParticipantWorkshopStateMapper(IQuizCatalog quizCatalog)
 {
-    private static readonly IReadOnlyDictionary<
+    private readonly IReadOnlyDictionary<
         Phase,
         Func<Session, ParticipantId, long, ParticipantWorkshopState>
-    > StateOfPhase = new Dictionary<
+    > stateOfPhase = new Dictionary<
         Phase,
         Func<Session, ParticipantId, long, ParticipantWorkshopState>
     >
@@ -18,11 +19,11 @@ public static class ParticipantWorkshopStateMapper
                 ParticipantCount(session),
                 OwnDisplayName(session, caller)
             ),
-        [Phase.Quiz] = (session, _, revision) =>
+        [Phase.Quiz] = (session, caller, revision) =>
             new ParticipantQuizState(
                 revision,
                 ParticipantCount(session),
-                SessionViews.Quiz(session)
+                QuizViews.ForParticipant(session, caller, quizCatalog)
             ),
         [Phase.ValueSelection] = (session, caller, revision) =>
             new ParticipantValueSelectionState(
@@ -69,13 +70,9 @@ public static class ParticipantWorkshopStateMapper
             ),
     };
 
-    public static ParticipantWorkshopState MapFor(
-        Session session,
-        ParticipantId caller,
-        long revision
-    )
+    public ParticipantWorkshopState MapFor(Session session, ParticipantId caller, long revision)
     {
-        return StateOfPhase[session.PhaseProgress.CurrentPhase](session, caller, revision);
+        return stateOfPhase[session.PhaseProgress.CurrentPhase](session, caller, revision);
     }
 
     private static int ParticipantCount(Session session)

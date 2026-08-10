@@ -68,16 +68,70 @@ public sealed class Session
 
     public void AdvancePhase(CallerSubject caller, PhaseExitGuards exitGuards)
     {
-        if (!IsFacilitatedBy(caller))
-        {
-            throw new NotAuthorizedException(
-                "Only the facilitator of this session may advance the phase (I2)."
-            );
-        }
+        RequireFacilitator(caller, "Only the facilitator of this session may advance the phase.");
 
         exitGuards.RequireSatisfied(this);
 
         PhaseProgress.Advance();
+
+        if (PhaseProgress.CurrentPhase == Phase.Quiz)
+        {
+            Quiz.PoseFirstQuestion();
+        }
+    }
+
+    public void RevealAnswer(CallerSubject caller)
+    {
+        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
+        RequireQuizPhase();
+
+        Quiz.RevealAnswer();
+    }
+
+    public void ShowLearningText(CallerSubject caller)
+    {
+        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
+        RequireQuizPhase();
+
+        Quiz.ShowLearningText();
+    }
+
+    public void ChooseQuizAnswer(ParticipantId participantId, int questionIndex, int answerIndex)
+    {
+        if (!Roster.Contains(participantId))
+        {
+            throw new NotAuthorizedException(
+                "Only a joined participant may answer a quiz question."
+            );
+        }
+
+        RequireQuizPhase();
+
+        Quiz.ChooseAnswer(participantId, questionIndex, answerIndex);
+    }
+
+    public void PoseNextQuestion(CallerSubject caller, int questionCount)
+    {
+        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
+        RequireQuizPhase();
+
+        Quiz.PoseNextQuestion(questionCount);
+    }
+
+    private void RequireFacilitator(CallerSubject caller, string refusal)
+    {
+        if (!IsFacilitatedBy(caller))
+        {
+            throw new NotAuthorizedException(refusal);
+        }
+    }
+
+    private void RequireQuizPhase()
+    {
+        if (PhaseProgress.CurrentPhase != Phase.Quiz)
+        {
+            throw new WrongPhaseException("The quiz commands exist only during the quiz phase.");
+        }
     }
 
     public void BumpRevision()

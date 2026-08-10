@@ -8,12 +8,16 @@ using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.Intents;
 using ValuesWorkshop.Application.Ports.Driven;
+using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 using ValuesWorkshop.Domain.Ports;
 using ValuesWorkshop.Host;
 using ValuesWorkshop.Host.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var configDirectory = Environment.GetEnvironmentVariable("CONFIG_DIR") ?? "config";
+var quizCatalog = QuizCatalogFile.LoadFrom(Path.Combine(configDirectory, "quiz.json"));
 
 var dataDirectory = Environment.GetEnvironmentVariable("DATA_DIR") ?? "data";
 Directory.CreateDirectory(dataDirectory);
@@ -28,13 +32,22 @@ builder.Services.AddScoped<SessionCommandHandler>();
 builder.Services.AddScoped<SessionCreationHandler>();
 builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddScoped<FacilitatorIntentHandler>();
+builder.Services.AddScoped<ParticipantIntentHandler>();
+builder.Services.AddSingleton<IQuizCatalog>(quizCatalog);
 builder.Services.AddSingleton(
-    new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard())
+    new PhaseExitGuards(
+        new QuizExitGuard(quizCatalog.Questions.Count),
+        new GroupWorkExitGuard(),
+        new FinalVotingExitGuard()
+    )
 );
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
     new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))
 );
+builder.Services.AddSingleton<FacilitatorWorkshopStateMapper>();
+builder.Services.AddSingleton<ParticipantWorkshopStateMapper>();
+builder.Services.AddSingleton<PresenterWorkshopStateMapper>();
 builder.Services.AddSingleton<WorkshopStateCache>();
 builder.Services.AddSingleton<SessionConnectionRegistry>();
 builder.Services.AddSingleton<RoleStateDispatcher>();

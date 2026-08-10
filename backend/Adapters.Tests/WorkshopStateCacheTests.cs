@@ -9,7 +9,7 @@ public class WorkshopStateCacheTests
         Guid.Parse("00000000-0000-0000-0000-00000000f00d")
     );
 
-    private readonly WorkshopStateCache cache = new();
+    private readonly WorkshopStateCache cache = TestWorkshopStateCache.Create();
 
     [Fact]
     public void An_unchanged_session_is_mapped_only_once()

@@ -12,8 +12,12 @@ services:
       OIDC_METADATA_URL: http://oidc:9000/.well-known/openid-configuration
       CORS_ORIGINS: http://localhost:3000
       FACILITATOR_PASSPHRASE: dev-facilitator-passphrase
+      CONFIG_DIR: /config
     volumes:
       - vw-data:/data
+      # Workshop content (config/quiz.json) lives at the repo root, outside the
+      # backend build context (./backend), so it must be mounted, not copied.
+      - ./config:/config:ro
     depends_on:
       oidc:
         condition: service_started

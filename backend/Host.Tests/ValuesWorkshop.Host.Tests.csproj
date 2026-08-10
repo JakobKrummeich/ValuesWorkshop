@@ -21,6 +21,11 @@
 
   <ItemGroup>
     <Content Include="PreMigrationsSchema.sql" CopyToOutputDirectory="PreserveNewest" />
+    <Content
+      Include="..\..\config\quiz.json"
+      Link="config\quiz.json"
+      CopyToOutputDirectory="PreserveNewest"
+    />
   </ItemGroup>
 
   <ItemGroup>

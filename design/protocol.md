@@ -32,11 +32,14 @@ transition referenced as `T*` is defined in `design/state-machine.md`.
    that constructs the adapters. It appears in no port signature, no UI
    prop, and no domain type (SPEC.md “Session binding at the edge”).
 7. **Content is not state.** The wire carries identifiers (`valueId`,
-   `questionId`, `answerId`, `animalId`); the localized texts live in
-   `config/*.json`, are loaded by the frontend, and are resolved there
-   (de/en). Group names are animal identifiers from `config/animals.json` and
-   are localized the same way. The single exception is participant-written
-   action text, which is free text and travels verbatim.
+   `animalId`); the localized texts live in `config/*.json`, are loaded by
+   the frontend, and are resolved there (de/en). Group names are animal
+   identifiers from `config/animals.json` and are localized the same way.
+   Two exceptions: participant-written action text, which is free text and
+   travels verbatim, and the quiz block, whose question and answer texts are
+   served from the server's `config/quiz.json` as `{de, en}` pairs (Task 13:
+   the frontend never reads the quiz config, and the correct answer must not
+   reach a client before the reveal).
 
 ---
 
@@ -253,8 +256,8 @@ the caller's authenticated principal, so no client can act as another.
 | # | Method | Payload | Guard (server-checked) | Rejection |
 |---|---|---|---|---|
 | T2 | `AdvancePhase` | — | facilitator (I2); forward only (I1); phase-exit guards T2a–T2c | `WrongPhase`, `NotAuthorized` |
-| T6 | `RevealAnswer` | — | phase Quiz; current question unrevealed | `WrongPhase` |
-| T7 | `ShowLearningText` | — | phase Quiz; answer revealed, text unshown | `WrongPhase` |
+| T6 | `RevealAnswer` | — | phase Quiz; a question is posed (repeat reveal is a no-op) | `WrongPhase` |
+| T7 | `ShowLearningText` | — | phase Quiz; answer revealed (repeat show is a no-op) | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
 | T13 | `ReassignScribe` | `{ groupName, participantId }` | phase Group work; target is a member of that group (I9) | `WrongPhase`, `InvariantViolated`, `UnknownParticipant` |
 | T17 | `GoToNextValue` | — | phase Value presentation; values remain (I12) | `WrongPhase` |
@@ -268,7 +271,7 @@ the caller's authenticated principal, so no client can act as another.
 | # | Method | Payload | Guard (server-checked) | Rejection |
 |---|---|---|---|---|
 | T4/T3 | *(implicit on connect)* | — | see § 3.1 | — |
-| T5 | `ChooseQuizAnswer` | `{ questionId, answerId }` | phase Quiz; `questionId` is the posed question; answer belongs to it; not yet answered (I5) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
+| T5 | `ChooseQuizAnswer` | `{ questionIndex, answerIndex }` | phase Quiz; `questionIndex` is the posed question and its answer unrevealed; `answerIndex` within 0..2; not yet answered (I5) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
 | T9 | `SubmitValueSelection` | `{ valueIds }` | phase Value selection; exactly ten distinct catalog values; not yet submitted (I6) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
 | T14 | `AddAction` | `{ valueId, text }` | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text non-empty ≤ 500 chars | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
 | T14 | `EditAction` | `{ actionId, text }` | as `AddAction`; action belongs to the caller's group | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
@@ -349,7 +352,7 @@ variant carries it.
 
 | Block | Fields |
 |---|---|
-| quiz | `questionId`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `ownAnswerId?`, `correctAnswerId?` (only once revealed) |
+| quiz | `questionIndex`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?`, `topValueIds?` |
 | ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
@@ -366,7 +369,7 @@ join lobby shows back to the person who just signed in.
 | Block | Fields |
 |---|---|
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
-| quiz | `questionId`, `subState`, `answerTallies`, `answeredCount` |
+| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
 | groups | `[{ name, memberParticipantIds, assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
@@ -385,7 +388,7 @@ what they answered, selected, or voted for.
 
 | Block | Fields |
 |---|---|
-| quiz | `questionId`, `subState`, `answerTallies`, `correctAnswerId?` (once revealed) |
+| quiz | `questionIndex`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
 | groups | `[{ name, memberCount, assignedValueIds, workStatus }]` |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
@@ -408,7 +411,7 @@ revealed. Groups are counted, not named by member.
    participant column, `voted_participants` has no value column).
 2. No role state above contains a participant-to-answer, -selection, or
    -vote mapping. The only per-person facts on the wire are the caller's own
-   (`ownAnswerId`, `ownSelectedValueIds`, `hasVotedThisRound`) inside that
+   (`ownAnswerIndex`, `ownSelectedValueIds`, `hasVotedThisRound`) inside that
    caller's own state.
 3. Because each hub can only send its own record type, a facilitator or
    presenter connection cannot be sent a participant's own block even by
@@ -456,7 +459,8 @@ this document.
 Server-side, in the pipeline, before any domain call: required fields
 present, identifiers non-empty, collections within bounds, free text
 non-empty and ≤ 500 characters, no unknown identifiers. Failure →
-`MalformedPayload`, nothing else happens.
+`MalformedPayload`, nothing else happens. First concrete producer: T5
+`ChooseQuizAnswer` with an `answerIndex` outside 0..2.
 
 Client-side, at the adapter boundary: every inbound state is parsed with a
 Zod schema before it enters the application. A parse failure is a bug, not a

@@ -30,6 +30,10 @@ public sealed class IntentPipeline(SessionCommandHandler commandHandler)
         {
             return IntentResult.Rejected(IntentRejectionCode.InvariantViolated, exception.Message);
         }
+        catch (MalformedPayloadException exception)
+        {
+            return IntentResult.Rejected(IntentRejectionCode.MalformedPayload, exception.Message);
+        }
         catch (ConcurrencyConflictException exception)
         {
             return IntentResult.Rejected(
