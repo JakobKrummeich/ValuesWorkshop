@@ -517,7 +517,7 @@ Screens depend only on their slice — never on a connection, never on
 |---|---|---|---|
 | participant | `sessionStatePort` | state stream + connection state | **9** |
 | participant | `quizPort` | `ChooseQuizAnswer` | 14 |
-| participant | `selectionPort` | `SubmitValueSelection` | 13 |
+| participant | `selectionPort` | `SubmitValueSelection` | 15 |
 | participant | `groupWorkPort` | `AddAction`, `EditAction`, `RemoveAction`, `SubmitGroupWork`, `ReopenGroupWork` | 16 |
 | participant | `votingPort` | `SubmitFinalVotes` | 17 |
 | facilitator | `sessionStatePort` | state stream + connection state | **9** |

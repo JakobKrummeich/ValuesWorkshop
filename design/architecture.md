@@ -79,6 +79,7 @@ concerns):
 |---|---|---|
 | `IBroadcaster` | `Application/IBroadcaster.cs` | `SignalRBroadcaster` (Adapters.Web) |
 | `IFacilitatorPassphrase` | `Application/Ports/Driven/IFacilitatorPassphrase.cs` | `FacilitatorPassphrase` (Host.Auth) |
+| `IValuesCatalog` | `Application/Ports/Driven/IValuesCatalog.cs` | `ValuesCatalogFile` (Host) |
 
 ### 2.2 Frontend Ports
 
@@ -91,6 +92,7 @@ Port interfaces live in `src/domain/ports/`, sliced per role and concern:
 | `FacilitatorLifecyclePort` | `src/domain/ports/facilitator/lifecyclePort.ts` | Facilitator intents (e.g. `advancePhase`) |
 | `FacilitatorQuizControlPort` | `src/domain/ports/facilitator/quizControlPort.ts` | Quiz sub-controls (`revealAnswer`, `showLearningText`, `poseNextQuestion`) |
 | `ParticipantQuizPort` | `src/domain/ports/participant/quizPort.ts` | Participant quiz answer (`chooseAnswer`) |
+| `ParticipantSelectionPort` | `src/domain/ports/participant/selectionPort.ts` | Participant value selection (`submitSelection`) |
 | `FacilitatorSessionCreationPort` | `src/domain/ports/facilitator/sessionCreationPort.ts` | Open a session over `POST /api/sessions` |
 | `ParticipantSessionStatePort` | `src/domain/ports/participant/sessionStatePort.ts` | Participant state stream |
 | `PresenterSessionStatePort` | `src/domain/ports/presenter/sessionStatePort.ts` | Presenter read-only state stream |
@@ -105,7 +107,7 @@ performs dependency injection of port implementations:
 | Screen group | Directory | Context file | Injects |
 |---|---|---|---|
 | Facilitator | `src/app/facilitator/` | `dependencies.tsx` | `FacilitatorSessionStatePort`, `FacilitatorLifecyclePort`, `FacilitatorQuizControlPort` |
-| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantSessionStatePort`, `ParticipantQuizPort` |
+| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantSessionStatePort`, `ParticipantQuizPort`, `ParticipantSelectionPort` |
 | Presenter | `src/app/presenter/` | `dependencies.tsx` | `PresenterSessionStatePort` |
 
 **Rules:**
