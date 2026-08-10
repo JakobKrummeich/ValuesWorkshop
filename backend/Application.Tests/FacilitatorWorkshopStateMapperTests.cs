@@ -1,3 +1,4 @@
+using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
@@ -174,9 +175,9 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var catalog = new TestQuizCatalog(5);
 
-        return new FacilitatorWorkshopStateMapper(
-            catalog,
-            TestExitGuards.RegisteredFor(catalog)
-        ).Map(session, revision);
+        return new FacilitatorWorkshopStateMapper(catalog, RegisteredExitGuards.For(catalog)).Map(
+            session,
+            revision
+        );
     }
 }

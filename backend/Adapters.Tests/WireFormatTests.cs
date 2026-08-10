@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.Options;
+using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
@@ -13,7 +14,7 @@ public class WireFormatTests
     private static readonly TestQuizCatalog Catalog = new(5);
     private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(
         Catalog,
-        TestExitGuards.RegisteredFor(Catalog)
+        RegisteredExitGuards.For(Catalog)
     );
     private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(Catalog);
     private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(Catalog);

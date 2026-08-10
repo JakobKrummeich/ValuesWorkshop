@@ -1,11 +1,11 @@
 using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
-namespace ValuesWorkshop.TestSupport;
+namespace ValuesWorkshop.Application;
 
-public static class TestExitGuards
+public static class RegisteredExitGuards
 {
-    public static PhaseExitGuards RegisteredFor(IQuizCatalog quizCatalog)
+    public static PhaseExitGuards For(IQuizCatalog quizCatalog)
     {
         return new PhaseExitGuards(
             new QuizExitGuard(quizCatalog.Questions.Count),

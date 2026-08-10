@@ -1,4 +1,5 @@
 using ValuesWorkshop.Adapters.Web;
+using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.State;
 
 namespace ValuesWorkshop.Adapters.Tests;
@@ -10,7 +11,7 @@ internal static class TestWorkshopStateCache
         var catalog = new TestQuizCatalog(5);
 
         return new WorkshopStateCache(
-            new FacilitatorWorkshopStateMapper(catalog, TestExitGuards.RegisteredFor(catalog)),
+            new FacilitatorWorkshopStateMapper(catalog, RegisteredExitGuards.For(catalog)),
             new PresenterWorkshopStateMapper(catalog),
             new ParticipantWorkshopStateMapper(catalog)
         );
