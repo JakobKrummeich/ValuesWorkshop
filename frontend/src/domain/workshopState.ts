@@ -12,6 +12,13 @@ export enum GroupWorkStatus {
   Submitted = 2,
 }
 
+export enum FacilitatorIntent {
+  AdvancePhase = "AdvancePhase",
+  RevealAnswer = "RevealAnswer",
+  ShowLearningText = "ShowLearningText",
+  PoseNextQuestion = "PoseNextQuestion",
+}
+
 const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
@@ -22,6 +29,7 @@ const localizedTextSchema = z.object({
 
 const quizViewBase = {
   questionIndex: z.int().nonnegative(),
+  questionCount: z.int().positive(),
   subState: z.enum(QuizSubState),
   question: localizedTextSchema,
   answers: z.array(localizedTextSchema),
@@ -128,6 +136,7 @@ const participantEnvelope = {
 const facilitatorEnvelope = {
   revision: revisionSchema,
   roster: rosterViewSchema,
+  enabledIntents: z.array(z.enum(FacilitatorIntent)),
 };
 
 const presenterEnvelope = participantEnvelope;

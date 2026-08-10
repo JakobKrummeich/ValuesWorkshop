@@ -1,5 +1,6 @@
 import { Phase } from "../phases";
 import {
+  FacilitatorIntent,
   GroupWorkStatus,
   QuizSubState,
   facilitatorWorkshopStateSchema,
@@ -102,6 +103,7 @@ describe("participant workshop state schema", () => {
       participantCount: 1,
       quiz: {
         questionIndex: 0,
+        questionCount: 5,
         subState: 1,
         question: { de: "Frage", en: "Question" },
         answers: [
@@ -117,6 +119,7 @@ describe("participant workshop state schema", () => {
       throw new Error("expected a quiz state");
     }
     expect(state.quiz.subState).toBe(QuizSubState.Answering);
+    expect(state.quiz.questionCount).toBe(5);
     expect(state.quiz.correctAnswerIndex).toBeUndefined();
   });
 
@@ -127,6 +130,7 @@ describe("participant workshop state schema", () => {
       participantCount: 1,
       quiz: {
         questionIndex: 2,
+        questionCount: 3,
         subState: 2,
         question: { de: "Frage", en: "Question" },
         answers: [{ de: "Richtig", en: "Right" }],
@@ -151,6 +155,23 @@ describe("participant workshop state schema", () => {
 
     expect(result.success).toBe(false);
   });
+
+  it("rejects a quiz state without the total question count", () => {
+    const result = participantWorkshopStateSchema.safeParse({
+      revision: 3,
+      phase: 2,
+      participantCount: 1,
+      quiz: {
+        questionIndex: 0,
+        subState: 1,
+        question: { de: "Frage", en: "Question" },
+        answers: [{ de: "Richtig", en: "Right" }],
+        ownAnswerIndex: null,
+      },
+    });
+
+    expect(result.success).toBe(false);
+  });
 });
 
 describe("facilitator workshop state schema", () => {
@@ -167,6 +188,7 @@ describe("facilitator workshop state schema", () => {
         ],
         participantCount: 1,
       },
+      enabledIntents: [],
       groups: [
         {
           name: "otter",
@@ -191,6 +213,7 @@ describe("facilitator workshop state schema", () => {
       revision: 30,
       phase: 5,
       roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["AdvancePhase"],
       selection: { submittedCount: 0, topValueIds: [] },
       groups: [
         {
@@ -213,6 +236,50 @@ describe("facilitator workshop state schema", () => {
     const result = facilitatorWorkshopStateSchema.safeParse({
       revision: 1,
       phase: 1,
+      enabledIntents: ["AdvancePhase"],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("narrows the enabled intents into the facilitator intent enum", () => {
+    const state = facilitatorWorkshopStateSchema.parse({
+      revision: 3,
+      phase: 2,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["RevealAnswer"],
+      quiz: {
+        questionIndex: 0,
+        questionCount: 5,
+        subState: 1,
+        question: { de: "Frage", en: "Question" },
+        answers: [{ de: "Richtig", en: "Right" }],
+        answerTallies: [0, 0, 0],
+        answeredCount: 0,
+        correctAnswerIndex: 1,
+        learningText: { de: "Lerntext", en: "Learning text" },
+      },
+    });
+
+    expect(state.enabledIntents).toEqual([FacilitatorIntent.RevealAnswer]);
+  });
+
+  it("rejects an intent name that is no facilitator hub method", () => {
+    const result = facilitatorWorkshopStateSchema.safeParse({
+      revision: 1,
+      phase: 1,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["DeleteSession"],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a state without the enabled intents", () => {
+    const result = facilitatorWorkshopStateSchema.safeParse({
+      revision: 1,
+      phase: 1,
+      roster: { participants: [], participantCount: 0 },
     });
 
     expect(result.success).toBe(false);
@@ -241,6 +308,7 @@ describe("presenter workshop state schema", () => {
       participantCount: 1,
       quiz: {
         questionIndex: 0,
+        questionCount: 5,
         subState: 1,
         question: { de: "Frage", en: "Question" },
         answers: [{ de: "Richtig", en: "Right" }],
