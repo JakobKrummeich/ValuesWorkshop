@@ -19,6 +19,7 @@ public sealed record LocalizedTextView(string De, string En);
 
 public sealed record ParticipantQuizView(
     int QuestionIndex,
+    int QuestionCount,
     QuizSubState SubState,
     LocalizedTextView Question,
     IReadOnlyList<LocalizedTextView> Answers,
@@ -30,6 +31,7 @@ public sealed record ParticipantQuizView(
 
 public sealed record FacilitatorQuizView(
     int QuestionIndex,
+    int QuestionCount,
     QuizSubState SubState,
     LocalizedTextView Question,
     IReadOnlyList<LocalizedTextView> Answers,
@@ -41,6 +43,7 @@ public sealed record FacilitatorQuizView(
 
 public sealed record PresenterQuizView(
     int QuestionIndex,
+    int QuestionCount,
     QuizSubState SubState,
     LocalizedTextView Question,
     IReadOnlyList<LocalizedTextView> Answers,

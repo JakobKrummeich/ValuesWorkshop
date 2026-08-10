@@ -17,6 +17,7 @@ internal static class QuizViews
 
         return new ParticipantQuizView(
             questionIndex,
+            quizCatalog.Questions.Count,
             SubStateOf(quiz),
             ViewOf(question.Question),
             AnswerViewsOf(question),
@@ -34,6 +35,7 @@ internal static class QuizViews
 
         return new FacilitatorQuizView(
             questionIndex,
+            quizCatalog.Questions.Count,
             SubStateOf(quiz),
             ViewOf(question.Question),
             AnswerViewsOf(question),
@@ -52,6 +54,7 @@ internal static class QuizViews
 
         return new PresenterQuizView(
             questionIndex,
+            quizCatalog.Questions.Count,
             SubStateOf(quiz),
             ViewOf(question.Question),
             AnswerViewsOf(question),
