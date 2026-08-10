@@ -293,22 +293,28 @@ list and advances.
 **Verification:** FE component tests + Playwright join flow.
 **Dependencies:** 10, 11. **Size:** M
 
-### Task 13: Quiz content + backend logic
+### Task 13: Quiz content + backend logic ✅
+**Spec:** `tasks/specs/13-quiz-backend.md` (approved via Lavish).
 **Description:** `config/quiz.json`: 5 questions, 3 answers each (correct /
 wrong / funny-wrong), learning texts, de+en. BE: one vote per participant per
 question, live tallies, sub-controls (next question, reveal, learning text).
 **Acceptance criteria:**
-- [ ] Duplicate vote rejected; tally correct
-- [ ] Reveal/learning-text only via facilitator intents
-- [ ] **From Task 11 (Q1 deferral):** quiz sub-state mechanics land here —
+- [x] Duplicate vote rejected; tally correct
+- [x] Reveal/learning-text only via facilitator intents
+- [x] **From Task 11 (Q1 deferral):** quiz sub-state mechanics land here —
       `PoseNextQuestion` / `RevealAnswer` / `ShowLearningText`, strictly forward
       `Answering → Revealed → LearningTextShown` per question, illegal order
-      rejected, transitions round-trip through the store
-- [ ] **From Task 11:** turn on the phase exit guard by registering a
+      rejected, transitions round-trip through the store (review decision:
+      repeat reveal/show is an idempotent no-op — no save, no revision bump)
+- [x] **From Task 11:** turn on the phase exit guard by registering a
       `QuizExitGuard` with the real question count in the host `PhaseExitGuards`
-- [ ] **From Task 11:** the quiz cursor stays 0-based end to end —
+- [x] **From Task 11:** the quiz cursor stays 0-based end to end —
       `current_question_index`, `QuizProgress.CurrentQuestionIndex`, the
       `questionIndex` wire field, no number/index conversion anywhere
+**Learnings for Task 14:** per-role quiz view blocks already carry catalog
+content (question/answer/learning texts, both locales) on the wire — FE never
+reads `config/`; participant/presenter get `correctAnswerIndex`/`learningText`
+only once revealed/shown; facilitator always sees both.
 **Verification:** BE quiz suite; JSON schema validation test on config.
 **Dependencies:** 11. **Size:** M
 
