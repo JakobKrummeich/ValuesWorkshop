@@ -513,13 +513,13 @@ Screens depend only on their slice — never on a connection, never on
 | Role | Slice | Intents / stream | Task |
 |---|---|---|---|
 | participant | `sessionStatePort` | state stream + connection state | **9** |
-| participant | `quizPort` | `ChooseQuizAnswer` | 12 |
+| participant | `quizPort` | `ChooseQuizAnswer` | 14 |
 | participant | `selectionPort` | `SubmitValueSelection` | 13 |
 | participant | `groupWorkPort` | `AddAction`, `EditAction`, `RemoveAction`, `SubmitGroupWork`, `ReopenGroupWork` | 16 |
 | participant | `votingPort` | `SubmitFinalVotes` | 17 |
 | facilitator | `sessionStatePort` | state stream + connection state | **9** |
 | facilitator | `lifecyclePort` | `AdvancePhase` | **9** |
-| facilitator | `quizControlPort` | `RevealAnswer`, `ShowLearningText`, `PoseNextQuestion` | 12 |
+| facilitator | `quizControlPort` | `RevealAnswer`, `ShowLearningText`, `PoseNextQuestion` | 14 |
 | facilitator | `formationPort` | `ReassignScribe` | 16 |
 | facilitator | `walkControlPort` | `GoToNextValue`, `CorrectActionWording`, `RevealNextValue` | 18 |
 | facilitator | `votingControlPort` | `CloseVoting`, `StartTiebreakRound` | 17 |

@@ -25,7 +25,7 @@ they fire. "Mirror" = passive copy of the presenter content, phone-sized.
 |---|---|---|---|
 | **0 · before** | Session open form (session name + facilitator passphrase). **OpenSession** | — intentionally empty — | QR scan → sign-in (skipped if already signed in) → lobby. **JoinSession** fires implicitly on arrival; no form, no button. |
 | **1 Join** | Live roster (names, count). **AdvancePhase** | Large QR invitation + live names of joined participants | Lobby: "you're in", waiting notice, participant count |
-| **2 Quiz** | Current question with answer tally and answered-count; one morphing sub-control button. **RevealAnswer**, **ShowLearningText**, **PoseNextQuestion**, **AdvancePhase** (disabled until the fifth question's learning text was shown) | Question + three answer cards (two top, one centered below), live bars under each card normalized to total answers; correct card highlighted after reveal; learning text on a centered card | Three answer buttons. **ChooseQuizAnswer**; locked ("answer received") after picking |
+| **2 Quiz** | Current question with answer tally and answered-count; one morphing sub-control button. **RevealAnswer**, **ShowLearningText**, **PoseNextQuestion**, **AdvancePhase** (disabled until the fifth question's learning text was shown) | Question + three answer cards (two top, one centered below), live bars under each card scaled relative to the max tally; correct card highlighted after reveal; learning text on a centered card | Three answer buttons. **ChooseQuizAnswer**; locked ("answer received") after picking |
 | **3 Value selection** | Submission progress count. **AdvancePhase** | Prompt + submission progress | Values grid (~50), pick exactly ten. **SubmitValueSelection** (enabled at 10/10); locked after |
 | **4 Selection results** | Top-values view (same as presenter). **AdvancePhase** · System: DetermineTopValues on entry | Two columns of ten values, ordered by selections (left column top→bottom, then right); top ten — or more on a tenth-place tie — color-highlighted | Top values (mirror, passive) |
 | **5 Group formation** | All groups: names, members, assigned values. **AdvancePhase** · System: FormGroups on entry | Paginated 3×2 group cards (name, members, values), cycles every 7 s | Own group card: members grouped top-left, values grouped bottom-right, distinct colors |
@@ -196,8 +196,8 @@ appointed on entry to phase 6.
 │        │ ▓▓▓▓▓ 6       │              │
 │        └───────────────┘              │
 │                                       │
-│ bars live · lengths normalized to     │
-│ total answers, labels absolute counts │
+│ bars live · widths scaled to max tally│
+│ labels are absolute vote counts       │
 │ reveal: correct card highlighted ✓    │
 │ learning text: centered card          │
 └───────────────────────────────────────┘

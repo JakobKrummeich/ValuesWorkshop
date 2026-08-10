@@ -89,6 +89,8 @@ Port interfaces live in `src/domain/ports/`, sliced per role and concern:
 | `SessionStatePort<T>` | `src/domain/ports/sessionStatePort.ts` | Role-generic live state + connection state |
 | `FacilitatorSessionStatePort` | `src/domain/ports/facilitator/sessionStatePort.ts` | Facilitator state stream |
 | `FacilitatorLifecyclePort` | `src/domain/ports/facilitator/lifecyclePort.ts` | Facilitator intents (e.g. `advancePhase`) |
+| `FacilitatorQuizControlPort` | `src/domain/ports/facilitator/quizControlPort.ts` | Quiz sub-controls (`revealAnswer`, `showLearningText`, `poseNextQuestion`) |
+| `ParticipantQuizPort` | `src/domain/ports/participant/quizPort.ts` | Participant quiz answer (`chooseAnswer`) |
 | `FacilitatorSessionCreationPort` | `src/domain/ports/facilitator/sessionCreationPort.ts` | Open a session over `POST /api/sessions` |
 | `ParticipantSessionStatePort` | `src/domain/ports/participant/sessionStatePort.ts` | Participant state stream |
 | `PresenterSessionStatePort` | `src/domain/ports/presenter/sessionStatePort.ts` | Presenter read-only state stream |
@@ -102,8 +104,8 @@ performs dependency injection of port implementations:
 
 | Screen group | Directory | Context file | Injects |
 |---|---|---|---|
-| Facilitator | `src/app/facilitator/` | `dependencies.tsx` | `FacilitatorSessionStatePort`, `FacilitatorLifecyclePort` |
-| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantSessionStatePort` |
+| Facilitator | `src/app/facilitator/` | `dependencies.tsx` | `FacilitatorSessionStatePort`, `FacilitatorLifecyclePort`, `FacilitatorQuizControlPort` |
+| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantSessionStatePort`, `ParticipantQuizPort` |
 | Presenter | `src/app/presenter/` | `dependencies.tsx` | `PresenterSessionStatePort` |
 
 **Rules:**
