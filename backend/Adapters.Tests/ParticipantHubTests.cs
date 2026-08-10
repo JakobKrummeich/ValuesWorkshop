@@ -195,6 +195,22 @@ public class ParticipantHubTests
     }
 
     [Fact]
+    public async Task Submitting_without_a_value_list_is_rejected_as_a_malformed_payload()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.ValueSelection);
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitValueSelection(null);
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task Choosing_an_answer_without_an_authenticated_subject_is_refused()
     {
         repository.Add(
