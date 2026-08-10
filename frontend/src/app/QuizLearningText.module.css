@@ -1,0 +1,18 @@
+.panel {
+  padding: var(--space-gap) var(--space-gutter);
+  border-left: var(--space-tight) solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+}
+
+.heading {
+  color: var(--color-accent);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+}
+
+.body {
+  color: var(--color-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}

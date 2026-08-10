@@ -4,6 +4,8 @@ import { localizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { FacilitatorQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { QuizLearningText } from "../../../QuizLearningText";
+import { QuizQuestion } from "../../../QuizQuestion";
 import styles from "./FacilitatorQuizScreen.module.css";
 import { useFacilitatorQuizScreen } from "./useFacilitatorQuizScreen";
 
@@ -19,15 +21,11 @@ export function FacilitatorQuizScreen({
 
   return (
     <section className={styles.quiz}>
-      <h2 className={styles.heading} data-testid="question-heading">
-        {translate(MessageKey.QuizQuestionHeading, {
-          n: questionNumber,
-          total: quiz.questionCount,
-        })}
-      </h2>
-      <p className={styles.question} data-testid="question-text">
-        {localizedText(language, quiz.question)}
-      </p>
+      <QuizQuestion
+        questionNumber={questionNumber}
+        questionCount={quiz.questionCount}
+        question={quiz.question}
+      />
       <p className={styles.answeredCount} data-testid="answered-count">
         {translate(MessageKey.QuizAnsweredCount, {
           answered: quiz.answeredCount,
@@ -65,14 +63,7 @@ export function FacilitatorQuizScreen({
           </li>
         ))}
       </ul>
-      <aside className={styles.learningText} data-testid="learning-text">
-        <h3 className={styles.learningTextHeading}>
-          {translate(MessageKey.QuizLearningTextHeading)}
-        </h3>
-        <p className={styles.learningTextBody}>
-          {localizedText(language, quiz.learningText)}
-        </p>
-      </aside>
+      <QuizLearningText learningText={quiz.learningText} />
       {quizControl !== null && (
         <button
           type="button"

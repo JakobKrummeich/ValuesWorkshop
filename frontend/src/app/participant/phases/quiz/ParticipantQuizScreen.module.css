@@ -6,19 +6,6 @@
   padding: var(--space-gutter);
 }
 
-.heading {
-  color: var(--color-text-muted);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-}
-
-.question {
-  color: var(--color-text);
-  font-size: var(--text-heading);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-}
-
 .answers {
   display: flex;
   flex-direction: column;
@@ -59,24 +46,4 @@
   color: var(--color-danger);
   font-family: var(--font-sans);
   font-size: var(--text-small);
-}
-
-.learningText {
-  margin-top: var(--space-gap);
-  padding: var(--space-gutter);
-  border: var(--border-hairline) solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-}
-
-.learningTextHeading {
-  color: var(--color-text-muted);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-}
-
-.learningTextBody {
-  color: var(--color-text);
-  font-size: var(--text-body);
-  line-height: var(--leading-normal);
 }

@@ -5,19 +5,6 @@
   padding: var(--space-gutter);
 }
 
-.heading {
-  color: var(--color-text-muted);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-}
-
-.question {
-  color: var(--color-text);
-  font-size: var(--text-heading);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-}
-
 .answeredCount {
   color: var(--color-accent);
   font-size: var(--text-small);
@@ -61,25 +48,6 @@
   color: var(--color-text-muted);
   font-size: var(--text-small);
   font-variant-numeric: tabular-nums;
-}
-
-.learningText {
-  padding: var(--space-gap) var(--space-gutter);
-  border-left: var(--space-tight) solid var(--color-accent);
-  border-radius: var(--radius-sm);
-  background: var(--color-accent-soft);
-}
-
-.learningTextHeading {
-  color: var(--color-accent);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-}
-
-.learningTextBody {
-  color: var(--color-text);
-  font-size: var(--text-body);
-  line-height: var(--leading-normal);
 }
 
 .controlButton {

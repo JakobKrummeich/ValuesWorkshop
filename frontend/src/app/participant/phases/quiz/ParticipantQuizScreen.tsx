@@ -1,9 +1,10 @@
 "use client";
 
 import { localizedText } from "../../../../domain/i18n/localizedText";
-import { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { QuizLearningText } from "../../../QuizLearningText";
+import { QuizQuestion } from "../../../QuizQuestion";
 import styles from "./ParticipantQuizScreen.module.css";
 import {
   AnswerStatus,
@@ -33,15 +34,11 @@ export function ParticipantQuizScreen({
 
   return (
     <section className={styles.quiz}>
-      <h2 className={styles.heading} data-testid="question-heading">
-        {translate(MessageKey.QuizQuestionHeading, {
-          n: questionNumber,
-          total: state.quiz.questionCount,
-        })}
-      </h2>
-      <p className={styles.question} data-testid="question-text">
-        {localizedText(language, state.quiz.question)}
-      </p>
+      <QuizQuestion
+        questionNumber={questionNumber}
+        questionCount={state.quiz.questionCount}
+        question={state.quiz.question}
+      />
       <div className={styles.answers}>
         {answers.map((answer, answerIndex) => (
           <button
@@ -63,14 +60,7 @@ export function ParticipantQuizScreen({
         </p>
       )}
       {state.quiz.learningText !== undefined && (
-        <aside className={styles.learningText} data-testid="learning-text">
-          <h3 className={styles.learningTextHeading}>
-            {translate(MessageKey.QuizLearningTextHeading)}
-          </h3>
-          <p className={styles.learningTextBody}>
-            {localizedText(language, state.quiz.learningText)}
-          </p>
-        </aside>
+        <QuizLearningText learningText={state.quiz.learningText} />
       )}
     </section>
   );

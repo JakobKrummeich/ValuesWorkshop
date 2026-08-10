@@ -5,20 +5,6 @@
   gap: var(--space-gap);
   justify-content: center;
   padding: var(--space-gutter);
-}
-
-.heading {
-  color: var(--color-text-muted);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-  text-align: center;
-}
-
-.question {
-  color: var(--color-text);
-  font-size: var(--text-heading);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
   text-align: center;
 }
 
@@ -34,6 +20,7 @@
   grid-template-columns: 1fr 2fr auto;
   gap: var(--space-gap);
   align-items: center;
+  text-align: left;
 }
 
 .answerText {
@@ -49,7 +36,7 @@
 }
 
 .track {
-  height: var(--base-space-32);
+  height: var(--control-height);
   overflow: hidden;
   border-radius: var(--radius-full);
   background: var(--color-border);
@@ -78,24 +65,4 @@
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
   text-align: right;
-}
-
-.learningText {
-  margin-top: var(--space-gap);
-  padding: var(--space-gap) var(--space-gutter);
-  border-left: var(--base-space-8) solid var(--color-accent);
-  border-radius: var(--radius-md);
-  background: var(--color-accent-soft);
-}
-
-.learningTextHeading {
-  color: var(--color-accent);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-}
-
-.learningTextBody {
-  color: var(--color-text);
-  font-size: var(--text-body);
-  line-height: var(--leading-normal);
 }

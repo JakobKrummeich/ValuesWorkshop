@@ -2,9 +2,10 @@
 
 import type { CSSProperties } from "react";
 import { localizedText } from "../../../../domain/i18n/localizedText";
-import { MessageKey } from "../../../../domain/i18n/messages";
 import type { PresenterQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { QuizLearningText } from "../../../QuizLearningText";
+import { QuizQuestion } from "../../../QuizQuestion";
 import styles from "./PresenterQuizScreen.module.css";
 import { usePresenterQuizScreen } from "./usePresenterQuizScreen";
 
@@ -22,22 +23,18 @@ function barClass(isRevealed: boolean, isCorrect: boolean): string {
 }
 
 export function PresenterQuizScreen({ state }: { state: PresenterQuizState }) {
-  const { language, translate } = useTranslation();
+  const { language } = useTranslation();
   const { questionNumber, isRevealed, bars } = usePresenterQuizScreen(
     state.quiz,
   );
 
   return (
     <section className={styles.quiz}>
-      <h2 className={styles.heading} data-testid="question-heading">
-        {translate(MessageKey.QuizQuestionHeading, {
-          n: questionNumber,
-          total: state.quiz.questionCount,
-        })}
-      </h2>
-      <p className={styles.question} data-testid="question-text">
-        {localizedText(language, state.quiz.question)}
-      </p>
+      <QuizQuestion
+        questionNumber={questionNumber}
+        questionCount={state.quiz.questionCount}
+        question={state.quiz.question}
+      />
       <div className={styles.chart}>
         {bars.map((bar, answerIndex) => (
           <div
@@ -72,14 +69,7 @@ export function PresenterQuizScreen({ state }: { state: PresenterQuizState }) {
         ))}
       </div>
       {state.quiz.learningText !== undefined && (
-        <aside className={styles.learningText} data-testid="learning-text">
-          <h3 className={styles.learningTextHeading}>
-            {translate(MessageKey.QuizLearningTextHeading)}
-          </h3>
-          <p className={styles.learningTextBody}>
-            {localizedText(language, state.quiz.learningText)}
-          </p>
-        </aside>
+        <QuizLearningText learningText={state.quiz.learningText} />
       )}
     </section>
   );
