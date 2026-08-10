@@ -2,17 +2,22 @@ import {
   test,
   expect,
   type BrowserContext,
-  type Locator,
   type Page,
 } from "@playwright/test";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
 import { openSignedIn, signInThroughOidcProvider } from "./support/oidcLogin";
 import { isPageStillMarked, markPage } from "./support/pageMarker";
+import {
+  advancePhaseButton,
+  answerButton,
+  expectQuestionHeading,
+  fastForwardQuizQuestions,
+  quizControlButton,
+} from "./support/quizFastForward";
 
 const FACILITATOR_ACCOUNT = "facilitator";
 const PARTICIPANT_ACCOUNTS = ["participant1", "participant2", "participant3"];
 const SESSION_NAME = "Playwright quiz session";
-const QUESTION_COUNT = 5;
 const CORRECT_ANSWER_INDEX = 0;
 const WRONG_ANSWER_INDEX = 1;
 const FIRST_LEARNING_TEXT =
@@ -86,18 +91,6 @@ test.describe.serial("phase 2 quiz", () => {
     return [facilitatorPage, ...participantPages(), presenterPage];
   }
 
-  function advanceButton(): Locator {
-    return facilitatorPage.getByRole("button", { name: "Advance phase" });
-  }
-
-  function quizControlButton(): Locator {
-    return facilitatorPage.getByTestId("quiz-control-button");
-  }
-
-  function answerButton(page: Page, answerIndex: number): Locator {
-    return page.getByTestId(`answer-button-${answerIndex}`);
-  }
-
   async function barWidth(answerIndex: number): Promise<number> {
     const box = await presenterPage
       .getByTestId(`answer-bar-${answerIndex}`)
@@ -105,24 +98,16 @@ test.describe.serial("phase 2 quiz", () => {
     return box?.width ?? 0;
   }
 
-  async function expectQuestionHeadingEverywhere(
-    questionNumber: number,
-  ): Promise<void> {
-    for (const page of everyRolePage()) {
-      await expect(page.getByTestId("question-heading")).toHaveText(
-        `Question ${questionNumber} of ${QUESTION_COUNT}`,
-      );
-    }
-  }
-
   test("advancing from the join phase shows question 1 to every role", async () => {
-    await expect(advanceButton()).toBeEnabled();
+    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
 
-    await advanceButton().click();
+    await advancePhaseButton(facilitatorPage).click();
 
-    await expectQuestionHeadingEverywhere(1);
-    await expect(quizControlButton()).toHaveText("Reveal answer");
-    await expect(advanceButton()).toBeDisabled();
+    await expectQuestionHeading(everyRolePage(), 1);
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Reveal answer",
+    );
+    await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
   });
 
   test("votes raise the facilitator tallies and presenter bars without a reload", async () => {
@@ -184,9 +169,11 @@ test.describe.serial("phase 2 quiz", () => {
   });
 
   test("the reveal highlights the correct answer for every role", async () => {
-    await quizControlButton().click();
+    await quizControlButton(facilitatorPage).click();
 
-    await expect(quizControlButton()).toHaveText("Show learning text");
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Show learning text",
+    );
     await expect(answerButton(alicePage, CORRECT_ANSWER_INDEX)).toHaveAttribute(
       "data-answer-status",
       "correct",
@@ -207,13 +194,15 @@ test.describe.serial("phase 2 quiz", () => {
     );
     await expect(alicePage.getByTestId("learning-text")).toHaveCount(0);
     await expect(presenterPage.getByTestId("learning-text")).toHaveCount(0);
-    await expect(advanceButton()).toBeDisabled();
+    await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
   });
 
   test("the learning text appears for every role on the facilitator's command", async () => {
-    await quizControlButton().click();
+    await quizControlButton(facilitatorPage).click();
 
-    await expect(quizControlButton()).toHaveText("Next question");
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Next question",
+    );
     await expect(alicePage.getByTestId("learning-text")).toContainText(
       FIRST_LEARNING_TEXT,
     );
@@ -223,14 +212,16 @@ test.describe.serial("phase 2 quiz", () => {
     await expect(facilitatorPage.getByTestId("learning-text")).toContainText(
       FIRST_LEARNING_TEXT,
     );
-    await expect(advanceButton()).toBeDisabled();
+    await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
   });
 
   test("the next question resets the answering state with cleared marks", async () => {
-    await quizControlButton().click();
+    await quizControlButton(facilitatorPage).click();
 
-    await expectQuestionHeadingEverywhere(2);
-    await expect(quizControlButton()).toHaveText("Reveal answer");
+    await expectQuestionHeading(everyRolePage(), 2);
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Reveal answer",
+    );
     for (let answerIndex = 0; answerIndex < 3; answerIndex += 1) {
       await expect(answerButton(alicePage, answerIndex)).toBeEnabled();
       await expect(answerButton(alicePage, answerIndex)).toHaveAttribute(
@@ -253,36 +244,18 @@ test.describe.serial("phase 2 quiz", () => {
   });
 
   test("the advance stays disabled until the last learning text is shown", async () => {
-    for (
-      let questionNumber = 2;
-      questionNumber <= QUESTION_COUNT;
-      questionNumber += 1
-    ) {
-      await answerButton(alicePage, CORRECT_ANSWER_INDEX).click();
-      await expect(facilitatorPage.getByTestId("answer-tally-0")).toHaveText(
-        "Votes: 1",
-      );
-      await expect(advanceButton()).toBeDisabled();
-
-      await expect(quizControlButton()).toHaveText("Reveal answer");
-      await quizControlButton().click();
-      await expect(quizControlButton()).toHaveText("Show learning text");
-      await quizControlButton().click();
-
-      if (questionNumber < QUESTION_COUNT) {
-        await expect(quizControlButton()).toHaveText("Next question");
-        await quizControlButton().click();
-        await expectQuestionHeadingEverywhere(questionNumber + 1);
-      }
-    }
-
-    await expect(quizControlButton()).toHaveCount(0);
+    await fastForwardQuizQuestions(
+      facilitatorPage,
+      alicePage,
+      everyRolePage(),
+      2,
+    );
   });
 
   test("after the last learning text the advance moves to phase 3", async () => {
-    await expect(advanceButton()).toBeEnabled();
+    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
 
-    await advanceButton().click();
+    await advancePhaseButton(facilitatorPage).click();
 
     for (const page of everyRolePage()) {
       await expect(page.getByTestId("phase")).toHaveText("Phase 3");
