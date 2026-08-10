@@ -3,6 +3,7 @@ import { EMPTY, Subject, of } from "rxjs";
 import { ConnectionState } from "../../../domain/connectionState";
 import { Phase } from "../../../domain/phases";
 import type { ParticipantWorkshopState } from "../../../domain/workshopState";
+import { QuizSubState } from "../../../domain/workshopState";
 import { currentSessionIdentity } from "../../../adapters/browserLocation";
 import { createParticipantSession } from "../../../adapters/workshopSessions";
 import { languageWrapper } from "../../../testing/languageWrapper";
@@ -70,7 +71,20 @@ describe("participant screen group", () => {
       workshopState.next({
         revision: 1,
         phase: Phase.Quiz,
-      } as ParticipantWorkshopState);
+        participantCount: 3,
+        quiz: {
+          questionIndex: 0,
+          questionCount: 3,
+          subState: QuizSubState.Answering,
+          question: { de: "Wie viele?", en: "How many?" },
+          answers: [
+            { de: "Eins", en: "One" },
+            { de: "Zwei", en: "Two" },
+            { de: "Drei", en: "Three" },
+          ],
+          ownAnswerIndex: null,
+        },
+      });
     });
 
     expect(createSession).toHaveBeenCalledWith("session-7");
