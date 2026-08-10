@@ -18,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var configDirectory = Environment.GetEnvironmentVariable("CONFIG_DIR") ?? "config";
 var quizCatalog = QuizCatalogFile.LoadFrom(Path.Combine(configDirectory, "quiz.json"));
+var valuesCatalog = ValuesCatalogFile.LoadFrom(Path.Combine(configDirectory, "values.json"));
 
 var dataDirectory = Environment.GetEnvironmentVariable("DATA_DIR") ?? "data";
 Directory.CreateDirectory(dataDirectory);
@@ -34,6 +35,7 @@ builder.Services.AddScoped<IntentPipeline>();
 builder.Services.AddScoped<FacilitatorIntentHandler>();
 builder.Services.AddScoped<ParticipantIntentHandler>();
 builder.Services.AddSingleton<IQuizCatalog>(quizCatalog);
+builder.Services.AddSingleton<IValuesCatalog>(valuesCatalog);
 builder.Services.AddSingleton(RegisteredExitGuards.For(quizCatalog));
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
