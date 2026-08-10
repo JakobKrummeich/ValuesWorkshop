@@ -5,6 +5,7 @@ namespace ValuesWorkshop.Application.State;
 
 public sealed class FacilitatorWorkshopStateMapper(
     IQuizCatalog quizCatalog,
+    IValuesCatalog valuesCatalog,
     PhaseExitGuards exitGuards
 )
 {
@@ -33,21 +34,21 @@ public sealed class FacilitatorWorkshopStateMapper(
                 revision,
                 SessionViews.Roster(session),
                 enabledIntents,
-                SessionViews.SelectionProgress(session)
+                SelectionViews.Progress(session, valuesCatalog)
             ),
         [Phase.SelectionResults] = (session, revision, enabledIntents) =>
             new FacilitatorSelectionResultsState(
                 revision,
                 SessionViews.Roster(session),
                 enabledIntents,
-                SessionViews.SelectionProgress(session)
+                SelectionViews.Progress(session, valuesCatalog)
             ),
         [Phase.GroupFormation] = (session, revision, enabledIntents) =>
             new FacilitatorGroupFormationState(
                 revision,
                 SessionViews.Roster(session),
                 enabledIntents,
-                SessionViews.SelectionProgress(session),
+                SelectionViews.Progress(session, valuesCatalog),
                 Groups(session)
             ),
         [Phase.GroupWork] = (session, revision, enabledIntents) =>

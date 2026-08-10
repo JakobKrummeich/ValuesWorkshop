@@ -3,7 +3,10 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.State;
 
-public sealed class ParticipantWorkshopStateMapper(IQuizCatalog quizCatalog)
+public sealed class ParticipantWorkshopStateMapper(
+    IQuizCatalog quizCatalog,
+    IValuesCatalog valuesCatalog
+)
 {
     private readonly IReadOnlyDictionary<
         Phase,
@@ -29,13 +32,13 @@ public sealed class ParticipantWorkshopStateMapper(IQuizCatalog quizCatalog)
             new ParticipantValueSelectionState(
                 revision,
                 ParticipantCount(session),
-                OwnSelection(session, caller)
+                SelectionViews.ForParticipant(session, caller, valuesCatalog)
             ),
         [Phase.SelectionResults] = (session, caller, revision) =>
             new ParticipantSelectionResultsState(
                 revision,
                 ParticipantCount(session),
-                OwnSelection(session, caller)
+                SelectionViews.ForParticipant(session, caller, valuesCatalog)
             ),
         [Phase.GroupFormation] = (session, caller, revision) =>
             new ParticipantGroupFormationState(
@@ -85,14 +88,6 @@ public sealed class ParticipantWorkshopStateMapper(IQuizCatalog quizCatalog)
         var name = session.Roster.Find(caller)?.Name ?? ParticipantName.Of(null, caller);
 
         return name.Value;
-    }
-
-    private static OwnSelectionView OwnSelection(Session session, ParticipantId caller)
-    {
-        return new OwnSelectionView(
-            session.Selection.SubmittedBy.Contains(caller),
-            SessionViews.TopValueIds(session)
-        );
     }
 
     private static OwnGroupView? OwnGroup(Session session, ParticipantId caller)

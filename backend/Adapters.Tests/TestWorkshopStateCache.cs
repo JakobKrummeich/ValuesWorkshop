@@ -9,11 +9,16 @@ internal static class TestWorkshopStateCache
     internal static WorkshopStateCache Create()
     {
         var catalog = new TestQuizCatalog(5);
+        var valuesCatalog = new TestValuesCatalog(50);
 
         return new WorkshopStateCache(
-            new FacilitatorWorkshopStateMapper(catalog, RegisteredExitGuards.For(catalog)),
-            new PresenterWorkshopStateMapper(catalog),
-            new ParticipantWorkshopStateMapper(catalog)
+            new FacilitatorWorkshopStateMapper(
+                catalog,
+                valuesCatalog,
+                RegisteredExitGuards.For(catalog)
+            ),
+            new PresenterWorkshopStateMapper(catalog, valuesCatalog),
+            new ParticipantWorkshopStateMapper(catalog, valuesCatalog)
         );
     }
 }

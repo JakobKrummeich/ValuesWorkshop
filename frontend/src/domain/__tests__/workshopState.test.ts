@@ -33,6 +33,77 @@ describe("participant workshop state schema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("accepts a value selection state with the catalog and the caller's own picks", () => {
+    const state = participantWorkshopStateSchema.parse({
+      revision: 5,
+      phase: 3,
+      participantCount: 3,
+      selection: {
+        values: [{ valueId: "mut", text: { de: "Mut", en: "Courage" } }],
+        ownSelectedValueIds: ["mut"],
+        isSubmitted: false,
+      },
+    });
+
+    if (state.phase !== Phase.ValueSelection) {
+      throw new Error("expected a value selection state");
+    }
+    expect(state.selection.values[0].text.de).toBe("Mut");
+    expect(state.selection.isSubmitted).toBe(false);
+    expect(state.selection.selectionTallies).toBeUndefined();
+    expect(state.selection.topValueIds).toBeUndefined();
+  });
+
+  it("accepts a selection block that carries tallies and top values once they exist", () => {
+    const state = participantWorkshopStateSchema.parse({
+      revision: 9,
+      phase: 4,
+      participantCount: 3,
+      selection: {
+        values: [{ valueId: "mut", text: { de: "Mut", en: "Courage" } }],
+        ownSelectedValueIds: ["mut"],
+        isSubmitted: true,
+        selectionTallies: { mut: 7 },
+        topValueIds: ["mut"],
+      },
+    });
+
+    if (state.phase !== Phase.SelectionResults) {
+      throw new Error("expected a selection results state");
+    }
+    expect(state.selection.selectionTallies).toEqual({ mut: 7 });
+    expect(state.selection.topValueIds).toEqual(["mut"]);
+  });
+
+  it("rejects a selection block without the submission flag", () => {
+    const result = participantWorkshopStateSchema.safeParse({
+      revision: 5,
+      phase: 3,
+      participantCount: 3,
+      selection: {
+        values: [],
+        ownSelectedValueIds: [],
+        isOwnSubmitted: false,
+      },
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a selection block without the values catalog", () => {
+    const result = participantWorkshopStateSchema.safeParse({
+      revision: 5,
+      phase: 3,
+      participantCount: 3,
+      selection: {
+        ownSelectedValueIds: [],
+        isSubmitted: false,
+      },
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it("accepts the caller-shaped block of a group work state", () => {
     const state = participantWorkshopStateSchema.parse({
       revision: 12,
@@ -214,7 +285,7 @@ describe("facilitator workshop state schema", () => {
       phase: 5,
       roster: { participants: [], participantCount: 0 },
       enabledIntents: ["AdvancePhase"],
-      selection: { submittedCount: 0, topValueIds: [] },
+      selection: { values: [], submittedCount: 0 },
       groups: [
         {
           name: "otter",
@@ -230,6 +301,26 @@ describe("facilitator workshop state schema", () => {
       throw new Error("expected a group formation state");
     }
     expect(state.groups[0].scribeParticipantId).toBeNull();
+  });
+
+  it("accepts a value selection progress block with the catalog", () => {
+    const state = facilitatorWorkshopStateSchema.parse({
+      revision: 5,
+      phase: 3,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["AdvancePhase"],
+      selection: {
+        values: [{ valueId: "mut", text: { de: "Mut", en: "Courage" } }],
+        submittedCount: 2,
+      },
+    });
+
+    if (state.phase !== Phase.ValueSelection) {
+      throw new Error("expected a value selection state");
+    }
+    expect(state.selection.submittedCount).toBe(2);
+    expect(state.selection.values).toHaveLength(1);
+    expect(state.selection.selectionTallies).toBeUndefined();
   });
 
   it("rejects a state without a roster", () => {
@@ -318,6 +409,25 @@ describe("presenter workshop state schema", () => {
     });
 
     expect("participantDisplayNames" in state).toBe(false);
+  });
+
+  it("accepts a selection progress block without tallies or top values", () => {
+    const state = presenterWorkshopStateSchema.parse({
+      revision: 5,
+      phase: 3,
+      participantCount: 4,
+      selection: {
+        values: [{ valueId: "mut", text: { de: "Mut", en: "Courage" } }],
+        submittedCount: 1,
+      },
+    });
+
+    if (state.phase !== Phase.ValueSelection) {
+      throw new Error("expected a value selection state");
+    }
+    expect(state.selection.submittedCount).toBe(1);
+    expect(state.selection.selectionTallies).toBeUndefined();
+    expect(state.selection.topValueIds).toBeUndefined();
   });
 
   it("accepts an anonymous voting state", () => {

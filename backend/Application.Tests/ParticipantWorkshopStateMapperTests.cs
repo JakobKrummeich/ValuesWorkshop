@@ -170,13 +170,72 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Selection_results_state_reports_the_callers_own_submission_and_the_top_values()
+    public void Value_selection_state_carries_the_full_catalog_in_config_order()
+    {
+        var selection = Map(SessionFixtures.InPhase(Phase.ValueSelection))
+            .ShouldBeOfType<ParticipantValueSelectionState>()
+            .Selection;
+
+        selection.Values.Count.ShouldBe(50);
+        selection
+            .Values[0]
+            .ShouldBe(new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")));
+        selection.Values[49].ValueId.ShouldBe("wert-50");
+    }
+
+    [Fact]
+    public void Value_selection_state_reports_the_callers_own_selection_and_nobody_elses()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValueSelection,
+            selection: SelectionRound.Restore(
+                [
+                    new SelectedValue(SessionFixtures.Anna, new ValueId("wert-3")),
+                    new SelectedValue(SessionFixtures.Anna, new ValueId("wert-1")),
+                    new SelectedValue(SessionFixtures.Ben, new ValueId("wert-2")),
+                ],
+                []
+            )
+        );
+
+        var annaSelection = Map(session, caller: SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantValueSelectionState>()
+            .Selection;
+        annaSelection.OwnSelectedValueIds.ShouldBe(["wert-3", "wert-1"]);
+        annaSelection.IsSubmitted.ShouldBeTrue();
+
+        var chrisSelection = Map(session, caller: SessionFixtures.Chris)
+            .ShouldBeOfType<ParticipantValueSelectionState>()
+            .Selection;
+        chrisSelection.OwnSelectedValueIds.ShouldBeEmpty();
+        chrisSelection.IsSubmitted.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Value_selection_state_carries_no_tallies_and_no_top_values()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValueSelection,
+            selection: SelectionRound.Restore(
+                [new SelectedValue(SessionFixtures.Anna, new ValueId("wert-1"))],
+                []
+            )
+        );
+
+        var selection = Map(session).ShouldBeOfType<ParticipantValueSelectionState>().Selection;
+
+        selection.SelectionTallies.ShouldBeNull();
+        selection.TopValueIds.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Selection_results_state_reports_the_callers_own_submission()
     {
         var session = SessionFixtures.InPhase(
             Phase.SelectionResults,
             selection: SelectionRound.Restore(
-                [new SelectedValue(SessionFixtures.Anna, new ValueId("honesty"))],
-                [new ValueId("honesty")]
+                [new SelectedValue(SessionFixtures.Anna, new ValueId("wert-7"))],
+                [new ValueId("wert-7")]
             )
         );
 
@@ -184,11 +243,11 @@ public class ParticipantWorkshopStateMapperTests
             .ShouldBeOfType<ParticipantSelectionResultsState>()
             .Selection;
 
-        selection.IsOwnSubmitted.ShouldBeTrue();
-        selection.TopValueIds.ShouldBe(["honesty"]);
+        selection.IsSubmitted.ShouldBeTrue();
+        selection.OwnSelectedValueIds.ShouldBe(["wert-7"]);
         Map(session, caller: SessionFixtures.Ben)
             .ShouldBeOfType<ParticipantSelectionResultsState>()
-            .Selection.IsOwnSubmitted.ShouldBeFalse();
+            .Selection.IsSubmitted.ShouldBeFalse();
     }
 
     [Fact]
@@ -289,10 +348,9 @@ public class ParticipantWorkshopStateMapperTests
         long revision = 1
     )
     {
-        return new ParticipantWorkshopStateMapper(new TestQuizCatalog(5)).MapFor(
-            session,
-            caller ?? SessionFixtures.Anna,
-            revision
-        );
+        return new ParticipantWorkshopStateMapper(
+            new TestQuizCatalog(5),
+            new TestValuesCatalog(50)
+        ).MapFor(session, caller ?? SessionFixtures.Anna, revision);
     }
 }

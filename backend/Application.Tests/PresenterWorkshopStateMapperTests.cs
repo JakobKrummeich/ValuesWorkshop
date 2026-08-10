@@ -111,7 +111,7 @@ public class PresenterWorkshopStateMapperTests
         var session = SessionFixtures.InPhase(
             Phase.ValueSelection,
             selection: SelectionRound.Restore(
-                [new SelectedValue(SessionFixtures.Chris, new ValueId("trust"))],
+                [new SelectedValue(SessionFixtures.Chris, new ValueId("wert-4"))],
                 []
             )
         );
@@ -119,7 +119,12 @@ public class PresenterWorkshopStateMapperTests
         var selection = Map(session).ShouldBeOfType<PresenterValueSelectionState>().Selection;
 
         selection.SubmittedCount.ShouldBe(1);
-        selection.TopValueIds.ShouldBeEmpty();
+        selection.Values.Count.ShouldBe(50);
+        selection
+            .Values[0]
+            .ShouldBe(new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")));
+        selection.SelectionTallies.ShouldBeNull();
+        selection.TopValueIds.ShouldBeNull();
     }
 
     [Fact]
@@ -187,6 +192,9 @@ public class PresenterWorkshopStateMapperTests
 
     private static PresenterWorkshopState Map(Session session, long revision = 1)
     {
-        return new PresenterWorkshopStateMapper(new TestQuizCatalog(5)).Map(session, revision);
+        return new PresenterWorkshopStateMapper(
+            new TestQuizCatalog(5),
+            new TestValuesCatalog(50)
+        ).Map(session, revision);
     }
 }

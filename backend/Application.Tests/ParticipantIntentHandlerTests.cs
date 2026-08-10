@@ -9,6 +9,11 @@ public class ParticipantIntentHandlerTests
         Guid.Parse("00000000-0000-0000-0000-00000000f00d")
     );
 
+    private static readonly IReadOnlyList<string> TenValueIds = Enumerable
+        .Range(1, 10)
+        .Select(valueNumber => $"wert-{valueNumber}")
+        .ToList();
+
     private readonly RecordingBroadcaster broadcaster = new();
 
     [Fact]
@@ -99,10 +104,80 @@ public class ParticipantIntentHandlerTests
         repository.Saved.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task A_participant_submits_ten_values_exactly_once()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.ValueSelection)
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new SubmitValueSelectionCommand(KnownSession, SessionFixtures.Anna, TenValueIds)
+            );
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Selection.SubmittedBy.ShouldBe([SessionFixtures.Anna]);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Selection.SubmittedBy.Count.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task A_selection_of_nine_values_is_rejected_as_a_malformed_payload()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.ValueSelection)
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new SubmitValueSelectionCommand(
+                    KnownSession,
+                    SessionFixtures.Anna,
+                    TenValueIds.Take(9).ToList()
+                )
+            );
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Submitting_a_second_selection_is_rejected_as_an_invariant_violation()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(
+                Phase.ValueSelection,
+                selection: SelectionRound.Restore(
+                    TenValueIds.Select(valueId => new SelectedValue(
+                        SessionFixtures.Anna,
+                        new ValueId(valueId)
+                    )),
+                    []
+                )
+            )
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new SubmitValueSelectionCommand(KnownSession, SessionFixtures.Anna, TenValueIds)
+            );
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.InvariantViolated);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
     private ParticipantIntentHandler HandlerOver(FakeSessionRepository repository)
     {
         return new ParticipantIntentHandler(
-            new IntentPipeline(new SessionCommandHandler(repository, broadcaster))
+            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            new TestValuesCatalog(50)
         );
     }
 }

@@ -106,9 +106,10 @@ public class FacilitatorEnabledIntentsTests
     {
         var catalog = new TestQuizCatalog(QuestionCount);
 
-        return new FacilitatorWorkshopStateMapper(catalog, RegisteredExitGuards.For(catalog)).Map(
-            session,
-            1
-        );
+        return new FacilitatorWorkshopStateMapper(
+            catalog,
+            new TestValuesCatalog(50),
+            RegisteredExitGuards.For(catalog)
+        ).Map(session, 1);
     }
 }

@@ -3,7 +3,10 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.State;
 
-public sealed class PresenterWorkshopStateMapper(IQuizCatalog quizCatalog)
+public sealed class PresenterWorkshopStateMapper(
+    IQuizCatalog quizCatalog,
+    IValuesCatalog valuesCatalog
+)
 {
     private readonly IReadOnlyDictionary<
         Phase,
@@ -26,19 +29,19 @@ public sealed class PresenterWorkshopStateMapper(IQuizCatalog quizCatalog)
             new PresenterValueSelectionState(
                 revision,
                 ParticipantCount(session),
-                SessionViews.SelectionProgress(session)
+                SelectionViews.Progress(session, valuesCatalog)
             ),
         [Phase.SelectionResults] = (session, revision) =>
             new PresenterSelectionResultsState(
                 revision,
                 ParticipantCount(session),
-                SessionViews.SelectionProgress(session)
+                SelectionViews.Progress(session, valuesCatalog)
             ),
         [Phase.GroupFormation] = (session, revision) =>
             new PresenterGroupFormationState(
                 revision,
                 ParticipantCount(session),
-                SessionViews.SelectionProgress(session),
+                SelectionViews.Progress(session, valuesCatalog),
                 Groups(session)
             ),
         [Phase.GroupWork] = (session, revision) =>

@@ -12,12 +12,20 @@ namespace ValuesWorkshop.Adapters.Tests;
 public class WireFormatTests
 {
     private static readonly TestQuizCatalog Catalog = new(5);
+    private static readonly TestValuesCatalog ValuesCatalog = new(50);
     private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(
         Catalog,
+        ValuesCatalog,
         RegisteredExitGuards.For(Catalog)
     );
-    private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(Catalog);
-    private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(Catalog);
+    private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(
+        Catalog,
+        ValuesCatalog
+    );
+    private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(
+        Catalog,
+        ValuesCatalog
+    );
 
     [Fact]
     public void Workshop_state_travels_as_camel_case_json_with_numeric_enums()

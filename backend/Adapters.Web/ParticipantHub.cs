@@ -68,4 +68,14 @@ public sealed class ParticipantHub(
             new ChooseQuizAnswerCommand(sessionIdentity, participantId, questionIndex, answerIndex)
         );
     }
+
+    public Task<IntentResult> SubmitValueSelection(IReadOnlyList<string> valueIds)
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        return intentHandler.HandleAsync(
+            new SubmitValueSelectionCommand(sessionIdentity, participantId, valueIds)
+        );
+    }
 }

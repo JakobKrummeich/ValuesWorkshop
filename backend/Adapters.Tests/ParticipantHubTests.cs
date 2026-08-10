@@ -21,6 +21,11 @@ public class ParticipantHubTests
         Subject
     );
 
+    private static readonly IReadOnlyList<string> TenValueIds = Enumerable
+        .Range(1, 10)
+        .Select(valueNumber => $"wert-{valueNumber}")
+        .ToList();
+
     private readonly InMemorySessionRepository repository = new();
     private readonly RecordingBroadcaster broadcaster = new();
     private readonly RecordingHubClients<IParticipantClient> clients = new();
@@ -159,6 +164,37 @@ public class ParticipantHubTests
     }
 
     [Fact]
+    public async Task Submitting_a_value_selection_mutates_persists_and_broadcasts()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.ValueSelection);
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitValueSelection(TenValueIds);
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Selection.SubmittedBy.ShouldBe([Anna]);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task Submitting_nine_values_is_rejected_as_a_malformed_payload()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.ValueSelection);
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitValueSelection(TenValueIds.Take(9).ToList());
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task Choosing_an_answer_without_an_authenticated_subject_is_refused()
     {
         repository.Add(
@@ -195,8 +231,8 @@ public class ParticipantHubTests
         return new ParticipantHub(
             repository,
             pipeline,
-            new ParticipantIntentHandler(pipeline),
-            new ParticipantWorkshopStateMapper(new TestQuizCatalog(5)),
+            new ParticipantIntentHandler(pipeline, new TestValuesCatalog(50)),
+            new ParticipantWorkshopStateMapper(new TestQuizCatalog(5), new TestValuesCatalog(50)),
             TestWorkshopStateCache.Create(),
             new FixedRandomness(0),
             registry
