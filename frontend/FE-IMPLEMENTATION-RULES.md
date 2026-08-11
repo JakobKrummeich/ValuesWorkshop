@@ -83,6 +83,10 @@ enum AuthState {
 type AuthState = "checking" | "authenticated" | "redirecting" | "error";
 ```
 
+Wire intent and hub method names at call sites come from the shared enums
+(`FacilitatorIntent`, `ParticipantIntent`) — never string literals like
+`invokeIntent(connection, "RevealAnswer")`.
+
 ## Runtime Validation with Zod
 
 Use [Zod](https://zod.dev) to validate `unknown` data at program boundaries
@@ -140,6 +144,15 @@ Every non-trivial React component is split into three files:
 
 The `.tsx` file is a thin rendering shell — it calls the hook and maps
 the returned values to JSX. All logic lives in the hook.
+
+- A screen with distinct visual regions (a chip grid, a dialog, a list) is
+  composed of subcomponents — each region gets its own `Component.tsx` +
+  `Component.module.css` (+ `useComponent.ts` when it has logic of its own).
+  One large component covering several regions is split in review.
+- A `.tsx` file defines nothing but the component itself: no module-level
+  helper functions, no event-handling logic beyond calling handlers the hook
+  returned. If a keydown/focus/derivation helper wants to live next to the
+  JSX, it belongs in the hook instead.
 
 ### Testing
 
