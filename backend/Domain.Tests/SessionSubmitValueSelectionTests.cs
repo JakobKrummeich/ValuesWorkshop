@@ -5,7 +5,8 @@ public class SessionSubmitValueSelectionTests
     private static readonly ParticipantId Anna = new(Guid.NewGuid());
     private static readonly ParticipantId Ben = new(Guid.NewGuid());
 
-    private static readonly IReadOnlySet<ValueId> ValidValueIds = ValueIdsNumbered(1, 12)
+    private static readonly IReadOnlySet<ValueId> ValidValueIds = TestValueIds
+        .Numbered(1, 12)
         .ToHashSet();
 
     [Fact]
@@ -13,11 +14,14 @@ public class SessionSubmitValueSelectionTests
     {
         var session = SelectionSessionWith(Anna);
 
-        session.SubmitValueSelection(Anna, ValueIdsNumbered(1, 10), ValidValueIds);
+        session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, 10), ValidValueIds);
 
         session.Selection.SubmittedBy.ShouldBe([Anna]);
         session.Selection.SelectedValues.ShouldBe(
-            ValueIdsNumbered(1, 10).Select(valueId => new SelectedValue(Anna, valueId)).ToList()
+            TestValueIds
+                .Numbered(1, 10)
+                .Select(valueId => new SelectedValue(Anna, valueId))
+                .ToList()
         );
     }
 
@@ -26,8 +30,8 @@ public class SessionSubmitValueSelectionTests
     {
         var session = SelectionSessionWith(Anna, Ben);
 
-        session.SubmitValueSelection(Anna, ValueIdsNumbered(1, 10), ValidValueIds);
-        session.SubmitValueSelection(Ben, ValueIdsNumbered(3, 10), ValidValueIds);
+        session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, 10), ValidValueIds);
+        session.SubmitValueSelection(Ben, TestValueIds.Numbered(3, 10), ValidValueIds);
 
         session.Selection.SubmittedBy.ShouldBe([Anna, Ben], ignoreOrder: true);
         session.Selection.SelectionTallies[new ValueId("wert-1")].ShouldBe(1);
@@ -44,7 +48,7 @@ public class SessionSubmitValueSelectionTests
         var session = SelectionSessionWith(Anna);
 
         Should.Throw<MalformedPayloadException>(() =>
-            session.SubmitValueSelection(Anna, ValueIdsNumbered(1, valueCount), ValidValueIds)
+            session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, valueCount), ValidValueIds)
         );
 
         session.Selection.SubmittedBy.ShouldBeEmpty();
@@ -55,7 +59,7 @@ public class SessionSubmitValueSelectionTests
     public void A_selection_with_a_duplicate_value_is_refused()
     {
         var session = SelectionSessionWith(Anna);
-        var valueIds = ValueIdsNumbered(1, 9).Append(new ValueId("wert-1")).ToList();
+        var valueIds = TestValueIds.Numbered(1, 9).Append(new ValueId("wert-1")).ToList();
 
         Should.Throw<MalformedPayloadException>(() =>
             session.SubmitValueSelection(Anna, valueIds, ValidValueIds)
@@ -68,7 +72,7 @@ public class SessionSubmitValueSelectionTests
     public void A_selection_with_an_unknown_value_id_is_refused()
     {
         var session = SelectionSessionWith(Anna);
-        var valueIds = ValueIdsNumbered(1, 9).Append(new ValueId("wert-99")).ToList();
+        var valueIds = TestValueIds.Numbered(1, 9).Append(new ValueId("wert-99")).ToList();
 
         Should.Throw<MalformedPayloadException>(() =>
             session.SubmitValueSelection(Anna, valueIds, ValidValueIds)
@@ -81,14 +85,17 @@ public class SessionSubmitValueSelectionTests
     public void A_second_submission_by_the_same_participant_is_refused()
     {
         var session = SelectionSessionWith(Anna);
-        session.SubmitValueSelection(Anna, ValueIdsNumbered(1, 10), ValidValueIds);
+        session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, 10), ValidValueIds);
 
         Should.Throw<InvariantViolationException>(() =>
-            session.SubmitValueSelection(Anna, ValueIdsNumbered(3, 10), ValidValueIds)
+            session.SubmitValueSelection(Anna, TestValueIds.Numbered(3, 10), ValidValueIds)
         );
 
         session.Selection.SelectedValues.ShouldBe(
-            ValueIdsNumbered(1, 10).Select(valueId => new SelectedValue(Anna, valueId)).ToList()
+            TestValueIds
+                .Numbered(1, 10)
+                .Select(valueId => new SelectedValue(Anna, valueId))
+                .ToList()
         );
     }
 
@@ -98,7 +105,7 @@ public class SessionSubmitValueSelectionTests
         var session = SelectionSessionWith(Anna);
 
         Should.Throw<NotAuthorizedException>(() =>
-            session.SubmitValueSelection(Ben, ValueIdsNumbered(1, 10), ValidValueIds)
+            session.SubmitValueSelection(Ben, TestValueIds.Numbered(1, 10), ValidValueIds)
         );
 
         session.Selection.SelectedValues.ShouldBeEmpty();
@@ -112,18 +119,10 @@ public class SessionSubmitValueSelectionTests
         TestSessions.AdvanceToNextPhase(session);
 
         Should.Throw<WrongPhaseException>(() =>
-            session.SubmitValueSelection(Anna, ValueIdsNumbered(1, 10), ValidValueIds)
+            session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, 10), ValidValueIds)
         );
 
         session.Selection.SelectedValues.ShouldBeEmpty();
-    }
-
-    private static IReadOnlyList<ValueId> ValueIdsNumbered(int firstNumber, int valueCount)
-    {
-        return Enumerable
-            .Range(firstNumber, valueCount)
-            .Select(valueNumber => new ValueId($"wert-{valueNumber}"))
-            .ToList();
     }
 
     private static Session SelectionSessionWith(params ParticipantId[] participants)

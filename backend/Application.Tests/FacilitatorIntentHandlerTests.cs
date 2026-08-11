@@ -73,10 +73,12 @@ public class FacilitatorIntentHandlerTests
     public async Task Entering_the_selection_results_fixes_the_top_values_in_catalog_tiebreak_order()
     {
         var selection = SelectionRound.Restore(
-            ValueIdsNumbered(1, 10)
+            TestValueIds
+                .Numbered(1, 10)
                 .Select(valueId => new SelectedValue(SessionFixtures.Anna, valueId))
                 .Concat(
-                    ValueIdsNumbered(3, 10)
+                    TestValueIds
+                        .Numbered(3, 10)
                         .Select(valueId => new SelectedValue(SessionFixtures.Ben, valueId))
                 ),
             []
@@ -92,7 +94,8 @@ public class FacilitatorIntentHandlerTests
         var saved = repository.Saved.ShouldHaveSingleItem();
         saved.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         saved.Selection.TopValues.ShouldBe(
-            ValueIdsNumbered(3, 8)
+            TestValueIds
+                .Numbered(3, 8)
                 .Concat([
                     new ValueId("wert-1"),
                     new ValueId("wert-2"),
@@ -101,14 +104,6 @@ public class FacilitatorIntentHandlerTests
                 ])
                 .ToList()
         );
-    }
-
-    private static IReadOnlyList<ValueId> ValueIdsNumbered(int firstNumber, int valueCount)
-    {
-        return Enumerable
-            .Range(firstNumber, valueCount)
-            .Select(valueNumber => new ValueId($"wert-{valueNumber}"))
-            .ToList();
     }
 
     [Fact]
