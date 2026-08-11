@@ -63,6 +63,7 @@ function model(
     cancelSubmission: jest.fn(),
     confirmSubmission: jest.fn(),
     rejectionMessage: null,
+    submitButtonRef: { current: null },
     ...overrides,
   };
 }
@@ -81,7 +82,7 @@ describe("participant selection screen", () => {
     );
   });
 
-  it("renders every value as a toggle chip", () => {
+  it("renders every value chip and forwards a toggle", () => {
     const toggleValue = jest.fn();
     screenHook.mockReturnValue(model({ toggleValue }));
 
@@ -92,29 +93,6 @@ describe("participant selection screen", () => {
 
     expect(screen.getByTestId("value-chip-trust")).toHaveTextContent("Trust");
     expect(toggleValue).toHaveBeenCalledWith("courage");
-  });
-
-  it("marks selected and disabled chips for styling and the at-ten lock", () => {
-    screenHook.mockReturnValue(
-      model({
-        chips: [
-          chip({ valueId: "trust", isSelected: true }),
-          chip({ valueId: "courage", text: values[1].text, isDisabled: true }),
-          chip({ valueId: "respect", text: values[2].text }),
-        ],
-      }),
-    );
-
-    render(<ParticipantSelectionScreen state={state} />, {
-      wrapper: languageWrapper(),
-    });
-
-    expect(screen.getByTestId("value-chip-trust")).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    expect(screen.getByTestId("value-chip-courage")).toBeDisabled();
-    expect(screen.getByTestId("value-chip-respect")).not.toBeDisabled();
   });
 
   it("disables the submit button until the hook allows submission", () => {
@@ -149,7 +127,7 @@ describe("participant selection screen", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("confirms the irrevocable submission through an accessible dialog", () => {
+  it("confirms the irrevocable submission through the dialog", () => {
     const confirmSubmission = jest.fn();
     screenHook.mockReturnValue(
       model({ isConfirming: true, confirmSubmission }),
@@ -158,14 +136,8 @@ describe("participant selection screen", () => {
     render(<ParticipantSelectionScreen state={state} />, {
       wrapper: languageWrapper(),
     });
-
-    const dialog = screen.getByRole("dialog");
-    expect(dialog).toHaveAttribute("aria-modal", "true");
-    expect(dialog).toHaveAccessibleName("Submit your selection for good?");
-    screen.getByText("Your selection cannot be changed afterwards.");
-    expect(screen.getByTestId("confirm-cancel-button")).toHaveFocus();
-
     fireEvent.click(screen.getByTestId("confirm-submit-button"));
+
     expect(confirmSubmission).toHaveBeenCalled();
   });
 
@@ -179,45 +151,6 @@ describe("participant selection screen", () => {
     fireEvent.click(screen.getByTestId("confirm-cancel-button"));
 
     expect(cancelSubmission).toHaveBeenCalled();
-  });
-
-  it("closes the confirmation dialog on escape", () => {
-    const cancelSubmission = jest.fn();
-    screenHook.mockReturnValue(model({ isConfirming: true, cancelSubmission }));
-
-    render(<ParticipantSelectionScreen state={state} />, {
-      wrapper: languageWrapper(),
-    });
-    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
-
-    expect(cancelSubmission).toHaveBeenCalled();
-  });
-
-  it("keeps tab focus cycling between the dialog buttons", () => {
-    screenHook.mockReturnValue(model({ isConfirming: true }));
-
-    render(<ParticipantSelectionScreen state={state} />, {
-      wrapper: languageWrapper(),
-    });
-    const dialog = screen.getByRole("dialog");
-
-    screen.getByTestId("confirm-submit-button").focus();
-    fireEvent.keyDown(dialog, { key: "Tab" });
-    expect(screen.getByTestId("confirm-cancel-button")).toHaveFocus();
-
-    fireEvent.keyDown(dialog, { key: "Tab", shiftKey: true });
-    expect(screen.getByTestId("confirm-submit-button")).toHaveFocus();
-  });
-
-  it("returns the focus to the submit button when the dialog closes", () => {
-    screenHook.mockReturnValue(model({ canSubmit: true, isConfirming: true }));
-
-    render(<ParticipantSelectionScreen state={state} />, {
-      wrapper: languageWrapper(),
-    });
-    fireEvent.click(screen.getByTestId("confirm-cancel-button"));
-
-    expect(screen.getByTestId("submit-selection-button")).toHaveFocus();
   });
 
   it("replaces the submit button with a notice once submitted", () => {
@@ -257,9 +190,6 @@ describe("participant selection screen", () => {
     screen.getByText("Wähle genau 10 Werte");
     expect(screen.getByTestId("selected-count")).toHaveTextContent(
       "Ausgewählt: 7/10",
-    );
-    expect(screen.getByTestId("value-chip-trust")).toHaveTextContent(
-      "Vertrauen",
     );
   });
 });

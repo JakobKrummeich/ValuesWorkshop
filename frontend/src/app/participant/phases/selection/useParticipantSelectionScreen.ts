@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState, type RefObject } from "react";
 import type { MessageKey } from "../../../../domain/i18n/messages";
 import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import type { OwnSelectionView } from "../../../../domain/workshopState";
@@ -27,6 +27,7 @@ export interface ParticipantSelectionScreenModel {
   cancelSubmission: () => void;
   confirmSubmission: () => void;
   rejectionMessage: MessageKey | null;
+  submitButtonRef: RefObject<HTMLButtonElement | null>;
 }
 
 export function useParticipantSelectionScreen(
@@ -38,6 +39,7 @@ export function useParticipantSelectionScreen(
     selection.ownSelectedValueIds,
   );
   const [isConfirming, setConfirming] = useState(false);
+  const submitButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const selectedValueIds = selection.isSubmitted
     ? selection.ownSelectedValueIds
@@ -65,11 +67,15 @@ export function useParticipantSelectionScreen(
     }
   }, [canSubmit]);
 
-  const cancelSubmission = useCallback(() => setConfirming(false), []);
+  const cancelSubmission = useCallback(() => {
+    setConfirming(false);
+    submitButtonRef.current?.focus();
+  }, []);
 
   const confirmSubmission = useCallback(() => {
     setConfirming(false);
     sendIntent(selectionPort.submitSelection(selectedValueIds));
+    submitButtonRef.current?.focus();
   }, [selectionPort, selectedValueIds, sendIntent]);
 
   return {
@@ -91,5 +97,6 @@ export function useParticipantSelectionScreen(
     cancelSubmission,
     confirmSubmission,
     rejectionMessage,
+    submitButtonRef,
   };
 }

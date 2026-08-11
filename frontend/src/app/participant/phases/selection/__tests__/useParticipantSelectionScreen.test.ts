@@ -69,6 +69,15 @@ function selectAll(
   }
 }
 
+function attachedSubmitButton(result: {
+  current: ParticipantSelectionScreenModel;
+}): HTMLButtonElement {
+  const submitButton = document.createElement("button");
+  document.body.appendChild(submitButton);
+  result.current.submitButtonRef.current = submitButton;
+  return submitButton;
+}
+
 describe("participant selection screen logic", () => {
   it("starts with nothing selected and everything selectable", () => {
     withSubmitSelection(() => NEVER);
@@ -180,6 +189,32 @@ describe("participant selection screen logic", () => {
 
     expect(result.current.isConfirming).toBe(false);
     expect(submitSelection).not.toHaveBeenCalled();
+  });
+
+  it("returns focus to the submit button when the confirmation is cancelled", () => {
+    withSubmitSelection(() => NEVER);
+    const { result } = renderSelection();
+    const submitButton = attachedSubmitButton(result);
+    selectAll(result, firstTenValueIds);
+    act(() => result.current.requestSubmission());
+
+    act(() => result.current.cancelSubmission());
+
+    expect(document.activeElement).toBe(submitButton);
+    submitButton.remove();
+  });
+
+  it("returns focus to the submit button when the submission is confirmed", () => {
+    withSubmitSelection(() => of(accepted));
+    const { result } = renderSelection();
+    const submitButton = attachedSubmitButton(result);
+    selectAll(result, firstTenValueIds);
+    act(() => result.current.requestSubmission());
+
+    act(() => result.current.confirmSubmission());
+
+    expect(document.activeElement).toBe(submitButton);
+    submitButton.remove();
   });
 
   it("submits the chosen ten on confirmation", () => {
