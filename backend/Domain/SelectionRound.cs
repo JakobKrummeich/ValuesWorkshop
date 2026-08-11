@@ -47,7 +47,7 @@ public sealed class SelectionRound
         if (selectedValues.Any(selected => selected.ParticipantId == participantId))
         {
             throw new InvariantViolationException(
-                "Each participant submits a value selection exactly once (I6)."
+                "Each participant submits a value selection exactly once."
             );
         }
 
