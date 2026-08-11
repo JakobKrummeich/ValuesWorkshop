@@ -39,6 +39,29 @@ nothing — no-op parameters, pass-through wrappers, defaults that paper over
 missing config — gets deleted, not justified. Fewer layers to read is itself a
 requirement, for humans and for agents.
 
+## Messages explain themselves ⟲
+
+Exception and user-facing text never carries spec or invariant tags like
+`(I2)` or `(I6)` — the reader of the message does not have the spec. Write
+the rule out instead: "Each participant submits a value selection exactly
+once." The invariant number belongs in the spec and in test names, not on
+the wire.
+
+## A port is named as one ⟲
+
+A field, prop or variable holding a port ends in `Port`:
+`sessionStatePort`, `quizPort`, `selectionPort`. A bare `quiz` or
+`sessionState` next to state objects reads as data and misleads the reader
+about what is being passed.
+
+## Repeating a reached state is a no-op
+
+Re-applying an already-applied transition — revealing an answer that is
+revealed, showing a learning text that is shown — does nothing; it does not
+throw. Exceptions are reserved for genuine invariant violations, such as
+resubmitting a data-bearing submission, never for idempotent repeats of a
+state the session has already reached.
+
 ## One concern per file
 
 Adapters do not read environment variables and do not carry config fallbacks;
