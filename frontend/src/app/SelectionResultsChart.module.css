@@ -13,7 +13,7 @@
   min-width: 0;
 }
 
-@media (max-width: 640px) {
+@media (width <= 40rem) {
   .chart {
     flex-direction: column;
   }

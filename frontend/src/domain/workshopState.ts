@@ -246,3 +246,16 @@ export type PresenterSelectionState = InPhase<
 >;
 
 export type OwnSelectionView = ParticipantSelectionState["selection"];
+
+export type ParticipantSelectionResultsState = InPhase<
+  ParticipantWorkshopState,
+  Phase.SelectionResults
+>;
+export type FacilitatorSelectionResultsState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.SelectionResults
+>;
+export type PresenterSelectionResultsState = InPhase<
+  PresenterWorkshopState,
+  Phase.SelectionResults
+>;
