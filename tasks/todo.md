@@ -371,18 +371,39 @@ no invariant tags in user-facing messages).
 **Verification:** BE selection suite; FE selection UI tests.
 **Dependencies:** 11. **Size:** M
 
-### Task 16: Phase 4 — Selection results
-**Description:** Bar chart of top-10 most-selected values; if tie at 10th
-place, all tied values shown (>10 bars). Presenter + facilitator views.
+### Task 16: Phase 4 — Selection results ✅
+**Spec:** `tasks/specs/16-selection-results.md` (approved via Lavish).
+**Description:** On entry into phase 4 the server fixes the top values from
+the selection tally (count desc, config-order tiebreak; tie at 10th place
+widens the set past 10; empty on zero submissions) and puts
+`selectionTallies`/`topValueIds` on the wire for all three roles. All three
+screens render the same top-values bar chart (Lavish decision, replacing the
+earlier two-column list mock): the 20 most-selected values in two columns
+(ranks 1–10 left, 11–20 right), label + count + bar ∝ selections with the
+most-selected at full width, top set color-highlighted, "and x more" hint
+below the cutoff, empty-state note on zero submissions. Fold-ins: migration
+dropping the write-only `selection_submissions` table; `(I1)`/`(I5)` tags
+stripped from Domain exception messages.
 **Acceptance criteria:**
-- [ ] Tie at 10th place includes all tied values (unit-tested)
-- [ ] Chart reads from server-computed tallies only
-- [ ] Multi-client e2e extended through phase 4
+- [x] Tie at 10th place includes all tied values (unit-tested)
+- [x] Chart reads from server-computed tallies only
+- [x] Multi-client e2e extended through phase 4
+**Learnings for Task 17/18:** the fixed top values persist on the session
+(`top_values`, restored by `DomainEntityMapper`) — the solver input for
+phase 5 is already durable; `FacilitatorIntentHandler` now threads the
+values-catalog order into `session.AdvancePhase(caller, exitGuards,
+CatalogValueIds())`, and `DetermineTopValues` runs as a phase-entry hook
+inside `AdvancePhase` — `FormGroups` on phase-5 entry can follow the same
+pattern; the phase-5 `GroupFormation` states still build their selection
+block with the plain `SelectionViews.Progress` (facilitator/presenter) or
+none at all (participant), so tallies/top values drop off the wire again
+after phase 4 — Task 18 must switch to `ProgressWithResults` (or a new
+view) if the group screens need them.
 **Verification:** BE tally/tie tests; Playwright visual presence check.
 **Dependencies:** 15. **Size:** S
 
-### Checkpoint C
-- [ ] Playwright: facilitator + presenter + 3 participants through phases 1–4
+### Checkpoint C ✅
+- [x] Playwright: facilitator + presenter + 3 participants through phases 1–4
 
 ---
 
