@@ -13,6 +13,12 @@ public sealed class SelectionRound
     public IReadOnlyList<ParticipantId> SubmittedBy =>
         selectedValues.Select(selected => selected.ParticipantId).Distinct().ToList();
 
+    public int SubmittedCount =>
+        selectedValues.Select(selected => selected.ParticipantId).Distinct().Count();
+
+    public bool HasSubmitted(ParticipantId participantId) =>
+        selectedValues.Any(selected => selected.ParticipantId == participantId);
+
     public IReadOnlyDictionary<ValueId, int> SelectionTallies =>
         selectedValues
             .GroupBy(selected => selected.ValueId)

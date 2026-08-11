@@ -8,23 +8,26 @@ internal static class SelectionViews
     internal static OwnSelectionView ForParticipant(
         Session session,
         ParticipantId caller,
-        IValuesCatalog valuesCatalog
+        IReadOnlyList<WorkshopValueView> catalogView
     )
     {
         return new OwnSelectionView(
-            CatalogOf(valuesCatalog),
+            catalogView,
             OwnSelectedValueIds(session, caller),
-            session.Selection.SubmittedBy.Contains(caller),
+            session.Selection.HasSubmitted(caller),
             SelectionTallies: null,
             TopValueIds: null
         );
     }
 
-    internal static SelectionProgressView Progress(Session session, IValuesCatalog valuesCatalog)
+    internal static SelectionProgressView Progress(
+        Session session,
+        IReadOnlyList<WorkshopValueView> catalogView
+    )
     {
         return new SelectionProgressView(
-            CatalogOf(valuesCatalog),
-            session.Selection.SubmittedBy.Count,
+            catalogView,
+            session.Selection.SubmittedCount,
             SelectionTallies: null,
             TopValueIds: null
         );
@@ -39,7 +42,7 @@ internal static class SelectionViews
         );
     }
 
-    private static IReadOnlyList<WorkshopValueView> CatalogOf(IValuesCatalog valuesCatalog)
+    internal static IReadOnlyList<WorkshopValueView> CatalogOf(IValuesCatalog valuesCatalog)
     {
         return valuesCatalog
             .Values.Select(value => new WorkshopValueView(
