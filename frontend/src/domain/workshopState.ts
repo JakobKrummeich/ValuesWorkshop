@@ -1,16 +1,23 @@
 import { z } from "zod";
 import { Phase } from "./phases";
+import {
+  conclusionViewSchema,
+  facilitatorGroupsSchema,
+  facilitatorQuizViewSchema,
+  ownGroupViewSchema,
+  ownSelectionViewSchema,
+  participantQuizViewSchema,
+  presentationViewSchema,
+  presenterGroupsSchema,
+  presenterPresentationViewSchema,
+  presenterQuizViewSchema,
+  presenterVotingViewSchema,
+  rosterViewSchema,
+  selectionProgressViewSchema,
+  votingViewSchema,
+} from "./workshopStateBlocks";
 
-export enum QuizSubState {
-  Answering = 1,
-  Revealed = 2,
-  LearningTextShown = 3,
-}
-
-export enum GroupWorkStatus {
-  Editing = 1,
-  Submitted = 2,
-}
+export { GroupWorkStatus, QuizSubState } from "./workshopStateBlocks";
 
 export enum FacilitatorIntent {
   AdvancePhase = "AdvancePhase",
@@ -21,114 +28,8 @@ export enum FacilitatorIntent {
 
 export enum ParticipantIntent {
   ChooseQuizAnswer = "ChooseQuizAnswer",
+  SubmitValueSelection = "SubmitValueSelection",
 }
-
-const valueIdsSchema = z.array(z.string());
-const participantIdSchema = z.string();
-
-const localizedTextSchema = z.object({
-  de: z.string(),
-  en: z.string(),
-});
-
-const quizViewBase = {
-  questionIndex: z.int().nonnegative(),
-  questionCount: z.int().positive(),
-  subState: z.enum(QuizSubState),
-  question: localizedTextSchema,
-  answers: z.array(localizedTextSchema),
-};
-
-const participantQuizViewSchema = z.object({
-  ...quizViewBase,
-  ownAnswerIndex: z.int().nullable(),
-  correctAnswerIndex: z.int().optional(),
-  learningText: localizedTextSchema.optional(),
-});
-
-const facilitatorQuizViewSchema = z.object({
-  ...quizViewBase,
-  answerTallies: z.array(z.int()),
-  answeredCount: z.int(),
-  correctAnswerIndex: z.int(),
-  learningText: localizedTextSchema,
-});
-
-const presenterQuizViewSchema = z.object({
-  ...quizViewBase,
-  answerTallies: z.array(z.int()),
-  correctAnswerIndex: z.int().optional(),
-  learningText: localizedTextSchema.optional(),
-});
-
-const rosterViewSchema = z.object({
-  participants: z.array(
-    z.object({
-      participantId: participantIdSchema,
-      displayName: z.string(),
-    }),
-  ),
-  participantCount: z.int(),
-});
-
-const ownSelectionViewSchema = z.object({
-  isOwnSubmitted: z.boolean(),
-  topValueIds: valueIdsSchema,
-});
-
-const selectionProgressViewSchema = z.object({
-  submittedCount: z.int(),
-  topValueIds: valueIdsSchema,
-});
-
-const ownGroupViewSchema = z.object({
-  name: z.string(),
-  memberCount: z.int(),
-  assignedValueIds: valueIdsSchema,
-  isCallerScribe: z.boolean(),
-  workStatus: z.enum(GroupWorkStatus),
-});
-
-const facilitatorGroupsSchema = z.array(
-  z.object({
-    name: z.string(),
-    memberParticipantIds: z.array(participantIdSchema),
-    assignedValueIds: valueIdsSchema,
-    scribeParticipantId: participantIdSchema.nullable(),
-    workStatus: z.enum(GroupWorkStatus),
-  }),
-);
-
-const presenterGroupsSchema = z.array(
-  z.object({
-    name: z.string(),
-    memberCount: z.int(),
-    assignedValueIds: valueIdsSchema,
-    workStatus: z.enum(GroupWorkStatus),
-  }),
-);
-
-const presentationViewSchema = z.object({
-  presentingGroupName: z.string().nullable(),
-  presentedValueId: z.string().nullable(),
-});
-
-const presenterPresentationViewSchema = z.object({
-  presentedValueId: z.string().nullable(),
-});
-
-const votingViewSchema = z.object({
-  roundNumber: z.int(),
-  isRoundOpen: z.boolean(),
-});
-
-const presenterVotingViewSchema = z.object({
-  isRoundOpen: z.boolean(),
-});
-
-const conclusionViewSchema = z.object({
-  winningValueIds: valueIdsSchema,
-});
 
 const revisionSchema = z.int().nonnegative();
 
@@ -330,3 +231,18 @@ export type PresenterQuizState = InPhase<PresenterWorkshopState, Phase.Quiz>;
 export type ParticipantQuizView = ParticipantQuizState["quiz"];
 export type FacilitatorQuizView = FacilitatorQuizState["quiz"];
 export type PresenterQuizView = PresenterQuizState["quiz"];
+
+export type ParticipantSelectionState = InPhase<
+  ParticipantWorkshopState,
+  Phase.ValueSelection
+>;
+export type FacilitatorSelectionState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.ValueSelection
+>;
+export type PresenterSelectionState = InPhase<
+  PresenterWorkshopState,
+  Phase.ValueSelection
+>;
+
+export type OwnSelectionView = ParticipantSelectionState["selection"];

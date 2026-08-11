@@ -160,7 +160,16 @@ CREATE TABLE selection_submissions (
     participant_id   TEXT NOT NULL REFERENCES participants(id),
     PRIMARY KEY (session_identity, participant_id)
 );
+```
 
+`value_selections` is the source of truth for the selection round: who
+submitted is the distinct set of participants in it, because a submission
+always stores exactly ten rows. `selection_submissions` is still written
+(derived from that same set, so it cannot diverge) but is not read on load;
+it exists only to keep the shipped schema populated until a migration
+retires it.
+
+```sql
 CREATE TABLE top_values (
     session_identity TEXT NOT NULL REFERENCES sessions(identity),
     value_id         TEXT NOT NULL,

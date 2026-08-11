@@ -25,8 +25,8 @@ export function FacilitatorSessionBoundary({
         <FacilitatorDependencyProvider
           dependencies={{
             sessionStatePort: session.sessionStatePort,
-            lifecycle: session.lifecycle,
-            quizControl: session.quizControl,
+            lifecyclePort: session.lifecyclePort,
+            quizControlPort: session.quizControlPort,
           }}
         >
           <div className="screenFacilitator">{children}</div>

@@ -31,7 +31,7 @@ export interface ParticipantQuizScreenModel {
 export function useParticipantQuizScreen(
   quiz: ParticipantQuizView,
 ): ParticipantQuizScreenModel {
-  const { quiz: quizPort } = useParticipantDependencies();
+  const { quizPort } = useParticipantDependencies();
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
   const questionIndex = quiz.questionIndex;
 

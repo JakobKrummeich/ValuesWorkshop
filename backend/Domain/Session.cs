@@ -110,6 +110,24 @@ public sealed class Session
         Quiz.ChooseAnswer(participantId, questionIndex, answerIndex);
     }
 
+    public void SubmitValueSelection(
+        ParticipantId participantId,
+        IReadOnlyList<ValueId> valueIds,
+        IReadOnlySet<ValueId> validValueIds
+    )
+    {
+        if (!Roster.Contains(participantId))
+        {
+            throw new NotAuthorizedException(
+                "Only a joined participant may submit a value selection."
+            );
+        }
+
+        RequireValueSelectionPhase();
+
+        Selection.Submit(participantId, valueIds, validValueIds);
+    }
+
     public void PoseNextQuestion(CallerSubject caller, int questionCount)
     {
         RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
@@ -131,6 +149,16 @@ public sealed class Session
         if (PhaseProgress.CurrentPhase != Phase.Quiz)
         {
             throw new WrongPhaseException("The quiz commands exist only during the quiz phase.");
+        }
+    }
+
+    private void RequireValueSelectionPhase()
+    {
+        if (PhaseProgress.CurrentPhase != Phase.ValueSelection)
+        {
+            throw new WrongPhaseException(
+                "The value-selection commands exist only during the value-selection phase."
+            );
         }
     }
 

@@ -1,0 +1,54 @@
+.selection {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-gap);
+  min-height: 0;
+  padding: var(--space-gutter);
+}
+
+.prompt {
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.counter {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.submitButton {
+  min-height: var(--control-height);
+  padding: var(--space-tight) var(--space-gutter);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+}
+
+.submitButton:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.submittedNotice {
+  padding: var(--space-tight) var(--space-gutter);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  text-align: center;
+}
+
+.rejection {
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+}

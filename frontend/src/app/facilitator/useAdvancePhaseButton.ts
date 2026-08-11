@@ -15,13 +15,13 @@ export interface AdvancePhaseButtonResult {
 }
 
 export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
-  const { lifecycle, sessionStatePort } = useFacilitatorDependencies();
+  const { lifecyclePort, sessionStatePort } = useFacilitatorDependencies();
   const state = usePhaseView(sessionStatePort);
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
 
   const advancePhase = useCallback(() => {
-    sendIntent(lifecycle.advancePhase());
-  }, [lifecycle, sendIntent]);
+    sendIntent(lifecyclePort.advancePhase());
+  }, [lifecyclePort, sendIntent]);
 
   return {
     isAdvancing: isSending,

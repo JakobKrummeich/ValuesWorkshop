@@ -21,16 +21,6 @@ internal static class SessionViews
         return session.Roster.Participants.Select(participant => participant.Name.Value).ToList();
     }
 
-    internal static IReadOnlyList<string> TopValueIds(Session session)
-    {
-        return ValueIdsOf(session.Selection.TopValues);
-    }
-
-    internal static SelectionProgressView SelectionProgress(Session session)
-    {
-        return new SelectionProgressView(session.Selection.SubmittedBy.Count, TopValueIds(session));
-    }
-
     internal static IReadOnlyList<Group> Groups(Session session)
     {
         return session.Formation.IsFormed ? session.Formation.Groups : [];

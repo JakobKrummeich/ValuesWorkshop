@@ -35,11 +35,14 @@ transition referenced as `T*` is defined in `design/state-machine.md`.
    `animalId`); the localized texts live in `config/*.json`, are loaded by
    the frontend, and are resolved there (de/en). Group names are animal
    identifiers from `config/animals.json` and are localized the same way.
-   Two exceptions: participant-written action text, which is free text and
-   travels verbatim, and the quiz block, whose question and answer texts are
+   Three exceptions: participant-written action text, which is free text and
+   travels verbatim; the quiz block, whose question and answer texts are
    served from the server's `config/quiz.json` as `{de, en}` pairs (Task 13:
    the frontend never reads the quiz config, and the correct answer must not
-   reach a client before the reveal).
+   reach a client before the reveal); and the selection block, whose `values`
+   catalog is served from the server's `config/values.json` as
+   `[{valueId, text: {de, en}}]` in config order (Task 15: the frontend
+   never reads the values config either).
 
 ---
 
@@ -353,7 +356,7 @@ variant carries it.
 | Block | Fields |
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
-| selection | `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?`, `topValueIds?` |
+| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent until phase 4, computed in Task 16), `topValueIds?` (absent until phase 4, computed in Task 16) |
 | ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
@@ -370,7 +373,7 @@ join lobby shows back to the person who just signed in.
 |---|---|
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
-| selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
+| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent until phase 4, computed in Task 16), `topValueIds?` (absent until phase 4, computed in Task 16) |
 | groups | `[{ name, memberParticipantIds, assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
@@ -389,7 +392,7 @@ what they answered, selected, or voted for.
 | Block | Fields |
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
-| selection | `submittedCount`, `selectionTallies`, `topValueIds?` |
+| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent until phase 4, computed in Task 16), `topValueIds?` (absent until phase 4, computed in Task 16) |
 | groups | `[{ name, memberCount, assignedValueIds, workStatus }]` |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
@@ -514,7 +517,7 @@ Screens depend only on their slice — never on a connection, never on
 |---|---|---|---|
 | participant | `sessionStatePort` | state stream + connection state | **9** |
 | participant | `quizPort` | `ChooseQuizAnswer` | 14 |
-| participant | `selectionPort` | `SubmitValueSelection` | 13 |
+| participant | `selectionPort` | `SubmitValueSelection` | 15 |
 | participant | `groupWorkPort` | `AddAction`, `EditAction`, `RemoveAction`, `SubmitGroupWork`, `ReopenGroupWork` | 16 |
 | participant | `votingPort` | `SubmitFinalVotes` | 17 |
 | facilitator | `sessionStatePort` | state stream + connection state | **9** |

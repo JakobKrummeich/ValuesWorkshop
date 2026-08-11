@@ -3,76 +3,84 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.State;
 
-public sealed class ParticipantWorkshopStateMapper(IQuizCatalog quizCatalog)
+public sealed class ParticipantWorkshopStateMapper(
+    IQuizCatalog quizCatalog,
+    IValuesCatalog valuesCatalog
+)
 {
     private readonly IReadOnlyDictionary<
         Phase,
         Func<Session, ParticipantId, long, ParticipantWorkshopState>
-    > stateOfPhase = new Dictionary<
-        Phase,
-        Func<Session, ParticipantId, long, ParticipantWorkshopState>
-    >
-    {
-        [Phase.Join] = (session, caller, revision) =>
-            new ParticipantJoinState(
-                revision,
-                ParticipantCount(session),
-                OwnDisplayName(session, caller)
-            ),
-        [Phase.Quiz] = (session, caller, revision) =>
-            new ParticipantQuizState(
-                revision,
-                ParticipantCount(session),
-                QuizViews.ForParticipant(session, caller, quizCatalog)
-            ),
-        [Phase.ValueSelection] = (session, caller, revision) =>
-            new ParticipantValueSelectionState(
-                revision,
-                ParticipantCount(session),
-                OwnSelection(session, caller)
-            ),
-        [Phase.SelectionResults] = (session, caller, revision) =>
-            new ParticipantSelectionResultsState(
-                revision,
-                ParticipantCount(session),
-                OwnSelection(session, caller)
-            ),
-        [Phase.GroupFormation] = (session, caller, revision) =>
-            new ParticipantGroupFormationState(
-                revision,
-                ParticipantCount(session),
-                OwnGroup(session, caller)
-            ),
-        [Phase.GroupWork] = (session, caller, revision) =>
-            new ParticipantGroupWorkState(
-                revision,
-                ParticipantCount(session),
-                OwnGroup(session, caller)
-            ),
-        [Phase.ValuePresentation] = (session, caller, revision) =>
-            new ParticipantValuePresentationState(
-                revision,
-                ParticipantCount(session),
-                OwnGroup(session, caller),
-                SessionViews.Presentation(session)
-            ),
-        [Phase.FinalVoting] = (session, _, revision) =>
-            new ParticipantFinalVotingState(
-                revision,
-                ParticipantCount(session),
-                SessionViews.Voting(session)
-            ),
-        [Phase.FinalPresentation] = (session, _, revision) =>
-            new ParticipantFinalPresentationState(
-                revision,
-                ParticipantCount(session),
-                SessionViews.Conclusion(session)
-            ),
-    };
+    > stateOfPhase = BuildStateMap(quizCatalog, SelectionViews.CatalogOf(valuesCatalog));
 
     public ParticipantWorkshopState MapFor(Session session, ParticipantId caller, long revision)
     {
         return stateOfPhase[session.PhaseProgress.CurrentPhase](session, caller, revision);
+    }
+
+    private static IReadOnlyDictionary<
+        Phase,
+        Func<Session, ParticipantId, long, ParticipantWorkshopState>
+    > BuildStateMap(IQuizCatalog quizCatalog, IReadOnlyList<WorkshopValueView> catalogView)
+    {
+        return new Dictionary<Phase, Func<Session, ParticipantId, long, ParticipantWorkshopState>>
+        {
+            [Phase.Join] = (session, caller, revision) =>
+                new ParticipantJoinState(
+                    revision,
+                    ParticipantCount(session),
+                    OwnDisplayName(session, caller)
+                ),
+            [Phase.Quiz] = (session, caller, revision) =>
+                new ParticipantQuizState(
+                    revision,
+                    ParticipantCount(session),
+                    QuizViews.ForParticipant(session, caller, quizCatalog)
+                ),
+            [Phase.ValueSelection] = (session, caller, revision) =>
+                new ParticipantValueSelectionState(
+                    revision,
+                    ParticipantCount(session),
+                    SelectionViews.ForParticipant(session, caller, catalogView)
+                ),
+            [Phase.SelectionResults] = (session, caller, revision) =>
+                new ParticipantSelectionResultsState(
+                    revision,
+                    ParticipantCount(session),
+                    SelectionViews.ForParticipant(session, caller, catalogView)
+                ),
+            [Phase.GroupFormation] = (session, caller, revision) =>
+                new ParticipantGroupFormationState(
+                    revision,
+                    ParticipantCount(session),
+                    OwnGroup(session, caller)
+                ),
+            [Phase.GroupWork] = (session, caller, revision) =>
+                new ParticipantGroupWorkState(
+                    revision,
+                    ParticipantCount(session),
+                    OwnGroup(session, caller)
+                ),
+            [Phase.ValuePresentation] = (session, caller, revision) =>
+                new ParticipantValuePresentationState(
+                    revision,
+                    ParticipantCount(session),
+                    OwnGroup(session, caller),
+                    SessionViews.Presentation(session)
+                ),
+            [Phase.FinalVoting] = (session, _, revision) =>
+                new ParticipantFinalVotingState(
+                    revision,
+                    ParticipantCount(session),
+                    SessionViews.Voting(session)
+                ),
+            [Phase.FinalPresentation] = (session, _, revision) =>
+                new ParticipantFinalPresentationState(
+                    revision,
+                    ParticipantCount(session),
+                    SessionViews.Conclusion(session)
+                ),
+        };
     }
 
     private static int ParticipantCount(Session session)
@@ -85,14 +93,6 @@ public sealed class ParticipantWorkshopStateMapper(IQuizCatalog quizCatalog)
         var name = session.Roster.Find(caller)?.Name ?? ParticipantName.Of(null, caller);
 
         return name.Value;
-    }
-
-    private static OwnSelectionView OwnSelection(Session session, ParticipantId caller)
-    {
-        return new OwnSelectionView(
-            session.Selection.SubmittedBy.Contains(caller),
-            SessionViews.TopValueIds(session)
-        );
     }
 
     private static OwnGroupView? OwnGroup(Session session, ParticipantId caller)

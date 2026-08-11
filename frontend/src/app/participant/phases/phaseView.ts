@@ -4,11 +4,12 @@ import { EmptyPhase } from "../../EmptyPhase";
 import type { PhaseComponents } from "../../PhaseView";
 import { ParticipantJoinScreen } from "./join/ParticipantJoinScreen";
 import { ParticipantQuizScreen } from "./quiz/ParticipantQuizScreen";
+import { ParticipantSelectionScreen } from "./selection/ParticipantSelectionScreen";
 
 export const participantPhaseView: PhaseComponents<ParticipantWorkshopState> = {
   [Phase.Join]: ParticipantJoinScreen,
   [Phase.Quiz]: ParticipantQuizScreen,
-  [Phase.ValueSelection]: EmptyPhase,
+  [Phase.ValueSelection]: ParticipantSelectionScreen,
   [Phase.SelectionResults]: EmptyPhase,
   [Phase.GroupFormation]: EmptyPhase,
   [Phase.GroupWork]: EmptyPhase,

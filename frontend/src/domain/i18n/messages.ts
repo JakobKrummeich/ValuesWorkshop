@@ -1,62 +1,7 @@
 import { Language } from "./language";
+import { MessageKey } from "./messageKey";
 
-export enum MessageKey {
-  AuthChecking = "auth.checking",
-  AuthRedirecting = "auth.redirecting",
-  AuthProviderUnavailable = "auth.providerUnavailable",
-  AuthCallbackCompleting = "auth.callback.completing",
-  AuthCallbackFailed = "auth.callback.failed",
-  AuthCallbackReturnHome = "auth.callback.returnHome",
-  ConnectionConnecting = "connection.connecting",
-  ConnectionConnected = "connection.connected",
-  ConnectionReconnecting = "connection.reconnecting",
-  ConnectionDisconnected = "connection.disconnected",
-  LanguageGerman = "language.german",
-  LanguageEnglish = "language.english",
-  LanguageSwitcherLabel = "language.switcherLabel",
-  MissingSession = "session.missing",
-  SessionPhase = "session.phase",
-  SessionWaiting = "session.waiting",
-  OpenSessionTitle = "facilitator.openSession.title",
-  OpenSessionName = "facilitator.openSession.name",
-  OpenSessionPassphrase = "facilitator.openSession.passphrase",
-  OpenSessionSubmit = "facilitator.openSession.submit",
-  OpenSessionSubmitting = "facilitator.openSession.submitting",
-  OpenSessionNameRequired = "facilitator.openSession.nameRequired",
-  OpenSessionSignInExpired = "facilitator.openSession.signInExpired",
-  OpenSessionPassphraseRejected = "facilitator.openSession.passphraseRejected",
-  OpenSessionNameRejected = "facilitator.openSession.nameRejected",
-  OpenSessionUnexpected = "facilitator.openSession.unexpected",
-  AdvancePhase = "facilitator.advancePhase",
-  IntentWrongPhase = "intent.wrongPhase",
-  IntentNotAuthorized = "intent.notAuthorized",
-  IntentUnknownSession = "intent.unknownSession",
-  IntentInvariantViolated = "intent.invariantViolated",
-  IntentMalformedPayload = "intent.malformedPayload",
-  IntentUnknownParticipant = "intent.unknownParticipant",
-  IntentConcurrencyConflict = "intent.concurrencyConflict",
-  IntentFailed = "intent.failed",
-  JoinYouAreIn = "join.youAreIn",
-  JoinWaitingForStart = "join.waitingForStart",
-  JoinParticipantCount = "join.participantCount",
-  JoinScanToJoin = "join.scanToJoin",
-  JoinAlreadyHere = "join.alreadyHere",
-  JoinNobodyYet = "join.nobodyYet",
-  JoinCopyUrl = "join.copyUrl",
-  JoinUrlCopied = "join.urlCopied",
-  JoinUrlCopyFailed = "join.urlCopyFailed",
-  QuizQuestionHeading = "quiz.questionHeading",
-  QuizAnsweredCount = "quiz.answeredCount",
-  QuizVoteCount = "quiz.voteCount",
-  QuizCorrectAnswer = "quiz.correctAnswer",
-  QuizLearningTextHeading = "quiz.learningTextHeading",
-  QuizRevealAnswer = "quiz.revealAnswer",
-  QuizShowLearningText = "quiz.showLearningText",
-  QuizNextQuestion = "quiz.nextQuestion",
-  FacilitatorHeading = "facilitator.heading",
-  ParticipantHeading = "participant.heading",
-  PresenterHeading = "presenter.heading",
-}
+export { MessageKey } from "./messageKey";
 
 type Message = Readonly<Record<Language, string>>;
 
@@ -279,6 +224,46 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
   [MessageKey.QuizNextQuestion]: {
     [Language.German]: "Nächste Frage",
     [Language.English]: "Next question",
+  },
+  [MessageKey.SelectionPrompt]: {
+    [Language.German]: "Wählt eure 10 Werte",
+    [Language.English]: "Pick your 10 values",
+  },
+  [MessageKey.SelectionChoosePrompt]: {
+    [Language.German]: "Wähle genau 10 Werte",
+    [Language.English]: "Pick exactly 10 values",
+  },
+  [MessageKey.SelectionSelectedCount]: {
+    [Language.German]: "Ausgewählt: {selected}/{total}",
+    [Language.English]: "Selected: {selected}/{total}",
+  },
+  [MessageKey.SelectionSubmit]: {
+    [Language.German]: "Auswahl abgeben",
+    [Language.English]: "Submit selection",
+  },
+  [MessageKey.SelectionConfirmTitle]: {
+    [Language.German]: "Auswahl endgültig abgeben?",
+    [Language.English]: "Submit your selection for good?",
+  },
+  [MessageKey.SelectionConfirmBody]: {
+    [Language.German]: "Die Auswahl kann danach nicht mehr geändert werden.",
+    [Language.English]: "Your selection cannot be changed afterwards.",
+  },
+  [MessageKey.SelectionConfirmSubmit]: {
+    [Language.German]: "Abgeben",
+    [Language.English]: "Submit",
+  },
+  [MessageKey.SelectionConfirmCancel]: {
+    [Language.German]: "Abbrechen",
+    [Language.English]: "Cancel",
+  },
+  [MessageKey.SelectionSubmittedNotice]: {
+    [Language.German]: "Deine Auswahl ist abgegeben.",
+    [Language.English]: "Your selection has been submitted.",
+  },
+  [MessageKey.SelectionSubmittedCount]: {
+    [Language.German]: "{submitted} von {total} haben abgegeben",
+    [Language.English]: "{submitted} of {total} have submitted",
   },
   [MessageKey.FacilitatorHeading]: {
     [Language.German]: "Moderation",

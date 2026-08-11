@@ -35,8 +35,8 @@ function withAdvancePhase(
 ) {
   dependencies.mockReturnValue({
     sessionStatePort: { workshopState, connectionState: NEVER },
-    lifecycle: { advancePhase },
-    quizControl: {
+    lifecyclePort: { advancePhase },
+    quizControlPort: {
       revealAnswer: () => NEVER,
       showLearningText: () => NEVER,
       poseNextQuestion: () => NEVER,

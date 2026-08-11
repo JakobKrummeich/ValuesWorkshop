@@ -109,7 +109,13 @@ public class WorkshopStateAnonymityTests
 
         if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type))
         {
-            return (type.GetGenericArguments().Single(), "[]");
+            var genericArguments = type.GetGenericArguments();
+
+            return (
+                genericArguments.FirstOrDefault(argument => argument == typeof(Guid))
+                    ?? genericArguments[^1],
+                "[]"
+            );
         }
 
         return (type, string.Empty);

@@ -44,8 +44,8 @@ beforeEach(() => {
       workshopState,
       connectionState: of(ConnectionState.Connected),
     },
-    lifecycle: { advancePhase },
-    quizControl: {
+    lifecyclePort: { advancePhase },
+    quizControlPort: {
       revealAnswer: jest.fn(() => EMPTY),
       showLearningText: jest.fn(() => EMPTY),
       poseNextQuestion: jest.fn(() => EMPTY),

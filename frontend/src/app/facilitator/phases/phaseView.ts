@@ -4,11 +4,12 @@ import { EmptyPhase } from "../../EmptyPhase";
 import type { PhaseComponents } from "../../PhaseView";
 import { FacilitatorJoinScreen } from "./join/FacilitatorJoinScreen";
 import { FacilitatorQuizScreen } from "./quiz/FacilitatorQuizScreen";
+import { FacilitatorSelectionScreen } from "./selection/FacilitatorSelectionScreen";
 
 export const facilitatorPhaseView: PhaseComponents<FacilitatorWorkshopState> = {
   [Phase.Join]: FacilitatorJoinScreen,
   [Phase.Quiz]: FacilitatorQuizScreen,
-  [Phase.ValueSelection]: EmptyPhase,
+  [Phase.ValueSelection]: FacilitatorSelectionScreen,
   [Phase.SelectionResults]: EmptyPhase,
   [Phase.GroupFormation]: EmptyPhase,
   [Phase.GroupWork]: EmptyPhase,

@@ -60,9 +60,26 @@ public sealed record RosterView(
     int ParticipantCount
 );
 
-public sealed record OwnSelectionView(bool IsOwnSubmitted, IReadOnlyList<string> TopValueIds);
+public sealed record WorkshopValueView(string ValueId, LocalizedTextView Text);
 
-public sealed record SelectionProgressView(int SubmittedCount, IReadOnlyList<string> TopValueIds);
+public sealed record OwnSelectionView(
+    IReadOnlyList<WorkshopValueView> Values,
+    IReadOnlyList<string> OwnSelectedValueIds,
+    bool IsSubmitted,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        IReadOnlyDictionary<string, int>? SelectionTallies,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        IReadOnlyList<string>? TopValueIds
+);
+
+public sealed record SelectionProgressView(
+    IReadOnlyList<WorkshopValueView> Values,
+    int SubmittedCount,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        IReadOnlyDictionary<string, int>? SelectionTallies,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        IReadOnlyList<string>? TopValueIds
+);
 
 public sealed record OwnGroupView(
     string Name,

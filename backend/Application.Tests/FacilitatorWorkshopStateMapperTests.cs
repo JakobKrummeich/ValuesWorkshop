@@ -84,20 +84,48 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Value_selection_state_reports_progress_and_carries_the_catalog()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValueSelection,
+            selection: SelectionRound.Restore(
+                [
+                    new SelectedValue(SessionFixtures.Anna, new ValueId("wert-1")),
+                    new SelectedValue(SessionFixtures.Ben, new ValueId("wert-1")),
+                ],
+                []
+            )
+        );
+
+        var selection = Map(session).ShouldBeOfType<FacilitatorValueSelectionState>().Selection;
+
+        selection.SubmittedCount.ShouldBe(2);
+        selection.Values.Count.ShouldBe(50);
+        selection
+            .Values[0]
+            .ShouldBe(new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")));
+        selection.SelectionTallies.ShouldBeNull();
+        selection.TopValueIds.ShouldBeNull();
+    }
+
+    [Fact]
     public void Selection_results_state_reports_how_many_participants_submitted()
     {
         var session = SessionFixtures.InPhase(
             Phase.SelectionResults,
             selection: SelectionRound.Restore(
-                [SessionFixtures.Anna, SessionFixtures.Ben],
-                [new ValueId("honesty")]
+                [
+                    new SelectedValue(SessionFixtures.Anna, new ValueId("wert-1")),
+                    new SelectedValue(SessionFixtures.Ben, new ValueId("wert-2")),
+                ],
+                [new ValueId("wert-1")]
             )
         );
 
         var selection = Map(session).ShouldBeOfType<FacilitatorSelectionResultsState>().Selection;
 
         selection.SubmittedCount.ShouldBe(2);
-        selection.TopValueIds.ShouldBe(["honesty"]);
+        selection.Values.Count.ShouldBe(50);
     }
 
     [Fact]
@@ -175,9 +203,10 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var catalog = new TestQuizCatalog(5);
 
-        return new FacilitatorWorkshopStateMapper(catalog, RegisteredExitGuards.For(catalog)).Map(
-            session,
-            revision
-        );
+        return new FacilitatorWorkshopStateMapper(
+            catalog,
+            new TestValuesCatalog(50),
+            RegisteredExitGuards.For(catalog)
+        ).Map(session, revision);
     }
 }

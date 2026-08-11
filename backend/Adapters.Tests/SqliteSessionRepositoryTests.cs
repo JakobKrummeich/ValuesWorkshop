@@ -156,7 +156,10 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             Roster.Restore([TestParticipants.Unnamed(participant)]),
             PhaseProgress.Restore(Phase.SelectionResults),
             QuizProgress.Restore(4, true, true, []),
-            SelectionRound.Restore([participant], [topValueOne, topValueTwo]),
+            SelectionRound.Restore(
+                [new SelectedValue(participant, topValueOne)],
+                [topValueOne, topValueTwo]
+            ),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore(false, 0, []),
@@ -169,6 +172,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         loaded.ShouldNotBeNull();
         loaded.Selection.SubmittedBy.Count.ShouldBe(1);
         loaded.Selection.SubmittedBy.ShouldContain(participant);
+        loaded.Selection.SelectedValues.ShouldBe([new SelectedValue(participant, topValueOne)]);
         loaded.Selection.TopValues.Count.ShouldBe(2);
         loaded.Selection.TopValues.ShouldContain(topValueOne);
         loaded.Selection.TopValues.ShouldContain(topValueTwo);

@@ -8,6 +8,8 @@ public class SelectionRoundTests
         var round = new SelectionRound();
 
         round.SubmittedBy.ShouldBeEmpty();
+        round.SelectedValues.ShouldBeEmpty();
+        round.SelectionTallies.ShouldBeEmpty();
         round.TopValues.ShouldBeEmpty();
     }
 }
