@@ -70,6 +70,29 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
     }
 
     [Fact]
+    public async Task Round_trip_preserves_the_top_values_fixed_on_entering_the_results_phase()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var anna = new ParticipantId(Guid.NewGuid());
+        var ben = new ParticipantId(Guid.NewGuid());
+        var session = TestSessions.InPhase(identity, Phase.Join);
+        session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
+        session.Join(TestParticipants.Named(ben, "Ben"), new FixedRandomness(0));
+        TestSessions.AdvanceToNextPhase(session);
+        TestSessions.AdvanceToNextPhase(session);
+        session.SubmitValueSelection(anna, ValueIdsNumbered(1, 10), ValidValueIds);
+        session.SubmitValueSelection(ben, ValueIdsNumbered(3, 10), ValidValueIds);
+        TestSessions.AdvanceToNextPhase(session, ValueIdsNumbered(1, 12));
+        session.Selection.TopValues.Count.ShouldBe(12);
+
+        await CreateSession(session);
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
+        loaded.Selection.TopValues.ShouldBe(session.Selection.TopValues, ignoreOrder: true);
+    }
+
+    [Fact]
     public async Task Saving_again_replaces_the_stored_selections_instead_of_duplicating_them()
     {
         var identity = new SessionIdentity(Guid.NewGuid());

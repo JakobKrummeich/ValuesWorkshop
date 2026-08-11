@@ -70,6 +70,48 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
+    public async Task Entering_the_selection_results_fixes_the_top_values_in_catalog_tiebreak_order()
+    {
+        var selection = SelectionRound.Restore(
+            ValueIdsNumbered(1, 10)
+                .Select(valueId => new SelectedValue(SessionFixtures.Anna, valueId))
+                .Concat(
+                    ValueIdsNumbered(3, 10)
+                        .Select(valueId => new SelectedValue(SessionFixtures.Ben, valueId))
+                ),
+            []
+        );
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.ValueSelection, selection: selection)
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.ShouldBe(IntentResult.Accepted());
+        var saved = repository.Saved.ShouldHaveSingleItem();
+        saved.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
+        saved.Selection.TopValues.ShouldBe(
+            ValueIdsNumbered(3, 8)
+                .Concat([
+                    new ValueId("wert-1"),
+                    new ValueId("wert-2"),
+                    new ValueId("wert-11"),
+                    new ValueId("wert-12"),
+                ])
+                .ToList()
+        );
+    }
+
+    private static IReadOnlyList<ValueId> ValueIdsNumbered(int firstNumber, int valueCount)
+    {
+        return Enumerable
+            .Range(firstNumber, valueCount)
+            .Select(valueNumber => new ValueId($"wert-{valueNumber}"))
+            .ToList();
+    }
+
+    [Fact]
     public async Task An_advance_past_the_last_phase_stays_an_invariant_violation()
     {
         var repository = FakeSessionRepository.Holding(
@@ -162,7 +204,8 @@ public class FacilitatorIntentHandlerTests
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
             new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard()),
-            new TestQuizCatalog(5)
+            new TestQuizCatalog(5),
+            new TestValuesCatalog(12)
         );
     }
 }
