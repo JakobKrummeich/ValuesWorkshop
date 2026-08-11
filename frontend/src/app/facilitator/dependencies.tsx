@@ -7,8 +7,8 @@ import type { FacilitatorSessionStatePort } from "../../domain/ports/facilitator
 
 export interface FacilitatorDependencies {
   sessionStatePort: FacilitatorSessionStatePort;
-  lifecycle: FacilitatorLifecyclePort;
-  quizControl: FacilitatorQuizControlPort;
+  lifecyclePort: FacilitatorLifecyclePort;
+  quizControlPort: FacilitatorQuizControlPort;
 }
 
 const FacilitatorDependencyContext =

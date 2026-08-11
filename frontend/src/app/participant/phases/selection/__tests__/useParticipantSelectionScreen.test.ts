@@ -25,8 +25,8 @@ function withSubmitSelection(
 ) {
   dependencies.mockReturnValue({
     sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
-    quiz: { chooseAnswer: () => NEVER },
-    selection: { submitSelection },
+    quizPort: { chooseAnswer: () => NEVER },
+    selectionPort: { submitSelection },
   });
 }
 

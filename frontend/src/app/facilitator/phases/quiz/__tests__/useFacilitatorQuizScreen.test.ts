@@ -32,8 +32,8 @@ function withQuizControl(overrides: Partial<FacilitatorQuizControlPort> = {}) {
   };
   dependencies.mockReturnValue({
     sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
-    lifecycle: { advancePhase: () => NEVER },
-    quizControl,
+    lifecyclePort: { advancePhase: () => NEVER },
+    quizControlPort: quizControl,
   });
   return quizControl;
 }

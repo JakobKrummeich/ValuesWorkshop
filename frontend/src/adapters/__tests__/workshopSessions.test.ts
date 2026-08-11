@@ -71,16 +71,16 @@ describe("session-bound role connections", () => {
     expect(urlOfLastConnection()).toBe(
       `http://localhost:5000/hub/participant?sessionIdentity=${SESSION_IDENTITY}`,
     );
-    expect(session.quiz.chooseAnswer).toBeInstanceOf(Function);
-    expect(session.selection.submitSelection).toBeInstanceOf(Function);
+    expect(session.quizPort.chooseAnswer).toBeInstanceOf(Function);
+    expect(session.selectionPort.submitSelection).toBeInstanceOf(Function);
   });
 
   it("binds the facilitator hub url and exposes the lifecycle slice", () => {
     const session = createFacilitatorSession(SESSION_IDENTITY);
 
     expect(urlOfLastConnection()).toContain("/hub/facilitator");
-    expect(session.lifecycle.advancePhase).toBeInstanceOf(Function);
-    expect(session.quizControl.revealAnswer).toBeInstanceOf(Function);
+    expect(session.lifecyclePort.advancePhase).toBeInstanceOf(Function);
+    expect(session.quizControlPort.revealAnswer).toBeInstanceOf(Function);
   });
 
   it("connects the presenter anonymously", () => {

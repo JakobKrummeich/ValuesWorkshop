@@ -49,7 +49,7 @@ export interface FacilitatorQuizScreenModel {
 export function useFacilitatorQuizScreen(
   state: FacilitatorQuizState,
 ): FacilitatorQuizScreenModel {
-  const { quizControl: quizControlPort } = useFacilitatorDependencies();
+  const { quizControlPort } = useFacilitatorDependencies();
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
 
   const enabledAction =

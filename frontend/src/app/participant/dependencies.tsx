@@ -7,8 +7,8 @@ import type { ParticipantSessionStatePort } from "../../domain/ports/participant
 
 export interface ParticipantDependencies {
   sessionStatePort: ParticipantSessionStatePort;
-  quiz: ParticipantQuizPort;
-  selection: ParticipantSelectionPort;
+  quizPort: ParticipantQuizPort;
+  selectionPort: ParticipantSelectionPort;
 }
 
 const ParticipantDependencyContext =

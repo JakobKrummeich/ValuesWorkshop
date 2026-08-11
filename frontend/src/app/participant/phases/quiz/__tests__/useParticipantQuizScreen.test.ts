@@ -28,8 +28,8 @@ function withChooseAnswer(
 ) {
   dependencies.mockReturnValue({
     sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
-    quiz: { chooseAnswer },
-    selection: { submitSelection: () => NEVER },
+    quizPort: { chooseAnswer },
+    selectionPort: { submitSelection: () => NEVER },
   });
 }
 

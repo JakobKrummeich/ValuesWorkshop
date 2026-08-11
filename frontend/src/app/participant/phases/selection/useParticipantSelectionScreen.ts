@@ -32,7 +32,7 @@ export interface ParticipantSelectionScreenModel {
 export function useParticipantSelectionScreen(
   selection: OwnSelectionView,
 ): ParticipantSelectionScreenModel {
-  const { selection: selectionPort } = useParticipantDependencies();
+  const { selectionPort } = useParticipantDependencies();
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
   const [chosenValueIds, setChosenValueIds] = useState<readonly string[]>(
     selection.ownSelectedValueIds,

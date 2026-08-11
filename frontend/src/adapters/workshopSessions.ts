@@ -30,14 +30,14 @@ export interface WorkshopSession {
 
 export interface ParticipantSession extends WorkshopSession {
   readonly sessionStatePort: ParticipantSessionStatePort;
-  readonly quiz: ParticipantQuizPort;
-  readonly selection: ParticipantSelectionPort;
+  readonly quizPort: ParticipantQuizPort;
+  readonly selectionPort: ParticipantSelectionPort;
 }
 
 export interface FacilitatorSession extends WorkshopSession {
   readonly sessionStatePort: FacilitatorSessionStatePort;
-  readonly lifecycle: FacilitatorLifecyclePort;
-  readonly quizControl: FacilitatorQuizControlPort;
+  readonly lifecyclePort: FacilitatorLifecyclePort;
+  readonly quizControlPort: FacilitatorQuizControlPort;
 }
 
 export interface PresenterSession extends WorkshopSession {
@@ -57,8 +57,8 @@ export function createParticipantSession(
       connection,
       participantWorkshopStateSchema,
     ),
-    quiz: createParticipantQuizPort(connection),
-    selection: createParticipantSelectionPort(connection),
+    quizPort: createParticipantQuizPort(connection),
+    selectionPort: createParticipantSelectionPort(connection),
     ...lifetimeOf(connection),
   };
 }
@@ -76,8 +76,8 @@ export function createFacilitatorSession(
       connection,
       facilitatorWorkshopStateSchema,
     ),
-    lifecycle: createFacilitatorLifecyclePort(connection),
-    quizControl: createFacilitatorQuizControlPort(connection),
+    lifecyclePort: createFacilitatorLifecyclePort(connection),
+    quizControlPort: createFacilitatorQuizControlPort(connection),
     ...lifetimeOf(connection),
   };
 }
