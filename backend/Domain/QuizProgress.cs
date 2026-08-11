@@ -98,7 +98,7 @@ public sealed class QuizProgress
         )
         {
             throw new InvariantViolationException(
-                "Each participant answers each quiz question exactly once (I5)."
+                "Each participant answers each quiz question exactly once."
             );
         }
 
