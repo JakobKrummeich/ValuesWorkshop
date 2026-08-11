@@ -43,6 +43,31 @@ internal static class SessionFixtures
         );
     }
 
+    internal static Session InSelectionResults()
+    {
+        return InPhase(
+            Phase.SelectionResults,
+            selection: SelectionRound.Restore(
+                [
+                    new SelectedValue(Anna, new ValueId("wert-5")),
+                    new SelectedValue(Ben, new ValueId("wert-5")),
+                    new SelectedValue(Chris, new ValueId("wert-5")),
+                    new SelectedValue(Anna, new ValueId("wert-2")),
+                    new SelectedValue(Ben, new ValueId("wert-2")),
+                    new SelectedValue(Anna, new ValueId("wert-9")),
+                    new SelectedValue(Chris, new ValueId("wert-9")),
+                    new SelectedValue(Ben, new ValueId("wert-1")),
+                ],
+                [
+                    new ValueId("wert-9"),
+                    new ValueId("wert-1"),
+                    new ValueId("wert-5"),
+                    new ValueId("wert-2"),
+                ]
+            )
+        );
+    }
+
     internal static FormationRecord TwoGroups()
     {
         return FormationRecord.Restore(

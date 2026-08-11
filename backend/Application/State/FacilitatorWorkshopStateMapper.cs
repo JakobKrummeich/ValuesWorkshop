@@ -59,7 +59,7 @@ public sealed class FacilitatorWorkshopStateMapper(
                     revision,
                     SessionViews.Roster(session),
                     enabledIntents,
-                    SelectionViews.Progress(session, catalogView)
+                    SelectionViews.ProgressWithResults(session, catalogView)
                 ),
             [Phase.GroupFormation] = (session, revision, enabledIntents) =>
                 new FacilitatorGroupFormationState(

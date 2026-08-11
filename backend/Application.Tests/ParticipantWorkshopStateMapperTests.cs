@@ -251,6 +251,42 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Selection_results_state_tallies_every_submitted_value()
+    {
+        var selection = Map(SessionFixtures.InSelectionResults())
+            .ShouldBeOfType<ParticipantSelectionResultsState>()
+            .Selection;
+
+        var tallies = selection.SelectionTallies.ShouldNotBeNull();
+        tallies.Count.ShouldBe(4);
+        tallies["wert-5"].ShouldBe(3);
+        tallies["wert-2"].ShouldBe(2);
+        tallies["wert-9"].ShouldBe(2);
+        tallies["wert-1"].ShouldBe(1);
+    }
+
+    [Fact]
+    public void Selection_results_state_orders_top_values_by_count_then_config_order_whatever_the_stored_order()
+    {
+        var selection = Map(SessionFixtures.InSelectionResults())
+            .ShouldBeOfType<ParticipantSelectionResultsState>()
+            .Selection;
+
+        selection.TopValueIds.ShouldBe(["wert-5", "wert-2", "wert-9", "wert-1"]);
+    }
+
+    [Fact]
+    public void Selection_results_state_without_submissions_carries_empty_tallies_and_top_values()
+    {
+        var selection = Map(SessionFixtures.InPhase(Phase.SelectionResults))
+            .ShouldBeOfType<ParticipantSelectionResultsState>()
+            .Selection;
+
+        selection.SelectionTallies.ShouldNotBeNull().ShouldBeEmpty();
+        selection.TopValueIds.ShouldNotBeNull().ShouldBeEmpty();
+    }
+
+    [Fact]
     public void Own_group_describes_only_the_callers_group()
     {
         var session = SessionFixtures.InPhase(

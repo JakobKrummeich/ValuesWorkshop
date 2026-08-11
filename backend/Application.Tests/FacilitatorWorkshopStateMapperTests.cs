@@ -129,6 +129,19 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Selection_results_state_carries_tallies_and_top_values_in_result_order()
+    {
+        var selection = Map(SessionFixtures.InSelectionResults())
+            .ShouldBeOfType<FacilitatorSelectionResultsState>()
+            .Selection;
+
+        var tallies = selection.SelectionTallies.ShouldNotBeNull();
+        tallies.Count.ShouldBe(4);
+        tallies["wert-5"].ShouldBe(3);
+        selection.TopValueIds.ShouldBe(["wert-5", "wert-2", "wert-9", "wert-1"]);
+    }
+
+    [Fact]
     public void Group_work_state_names_members_and_scribes_of_every_group()
     {
         var session = SessionFixtures.InPhase(
