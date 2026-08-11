@@ -79,6 +79,7 @@ concerns):
 |---|---|---|
 | `IBroadcaster` | `Application/IBroadcaster.cs` | `SignalRBroadcaster` (Adapters.Web) |
 | `IFacilitatorPassphrase` | `Application/Ports/Driven/IFacilitatorPassphrase.cs` | `FacilitatorPassphrase` (Host.Auth) |
+| `IQuizCatalog` | `Application/Ports/Driven/IQuizCatalog.cs` | `QuizCatalogFile` (Host) |
 | `IValuesCatalog` | `Application/Ports/Driven/IValuesCatalog.cs` | `ValuesCatalogFile` (Host) |
 
 ### 2.2 Frontend Ports
