@@ -13,8 +13,6 @@ public sealed class WorkshopDbContext(DbContextOptions<WorkshopDbContext> option
     public DbSet<ParticipantEntity> Participants => Set<ParticipantEntity>();
     public DbSet<QuizAnswerEntity> QuizAnswers => Set<QuizAnswerEntity>();
     public DbSet<ValueSelectionEntity> ValueSelections => Set<ValueSelectionEntity>();
-    public DbSet<SelectionSubmissionEntity> SelectionSubmissions =>
-        Set<SelectionSubmissionEntity>();
     public DbSet<TopValueEntity> TopValues => Set<TopValueEntity>();
     public DbSet<GroupEntity> Groups => Set<GroupEntity>();
     public DbSet<GroupMemberEntity> GroupMembers => Set<GroupMemberEntity>();
@@ -33,7 +31,6 @@ public sealed class WorkshopDbContext(DbContextOptions<WorkshopDbContext> option
         modelBuilder.ApplyConfiguration(new ParticipantEntityConfiguration());
         modelBuilder.ApplyConfiguration(new QuizAnswerEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ValueSelectionEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new SelectionSubmissionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new TopValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GroupEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GroupMemberEntityConfiguration());

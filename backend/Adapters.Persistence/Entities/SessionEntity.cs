@@ -16,7 +16,6 @@ public sealed class SessionEntity
     public List<ParticipantEntity> Participants { get; set; } = [];
     public List<QuizAnswerEntity> QuizAnswers { get; set; } = [];
     public List<ValueSelectionEntity> ValueSelections { get; set; } = [];
-    public List<SelectionSubmissionEntity> SelectionSubmissions { get; set; } = [];
     public List<TopValueEntity> TopValues { get; set; } = [];
     public List<GroupEntity> Groups { get; set; } = [];
     public List<VoteTallyEntity> VoteTallies { get; set; } = [];
