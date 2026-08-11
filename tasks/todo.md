@@ -343,13 +343,31 @@ tall states against 1080p.
 bars reflect tallies.
 **Dependencies:** 12, 13. **Size:** M
 
-### Task 15: Phase 3 — Value selection
-**Description:** `config/values.json` (~50 values, de+en). Participant
-selects exactly 10, no duplicates; server enforces; submission locks in.
+### Task 15: Phase 3 — Value selection ✅
+**Spec:** `tasks/specs/15-value-selection.md` (approved via Lavish, 3 rounds).
+**Description:** `config/values.json` (50 values, de+en, research-grounded
+catalog: Schwartz/Rokeach/Ryff/Aristotle). Participant selects exactly 10,
+no duplicates; server enforces; submission locks in behind a confirm dialog.
 **Acceptance criteria:**
-- [ ] <10 or >10 or duplicate selection rejected server-side
-- [ ] Facilitator sees submission progress count
-- [ ] Multi-client e2e extended through phase 3
+- [x] <10 or >10 or duplicate or unknown-id selection rejected server-side
+      (`MalformedPayload`); resubmission rejected (`InvariantViolated`, I6)
+- [x] Facilitator sees submission progress count; presenter shows prompt +
+      progress, never tallies (secrecy-tested for all roles in phase 3)
+- [x] Multi-client e2e extended through phase 3 (shared quiz fast-forward
+      helper in `e2e/support/quizFastForward.ts`)
+**Learnings for Task 16:** `SelectionRound` already derives
+`SelectionTallies`, `HasSubmitted`, `SubmittedCount` — Task 16 only flips
+tallies/top values onto the wire for phase 4 (`selectionTallies?`/
+`topValueIds?` are already optional in protocol §5.2–5.4, zod, and
+`JsonIgnore WhenWritingNull` views) and must update
+`SelectionTalliesSecrecyTests` to assert phase-4 presence alongside phase-3
+absence; selection views carry the full values catalog on the wire, so the
+results chart gets its labels for free; `selection_submissions` is now
+write-only (`value_selections` is the source of truth, see
+`design/persistence.md`) — fold the migration dropping it into Task 16's
+`top_values` persistence work; while touching Domain exception messages,
+remove the pre-existing internal `(I1)`/`(I5)` tags (review preference:
+no invariant tags in user-facing messages).
 **Verification:** BE selection suite; FE selection UI tests.
 **Dependencies:** 11. **Size:** M
 
