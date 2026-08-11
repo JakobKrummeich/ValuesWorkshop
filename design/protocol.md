@@ -356,7 +356,7 @@ variant carries it.
 | Block | Fields |
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
-| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent until phase 4, computed in Task 16), `topValueIds?` (absent until phase 4, computed in Task 16) |
+| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
@@ -373,7 +373,7 @@ join lobby shows back to the person who just signed in.
 |---|---|
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
-| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent until phase 4, computed in Task 16), `topValueIds?` (absent until phase 4, computed in Task 16) |
+| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | groups | `[{ name, memberParticipantIds, assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
@@ -392,7 +392,7 @@ what they answered, selected, or voted for.
 | Block | Fields |
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
-| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent until phase 4, computed in Task 16), `topValueIds?` (absent until phase 4, computed in Task 16) |
+| selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | groups | `[{ name, memberCount, assignedValueIds, workStatus }]` |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
