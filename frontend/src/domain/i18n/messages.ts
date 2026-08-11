@@ -265,6 +265,18 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
     [Language.German]: "{submitted} von {total} haben abgegeben",
     [Language.English]: "{submitted} of {total} have submitted",
   },
+  [MessageKey.SelectionResultsHeading]: {
+    [Language.German]: "Eure Top-Werte",
+    [Language.English]: "Your top values",
+  },
+  [MessageKey.SelectionResultsHiddenValues]: {
+    [Language.German]: "und {count} weitere",
+    [Language.English]: "and {count} more",
+  },
+  [MessageKey.SelectionResultsNoSubmissions]: {
+    [Language.German]: "Niemand hat eine Auswahl abgegeben.",
+    [Language.English]: "Nobody submitted a selection.",
+  },
   [MessageKey.FacilitatorHeading]: {
     [Language.German]: "Moderation",
     [Language.English]: "Facilitator",

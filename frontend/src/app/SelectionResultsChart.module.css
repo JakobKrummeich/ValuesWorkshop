@@ -1,0 +1,20 @@
+.chart {
+  display: flex;
+  gap: var(--space-gutter);
+  width: 100%;
+  min-height: 0;
+}
+
+.column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-gap);
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .chart {
+    flex-direction: column;
+  }
+}
