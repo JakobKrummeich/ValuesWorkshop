@@ -76,9 +76,12 @@ through phase 4, which completes Checkpoint C (phases 1–4).
 - Extend `e2e/selectionPhase.spec.ts`: participants submit **fixed,
   partially overlapping selections** so counts and the top set are
   deterministic; advance → all three roles show the results chart
-  (assert a known label + count, highlighted top set present, "and x
-  more" hint, facilitator Advance still enabled). English locale as
-  established.
+  (assert a known label + count, highlighted top set present,
+  facilitator Advance still enabled). With 3 participants a nonzero
+  "and x more" is arithmetically impossible (distinct > 20 forces a
+  count-1 tie at 10th, widening the top set to everything) — e2e
+  asserts the hint absent; hint rendering is unit-test covered.
+  English locale as established.
 - This closes Checkpoint C (facilitator + presenter + 3 participants
   through phases 1–4) — tick both in `tasks/todo.md`.
 
@@ -99,7 +102,8 @@ selections after results exist.
 - [ ] `selection_submissions` dropped by migration; persistence.md
       updated; round-trip stays green
 - [ ] All three FE screens render the two-column highlighted bar chart
-      (widths ∝ count, max full) + "and x more" hint from wire data only
+      (widths ∝ count, max full) + "and x more" hint (unit-tested;
+      absent in 3-participant e2e) from wire data only
 - [ ] e2e covers phases 1–4 green in CI; Checkpoint C ticked
 
 ## Verification
