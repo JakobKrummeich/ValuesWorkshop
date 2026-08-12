@@ -376,12 +376,14 @@ no invariant tags in user-facing messages).
 **Description:** On entry into phase 4 the server fixes the top values from
 the selection tally (count desc, config-order tiebreak; tie at 10th place
 widens the set past 10; empty on zero submissions) and puts
-`selectionTallies`/`topValueIds` on the wire for all three roles. All three
-screens render the same top-values bar chart (Lavish decision, replacing the
-earlier two-column list mock): the 20 most-selected values in two columns
+`selectionTallies`/`topValueIds` on the wire for all three roles. Facilitator
+and presenter render the same top-values bar chart (Lavish decision, replacing
+the earlier two-column list mock): the 20 most-selected values in two columns
 (ranks 1–10 left, 11–20 right), label + count + bar ∝ selections with the
 most-selected at full width, top set color-highlighted, "and x more" hint
-below the cutoff, empty-state note on zero submissions. Fold-ins: migration
+below the cutoff, empty-state note on zero submissions. The participant shows
+a waiting screen instead — icon + slow pulsating circle, no chart — so
+attention belongs on the presenter wall (Lightspeed decision). Fold-ins: migration
 dropping the write-only `selection_submissions` table; `(I1)`/`(I5)` tags
 stripped from Domain exception messages.
 **Acceptance criteria:**

@@ -63,9 +63,11 @@ through phase 4, which completes Checkpoint C (phases 1–4).
   cutoff a hint "und x weitere" / "and x more", x = number of values
   with ≥1 selection not shown (omitted when x = 0). Zero submissions →
   heading + empty-state note.
-- Participant and facilitator phase 4 mirror the presenter view
-  (screens.md:30); facilitator additionally keeps Advance (no 4→5
-  guard). Per-role components in `phases/selectionResults/`, replacing
+- Facilitator phase 4 mirrors the presenter view (screens.md:30) and
+  additionally keeps Advance (no 4→5 guard). Participant phase 4 shows
+  a waiting screen — centered icon with a slow pulsating circle, no
+  chart, no counts — so attention goes to the presenter wall (decision
+  6). Per-role components in `phases/selectionResults/`, replacing
   the `EmptyPhase` mapping in each role's `phaseView.ts`; labels come
   from the `values` catalog already on the wire; display order derived
   client-side from `selectionTallies` (count desc, then catalog order —
@@ -75,9 +77,10 @@ through phase 4, which completes Checkpoint C (phases 1–4).
 
 - Extend `e2e/selectionPhase.spec.ts`: participants submit **fixed,
   partially overlapping selections** so counts and the top set are
-  deterministic; advance → all three roles show the results chart
-  (assert a known label + count, highlighted top set present,
-  facilitator Advance still enabled). With 3 participants a nonzero
+  deterministic; advance → facilitator and presenter show the results
+  chart (assert a known label + count, highlighted top set present,
+  facilitator Advance still enabled) while participants show the
+  waiting screen and no chart. With 3 participants a nonzero
   "and x more" is arithmetically impossible (distinct > 20 forces a
   count-1 tie at 10th, widening the top set to everything) — e2e
   asserts the hint absent; hint rendering is unit-test covered.
@@ -101,9 +104,10 @@ selections after results exist.
       still absent in phase 3 (secrecy tests extended)
 - [ ] `selection_submissions` dropped by migration; persistence.md
       updated; round-trip stays green
-- [ ] All three FE screens render the two-column highlighted bar chart
-      (widths ∝ count, max full) + "and x more" hint (unit-tested;
-      absent in 3-participant e2e) from wire data only
+- [ ] Facilitator and presenter screens render the two-column
+      highlighted bar chart (widths ∝ count, max full) + "and x more"
+      hint (unit-tested; absent in 3-participant e2e) from wire data
+      only; the participant screen renders the waiting view instead
 - [ ] e2e covers phases 1–4 green in CI; Checkpoint C ticked
 
 ## Verification
@@ -134,3 +138,6 @@ selections after results exist.
    everywhere (no crash, no fabricated values).
 5. **Fold-ins approved:** drop `selection_submissions`, strip
    `(I1)`/`(I5)` tags.
+6. **Lightspeed review: participant phase-4 shows a waiting screen
+   (icon + slow pulsating circle), not the chart — attention belongs
+   on the presenter wall.**
