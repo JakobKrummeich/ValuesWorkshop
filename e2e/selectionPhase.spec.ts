@@ -317,7 +317,7 @@ test.describe.serial("phase 3 value selection", () => {
     await expectEveryChipDisabled(alicePage);
   });
 
-  test("the advance into phase 4 shows the results chart to every role", async () => {
+  test("the advance into phase 4 shows the chart on the wall and a waiting screen on phones", async () => {
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
 
     await advancePhaseButton(facilitatorPage).click();
@@ -325,17 +325,23 @@ test.describe.serial("phase 3 value selection", () => {
     for (const page of everyRolePage()) {
       await expect(page.getByTestId("phase")).toHaveText("Phase 4");
       await expect(page.getByTestId("connection")).toHaveText("Connected");
+    }
+    for (const page of [facilitatorPage, presenterPage]) {
       await expect(page.getByTestId("results-heading")).toHaveText(
         "Your top values",
       );
+    }
+    for (const page of participantPages()) {
+      await expect(page.getByTestId("results-waiting")).toBeVisible();
+      await expect(page.getByTestId("results-heading")).toHaveCount(0);
     }
     await expect(alicePage.getByTestId("submitted-notice")).toHaveCount(0);
     await expect(submittedCount(facilitatorPage)).toHaveCount(0);
     await expect(submittedCount(presenterPage)).toHaveCount(0);
   });
 
-  test("every role sees the shared tallies with the top ten highlighted", async () => {
-    for (const page of everyRolePage()) {
+  test("the facilitator and the presenter see the shared tallies with the top ten highlighted", async () => {
+    for (const page of [facilitatorPage, presenterPage]) {
       await expect(page.getByTestId("result-count-vertrauen")).toHaveText("3");
       await expect(page.getByTestId("result-count-freiheit")).toHaveText("2");
       await expect(page.getByTestId("result-count-humor")).toHaveText("1");
@@ -347,6 +353,10 @@ test.describe.serial("phase 3 value selection", () => {
       );
       await expect(page.getByTestId("hidden-values-hint")).toHaveCount(0);
       await expect(page.getByTestId("results-empty-note")).toHaveCount(0);
+    }
+    for (const page of participantPages()) {
+      await expect(page.getByTestId(/^result-row-/)).toHaveCount(0);
+      await expect(page.getByTestId(/^result-count-/)).toHaveCount(0);
     }
   });
 
