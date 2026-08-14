@@ -174,7 +174,6 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
             .Include(sessionEntity => sessionEntity.Participants)
             .Include(sessionEntity => sessionEntity.QuizAnswers)
             .Include(sessionEntity => sessionEntity.ValueSelections)
-            .Include(sessionEntity => sessionEntity.SelectionSubmissions)
             .Include(sessionEntity => sessionEntity.TopValues)
             .Include(sessionEntity => sessionEntity.Groups)
                 .ThenInclude(groupEntity => groupEntity.Members)
@@ -192,7 +191,6 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         database.RemoveRange(entity.Participants);
         database.RemoveRange(entity.QuizAnswers);
         database.RemoveRange(entity.ValueSelections);
-        database.RemoveRange(entity.SelectionSubmissions);
         database.RemoveRange(entity.TopValues);
         database.RemoveRange(entity.VoteTallies);
         database.RemoveRange(entity.VotedParticipants);

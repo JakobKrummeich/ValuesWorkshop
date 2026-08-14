@@ -27,6 +27,7 @@ public static class TestSessions
         SessionIdentity identity,
         Phase phase,
         QuizProgress? quiz = null,
+        SelectionRound? selection = null,
         FormationRecord? formation = null,
         PresentationWalk? presentation = null,
         VotingRounds? voting = null,
@@ -40,7 +41,7 @@ public static class TestSessions
             Roster.Restore([]),
             PhaseProgress.Restore(phase),
             quiz ?? QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []),
-            SelectionRound.Restore([], []),
+            selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),
             voting ?? VotingRounds.Restore(false, 0, []),
@@ -48,8 +49,11 @@ public static class TestSessions
         );
     }
 
-    public static void AdvanceToNextPhase(Session session)
+    public static void AdvanceToNextPhase(
+        Session session,
+        IReadOnlyList<ValueId>? valueCatalogOrder = null
+    )
     {
-        session.AdvancePhase(CallerOf(session), PhaseExitGuards.None);
+        session.AdvancePhase(CallerOf(session), PhaseExitGuards.None, valueCatalogOrder ?? []);
     }
 }

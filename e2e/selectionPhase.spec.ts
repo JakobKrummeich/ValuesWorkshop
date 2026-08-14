@@ -34,7 +34,43 @@ const FIRST_NINE_VALUE_IDS = [
 const TRUST_VALUE_ID = "vertrauen";
 const SWAP_OUT_VALUE_ID = "freiheit";
 const SWAP_IN_VALUE_ID = "leistung";
-const QUICK_PICK_VALUE_IDS = [...FIRST_NINE_VALUE_IDS, SWAP_IN_VALUE_ID];
+const BOB_VALUE_IDS = [
+  "vertrauen",
+  "autonomie",
+  "kreativitaet",
+  "neugier",
+  "freiheit",
+  "exzellenz",
+  "kompetenz",
+  "ehrgeiz",
+  "entschlossenheit",
+  "ausdauer",
+];
+const CHARLIE_VALUE_IDS = [
+  "vertrauen",
+  "authentizitaet",
+  "offenheit",
+  "mut",
+  "freiheit",
+  "exzellenz",
+  "kompetenz",
+  "disziplin",
+  "freude",
+  "humor",
+];
+const EXPECTED_TOP_VALUE_IDS = [
+  "vertrauen",
+  "freiheit",
+  "autonomie",
+  "kreativitaet",
+  "neugier",
+  "authentizitaet",
+  "offenheit",
+  "mut",
+  "exzellenz",
+  "kompetenz",
+];
+const EXPECTED_DISTINCT_SELECTED_COUNT = 19;
 
 test.describe.serial("phase 3 value selection", () => {
   let facilitatorContext: BrowserContext;
@@ -237,8 +273,12 @@ test.describe.serial("phase 3 value selection", () => {
   });
 
   test("the remaining participants submit and complete the progress", async () => {
-    for (const participantPage of [bobPage, charliePage]) {
-      for (const valueId of QUICK_PICK_VALUE_IDS) {
+    const remainingSelections: Array<[Page, string[]]> = [
+      [bobPage, BOB_VALUE_IDS],
+      [charliePage, CHARLIE_VALUE_IDS],
+    ];
+    for (const [participantPage, valueIds] of remainingSelections) {
+      for (const valueId of valueIds) {
         await valueChip(participantPage, valueId).click();
       }
       await submitThroughConfirmationDialog(participantPage);
@@ -277,7 +317,7 @@ test.describe.serial("phase 3 value selection", () => {
     await expectEveryChipDisabled(alicePage);
   });
 
-  test("the advance into phase 4 renders the placeholder for every role", async () => {
+  test("the advance into phase 4 shows the chart on the wall and a waiting screen on phones", async () => {
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
 
     await advancePhaseButton(facilitatorPage).click();
@@ -286,9 +326,53 @@ test.describe.serial("phase 3 value selection", () => {
       await expect(page.getByTestId("phase")).toHaveText("Phase 4");
       await expect(page.getByTestId("connection")).toHaveText("Connected");
     }
-    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
+    for (const page of [facilitatorPage, presenterPage]) {
+      await expect(page.getByTestId("results-heading")).toHaveText(
+        "Your top values",
+      );
+    }
+    for (const page of participantPages()) {
+      await expect(page.getByTestId("results-waiting")).toBeVisible();
+      await expect(page.getByTestId("results-heading")).toHaveCount(0);
+    }
     await expect(alicePage.getByTestId("submitted-notice")).toHaveCount(0);
     await expect(submittedCount(facilitatorPage)).toHaveCount(0);
     await expect(submittedCount(presenterPage)).toHaveCount(0);
+  });
+
+  test("the facilitator and the presenter see the shared tallies with the top ten highlighted", async () => {
+    for (const page of [facilitatorPage, presenterPage]) {
+      await expect(page.getByTestId("result-count-vertrauen")).toHaveText("3");
+      await expect(page.getByTestId("result-count-freiheit")).toHaveText("2");
+      await expect(page.getByTestId("result-count-humor")).toHaveText("1");
+      await expect(page.getByTestId(/^result-row-/)).toHaveCount(
+        EXPECTED_DISTINCT_SELECTED_COUNT,
+      );
+      await expect(page.locator('[data-top-value="true"]')).toHaveCount(
+        EXPECTED_TOP_VALUE_IDS.length,
+      );
+      await expect(page.getByTestId("hidden-values-hint")).toHaveCount(0);
+      await expect(page.getByTestId("results-empty-note")).toHaveCount(0);
+    }
+    for (const page of participantPages()) {
+      await expect(page.getByTestId(/^result-row-/)).toHaveCount(0);
+      await expect(page.getByTestId(/^result-count-/)).toHaveCount(0);
+    }
+  });
+
+  test("the presenter ranks trust first and keeps the facilitator advancing", async () => {
+    await expect(
+      presenterPage.getByTestId(/^result-row-/).first(),
+    ).toHaveAttribute("data-testid", "result-row-vertrauen");
+    for (const valueId of EXPECTED_TOP_VALUE_IDS) {
+      await expect(
+        presenterPage.getByTestId(`result-row-${valueId}`),
+      ).toHaveAttribute("data-top-value", "true");
+    }
+    await expect(
+      presenterPage.getByTestId("result-row-anpassungsfaehigkeit"),
+    ).toHaveAttribute("data-top-value", "false");
+
+    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
   });
 });

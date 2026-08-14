@@ -7,7 +7,8 @@ namespace ValuesWorkshop.Adapters.Tests;
 
 public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
 {
-    private static readonly IReadOnlySet<ValueId> ValidValueIds = ValueIdsNumbered(1, 12)
+    private static readonly IReadOnlySet<ValueId> ValidValueIds = TestValueIds
+        .Numbered(1, 12)
         .ToHashSet();
 
     private readonly SqliteConnection connection;
@@ -48,8 +49,8 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         session.Join(TestParticipants.Named(ben, "Ben"), new FixedRandomness(0));
         TestSessions.AdvanceToNextPhase(session);
         TestSessions.AdvanceToNextPhase(session);
-        session.SubmitValueSelection(anna, ValueIdsNumbered(1, 10), ValidValueIds);
-        session.SubmitValueSelection(ben, ValueIdsNumbered(3, 10), ValidValueIds);
+        session.SubmitValueSelection(anna, TestValueIds.Numbered(1, 10), ValidValueIds);
+        session.SubmitValueSelection(ben, TestValueIds.Numbered(3, 10), ValidValueIds);
 
         await CreateSession(session);
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
@@ -57,9 +58,12 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
         loaded.Selection.SubmittedBy.ShouldBe([anna, ben], ignoreOrder: true);
         loaded.Selection.SelectedValues.ShouldBe(
-            ValueIdsNumbered(1, 10)
+            TestValueIds
+                .Numbered(1, 10)
                 .Select(valueId => new SelectedValue(anna, valueId))
-                .Concat(ValueIdsNumbered(3, 10).Select(valueId => new SelectedValue(ben, valueId)))
+                .Concat(
+                    TestValueIds.Numbered(3, 10).Select(valueId => new SelectedValue(ben, valueId))
+                )
                 .ToList(),
             ignoreOrder: true
         );
@@ -67,6 +71,29 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         loaded.Selection.SelectionTallies[new ValueId("wert-3")].ShouldBe(2);
         loaded.Selection.SelectionTallies[new ValueId("wert-12")].ShouldBe(1);
         loaded.Selection.TopValues.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Round_trip_preserves_the_top_values_fixed_on_entering_the_results_phase()
+    {
+        var identity = new SessionIdentity(Guid.NewGuid());
+        var anna = new ParticipantId(Guid.NewGuid());
+        var ben = new ParticipantId(Guid.NewGuid());
+        var session = TestSessions.InPhase(identity, Phase.Join);
+        session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
+        session.Join(TestParticipants.Named(ben, "Ben"), new FixedRandomness(0));
+        TestSessions.AdvanceToNextPhase(session);
+        TestSessions.AdvanceToNextPhase(session);
+        session.SubmitValueSelection(anna, TestValueIds.Numbered(1, 10), ValidValueIds);
+        session.SubmitValueSelection(ben, TestValueIds.Numbered(3, 10), ValidValueIds);
+        TestSessions.AdvanceToNextPhase(session, TestValueIds.Numbered(1, 12));
+        session.Selection.TopValues.Count.ShouldBe(12);
+
+        await CreateSession(session);
+        var loaded = (await LoadSession(identity)).ShouldNotBeNull();
+
+        loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
+        loaded.Selection.TopValues.ShouldBe(session.Selection.TopValues, ignoreOrder: true);
     }
 
     [Fact]
@@ -78,7 +105,7 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
         TestSessions.AdvanceToNextPhase(session);
         TestSessions.AdvanceToNextPhase(session);
-        session.SubmitValueSelection(anna, ValueIdsNumbered(1, 10), ValidValueIds);
+        session.SubmitValueSelection(anna, TestValueIds.Numbered(1, 10), ValidValueIds);
         await CreateSession(session);
 
         var reloaded = (await LoadSession(identity)).ShouldNotBeNull();
@@ -88,17 +115,12 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
         loaded.Selection.SubmittedBy.ShouldBe([anna]);
         loaded.Selection.SelectedValues.ShouldBe(
-            ValueIdsNumbered(1, 10).Select(valueId => new SelectedValue(anna, valueId)).ToList(),
+            TestValueIds
+                .Numbered(1, 10)
+                .Select(valueId => new SelectedValue(anna, valueId))
+                .ToList(),
             ignoreOrder: true
         );
-    }
-
-    private static IReadOnlyList<ValueId> ValueIdsNumbered(int firstNumber, int valueCount)
-    {
-        return Enumerable
-            .Range(firstNumber, valueCount)
-            .Select(valueNumber => new ValueId($"wert-{valueNumber}"))
-            .ToList();
     }
 
     private async Task CreateSession(Session session)

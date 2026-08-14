@@ -47,7 +47,7 @@ public sealed class ParticipantWorkshopStateMapper(
                 new ParticipantSelectionResultsState(
                     revision,
                     ParticipantCount(session),
-                    SelectionViews.ForParticipant(session, caller, catalogView)
+                    SelectionViews.ForParticipantWithResults(session, caller, catalogView)
                 ),
             [Phase.GroupFormation] = (session, caller, revision) =>
                 new ParticipantGroupFormationState(

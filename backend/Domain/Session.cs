@@ -66,7 +66,11 @@ public sealed class Session
         return true;
     }
 
-    public void AdvancePhase(CallerSubject caller, PhaseExitGuards exitGuards)
+    public void AdvancePhase(
+        CallerSubject caller,
+        PhaseExitGuards exitGuards,
+        IReadOnlyList<ValueId> valueCatalogOrder
+    )
     {
         RequireFacilitator(caller, "Only the facilitator of this session may advance the phase.");
 
@@ -77,6 +81,11 @@ public sealed class Session
         if (PhaseProgress.CurrentPhase == Phase.Quiz)
         {
             Quiz.PoseFirstQuestion();
+        }
+
+        if (PhaseProgress.CurrentPhase == Phase.SelectionResults)
+        {
+            Selection.DetermineTopValues(valueCatalogOrder);
         }
     }
 

@@ -67,13 +67,6 @@ internal static class DomainEntityMapper
                     ValueId = selected.ValueId.Value,
                 })
                 .ToList(),
-            SelectionSubmissions = session
-                .Selection.SubmittedBy.Select(participantId => new SelectionSubmissionEntity
-                {
-                    SessionIdentity = identityString,
-                    ParticipantId = participantId.Value.ToString(),
-                })
-                .ToList(),
             TopValues = session
                 .Selection.TopValues.Select(valueId => new TopValueEntity
                 {

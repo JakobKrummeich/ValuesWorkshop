@@ -4,6 +4,8 @@ public sealed class SelectionRound
 {
     public const int ValuesPerSelection = 10;
 
+    private const int TopValueTargetCount = 10;
+
     private readonly List<SelectedValue> selectedValues = [];
     private readonly List<ValueId> topValues = [];
 
@@ -59,6 +61,29 @@ public sealed class SelectionRound
 
         selectedValues.AddRange(
             valueIds.Select(valueId => new SelectedValue(participantId, valueId))
+        );
+    }
+
+    internal void DetermineTopValues(IReadOnlyList<ValueId> catalogOrder)
+    {
+        if (topValues.Count > 0 || selectedValues.Count == 0)
+        {
+            return;
+        }
+
+        var catalogPositions = catalogOrder
+            .Select((valueId, position) => (valueId, position))
+            .ToDictionary(entry => entry.valueId, entry => entry.position);
+
+        var ranked = SelectionTallies
+            .OrderByDescending(tally => tally.Value)
+            .ThenBy(tally => catalogPositions[tally.Key])
+            .ToList();
+
+        var cutoffCount = ranked.Take(TopValueTargetCount).Last().Value;
+
+        topValues.AddRange(
+            ranked.Where(tally => tally.Value >= cutoffCount).Select(tally => tally.Key)
         );
     }
 

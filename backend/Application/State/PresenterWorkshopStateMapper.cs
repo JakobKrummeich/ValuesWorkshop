@@ -47,7 +47,7 @@ public sealed class PresenterWorkshopStateMapper(
                 new PresenterSelectionResultsState(
                     revision,
                     ParticipantCount(session),
-                    SelectionViews.Progress(session, catalogView)
+                    SelectionViews.ProgressWithResults(session, catalogView)
                 ),
             [Phase.GroupFormation] = (session, revision) =>
                 new PresenterGroupFormationState(

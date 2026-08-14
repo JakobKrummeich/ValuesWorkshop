@@ -206,21 +206,6 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.ToTable("quiz_state", (string)null);
                 });
 
-            modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.SelectionSubmissionEntity", b =>
-                {
-                    b.Property<string>("SessionIdentity")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("session_identity");
-
-                    b.Property<string>("ParticipantId")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("participant_id");
-
-                    b.HasKey("SessionIdentity", "ParticipantId");
-
-                    b.ToTable("selection_submissions", (string)null);
-                });
-
             modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.SessionEntity", b =>
                 {
                     b.Property<string>("Identity")
@@ -461,17 +446,6 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.Navigation("Session");
                 });
 
-            modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.SelectionSubmissionEntity", b =>
-                {
-                    b.HasOne("ValuesWorkshop.Adapters.Persistence.Entities.SessionEntity", "Session")
-                        .WithMany("SelectionSubmissions")
-                        .HasForeignKey("SessionIdentity")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Session");
-                });
-
             modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.TopValueEntity", b =>
                 {
                     b.HasOne("ValuesWorkshop.Adapters.Persistence.Entities.SessionEntity", "Session")
@@ -560,8 +534,6 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
 
                     b.Navigation("QuizState")
                         .IsRequired();
-
-                    b.Navigation("SelectionSubmissions");
 
                     b.Navigation("TopValues");
 

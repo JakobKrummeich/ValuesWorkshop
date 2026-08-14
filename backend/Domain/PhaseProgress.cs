@@ -11,7 +11,7 @@ public sealed class PhaseProgress
         if (!HasNextPhase)
         {
             throw new InvariantViolationException(
-                "The workshop is in its last phase; phases move forward only (I1)."
+                "The workshop is in its last phase; phases move forward only."
             );
         }
 

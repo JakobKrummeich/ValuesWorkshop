@@ -128,6 +128,19 @@ public class PresenterWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Selection_results_state_carries_tallies_and_top_values_in_result_order()
+    {
+        var selection = Map(SessionFixtures.InSelectionResults())
+            .ShouldBeOfType<PresenterSelectionResultsState>()
+            .Selection;
+
+        var tallies = selection.SelectionTallies.ShouldNotBeNull();
+        tallies.Count.ShouldBe(4);
+        tallies["wert-9"].ShouldBe(2);
+        selection.TopValueIds.ShouldBe(["wert-5", "wert-2", "wert-9", "wert-1"]);
+    }
+
+    [Fact]
     public void Group_work_state_counts_members_instead_of_identifying_them()
     {
         var session = SessionFixtures.InPhase(

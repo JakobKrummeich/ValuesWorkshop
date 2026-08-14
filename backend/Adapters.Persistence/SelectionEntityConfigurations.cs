@@ -26,24 +26,6 @@ internal sealed class ValueSelectionEntityConfiguration
     }
 }
 
-internal sealed class SelectionSubmissionEntityConfiguration
-    : IEntityTypeConfiguration<SelectionSubmissionEntity>
-{
-    public void Configure(EntityTypeBuilder<SelectionSubmissionEntity> builder)
-    {
-        builder.ToTable("selection_submissions");
-        builder.HasKey(submission => new { submission.SessionIdentity, submission.ParticipantId });
-        builder
-            .Property(submission => submission.SessionIdentity)
-            .HasColumnName("session_identity");
-        builder.Property(submission => submission.ParticipantId).HasColumnName("participant_id");
-        builder
-            .HasOne(submission => submission.Session)
-            .WithMany(session => session.SelectionSubmissions)
-            .HasForeignKey(submission => submission.SessionIdentity);
-    }
-}
-
 internal sealed class TopValueEntityConfiguration : IEntityTypeConfiguration<TopValueEntity>
 {
     public void Configure(EntityTypeBuilder<TopValueEntity> builder)
