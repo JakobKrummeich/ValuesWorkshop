@@ -70,7 +70,7 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
-    public async Task Entering_the_selection_results_fixes_the_top_values_in_catalog_tiebreak_order()
+    public async Task Entering_the_selection_results_fixes_the_top_value_set_widened_by_a_tie()
     {
         var selection = SelectionRound.Restore(
             TestValueIds
@@ -102,7 +102,8 @@ public class FacilitatorIntentHandlerTests
                     new ValueId("wert-11"),
                     new ValueId("wert-12"),
                 ])
-                .ToList()
+                .ToList(),
+            ignoreOrder: true
         );
     }
 
