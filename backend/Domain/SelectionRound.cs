@@ -64,26 +64,20 @@ public sealed class SelectionRound
         );
     }
 
-    internal void DetermineTopValues(IReadOnlyList<ValueId> catalogOrder)
+    internal void DetermineTopValues()
     {
         if (topValues.Count > 0 || selectedValues.Count == 0)
         {
             return;
         }
 
-        var catalogPositions = catalogOrder
-            .Select((valueId, position) => (valueId, position))
-            .ToDictionary(entry => entry.valueId, entry => entry.position);
-
-        var ranked = SelectionTallies
-            .OrderByDescending(tally => tally.Value)
-            .ThenBy(tally => catalogPositions[tally.Key])
-            .ToList();
-
-        var cutoffCount = ranked.Take(TopValueTargetCount).Last().Value;
+        var cutoffCount = SelectionTallies
+            .Values.OrderByDescending(count => count)
+            .Take(TopValueTargetCount)
+            .Last();
 
         topValues.AddRange(
-            ranked.Where(tally => tally.Value >= cutoffCount).Select(tally => tally.Key)
+            SelectionTallies.Where(tally => tally.Value >= cutoffCount).Select(tally => tally.Key)
         );
     }
 

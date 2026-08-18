@@ -49,11 +49,8 @@ public static class TestSessions
         );
     }
 
-    public static void AdvanceToNextPhase(
-        Session session,
-        IReadOnlyList<ValueId>? valueCatalogOrder = null
-    )
+    public static void AdvanceToNextPhase(Session session)
     {
-        session.AdvancePhase(CallerOf(session), PhaseExitGuards.None, valueCatalogOrder ?? []);
+        session.AdvancePhase(CallerOf(session), PhaseExitGuards.None);
     }
 }

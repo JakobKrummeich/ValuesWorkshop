@@ -14,9 +14,14 @@ through phase 4, which completes Checkpoint C (phases 1–4).
 
 ### 1. Domain — DetermineTopValues (I7)
 
+> **Revised by [spec 16a](16a-top-values-responsibility.md):** Domain
+> `DetermineTopValues` now produces an unordered membership set from
+> tallies alone — catalog ordering removed; wire order is Application's
+> responsibility.
+
 - `SelectionRound.DetermineTopValues()` fills the existing `topValues`
-  list from `SelectionTallies`: order by count desc, then catalog/config
-  order for determinism; take 10; widen to include every value tied with
+  list from `SelectionTallies`: ~~order by count desc, then catalog/config
+  order for determinism;~~ take 10; widen to include every value tied with
   the 10th. Zero submissions → empty top values (no guard on 3→4;
   facilitator may advance early — state renders an empty result).
 - Called from `Session.AdvancePhase` on entry into `SelectionResults`

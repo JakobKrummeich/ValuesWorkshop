@@ -154,7 +154,7 @@ public class SessionExitGuardTests
 
     private static void Advance(Session session, PhaseExitGuards? exitGuards = null)
     {
-        session.AdvancePhase(TestSessions.CallerOf(session), exitGuards ?? AllGuards, []);
+        session.AdvancePhase(TestSessions.CallerOf(session), exitGuards ?? AllGuards);
     }
 
     private static void ShouldRefuseToAdvance(Session session, Phase expectedPhase)

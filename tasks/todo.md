@@ -392,9 +392,11 @@ stripped from Domain exception messages.
 - [x] Multi-client e2e extended through phase 4
 **Learnings for Task 17/18:** the fixed top values persist on the session
 (`top_values`, restored by `DomainEntityMapper`) — the solver input for
-phase 5 is already durable; `FacilitatorIntentHandler` now threads the
+phase 5 is already durable; ~~`FacilitatorIntentHandler` now threads the
 values-catalog order into `session.AdvancePhase(caller, exitGuards,
-CatalogValueIds())`, and `DetermineTopValues` runs as a phase-entry hook
+CatalogValueIds())`~~ (revised by spec 16a: catalog threading removed;
+`DetermineTopValues` is parameterless, `AdvancePhase` takes no catalog),
+and `DetermineTopValues` runs as a phase-entry hook
 inside `AdvancePhase` — `FormGroups` on phase-5 entry can follow the same
 pattern; the phase-5 `GroupFormation` states still build their selection
 block with the plain `SelectionViews.Progress` (facilitator/presenter) or
