@@ -81,6 +81,7 @@ concerns):
 | `IFacilitatorPassphrase` | `Application/Ports/Driven/IFacilitatorPassphrase.cs` | `FacilitatorPassphrase` (Host.Auth) |
 | `IQuizCatalog` | `Application/Ports/Driven/IQuizCatalog.cs` | `QuizCatalogFile` (Host) |
 | `IValuesCatalog` | `Application/Ports/Driven/IValuesCatalog.cs` | `ValuesCatalogFile` (Host) |
+| `IGroupSolver` | `Application/Ports/Driven/IGroupSolver.cs` | `CpSatGroupSolver` (Host) |
 
 ### 2.2 Frontend Ports
 
