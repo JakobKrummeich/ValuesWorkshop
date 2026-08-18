@@ -70,6 +70,14 @@ contribute to the objective, so it needs no variable.
 | Value exactly-one | `Σ_g y[v,g] = 1` for every v | each top value dealt to exactly one group |
 | Exact value counts | `Σ_v y[v,g] = valueCount(g)` for every g | sizing rule, value side |
 | Linearization | `z[p,v,g] ≤ x[p,g]` and `z[p,v,g] ≤ y[v,g]` | z can be 1 only if p is in g and g holds v |
+| Participant capacity cut | `Σ_v z[p,v,g] ≤ min(\|sel(p)\|, valueCount(g)) · x[p,g]` for every p, g | redundant, tightens the relaxation: a participant scores nothing in a group they are not in, and never more than that group's value count |
+| Value capacity cut | `Σ_p z[p,v,g] ≤ size(g) · y[v,g]` for every v, g | redundant, tightens the relaxation: a value scores nothing in a group it is not dealt to, and never more than that group's size |
+
+The two capacity-cut families were added during implementation (deviation):
+without them the LP bound stays near the trivial Σ\|sel\| and single-worker
+search cannot close the gap — the adversarial N=30 benchmark stayed unproven
+after 30 s. With the cuts plus `linearization_level:2` the same instance is
+proven optimal in under one second.
 
 The ≥ side of the linearization (`z ≥ x + y − 1`) is deliberately absent.
 `z` appears only with positive coefficient in a maximization objective, so
@@ -99,10 +107,23 @@ tests. Three ingredients:
   runs.
 - `random_seed` fixed, `num_search_workers = 1` — a single worker removes
   the nondeterminism of parallel portfolio search.
-- `max_time_in_seconds = 3` wall cap; the best incumbent found by then is
-  returned (status `OPTIMAL` or `FEASIBLE`). At workshop scale (N ≤ ~30,
-  V ≈ 10) CP-SAT proves optimality well inside the cap; the cap is a
-  safety net, not a tuning knob.
+- `linearization_level = 2` (deviation from the default): the LP relaxation
+  carries this model; with the default level the single worker wanders.
+- `max_deterministic_time = 1.5` is the primary cap (deviation): it counts
+  solver work units, not wall time, so the interruption point — and with it
+  the returned incumbent — is reproducible across runs. A wall cap that
+  fires mid-search would return whatever incumbent the clock happened to
+  land on.
+- `max_time_in_seconds = 2.5` stays as the wall-clock safety net under the
+  spec's 3 s budget, for machines where 1.5 deterministic units run slower
+  than wall 2.5 s; only there can the returned incumbent vary by machine.
+- Optimality at workshop scale, measured (deviation from the original
+  claim): dense structured instances (hand-worked N=8, disjoint-interest
+  N=9, saturated N=30 with 6 selections in the top set) are proven
+  `OPTIMAL` in well under a second. Sparse adversarial N=30 instances
+  (3 selections each) exhaust the deterministic budget and return their
+  best incumbent as `FEASIBLE` — a valid partition, a few points under the
+  proven optimum (39 vs 42 on the benchmark), still inside 3 s wall.
 
 ## 7. Symmetry
 
@@ -115,7 +136,9 @@ kept at default). Decision recorded per spec 17 review.
 Fallback, documented only in case solve times ever demand it: manual
 lexicographic label ordering — for each pair of adjacent equal-sized groups,
 constrain the lowest participant index in group g to be smaller than the
-lowest in group g+1.
+lowest in group g+1. Measured during implementation: this fallback made
+every benchmark slower (the cyclic N=30 proof went from 1.0 s to 2.1 s), so
+it stays out.
 
 ## 8. Hand-worked example — N=8, V=6
 
