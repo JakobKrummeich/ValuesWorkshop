@@ -57,9 +57,13 @@ screens (all Task 18).
   the library, so swapping solvers means one new class behind the same
   port. An architecture test (or lint gate) asserts the single-file
   import rule.
-- Determinism: fixed random seed, `num_search_workers = 1`, 3 s wall
-  time cap, best incumbent returned. Selections outside the top set are
-  ignored (they can never score).
+- Determinism: fixed random seed, `num_search_workers = 1`, best
+  incumbent returned. Capping (measured during implementation, details
+  in cpsat-model.md): `max_deterministic_time = 1.5` as the primary,
+  reproducible cap + 2.5 s wall safety net — total stays inside the
+  3 s budget; two redundant capacity cuts + `linearization_level = 2`
+  make dense N=30 instances prove optimality in ~1 s. Selections
+  outside the top set are ignored (they can never score).
 - Edges: N < 8 → G = 1, trivial single group (still through the same
   code path); N = 0 or V = 0 → empty/degenerate result without
   crashing (Task 18 decides what reaches users).
