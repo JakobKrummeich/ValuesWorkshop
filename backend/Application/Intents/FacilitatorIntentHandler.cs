@@ -6,8 +6,7 @@ namespace ValuesWorkshop.Application.Intents;
 public sealed class FacilitatorIntentHandler(
     IntentPipeline pipeline,
     PhaseExitGuards exitGuards,
-    IQuizCatalog quizCatalog,
-    IValuesCatalog valuesCatalog
+    IQuizCatalog quizCatalog
 )
 {
     public Task<IntentResult> HandleAsync(AdvancePhaseCommand command)
@@ -16,15 +15,10 @@ public sealed class FacilitatorIntentHandler(
             command.SessionIdentity,
             session =>
             {
-                session.AdvancePhase(command.Caller, exitGuards, CatalogValueIds());
+                session.AdvancePhase(command.Caller, exitGuards);
                 return true;
             }
         );
-    }
-
-    private IReadOnlyList<ValueId> CatalogValueIds()
-    {
-        return valuesCatalog.Values.Select(value => new ValueId(value.ValueId)).ToList();
     }
 
     public Task<IntentResult> HandleAsync(RevealAnswerCommand command)

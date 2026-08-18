@@ -6,8 +6,9 @@ public class SessionDetermineTopValuesTests
     private static readonly ParticipantId Ben = new(Guid.NewGuid());
     private static readonly ParticipantId Chris = new(Guid.NewGuid());
 
-    private static readonly IReadOnlyList<ValueId> CatalogOrder = TestValueIds.Numbered(1, 12);
-    private static readonly IReadOnlySet<ValueId> ValidValueIds = CatalogOrder.ToHashSet();
+    private static readonly IReadOnlySet<ValueId> ValidValueIds = TestValueIds
+        .Numbered(1, 12)
+        .ToHashSet();
 
     [Fact]
     public void Entering_the_results_phase_fixes_the_ten_most_selected_values()
@@ -17,7 +18,7 @@ public class SessionDetermineTopValuesTests
         session.SubmitValueSelection(Ben, TestValueIds.Numbered(3, 10), ValidValueIds);
         session.SubmitValueSelection(Chris, TestValueIds.Numbered(3, 10), ValidValueIds);
 
-        TestSessions.AdvanceToNextPhase(session, CatalogOrder);
+        TestSessions.AdvanceToNextPhase(session);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         session.Selection.TopValues.ShouldBe(TestValueIds.Numbered(3, 10), ignoreOrder: true);
@@ -30,7 +31,7 @@ public class SessionDetermineTopValuesTests
         session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, 10), ValidValueIds);
         session.SubmitValueSelection(Ben, TestValueIds.Numbered(3, 10), ValidValueIds);
 
-        TestSessions.AdvanceToNextPhase(session, CatalogOrder);
+        TestSessions.AdvanceToNextPhase(session);
 
         session.Selection.TopValues.ShouldBe(
             TestValueIds
@@ -59,7 +60,7 @@ public class SessionDetermineTopValuesTests
             selection: selection
         );
 
-        TestSessions.AdvanceToNextPhase(session, CatalogOrder);
+        TestSessions.AdvanceToNextPhase(session);
 
         session.Selection.TopValues.ShouldBe(TestValueIds.Numbered(1, 3), ignoreOrder: true);
     }
@@ -69,7 +70,7 @@ public class SessionDetermineTopValuesTests
     {
         var session = SelectionSessionWith();
 
-        TestSessions.AdvanceToNextPhase(session, CatalogOrder);
+        TestSessions.AdvanceToNextPhase(session);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         session.Selection.TopValues.ShouldBeEmpty();
@@ -89,7 +90,7 @@ public class SessionDetermineTopValuesTests
             selection: selection
         );
 
-        TestSessions.AdvanceToNextPhase(session, CatalogOrder);
+        TestSessions.AdvanceToNextPhase(session);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         session.Selection.TopValues.ShouldBe(restoredTopValues);

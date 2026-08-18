@@ -86,7 +86,7 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         TestSessions.AdvanceToNextPhase(session);
         session.SubmitValueSelection(anna, TestValueIds.Numbered(1, 10), ValidValueIds);
         session.SubmitValueSelection(ben, TestValueIds.Numbered(3, 10), ValidValueIds);
-        TestSessions.AdvanceToNextPhase(session, TestValueIds.Numbered(1, 12));
+        TestSessions.AdvanceToNextPhase(session);
         session.Selection.TopValues.Count.ShouldBe(12);
 
         await CreateSession(session);
