@@ -12,20 +12,31 @@ public class ArchitectureTests
     public void Only_the_CpSat_adapter_references_OrTools()
     {
         var orToolsNamespace = string.Join('.', "Google", "OrTools");
-        var filesReferencingOrTools = Directory
-            .EnumerateFiles(BackendSourceRoot(), "*.cs", SearchOption.AllDirectories)
+        var backendSourceRoot = BackendSourceRoot();
+        var filesReferencingOrTools = BackendSourceFiles(backendSourceRoot, "*.cs")
+            .Concat(BackendSourceFiles(backendSourceRoot, "*.csproj"))
+            .Where(path => File.ReadAllText(path).Contains(orToolsNamespace))
+            .Select(Path.GetFileName)
+            .ToList();
+
+        filesReferencingOrTools.ShouldBe(
+            ["CpSatGroupSolver.cs", "ValuesWorkshop.Host.csproj"],
+            ignoreOrder: true
+        );
+    }
+
+    private static IEnumerable<string> BackendSourceFiles(
+        string sourceRoot,
+        string searchPattern
+    ) =>
+        Directory
+            .EnumerateFiles(sourceRoot, searchPattern, SearchOption.AllDirectories)
             .Where(path =>
                 !path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}")
             )
             .Where(path =>
                 !path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")
-            )
-            .Where(path => File.ReadAllText(path).Contains(orToolsNamespace))
-            .Select(Path.GetFileName)
-            .ToList();
-
-        filesReferencingOrTools.ShouldBe(["CpSatGroupSolver.cs"]);
-    }
+            );
 
     private static string BackendSourceRoot()
     {
