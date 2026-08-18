@@ -19,7 +19,10 @@ public sealed class CpSatGroupSolverTests
         result.Groups.Select(group => group.AssignedValues.Count).ShouldBe([2, 2, 2, 1, 1, 1, 1]);
         result
             .Groups.SelectMany(group => group.Members)
-            .ShouldBe(request.Participants.Select(p => p.ParticipantId), ignoreOrder: true);
+            .ShouldBe(
+                request.Participants.Select(participant => participant.ParticipantId),
+                ignoreOrder: true
+            );
         result
             .Groups.SelectMany(group => group.AssignedValues)
             .ShouldBe(request.TopValues, ignoreOrder: true);

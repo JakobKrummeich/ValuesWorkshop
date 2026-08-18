@@ -19,10 +19,16 @@ public sealed class CpSatGroupSolver : IGroupSolver
         var model = new CpModel();
         var participantInGroup = AddExactAssignments(
             model,
+            "participant",
             request.Participants.Count,
             memberCounts
         );
-        var valueInGroup = AddExactAssignments(model, request.TopValues.Count, valueCounts);
+        var valueInGroup = AddExactAssignments(
+            model,
+            "value",
+            request.TopValues.Count,
+            valueCounts
+        );
         AddOverlapMaximization(
             model,
             SelectedValueIndices(request),
@@ -46,6 +52,7 @@ public sealed class CpSatGroupSolver : IGroupSolver
 
     private static BoolVar[,] AddExactAssignments(
         CpModel model,
+        string itemLabel,
         int itemCount,
         IReadOnlyList<int> countsPerGroup
     )
@@ -57,7 +64,7 @@ public sealed class CpSatGroupSolver : IGroupSolver
         {
             for (var group = 0; group < groupCount; group++)
             {
-                itemInGroup[item, group] = model.NewBoolVar($"item{item}_group{group}");
+                itemInGroup[item, group] = model.NewBoolVar($"{itemLabel}{item}_group{group}");
             }
             model.AddExactlyOne(
                 Enumerable.Range(0, groupCount).Select(group => itemInGroup[item, group]).ToArray()
