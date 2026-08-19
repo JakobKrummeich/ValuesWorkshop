@@ -54,12 +54,14 @@ export const rosterViewSchema = z.object({
   participantCount: z.int(),
 });
 
-const workshopValuesSchema = z.array(
-  z.object({
-    valueId: z.string(),
-    text: localizedTextSchema,
-  }),
-);
+const workshopValueSchema = z.object({
+  valueId: z.string(),
+  text: localizedTextSchema,
+});
+
+const workshopValuesSchema = z.array(workshopValueSchema);
+
+export type WorkshopValue = z.infer<typeof workshopValueSchema>;
 
 const selectionTalliesSchema = z.record(z.string(), z.int());
 
@@ -82,6 +84,8 @@ const groupNameSchema = z.object({
   animalId: z.string(),
   text: localizedTextSchema,
 });
+
+export type GroupName = z.infer<typeof groupNameSchema>;
 
 export const ownGroupViewSchema = z.object({
   name: groupNameSchema,
