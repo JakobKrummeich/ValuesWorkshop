@@ -62,15 +62,18 @@ layer** (not in a separate layer), and are implemented by adapters.
 
 ### 2.1 Backend Ports
 
-Port interfaces live in `ValuesWorkshop.Domain/Ports/`. Adapters implement
-them. Application layer references port interfaces from Domain to orchestrate
-use cases.
+Domain port interfaces live in `ValuesWorkshop.Domain/Ports/` or in the
+Domain root namespace (`ValuesWorkshop.Domain`) when they are passed into
+aggregate methods and a `Domain.Ports` sub-namespace would create a cycle
+under the ArchUnit slice rule (`IRandomness` precedent).
 
-Current ports:
+Current Domain ports:
 
 | Interface | File | Implemented by |
 |---|---|---|
 | `ISessionRepository` | `Domain/Ports/ISessionRepository.cs` | `SqliteSessionRepository` (Adapters.Persistence) |
+| `IGroupSolver` | `Domain/IGroupSolver.cs` | `CpSatGroupSolver` (Host) |
+| `IAnimalNames` | `Domain/IAnimalNames.cs` | `AnimalsCatalogFile` (Host) |
 
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):
@@ -81,7 +84,7 @@ concerns):
 | `IFacilitatorPassphrase` | `Application/Ports/Driven/IFacilitatorPassphrase.cs` | `FacilitatorPassphrase` (Host.Auth) |
 | `IQuizCatalog` | `Application/Ports/Driven/IQuizCatalog.cs` | `QuizCatalogFile` (Host) |
 | `IValuesCatalog` | `Application/Ports/Driven/IValuesCatalog.cs` | `ValuesCatalogFile` (Host) |
-| `IGroupSolver` | `Application/Ports/Driven/IGroupSolver.cs` | `CpSatGroupSolver` (Host) |
+| `IAnimalsCatalog` | `Application/Ports/Driven/IAnimalsCatalog.cs` | `AnimalsCatalogFile` (Host) |
 
 ### 2.2 Frontend Ports
 
