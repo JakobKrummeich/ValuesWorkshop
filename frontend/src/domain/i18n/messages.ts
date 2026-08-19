@@ -281,6 +281,10 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
     [Language.German]: "Schaut auf die Präsentationswand",
     [Language.English]: "Look at the presenter wall",
   },
+  [MessageKey.GroupFormationWaitingForGroup]: {
+    [Language.German]: "Deine Gruppe wird gerade gebildet\u2026",
+    [Language.English]: "Your group is being formed\u2026",
+  },
   [MessageKey.FacilitatorHeading]: {
     [Language.German]: "Moderation",
     [Language.English]: "Facilitator",
