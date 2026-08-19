@@ -429,15 +429,41 @@ best incumbent; no manual symmetry breaking (CP-SAT auto).
 **Verification:** `dotnet test backend` (solver suite).
 **Dependencies:** 3 (OR-Tools in image), 7. **Size:** M
 
-### Task 18: Phase 5 — Group selection
-**Description:** On phase entry, run solver over survivors from Phase 4;
-assign animal-name labels; show groups + assigned values on all screens;
-persist assignment.
+### Task 18: Phase 5 — Group formation ✅
+**Spec:** `tasks/specs/18-group-formation.md` (approved via Lavish).
+**Description:** Entering phase 5 forms the groups as a Domain procedure:
+`Session.AdvancePhase(caller, exitGuards, groupSolver, animalNames)` builds
+the solver request from its own state (full roster, per-participant submitted
+selections, fixed top values), calls the CP-SAT solver through the Domain
+ports `IGroupSolver`/`IAnimalNames` (Domain ROOT namespace, `IRandomness`
+precedent — `Domain.Ports` would cycle with `Domain` under the ArchUnit
+slice rule), and creates `Group` aggregates named by `config/animals.json`
+order (host loader `AnimalsCatalogFile`, fail-fast validation). I8: formation
+is idempotent, restore never re-forms, restart keeps identical groups; late
+joiners from phase 5 on land in the smallest group, values untouched. Views:
+participant own-group card (animal name, members top-left, value chips
+bottom-right, no labels/icon), facilitator all-groups list, presenter 3×2
+cards cycling every 7 s (static single page when all fit); the animal name
+rides the wire as id + `{de,en}` text. Scribe/work-status fields were removed
+from the shipped view records (not null-carried) — protocol §5 documents them
+as absent until T19/T20.
 **Acceptance criteria:**
-- [ ] Assignment persisted; restart keeps identical groups
-- [ ] Each participant sees own group + its values
-- [ ] Multi-client e2e extended through phase 5
-**Verification:** BE integration test; Playwright group display check.
+- [x] Assignment persisted; restart keeps identical groups
+- [x] Each participant sees own group + its values
+- [x] Multi-client e2e extended through phase 5
+**Learnings for Task 19:** the `Group` aggregate already carries
+`Scribe`/`IsSubmitted` restore-only fields (`Group.Restore`) awaiting
+behavior; `AppointScribes` fires on P5→6 entry — the `AdvancePhase`
+double-dispatch port pattern (`groupSolver`/`animalNames` passed at the point
+of use, `IRandomness` already in the Domain root) is the template; the group
+child tables (`group_members`, `group_assigned_values`, `group_actions`)
+carry `sort_order` columns, so ordering is durable; the wire group blocks
+(`ownGroup`, facilitator/presenter `groups`) are shared across phases 5/6/7
+— Task 19 re-adds scribe/work-status there as optionals (protocol §5 already
+documents the shapes); the full-session load now runs with `AsSplitQuery`
+(`SqliteSessionRepository`).
+**Verification:** BE formation/round-trip/late-join suites; Playwright
+phases 1–5.
 **Dependencies:** 16, 17. **Size:** M
 
 ### Task 19: Group work backend
