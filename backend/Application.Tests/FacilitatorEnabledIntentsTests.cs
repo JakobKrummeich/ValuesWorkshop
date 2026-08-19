@@ -81,9 +81,9 @@ public class FacilitatorEnabledIntentsTests
                 true,
                 [
                     Group.Restore(
-                        "fox",
+                        "tier-1",
                         [SessionFixtures.Anna],
-                        [new ValueId("honesty")],
+                        [new ValueId("wert-1")],
                         SessionFixtures.Anna,
                         true
                     ),
@@ -109,6 +109,7 @@ public class FacilitatorEnabledIntentsTests
         return new FacilitatorWorkshopStateMapper(
             catalog,
             new TestValuesCatalog(50),
+            new TestAnimalsCatalog(8),
             RegisteredExitGuards.For(catalog)
         ).Map(session, 1);
     }

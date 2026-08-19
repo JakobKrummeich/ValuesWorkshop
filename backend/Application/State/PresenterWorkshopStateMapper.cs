@@ -5,13 +5,18 @@ namespace ValuesWorkshop.Application.State;
 
 public sealed class PresenterWorkshopStateMapper(
     IQuizCatalog quizCatalog,
-    IValuesCatalog valuesCatalog
+    IValuesCatalog valuesCatalog,
+    IAnimalsCatalog animalsCatalogPort
 )
 {
     private readonly IReadOnlyDictionary<
         Phase,
         Func<Session, long, PresenterWorkshopState>
-    > stateOfPhase = BuildStateMap(quizCatalog, SelectionViews.CatalogOf(valuesCatalog));
+    > stateOfPhase = BuildStateMap(
+        quizCatalog,
+        SelectionViews.CatalogOf(valuesCatalog),
+        new GroupViews(animalsCatalogPort, valuesCatalog)
+    );
 
     public PresenterWorkshopState Map(Session session, long revision)
     {
@@ -21,7 +26,11 @@ public sealed class PresenterWorkshopStateMapper(
     private static IReadOnlyDictionary<
         Phase,
         Func<Session, long, PresenterWorkshopState>
-    > BuildStateMap(IQuizCatalog quizCatalog, IReadOnlyList<WorkshopValueView> catalogView)
+    > BuildStateMap(
+        IQuizCatalog quizCatalog,
+        IReadOnlyList<WorkshopValueView> catalogView,
+        GroupViews groupViews
+    )
     {
         return new Dictionary<Phase, Func<Session, long, PresenterWorkshopState>>
         {
@@ -54,15 +63,19 @@ public sealed class PresenterWorkshopStateMapper(
                     revision,
                     ParticipantCount(session),
                     SelectionViews.Progress(session, catalogView),
-                    Groups(session)
+                    Groups(session, groupViews)
                 ),
             [Phase.GroupWork] = (session, revision) =>
-                new PresenterGroupWorkState(revision, ParticipantCount(session), Groups(session)),
+                new PresenterGroupWorkState(
+                    revision,
+                    ParticipantCount(session),
+                    Groups(session, groupViews)
+                ),
             [Phase.ValuePresentation] = (session, revision) =>
                 new PresenterValuePresentationState(
                     revision,
                     ParticipantCount(session),
-                    Groups(session),
+                    Groups(session, groupViews),
                     new PresenterPresentationView(SessionViews.PresentedValueId(session))
                 ),
             [Phase.FinalVoting] = (session, revision) =>
@@ -85,15 +98,14 @@ public sealed class PresenterWorkshopStateMapper(
         return session.Roster.Participants.Count;
     }
 
-    private static IReadOnlyList<PresenterGroupView> Groups(Session session)
+    private static IReadOnlyList<PresenterGroupView> Groups(Session session, GroupViews groupViews)
     {
         return SessionViews
             .Groups(session)
             .Select(group => new PresenterGroupView(
-                group.Name,
-                group.Members.Count,
-                SessionViews.ValueIdsOf(group.AssignedValues),
-                SessionViews.WorkStatusOf(group)
+                groupViews.NameOf(group),
+                groupViews.MemberDisplayNamesOf(group, session),
+                groupViews.AssignedValuesOf(group)
             ))
             .ToList();
     }

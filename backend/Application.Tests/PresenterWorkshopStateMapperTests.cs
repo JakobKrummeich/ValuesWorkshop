@@ -141,21 +141,47 @@ public class PresenterWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Group_work_state_counts_members_instead_of_identifying_them()
+    public void Groups_carry_animal_names_member_names_and_value_texts()
     {
         var session = SessionFixtures.InPhase(
-            Phase.GroupWork,
+            Phase.GroupFormation,
             formation: SessionFixtures.TwoGroups()
         );
 
-        var groups = Map(session).ShouldBeOfType<PresenterGroupWorkState>().Groups;
+        var state = Map(session).ShouldBeOfType<PresenterGroupFormationState>();
 
-        groups.Count.ShouldBe(2);
-        groups[0].Name.ShouldBe("fox");
-        groups[0].MemberCount.ShouldBe(2);
-        groups[0].AssignedValueIds.ShouldBe(["honesty"]);
-        groups[0].WorkStatus.ShouldBe(GroupWorkStatus.Editing);
-        groups[1].WorkStatus.ShouldBe(GroupWorkStatus.Submitted);
+        state.Groups.Count.ShouldBe(2);
+        state
+            .Groups[0]
+            .Name.ShouldBe(
+                new GroupNameView("tier-1", new LocalizedTextView("Tier 1", "Animal 1"))
+            );
+        state.Groups[0].MemberDisplayNames.ShouldBe(["Ben", "Anna Schmidt"]);
+        state
+            .Groups[0]
+            .AssignedValues.ShouldBe([
+                new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")),
+            ]);
+        state.Groups[1].MemberDisplayNames.ShouldBe(["#c3c3c3"]);
+        state.Selection.SelectionTallies.ShouldBeNull();
+    }
+
+    [Fact]
+    public void A_group_without_members_still_carries_its_name_and_values()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupFormation,
+            formation: FormationRecord.Restore(
+                true,
+                [Group.Restore("tier-1", [], [new ValueId("wert-1")], null, false)]
+            )
+        );
+
+        var groups = Map(session).ShouldBeOfType<PresenterGroupFormationState>().Groups;
+
+        groups.Count.ShouldBe(1);
+        groups[0].MemberDisplayNames.ShouldBeEmpty();
+        groups[0].Name.AnimalId.ShouldBe("tier-1");
     }
 
     [Fact]
@@ -207,7 +233,8 @@ public class PresenterWorkshopStateMapperTests
     {
         return new PresenterWorkshopStateMapper(
             new TestQuizCatalog(5),
-            new TestValuesCatalog(50)
+            new TestValuesCatalog(50),
+            new TestAnimalsCatalog(8)
         ).Map(session, revision);
     }
 }

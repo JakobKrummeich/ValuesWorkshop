@@ -6,6 +6,7 @@ namespace ValuesWorkshop.Application.State;
 public sealed class FacilitatorWorkshopStateMapper(
     IQuizCatalog quizCatalog,
     IValuesCatalog valuesCatalog,
+    IAnimalsCatalog animalsCatalogPort,
     PhaseExitGuards exitGuards
 )
 {
@@ -17,7 +18,8 @@ public sealed class FacilitatorWorkshopStateMapper(
 
     private readonly IReadOnlyDictionary<Phase, StateFactory> stateOfPhase = BuildStateMap(
         quizCatalog,
-        SelectionViews.CatalogOf(valuesCatalog)
+        SelectionViews.CatalogOf(valuesCatalog),
+        new GroupViews(animalsCatalogPort, valuesCatalog)
     );
 
     public FacilitatorWorkshopState Map(Session session, long revision)
@@ -33,7 +35,8 @@ public sealed class FacilitatorWorkshopStateMapper(
 
     private static IReadOnlyDictionary<Phase, StateFactory> BuildStateMap(
         IQuizCatalog quizCatalog,
-        IReadOnlyList<WorkshopValueView> catalogView
+        IReadOnlyList<WorkshopValueView> catalogView,
+        GroupViews groupViews
     )
     {
         return new Dictionary<Phase, StateFactory>
@@ -67,21 +70,21 @@ public sealed class FacilitatorWorkshopStateMapper(
                     SessionViews.Roster(session),
                     enabledIntents,
                     SelectionViews.Progress(session, catalogView),
-                    Groups(session)
+                    Groups(session, groupViews)
                 ),
             [Phase.GroupWork] = (session, revision, enabledIntents) =>
                 new FacilitatorGroupWorkState(
                     revision,
                     SessionViews.Roster(session),
                     enabledIntents,
-                    Groups(session)
+                    Groups(session, groupViews)
                 ),
             [Phase.ValuePresentation] = (session, revision, enabledIntents) =>
                 new FacilitatorValuePresentationState(
                     revision,
                     SessionViews.Roster(session),
                     enabledIntents,
-                    Groups(session),
+                    Groups(session, groupViews),
                     SessionViews.Presentation(session)
                 ),
             [Phase.FinalVoting] = (session, revision, enabledIntents) =>
@@ -101,16 +104,17 @@ public sealed class FacilitatorWorkshopStateMapper(
         };
     }
 
-    private static IReadOnlyList<FacilitatorGroupView> Groups(Session session)
+    private static IReadOnlyList<FacilitatorGroupView> Groups(
+        Session session,
+        GroupViews groupViews
+    )
     {
         return SessionViews
             .Groups(session)
             .Select(group => new FacilitatorGroupView(
-                group.Name,
-                group.Members.Select(member => member.Value).ToList(),
-                SessionViews.ValueIdsOf(group.AssignedValues),
-                group.Scribe?.Value,
-                SessionViews.WorkStatusOf(group)
+                groupViews.NameOf(group),
+                groupViews.MembersOf(group, session),
+                groupViews.AssignedValuesOf(group)
             ))
             .ToList();
     }

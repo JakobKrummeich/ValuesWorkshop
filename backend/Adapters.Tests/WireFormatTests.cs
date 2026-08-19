@@ -13,18 +13,22 @@ public class WireFormatTests
 {
     private static readonly TestQuizCatalog Catalog = new(5);
     private static readonly TestValuesCatalog ValuesCatalog = new(50);
+    private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
     private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(
         Catalog,
         ValuesCatalog,
+        AnimalsCatalog,
         RegisteredExitGuards.For(Catalog)
     );
     private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(
         Catalog,
-        ValuesCatalog
+        ValuesCatalog,
+        AnimalsCatalog
     );
     private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(
         Catalog,
-        ValuesCatalog
+        ValuesCatalog,
+        AnimalsCatalog
     );
 
     [Fact]
