@@ -74,6 +74,15 @@
   --color-on-primary: var(--base-white);
   --color-scrim: var(--base-scrim);
 
+  --color-value-accent-1: var(--base-green-700);
+  --color-value-accent-1-soft: var(--base-green-100);
+  --color-value-accent-2: var(--base-amber-700);
+  --color-value-accent-2-soft: var(--base-amber-100);
+  --color-value-accent-3: var(--base-red-700);
+  --color-value-accent-3-soft: var(--base-red-100);
+  --color-value-accent-4: var(--base-gray-700);
+  --color-value-accent-4-soft: var(--base-gray-300);
+
   --font-sans: var(--base-font-sans);
   --weight-regular: var(--base-weight-regular);
   --weight-bold: var(--base-weight-bold);
