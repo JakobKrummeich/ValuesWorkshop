@@ -1,4 +1,4 @@
-export const groupPageCapacity = 6;
+const groupPageCapacity = 6;
 
 export function splitIntoGroupPages<TGroup>(
   groups: readonly TGroup[],

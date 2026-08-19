@@ -30,5 +30,7 @@ export function usePresenterGroupFormationScreen(
     return () => clearInterval(pageTimer);
   }, [pageCount]);
 
-  return { currentPageGroups: pages[pageIndex % pageCount] ?? [] };
+  return {
+    currentPageGroups: pageCount === 0 ? [] : pages[pageIndex % pageCount],
+  };
 }
