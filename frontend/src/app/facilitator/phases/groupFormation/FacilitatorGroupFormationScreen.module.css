@@ -1,0 +1,14 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-gutter);
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
