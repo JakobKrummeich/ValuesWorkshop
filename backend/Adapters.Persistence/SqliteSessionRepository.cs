@@ -183,7 +183,8 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
                 .ThenInclude(groupEntity => groupEntity.Actions)
             .Include(sessionEntity => sessionEntity.VoteTallies)
             .Include(sessionEntity => sessionEntity.VotedParticipants)
-            .Include(sessionEntity => sessionEntity.WinningValues);
+            .Include(sessionEntity => sessionEntity.WinningValues)
+            .AsSplitQuery();
     }
 
     private void RemoveExistingChildren(Persistence.Entities.SessionEntity entity)

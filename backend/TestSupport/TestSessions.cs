@@ -31,28 +31,22 @@ public static class TestSessions
         FormationRecord? formation = null,
         PresentationWalk? presentation = null,
         VotingRounds? voting = null,
-        long revision = 0,
-        Roster? roster = null
+        long revision = 0
     )
     {
         return Session.Restore(
             identity,
             Facilitator,
             Name,
-            roster ?? Roster.Restore([]),
+            Roster.Restore([]),
             PhaseProgress.Restore(phase),
-            quiz ?? DefaultQuiz(phase),
+            quiz ?? QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []),
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),
             voting ?? VotingRounds.Restore(false, 0, []),
             revision
         );
-    }
-
-    private static QuizProgress DefaultQuiz(Phase phase)
-    {
-        return QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []);
     }
 
     public static void AdvanceToNextPhase(Session session)

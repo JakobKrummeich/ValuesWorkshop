@@ -184,12 +184,14 @@ CREATE TABLE groups (
 CREATE TABLE group_members (
     group_id       INTEGER NOT NULL REFERENCES groups(id),
     participant_id TEXT    NOT NULL REFERENCES participants(id),
+    sort_order     INTEGER NOT NULL,
     PRIMARY KEY (group_id, participant_id)
 );
 
 CREATE TABLE group_assigned_values (
-    group_id INTEGER NOT NULL REFERENCES groups(id),
-    value_id TEXT    NOT NULL,
+    group_id   INTEGER NOT NULL REFERENCES groups(id),
+    value_id   TEXT    NOT NULL,
+    sort_order INTEGER NOT NULL,
     PRIMARY KEY (group_id, value_id)
 );
 

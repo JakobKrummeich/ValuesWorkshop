@@ -4,6 +4,7 @@ public sealed class GroupAssignedValueEntity
 {
     public int GroupId { get; set; }
     public string ValueId { get; set; } = "";
+    public int SortOrder { get; set; }
 
     public GroupEntity Group { get; set; } = null!;
 }
