@@ -463,6 +463,7 @@ carry `sort_order` columns, so ordering is durable; the wire group blocks
 (`ownGroup`, facilitator/presenter `groups`) are shared across phases 5/6/7
 — Task 19 re-adds scribe/work-status there as optionals (protocol §5 already
 documents the shapes); the full-session load now runs with `AsSplitQuery`
+inside a transaction so the split reads see one snapshot
 (`SqliteSessionRepository`).
 **Verification:** BE formation/round-trip/late-join suites; Playwright
 phases 1–5.
