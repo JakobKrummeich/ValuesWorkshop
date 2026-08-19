@@ -66,7 +66,12 @@ public sealed class Session
         return true;
     }
 
-    public void AdvancePhase(CallerSubject caller, PhaseExitGuards exitGuards)
+    public void AdvancePhase(
+        CallerSubject caller,
+        PhaseExitGuards exitGuards,
+        IGroupSolver groupSolverPort,
+        IAnimalNames animalNamesPort
+    )
     {
         RequireFacilitator(caller, "Only the facilitator of this session may advance the phase.");
 
@@ -83,6 +88,32 @@ public sealed class Session
         {
             Selection.DetermineTopValues();
         }
+
+        if (PhaseProgress.CurrentPhase == Phase.GroupFormation)
+        {
+            FormGroups(groupSolverPort, animalNamesPort);
+        }
+    }
+
+    private void FormGroups(IGroupSolver groupSolverPort, IAnimalNames animalNamesPort)
+    {
+        if (Formation.IsFormed)
+        {
+            return;
+        }
+
+        var participants = Roster
+            .Participants.Select(participant => new ParticipantSelection(
+                participant.Id,
+                Selection.SelectedValuesOf(participant.Id)
+            ))
+            .ToList();
+
+        var formationResult = groupSolverPort.Solve(
+            new GroupFormationRequest(participants, Selection.TopValues)
+        );
+
+        Formation.Form(formationResult, animalNamesPort);
     }
 
     public void RevealAnswer(CallerSubject caller)

@@ -31,16 +31,17 @@ public static class TestSessions
         FormationRecord? formation = null,
         PresentationWalk? presentation = null,
         VotingRounds? voting = null,
-        long revision = 0
+        long revision = 0,
+        Roster? roster = null
     )
     {
         return Session.Restore(
             identity,
             Facilitator,
             Name,
-            Roster.Restore([]),
+            roster ?? Roster.Restore([]),
             PhaseProgress.Restore(phase),
-            quiz ?? QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []),
+            quiz ?? DefaultQuiz(phase),
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),
@@ -49,8 +50,18 @@ public static class TestSessions
         );
     }
 
+    private static QuizProgress DefaultQuiz(Phase phase)
+    {
+        return QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []);
+    }
+
     public static void AdvanceToNextPhase(Session session)
     {
-        session.AdvancePhase(CallerOf(session), PhaseExitGuards.None);
+        session.AdvancePhase(
+            CallerOf(session),
+            PhaseExitGuards.None,
+            new TestGroupSolver(),
+            new TestAnimalNames(8)
+        );
     }
 }

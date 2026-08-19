@@ -11,7 +11,7 @@ public class SessionQuizWalkTests
     {
         var session = TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Join);
 
-        session.AdvancePhase(TestSessions.CallerOf(session), PhaseExitGuards.None);
+        TestSessions.AdvanceToNextPhase(session);
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(0);
         session.Quiz.IsRevealed.ShouldBeFalse();

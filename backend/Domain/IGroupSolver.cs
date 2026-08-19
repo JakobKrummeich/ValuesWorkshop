@@ -1,4 +1,4 @@
-namespace ValuesWorkshop.Domain.Ports;
+namespace ValuesWorkshop.Domain;
 
 public interface IGroupSolver
 {

@@ -18,6 +18,12 @@ public sealed class SelectionRound
     public int SubmittedCount =>
         selectedValues.Select(selected => selected.ParticipantId).Distinct().Count();
 
+    public IReadOnlyList<ValueId> SelectedValuesOf(ParticipantId participantId) =>
+        selectedValues
+            .Where(selected => selected.ParticipantId == participantId)
+            .Select(selected => selected.ValueId)
+            .ToList();
+
     public bool HasSubmitted(ParticipantId participantId) =>
         selectedValues.Any(selected => selected.ParticipantId == participantId);
 

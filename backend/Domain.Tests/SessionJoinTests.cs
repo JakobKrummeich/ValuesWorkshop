@@ -99,6 +99,27 @@ public class SessionJoinTests
     }
 
     [Fact]
+    public void Placing_a_late_joiner_never_re_deals_the_assigned_values()
+    {
+        var session = SessionInPhase(
+            Phase.GroupWork,
+            FormationRecord.Restore(
+                true,
+                [
+                    Group.Restore("fox", [Anna, Chris], [new ValueId("wert-1")], Anna, false),
+                    Group.Restore("owl", [Ben], [new ValueId("wert-2")], Ben, false),
+                ]
+            )
+        );
+
+        session.Join(TestParticipants.Named(Latecomer, "Late Lucy"), Randomness.Fixed(0));
+
+        GroupNamed(session, "fox").AssignedValues.ShouldBe([new ValueId("wert-1")]);
+        GroupNamed(session, "owl").AssignedValues.ShouldBe([new ValueId("wert-2")]);
+        GroupNamed(session, "owl").Members.ShouldBe([Ben, Latecomer]);
+    }
+
+    [Fact]
     public void A_participant_placed_into_a_group_never_becomes_its_scribe()
     {
         var session = SessionInPhase(Phase.GroupWork, TwoGroups());

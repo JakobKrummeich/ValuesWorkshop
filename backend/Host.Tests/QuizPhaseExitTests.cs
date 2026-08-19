@@ -18,7 +18,12 @@ public sealed class QuizPhaseExitTests : IClassFixture<WorkshopTestFactory>
         var session = SessionInQuizPhase(QuizProgress.Restore(0, false, false, []));
 
         Should.Throw<WrongPhaseException>(() =>
-            session.AdvancePhase(TestSessions.CallerOf(session), RegisteredExitGuards())
+            session.AdvancePhase(
+                TestSessions.CallerOf(session),
+                RegisteredExitGuards(),
+                new TestGroupSolver(),
+                new TestAnimalNames(8)
+            )
         );
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.Quiz);
@@ -29,7 +34,12 @@ public sealed class QuizPhaseExitTests : IClassFixture<WorkshopTestFactory>
     {
         var session = SessionInQuizPhase(QuizProgress.Restore(4, true, true, []));
 
-        session.AdvancePhase(TestSessions.CallerOf(session), RegisteredExitGuards());
+        session.AdvancePhase(
+            TestSessions.CallerOf(session),
+            RegisteredExitGuards(),
+            new TestGroupSolver(),
+            new TestAnimalNames(8)
+        );
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValueSelection);
     }

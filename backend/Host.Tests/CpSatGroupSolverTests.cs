@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using ValuesWorkshop.Domain;
-using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Host.Tests;
 

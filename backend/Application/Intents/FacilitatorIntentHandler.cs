@@ -6,7 +6,9 @@ namespace ValuesWorkshop.Application.Intents;
 public sealed class FacilitatorIntentHandler(
     IntentPipeline pipeline,
     PhaseExitGuards exitGuards,
-    IQuizCatalog quizCatalog
+    IQuizCatalog quizCatalog,
+    IGroupSolver groupSolverPort,
+    IAnimalNames animalNamesPort
 )
 {
     public Task<IntentResult> HandleAsync(AdvancePhaseCommand command)
@@ -15,7 +17,7 @@ public sealed class FacilitatorIntentHandler(
             command.SessionIdentity,
             session =>
             {
-                session.AdvancePhase(command.Caller, exitGuards);
+                session.AdvancePhase(command.Caller, exitGuards, groupSolverPort, animalNamesPort);
                 return true;
             }
         );

@@ -8,6 +8,30 @@ public sealed class FormationRecord
     public IReadOnlyList<Group> Groups => _groups;
     public bool IsEveryGroupSubmitted => _groups.TrueForAll(group => group.IsSubmitted);
 
+    internal void Form(GroupFormationResult formationResult, IAnimalNames animalNamesPort)
+    {
+        var animalNames = animalNamesPort.Names;
+
+        if (formationResult.Groups.Count > animalNames.Count)
+        {
+            throw new InvariantViolationException(
+                $"Group formation needs {formationResult.Groups.Count} animal names but only {animalNames.Count} exist."
+            );
+        }
+
+        _groups.AddRange(
+            formationResult.Groups.Select(
+                (formedGroup, groupIndex) =>
+                    new Group(
+                        animalNames[groupIndex],
+                        formedGroup.Members,
+                        formedGroup.AssignedValues
+                    )
+            )
+        );
+        IsFormed = true;
+    }
+
     internal void PlaceIntoSmallestGroup(ParticipantId participantId, IRandomness randomness)
     {
         if (_groups.Count == 0)

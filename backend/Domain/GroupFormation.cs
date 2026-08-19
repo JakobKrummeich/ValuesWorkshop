@@ -1,4 +1,4 @@
-namespace ValuesWorkshop.Domain.Ports;
+namespace ValuesWorkshop.Domain;
 
 public sealed record GroupFormationRequest(
     IReadOnlyList<ParticipantSelection> Participants,
