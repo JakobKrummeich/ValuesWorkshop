@@ -218,7 +218,7 @@ each workshop phase completes (regression protection from day one).
 - [ ] 17. CP-SAT wrapper (backend): sizing rule from this plan, assignment
       model (participants + values → groups), objective
       max Σ |own selections ∩ group values|, 3 s time cap with best
-      incumbent, symmetry breaking on group labels; unit-tested.
+      incumbent; no manual symmetry breaking (CP-SAT auto); unit-tested.
 - [ ] 18. Phase 5 Group selection: run solver on phase entry, animal-name
       group labels, results on all three screens, persisted.
 - [ ] 19. Group work backend: random scribe per group, facilitator

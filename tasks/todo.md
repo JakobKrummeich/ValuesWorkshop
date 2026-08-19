@@ -415,13 +415,13 @@ view) if the group screens need them.
 
 ### Task 17: CP-SAT wrapper  *(parallelizable after Checkpoint B)*
 **Description:** First write `design/cpsat-model.md` (variables, constraints,
-objective as linear formulation, symmetry breaking, hand-worked example
+objective as linear formulation, hand-worked example
 N=8/V=6 with expected optimum). Then implement: BE service (adapter behind
 Application port) wrapping OR-Tools CP-SAT. Sizing rule (plan.md): `G = max(1, floor(N/4))`;
 participant group sizes `floor(N/G)` (+1 for first `N mod G`); same deal-out
 for values. Model assigns participants AND values; objective: maximize
 Σ over participants of |own 10 selections ∩ group's values|. 3 s time cap,
-best incumbent; symmetry breaking on group labels.
+best incumbent; no manual symmetry breaking (CP-SAT auto).
 **Acceptance criteria:**
 - [ ] Sizing rule unit-tested (incl. N=30→7 groups 5,5,4,4,4,4,4; N<8 edge)
 - [ ] Returns valid partition within 3 s for N=30, V=10 (wall-clock test)

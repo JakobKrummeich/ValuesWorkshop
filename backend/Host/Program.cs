@@ -36,6 +36,7 @@ builder.Services.AddScoped<FacilitatorIntentHandler>();
 builder.Services.AddScoped<ParticipantIntentHandler>();
 builder.Services.AddSingleton<IQuizCatalog>(quizCatalog);
 builder.Services.AddSingleton<IValuesCatalog>(valuesCatalog);
+builder.Services.AddSingleton<IGroupSolver, CpSatGroupSolver>();
 builder.Services.AddSingleton(RegisteredExitGuards.For(quizCatalog));
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
@@ -124,8 +125,6 @@ using (var scope = app.Services.CreateScope())
     await WorkshopDatabaseSchema.ApplyAsync(database);
 }
 
-LogOrToolsVersion(app);
-
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -141,13 +140,3 @@ app.MapHub<ParticipantHub>("/hub/participant");
 app.MapHub<PresenterHub>("/hub/presenter");
 
 await app.RunAsync();
-
-static void LogOrToolsVersion(WebApplication app)
-{
-    var solver = new Google.OrTools.Sat.CpSolver();
-    _ = solver;
-    app.Logger.LogInformation(
-        "OR-Tools loaded: {Version}",
-        Google.OrTools.Init.OrToolsVersion.VersionString()
-    );
-}
