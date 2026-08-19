@@ -357,7 +357,7 @@ variant carries it.
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
-| ownGroup | `name` (animal identifier, localized by the client), `memberNames`, `assignedValueIds`, `isCallerScribe`, `scribeName`, `workStatus` (`editing` \| `submitted`), `actions: [{ actionId, valueId, text, sortOrder }]` |
+| ownGroup | `name: {animalId, text: {de, en}}` (the animal label rides the wire — values-catalog precedent, the client never reads `config/`), `memberDisplayNames` (formation order), `assignedValues: [{valueId, text: {de, en}}]` (deal order; texts embedded because the participant variant carries no values catalog in phase 5), `isCallerScribe?`, `scribeName?` (absent until scribes are appointed on entry into phase 6 — T19), `workStatus?` (`editing` \| `submitted`; absent until group work ships — T19), `actions?: [{ actionId, valueId, text, sortOrder }]` (absent until T20) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
@@ -374,7 +374,7 @@ join lobby shows back to the person who just signed in.
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
-| groups | `[{ name, memberParticipantIds, assignedValueIds, scribeParticipantId, actionCountPerValue, workStatus }]` |
+| groups | `[{ name: {animalId, text: {de, en}}, members: [{participantId, displayName}] (formation order), assignedValues: [{valueId, text: {de, en}}], scribeParticipantId?, workStatus?, actionCountPerValue? }]` — scribe and work-status fields absent until T19, action counts until T20 |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
 | conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
@@ -393,18 +393,20 @@ what they answered, selected, or voted for.
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
-| groups | `[{ name, memberCount, assignedValueIds, workStatus }]` |
+| groups | `[{ name: {animalId, text: {de, en}}, memberDisplayNames (formation order), assignedValues: [{valueId, text: {de, en}}], workStatus? }]` — `workStatus` absent until T19 |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
 
 `participantDisplayNames` is the join lobby only (phase 1): the projection
 shows who has arrived while the room fills. It carries names without
-identifiers, and no later variant carries either.
+identifiers. From phase 5 on, group cards mirror the participant card and
+therefore name their members (`design/screens.md`) — display names only,
+never identifiers.
 
 Deliberately absent: every participant identifier, every per-person fact
-beyond the phase 1 lobby names, and all vote tallies before the winners are
-revealed. Groups are counted, not named by member.
+beyond the lobby names and the group-card member names, and all vote
+tallies before the winners are revealed.
 
 ### 5.5 Anonymity argument
 
@@ -423,9 +425,11 @@ revealed. Groups are counted, not named by member.
    reflection test walks every variant of each union and asserts, per
    variant, exactly where a person can be identified: `ownDisplayName` on
    `ParticipantJoinState`, `participantDisplayNames` on
-   `PresenterJoinState`, the roster on every facilitator variant, and group
-   membership on the facilitator variants that carry groups. A name or an
-   identifier appearing on any other variant fails that test.
+   `PresenterJoinState`, the roster on every facilitator variant, group
+   membership on the facilitator variants that carry groups, and group
+   member display names on the participant and presenter variants that
+   carry groups. A name or an identifier appearing on any other variant
+   fails that test.
 
 ---
 
