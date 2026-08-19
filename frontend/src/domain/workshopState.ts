@@ -17,7 +17,7 @@ import {
   votingViewSchema,
 } from "./workshopStateBlocks";
 
-export { GroupWorkStatus, QuizSubState } from "./workshopStateBlocks";
+export { QuizSubState } from "./workshopStateBlocks";
 
 export enum FacilitatorIntent {
   AdvancePhase = "AdvancePhase",

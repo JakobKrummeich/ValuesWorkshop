@@ -1,7 +1,6 @@
 import { Phase } from "../phases";
 import {
   FacilitatorIntent,
-  GroupWorkStatus,
   QuizSubState,
   facilitatorWorkshopStateSchema,
   participantWorkshopStateSchema,
@@ -104,35 +103,52 @@ describe("participant workshop state schema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts the caller-shaped block of a group work state", () => {
+  it("accepts the caller's own group card with localized texts", () => {
     const state = participantWorkshopStateSchema.parse({
       revision: 12,
-      phase: 6,
+      phase: 5,
       participantCount: 8,
       ownGroup: {
-        name: "otter",
-        memberCount: 4,
-        assignedValueIds: ["courage", "trust"],
-        isCallerScribe: true,
-        workStatus: 2,
+        name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+        memberDisplayNames: ["Anna Schmidt", "Ben"],
+        assignedValues: [
+          { valueId: "mut", text: { de: "Mut", en: "Courage" } },
+        ],
       },
     });
 
-    if (state.phase !== Phase.GroupWork) {
-      throw new Error("expected a group work state");
+    if (state.phase !== Phase.GroupFormation) {
+      throw new Error("expected a group formation state");
     }
-    expect(state.ownGroup?.workStatus).toBe(GroupWorkStatus.Submitted);
+    expect(state.ownGroup?.name.text.en).toBe("Otter");
+    expect(state.ownGroup?.memberDisplayNames).toEqual(["Anna Schmidt", "Ben"]);
+    expect(state.ownGroup?.assignedValues[0].text.de).toBe("Mut");
   });
 
-  it("accepts a group work state for a caller who is in no group", () => {
+  it("rejects an own group whose name is a bare string", () => {
+    const result = participantWorkshopStateSchema.safeParse({
+      revision: 12,
+      phase: 5,
+      participantCount: 8,
+      ownGroup: {
+        name: "otter",
+        memberDisplayNames: [],
+        assignedValues: [],
+      },
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts a group formation state for a caller who is in no group", () => {
     const state = participantWorkshopStateSchema.parse({
       revision: 12,
-      phase: 6,
+      phase: 5,
       participantCount: 8,
       ownGroup: null,
     });
 
-    expect(state.phase).toBe(Phase.GroupWork);
+    expect(state.phase).toBe(Phase.GroupFormation);
   });
 
   it("rejects a state whose phase is outside the nine phases", () => {
@@ -262,11 +278,16 @@ describe("facilitator workshop state schema", () => {
       enabledIntents: [],
       groups: [
         {
-          name: "otter",
-          memberParticipantIds: ["3f1a0f2e-0000-4000-8000-000000000001"],
-          assignedValueIds: ["courage"],
-          scribeParticipantId: "3f1a0f2e-0000-4000-8000-000000000001",
-          workStatus: 1,
+          name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+          members: [
+            {
+              participantId: "3f1a0f2e-0000-4000-8000-000000000001",
+              displayName: "Anna Schmidt",
+            },
+          ],
+          assignedValues: [
+            { valueId: "mut", text: { de: "Mut", en: "Courage" } },
+          ],
         },
       ],
     });
@@ -274,12 +295,12 @@ describe("facilitator workshop state schema", () => {
     if (state.phase !== Phase.GroupWork) {
       throw new Error("expected a group work state");
     }
-    expect(state.groups[0].workStatus).toBe(GroupWorkStatus.Editing);
+    expect(state.groups[0].members[0].displayName).toBe("Anna Schmidt");
     expect(state.roster.participants[0].displayName).toBe("Anna Schmidt");
     expect(state.roster.participantCount).toBe(1);
   });
 
-  it("accepts a group without a scribe yet", () => {
+  it("accepts a formation state that carries both the selection progress and the groups", () => {
     const state = facilitatorWorkshopStateSchema.parse({
       revision: 30,
       phase: 5,
@@ -288,11 +309,9 @@ describe("facilitator workshop state schema", () => {
       selection: { values: [], submittedCount: 0 },
       groups: [
         {
-          name: "otter",
-          memberParticipantIds: [],
-          assignedValueIds: [],
-          scribeParticipantId: null,
-          workStatus: 1,
+          name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+          members: [],
+          assignedValues: [],
         },
       ],
     });
@@ -300,7 +319,8 @@ describe("facilitator workshop state schema", () => {
     if (state.phase !== Phase.GroupFormation) {
       throw new Error("expected a group formation state");
     }
-    expect(state.groups[0].scribeParticipantId).toBeNull();
+    expect(state.groups[0].name.animalId).toBe("otter");
+    expect(state.selection.submittedCount).toBe(0);
   });
 
   it("accepts a value selection progress block with the catalog", () => {
@@ -444,17 +464,44 @@ describe("presenter workshop state schema", () => {
     expect(state.voting.isRoundOpen).toBe(true);
   });
 
-  it("rejects a group that reports members instead of an anonymous count", () => {
+  it("accepts groups that name members without identifying them", () => {
+    const state = presenterWorkshopStateSchema.parse({
+      revision: 44,
+      phase: 5,
+      participantCount: 8,
+      selection: { values: [], submittedCount: 0 },
+      groups: [
+        {
+          name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+          memberDisplayNames: ["Anna Schmidt"],
+          assignedValues: [
+            { valueId: "mut", text: { de: "Mut", en: "Courage" } },
+          ],
+        },
+      ],
+    });
+
+    if (state.phase !== Phase.GroupFormation) {
+      throw new Error("expected a group formation state");
+    }
+    expect(state.groups[0].memberDisplayNames).toEqual(["Anna Schmidt"]);
+  });
+
+  it("rejects a group that omits the member display names", () => {
     const result = presenterWorkshopStateSchema.safeParse({
       revision: 44,
       phase: 6,
       participantCount: 8,
       groups: [
         {
-          name: "otter",
-          memberParticipantIds: ["3f1a0f2e-0000-4000-8000-000000000001"],
-          assignedValueIds: [],
-          workStatus: 1,
+          name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+          members: [
+            {
+              participantId: "3f1a0f2e-0000-4000-8000-000000000001",
+              displayName: "Anna Schmidt",
+            },
+          ],
+          assignedValues: [],
         },
       ],
     });
