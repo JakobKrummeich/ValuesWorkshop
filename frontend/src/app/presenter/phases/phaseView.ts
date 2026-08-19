@@ -2,6 +2,7 @@ import { Phase } from "../../../domain/phases";
 import type { PresenterWorkshopState } from "../../../domain/workshopState";
 import { EmptyPhase } from "../../EmptyPhase";
 import type { PhaseComponents } from "../../PhaseView";
+import { PresenterGroupFormationScreen } from "./groupFormation/PresenterGroupFormationScreen";
 import { PresenterJoinScreen } from "./join/PresenterJoinScreen";
 import { PresenterQuizScreen } from "./quiz/PresenterQuizScreen";
 import { PresenterSelectionScreen } from "./selection/PresenterSelectionScreen";
@@ -12,7 +13,7 @@ export const presenterPhaseView: PhaseComponents<PresenterWorkshopState> = {
   [Phase.Quiz]: PresenterQuizScreen,
   [Phase.ValueSelection]: PresenterSelectionScreen,
   [Phase.SelectionResults]: PresenterSelectionResultsScreen,
-  [Phase.GroupFormation]: EmptyPhase,
+  [Phase.GroupFormation]: PresenterGroupFormationScreen,
   [Phase.GroupWork]: EmptyPhase,
   [Phase.ValuePresentation]: EmptyPhase,
   [Phase.FinalVoting]: EmptyPhase,
