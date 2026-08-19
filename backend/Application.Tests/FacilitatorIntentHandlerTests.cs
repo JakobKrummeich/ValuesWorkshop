@@ -108,6 +108,44 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
+    public async Task Entering_group_formation_forms_the_groups()
+    {
+        var repository = FakeSessionRepository.Holding(SessionFixtures.InSelectionResults());
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.ShouldBe(IntentResult.Accepted());
+        var saved = repository.Saved.ShouldHaveSingleItem();
+        saved.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
+        saved.Formation.IsFormed.ShouldBeTrue();
+        var group = saved.Formation.Groups.ShouldHaveSingleItem();
+        group.Name.ShouldBe("tier-1");
+        group.Members.ShouldBe(
+            [SessionFixtures.Anna, SessionFixtures.Ben, SessionFixtures.Chris],
+            ignoreOrder: true
+        );
+        group.AssignedValues.ShouldBe(saved.Selection.TopValues, ignoreOrder: true);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Formation.IsFormed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task A_failing_solver_propagates_loudly()
+    {
+        var repository = FakeSessionRepository.Holding(SessionFixtures.InSelectionResults());
+        var handler = HandlerOver(repository, new ThrowingGroupSolver());
+
+        await Should.ThrowAsync<InvalidOperationException>(() =>
+            handler.HandleAsync(
+                new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller)
+            )
+        );
+
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task An_advance_past_the_last_phase_stays_an_invariant_violation()
     {
         var repository = FakeSessionRepository.Holding(
@@ -195,13 +233,16 @@ public class FacilitatorIntentHandlerTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
-    private FacilitatorIntentHandler HandlerOver(FakeSessionRepository repository)
+    private FacilitatorIntentHandler HandlerOver(
+        FakeSessionRepository repository,
+        IGroupSolver? groupSolverPort = null
+    )
     {
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
             new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard()),
             new TestQuizCatalog(5),
-            new TestGroupSolver(),
+            groupSolverPort ?? new TestGroupSolver(),
             new TestAnimalNames(8)
         );
     }
