@@ -1,6 +1,6 @@
 using Google.OrTools.Sat;
-using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
+using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Host;
 
