@@ -413,7 +413,8 @@ view) if the group screens need them.
 
 ## Phase D: Grouping + Group Work
 
-### Task 17: CP-SAT wrapper  *(parallelizable after Checkpoint B)*
+### Task 17: CP-SAT wrapper ✅
+**Spec:** `tasks/specs/17-cpsat-wrapper.md` (approved via Lavish).
 **Description:** First write `design/cpsat-model.md` (variables, constraints,
 objective as linear formulation, hand-worked example
 N=8/V=6 with expected optimum). Then implement: BE service (adapter behind
@@ -423,9 +424,10 @@ for values. Model assigns participants AND values; objective: maximize
 Σ over participants of |own 10 selections ∩ group's values|. 3 s time cap,
 best incumbent; no manual symmetry breaking (CP-SAT auto).
 **Acceptance criteria:**
-- [ ] Sizing rule unit-tested (incl. N=30→7 groups 5,5,4,4,4,4,4; N<8 edge)
-- [ ] Returns valid partition within 3 s for N=30, V=10 (wall-clock test)
-- [ ] Objective verified on small hand-checkable instances
+- [x] Sizing rule unit-tested (incl. N=30→7 groups 5,5,4,4,4,4,4; N<8 edge)
+- [x] Returns valid partition within 3 s for N=30, V=10 (wall-clock test)
+- [x] Objective verified on small hand-checkable instances (proven-unique
+      optimum 22 for the N=8/V=6 doc example)
 **Verification:** `dotnet test backend` (solver suite).
 **Dependencies:** 3 (OR-Tools in image), 7. **Size:** M
 
