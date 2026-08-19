@@ -21,6 +21,13 @@ phase 5.
   `Domain/Ports/` (`ISessionRepository` precedent; its records already
   speak only Domain types). A second Domain port `IAnimalNames`
   exposes the ordered animal ids.
+
+  > **Amended in implementation:** both ports live in the Domain ROOT
+  > namespace `ValuesWorkshop.Domain` (`IRandomness` precedent), not in
+  > `Domain/Ports/` — the solver records reference Domain types, so a
+  > `ValuesWorkshop.Domain.Ports` namespace would form a cycle with
+  > `ValuesWorkshop.Domain`, which the ArchUnit slice rule
+  > (`ValuesWorkshop.(*)` slices free of cycles) forbids.
 - Both are passed into `Session.AdvancePhase(caller, exitGuards,
   groupSolver, animalNames)` — collaborators like `exitGuards`, not
   data fixtures (the 16a objection was threading *data*; interfaces
@@ -60,6 +67,11 @@ phase 5.
 - Per-role views per protocol §5.2–5.4, restricted to what phase 5
   needs (scribe/actions fields are Task 19/20 — optional, absent, like
   tallies were in phase 3):
+
+  > **Amended in implementation:** the scribe/work-status fields were
+  > REMOVED from the shipped view records rather than carried as null —
+  > Task 19 re-adds them as optionals; protocol.md §5 documents them as
+  > absent until T19/T20.
   - participant `ownGroup`: animal name, member display names, own
     assigned value ids
   - facilitator `groups`: all groups (name, member names + ids,
