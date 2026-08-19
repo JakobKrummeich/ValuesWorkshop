@@ -38,7 +38,7 @@ public sealed class ParticipantWorkshopStateMapper(
                 new ParticipantJoinState(
                     revision,
                     ParticipantCount(session),
-                    OwnDisplayName(session, caller)
+                    SessionViews.DisplayNameOf(session, caller)
                 ),
             [Phase.Quiz] = (session, caller, revision) =>
                 new ParticipantQuizState(
@@ -95,11 +95,6 @@ public sealed class ParticipantWorkshopStateMapper(
     private static int ParticipantCount(Session session)
     {
         return session.Roster.Participants.Count;
-    }
-
-    private static string OwnDisplayName(Session session, ParticipantId caller)
-    {
-        return SessionViews.DisplayNameOf(session, caller);
     }
 
     private static OwnGroupView? OwnGroup(
