@@ -67,14 +67,11 @@ public sealed class Session
     }
 
     public void AdvancePhase(
-        CallerSubject caller,
         PhaseExitGuards exitGuards,
         IGroupSolver groupSolverPort,
         IAnimalNames animalNamesPort
     )
     {
-        RequireFacilitator(caller, "Only the facilitator of this session may advance the phase.");
-
         exitGuards.RequireSatisfied(this);
 
         PhaseProgress.Advance();
@@ -116,17 +113,15 @@ public sealed class Session
         Formation.Form(formationResult, animalNamesPort);
     }
 
-    public void RevealAnswer(CallerSubject caller)
+    public void RevealAnswer()
     {
-        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
         RequireQuizPhase();
 
         Quiz.RevealAnswer();
     }
 
-    public void ShowLearningText(CallerSubject caller)
+    public void ShowLearningText()
     {
-        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
         RequireQuizPhase();
 
         Quiz.ShowLearningText();
@@ -164,20 +159,11 @@ public sealed class Session
         Selection.Submit(participantId, valueIds, validValueIds);
     }
 
-    public void PoseNextQuestion(CallerSubject caller, int questionCount)
+    public void PoseNextQuestion(int questionCount)
     {
-        RequireFacilitator(caller, "Only the facilitator of this session may walk the quiz.");
         RequireQuizPhase();
 
         Quiz.PoseNextQuestion(questionCount);
-    }
-
-    private void RequireFacilitator(CallerSubject caller, string refusal)
-    {
-        if (!IsFacilitatedBy(caller))
-        {
-            throw new NotAuthorizedException(refusal);
-        }
     }
 
     private void RequireQuizPhase()

@@ -51,11 +51,6 @@ public static class TestSessions
 
     public static void AdvanceToNextPhase(Session session)
     {
-        session.AdvancePhase(
-            CallerOf(session),
-            PhaseExitGuards.None,
-            new TestGroupSolver(),
-            new TestAnimalNames(8)
-        );
+        session.AdvancePhase(PhaseExitGuards.None, new TestGroupSolver(), new TestAnimalNames(8));
     }
 }

@@ -96,7 +96,6 @@ public class SessionFormGroupsTests
         );
 
         session.AdvancePhase(
-            TestSessions.CallerOf(session),
             PhaseExitGuards.None,
             new ThrowingGroupSolver(),
             new TestAnimalNames(8)
@@ -139,7 +138,6 @@ public class SessionFormGroupsTests
         Should
             .Throw<InvariantViolationException>(() =>
                 session.AdvancePhase(
-                    TestSessions.CallerOf(session),
                     PhaseExitGuards.None,
                     new TestGroupSolver(),
                     new TestAnimalNames(1)
@@ -166,12 +164,7 @@ public class SessionFormGroupsTests
 
     private static void AdvanceIntoGroupFormation(Session session, IGroupSolver groupSolverPort)
     {
-        session.AdvancePhase(
-            TestSessions.CallerOf(session),
-            PhaseExitGuards.None,
-            groupSolverPort,
-            new TestAnimalNames(8)
-        );
+        session.AdvancePhase(PhaseExitGuards.None, groupSolverPort, new TestAnimalNames(8));
     }
 
     private static ParticipantId ParticipantAt(int number)

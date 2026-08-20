@@ -218,7 +218,7 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
-    public async Task Another_subject_may_not_walk_the_quiz()
+    public async Task Another_subject_may_not_reveal_the_answer()
     {
         var repository = FakeSessionRepository.Holding(
             SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, false, false, []))
@@ -227,8 +227,47 @@ public class FacilitatorIntentHandlerTests
         var result = await HandlerOver(repository)
             .HandleAsync(new RevealAnswerCommand(KnownSession, new CallerSubject("someone-else")));
 
+        ShouldBeRejectedAsNotAuthorized(result, repository);
+    }
+
+    [Fact]
+    public async Task Another_subject_may_not_show_the_learning_text()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, true, false, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ShowLearningTextCommand(KnownSession, new CallerSubject("someone-else"))
+            );
+
+        ShouldBeRejectedAsNotAuthorized(result, repository);
+    }
+
+    [Fact]
+    public async Task Another_subject_may_not_pose_the_next_question()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, true, true, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new PoseNextQuestionCommand(KnownSession, new CallerSubject("someone-else"))
+            );
+
+        ShouldBeRejectedAsNotAuthorized(result, repository);
+    }
+
+    private void ShouldBeRejectedAsNotAuthorized(
+        IntentResult result,
+        FakeSessionRepository repository
+    )
+    {
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
         repository.Saved.ShouldBeEmpty();
         broadcaster.Broadcasts.ShouldBeEmpty();
     }

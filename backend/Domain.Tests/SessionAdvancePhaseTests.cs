@@ -26,23 +26,6 @@ public class SessionAdvancePhaseTests
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.FinalPresentation);
     }
 
-    [Fact]
-    public void Advancing_as_someone_other_than_the_facilitator_is_refused()
-    {
-        var session = SessionInPhase(Phase.Join);
-
-        Should.Throw<NotAuthorizedException>(() =>
-            session.AdvancePhase(
-                new CallerSubject("someone-else"),
-                PhaseExitGuards.None,
-                new TestGroupSolver(),
-                new TestAnimalNames(8)
-            )
-        );
-
-        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.Join);
-    }
-
     private static Session SessionInPhase(Phase phase)
     {
         return TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), phase);
