@@ -287,52 +287,101 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Own_group_describes_only_the_callers_group()
+    public void Own_group_carries_the_animal_name_members_in_formation_order_and_value_texts()
     {
         var session = SessionFixtures.InPhase(
-            Phase.GroupWork,
+            Phase.GroupFormation,
             formation: SessionFixtures.TwoGroups()
         );
 
-        var ownGroup = Map(session, caller: SessionFixtures.Ben)
-            .ShouldBeOfType<ParticipantGroupWorkState>()
+        var ownGroup = Map(session, caller: SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantGroupFormationState>()
             .OwnGroup.ShouldNotBeNull();
 
-        ownGroup.Name.ShouldBe("fox");
-        ownGroup.MemberCount.ShouldBe(2);
-        ownGroup.AssignedValueIds.ShouldBe(["honesty"]);
-        ownGroup.IsCallerScribe.ShouldBeFalse();
-        ownGroup.WorkStatus.ShouldBe(GroupWorkStatus.Editing);
+        ownGroup.Name.ShouldBe(
+            new GroupNameView("tier-1", new LocalizedTextView("Tier 1", "Animal 1"))
+        );
+        ownGroup.MemberDisplayNames.ShouldBe(["Ben", "Anna Schmidt"]);
+        ownGroup.AssignedValues.ShouldBe([
+            new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")),
+        ]);
     }
 
     [Fact]
-    public void Own_group_marks_the_caller_as_scribe_and_reports_submitted_work()
+    public void Own_group_describes_only_the_callers_group()
     {
         var session = SessionFixtures.InPhase(
-            Phase.GroupWork,
+            Phase.GroupFormation,
             formation: SessionFixtures.TwoGroups()
         );
 
         var ownGroup = Map(session, caller: SessionFixtures.Chris)
-            .ShouldBeOfType<ParticipantGroupWorkState>()
+            .ShouldBeOfType<ParticipantGroupFormationState>()
             .OwnGroup.ShouldNotBeNull();
 
-        ownGroup.Name.ShouldBe("owl");
-        ownGroup.IsCallerScribe.ShouldBeTrue();
-        ownGroup.WorkStatus.ShouldBe(GroupWorkStatus.Submitted);
+        ownGroup.Name.AnimalId.ShouldBe("tier-2");
+        ownGroup.MemberDisplayNames.ShouldBe(["#c3c3c3"]);
     }
 
     [Fact]
     public void A_caller_who_is_in_no_group_gets_no_own_group()
     {
         var session = SessionFixtures.InPhase(
-            Phase.GroupWork,
+            Phase.GroupFormation,
             formation: SessionFixtures.TwoGroups()
         );
 
         Map(session, caller: new ParticipantId(Guid.NewGuid()))
-            .ShouldBeOfType<ParticipantGroupWorkState>()
+            .ShouldBeOfType<ParticipantGroupFormationState>()
             .OwnGroup.ShouldBeNull();
+    }
+
+    [Fact]
+    public void A_group_named_after_an_unknown_animal_fails_loudly()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupFormation,
+            formation: FormationRecord.Restore(
+                true,
+                [
+                    Group.Restore(
+                        "tier-99",
+                        [SessionFixtures.Anna],
+                        [new ValueId("wert-1")],
+                        null,
+                        false
+                    ),
+                ]
+            )
+        );
+
+        Should
+            .Throw<InvalidOperationException>(() => Map(session))
+            .Message.ShouldContain("tier-99");
+    }
+
+    [Fact]
+    public void An_assigned_value_missing_from_the_catalog_fails_loudly()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupFormation,
+            formation: FormationRecord.Restore(
+                true,
+                [
+                    Group.Restore(
+                        "tier-1",
+                        [SessionFixtures.Anna],
+                        [new ValueId("wert-999")],
+                        null,
+                        false
+                    ),
+                ]
+            )
+        );
+
+        Should
+            .Throw<InvalidOperationException>(() => Map(session))
+            .Message.ShouldContain("wert-999");
     }
 
     [Fact]
@@ -386,7 +435,8 @@ public class ParticipantWorkshopStateMapperTests
     {
         return new ParticipantWorkshopStateMapper(
             new TestQuizCatalog(5),
-            new TestValuesCatalog(50)
+            new TestValuesCatalog(50),
+            new TestAnimalsCatalog(8)
         ).MapFor(session, caller ?? SessionFixtures.Anna, revision);
     }
 }

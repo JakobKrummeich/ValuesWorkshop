@@ -20,7 +20,7 @@ public class IntentPipelineTests
             KnownSession,
             session =>
             {
-                TestSessions.AdvanceToNextPhase(session);
+                session.AdvancePhase();
                 return true;
             }
         );
@@ -43,7 +43,7 @@ public class IntentPipelineTests
             KnownSession,
             session =>
             {
-                TestSessions.AdvanceToNextPhase(session);
+                session.AdvancePhase();
                 return true;
             }
         );
@@ -64,7 +64,7 @@ public class IntentPipelineTests
             KnownSession,
             mutatedSession =>
             {
-                TestSessions.AdvanceToNextPhase(mutatedSession);
+                mutatedSession.AdvancePhase();
                 return true;
             }
         );
@@ -84,7 +84,7 @@ public class IntentPipelineTests
             KnownSession,
             session =>
             {
-                TestSessions.AdvanceToNextPhase(session);
+                session.AdvancePhase();
                 return true;
             }
         );
@@ -107,7 +107,7 @@ public class IntentPipelineTests
             KnownSession,
             session =>
             {
-                TestSessions.AdvanceToNextPhase(session);
+                session.AdvancePhase();
                 return true;
             }
         );
@@ -131,7 +131,7 @@ public class IntentPipelineTests
             KnownSession,
             session =>
             {
-                TestSessions.AdvanceToNextPhase(session);
+                session.AdvancePhase();
                 return true;
             }
         );

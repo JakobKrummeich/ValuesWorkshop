@@ -28,7 +28,7 @@ they fire. "Mirror" = passive copy of the presenter content, phone-sized.
 | **2 Quiz** | Current question with answer tally and answered-count; one morphing sub-control button. **RevealAnswer**, **ShowLearningText**, **PoseNextQuestion**, **AdvancePhase** (disabled until the fifth question's learning text was shown) | Question + three answer cards (two top, one centered below), live bars under each card scaled relative to the max tally; correct card highlighted after reveal; learning text on a centered card | Three answer buttons. **ChooseQuizAnswer**; locked ("answer received") after picking |
 | **3 Value selection** | Submission progress count. **AdvancePhase** | Prompt + submission progress | Values grid (~50), pick exactly ten. **SubmitValueSelection** (enabled at 10/10); locked after |
 | **4 Selection results** | Top-values bar chart (same as presenter). **AdvancePhase** · System: DetermineTopValues on entry | Bar chart of the 20 most-selected values in two columns (ranks 1–10 left, 11–20 right), label + count + bar ∝ selections (most-selected = full width); top set color-highlighted (tie at 10th → 11+ highlighted); "and x more" hint below the cutoff; zero submissions → empty-state note | Waiting screen: centered icon with a slow pulsating circle — attention goes to the presenter wall; no tallies, no chart |
-| **5 Group formation** | All groups: names, members, assigned values. **AdvancePhase** · System: FormGroups on entry | Paginated 3×2 group cards (name, members, values), cycles every 7 s | Own group card: members grouped top-left, values grouped bottom-right, distinct colors |
+| **5 Group formation** | All groups: names, members, assigned values. **AdvancePhase** · System: FormGroups on entry | Paginated 3×2 group cards mirroring the participant card (name, members, values); cycles every 7 s, static single page when all groups fit | Own group card: animal name, members grouped top-left, values grouped bottom-right in distinct colors — no section labels, no icon |
 | **6 Group work** | Per-group table: scribe, action count, editing/submitted status. **ReassignScribe**, **AdvancePhase** (disabled until every group submitted) · System: AppointScribes on entry | Same paginated 3×2 cards + working/submitted indicator per group | **Scribe:** value tabs + actions editor. **AddAction**, **EditAction**, **RemoveAction**, **SubmitGroupWork**, **ReopenGroupWork** · **Member:** same value tabs, read-only, synced with the scribe's state every 0.5 s |
 | **7 Value presentation** | Presenting position (group, value) + presented actions with edit affordance. **GoToNextValue**, **EditAction** (wording/typo fixes only, T17a), **AdvancePhase** (disabled until all values presented) | Presented value + its actions; no position counter | Presented value (mirror, passive) |
 | **8 Final voting** | Round + voted-count progress; tie indicator after close. **CloseVoting**, **StartTiebreakRound**, **AdvancePhase** (winners must stand) | "Voting ongoing…" screen — no tallies shown | One card per presented value (value + its actions + vote stepper), allotment counter. **SubmitFinalVotes** (enabled at full allotment; irrevocable). Tiebreak round: tied values only, allotment = number of tied values |
@@ -285,34 +285,35 @@ circle) so attention goes to the presenter wall — no chart, no counts.
 
 ```
 ┌──────────────────────┐
-│ Your group: Otter    │
-├──────────────────────┤
-│ Anna   Ben           │  ← members grouped
-│ you    Dana          │    top-left (color A)
-│                      │
-│                      │
-│          Vertrauen   │  ← values grouped
-│             Mut      │    bottom-right
-│           Respekt    │    (color B)
-└──────────────────────┘
+│ Otter                │  ← animal name only,
+├──────────────────────┤    no label, no icon
+│ Anna                 │  ← members grouped
+│ Ben                  │    top-left, one per
+│ Dana                 │    line (own name
+│                      │    listed like any)
+│          (Vertrauen) │  ← value chips
+│    (Mut)  (Respekt)  │    grouped bottom-
+│                      │    right, rotating
+└──────────────────────┘    accent colors
 ```
 
 **Presenter · Paginated group cards, 3×2 (fullscreen)**
 
 ```
 ┌───────────────────────────────────────┐
-│ Groups                                │
 │ ┌────────┐ ┌────────┐ ┌────────┐      │
 │ │ Otter  │ │ Fuchs  │ │ Igel   │      │
 │ │ Anna … │ │ Edi …  │ │ Ida …  │      │
 │ │ values │ │ values │ │ values │      │
 │ └────────┘ └────────┘ └────────┘      │
 │ ┌────────┐ ┌────────┐ ┌────────┐      │
-│ │ Hase   │ │ Luchs  │ │ Biber  │      │
+│ │ Dachs  │ │ Luchs  │ │ Biber  │      │
 │ └────────┘ └────────┘ └────────┘      │
 │                                       │
-│      ● ○    6 cards per page,         │
-│             cycles every 7 s          │
+│ 6 cards per page, each mirroring the  │
+│ participant card; cycles every 7 s,   │
+│ static single page when all fit —     │
+│ no heading, no page indicator         │
 └───────────────────────────────────────┘
 ```
 
@@ -381,7 +382,7 @@ Facilitator phase 5: full list of groups with members and assigned values
 │ │ submtd │ │ working│ │ working│      │
 │ └────────┘ └────────┘ └────────┘      │
 │ ┌────────┐ ┌────────┐ ┌────────┐      │
-│ │ Hase  …│ │ Luchs ✓│ │ Biber …│      │
+│ │ Dachs …│ │ Luchs ✓│ │ Biber …│      │
 │ └────────┘ └────────┘ └────────┘      │
 │                                       │
 │ same 3×2 paginated cards as phase 5,  │

@@ -1,0 +1,14 @@
+.screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  padding: var(--space-gutter);
+}
+
+.waitingNote {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+  text-align: center;
+}

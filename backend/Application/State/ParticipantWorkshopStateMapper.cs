@@ -5,13 +5,18 @@ namespace ValuesWorkshop.Application.State;
 
 public sealed class ParticipantWorkshopStateMapper(
     IQuizCatalog quizCatalog,
-    IValuesCatalog valuesCatalog
+    IValuesCatalog valuesCatalog,
+    IAnimalsCatalog animalsCatalogPort
 )
 {
     private readonly IReadOnlyDictionary<
         Phase,
         Func<Session, ParticipantId, long, ParticipantWorkshopState>
-    > stateOfPhase = BuildStateMap(quizCatalog, SelectionViews.CatalogOf(valuesCatalog));
+    > stateOfPhase = BuildStateMap(
+        quizCatalog,
+        SelectionViews.CatalogOf(valuesCatalog),
+        new GroupViews(animalsCatalogPort, valuesCatalog)
+    );
 
     public ParticipantWorkshopState MapFor(Session session, ParticipantId caller, long revision)
     {
@@ -21,7 +26,11 @@ public sealed class ParticipantWorkshopStateMapper(
     private static IReadOnlyDictionary<
         Phase,
         Func<Session, ParticipantId, long, ParticipantWorkshopState>
-    > BuildStateMap(IQuizCatalog quizCatalog, IReadOnlyList<WorkshopValueView> catalogView)
+    > BuildStateMap(
+        IQuizCatalog quizCatalog,
+        IReadOnlyList<WorkshopValueView> catalogView,
+        GroupViews groupViews
+    )
     {
         return new Dictionary<Phase, Func<Session, ParticipantId, long, ParticipantWorkshopState>>
         {
@@ -29,7 +38,7 @@ public sealed class ParticipantWorkshopStateMapper(
                 new ParticipantJoinState(
                     revision,
                     ParticipantCount(session),
-                    OwnDisplayName(session, caller)
+                    SessionViews.DisplayNameOf(session, caller)
                 ),
             [Phase.Quiz] = (session, caller, revision) =>
                 new ParticipantQuizState(
@@ -53,19 +62,19 @@ public sealed class ParticipantWorkshopStateMapper(
                 new ParticipantGroupFormationState(
                     revision,
                     ParticipantCount(session),
-                    OwnGroup(session, caller)
+                    OwnGroup(session, caller, groupViews)
                 ),
             [Phase.GroupWork] = (session, caller, revision) =>
                 new ParticipantGroupWorkState(
                     revision,
                     ParticipantCount(session),
-                    OwnGroup(session, caller)
+                    OwnGroup(session, caller, groupViews)
                 ),
             [Phase.ValuePresentation] = (session, caller, revision) =>
                 new ParticipantValuePresentationState(
                     revision,
                     ParticipantCount(session),
-                    OwnGroup(session, caller),
+                    OwnGroup(session, caller, groupViews),
                     SessionViews.Presentation(session)
                 ),
             [Phase.FinalVoting] = (session, _, revision) =>
@@ -88,14 +97,11 @@ public sealed class ParticipantWorkshopStateMapper(
         return session.Roster.Participants.Count;
     }
 
-    private static string OwnDisplayName(Session session, ParticipantId caller)
-    {
-        var name = session.Roster.Find(caller)?.Name ?? ParticipantName.Of(null, caller);
-
-        return name.Value;
-    }
-
-    private static OwnGroupView? OwnGroup(Session session, ParticipantId caller)
+    private static OwnGroupView? OwnGroup(
+        Session session,
+        ParticipantId caller,
+        GroupViews groupViews
+    )
     {
         var ownGroup = SessionViews
             .Groups(session)
@@ -107,11 +113,9 @@ public sealed class ParticipantWorkshopStateMapper(
         }
 
         return new OwnGroupView(
-            ownGroup.Name,
-            ownGroup.Members.Count,
-            SessionViews.ValueIdsOf(ownGroup.AssignedValues),
-            ownGroup.Scribe == caller,
-            SessionViews.WorkStatusOf(ownGroup)
+            groupViews.NameOf(ownGroup),
+            groupViews.MemberDisplayNamesOf(ownGroup, session),
+            groupViews.AssignedValuesOf(ownGroup)
         );
     }
 }

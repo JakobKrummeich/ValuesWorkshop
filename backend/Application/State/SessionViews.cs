@@ -21,14 +21,17 @@ internal static class SessionViews
         return session.Roster.Participants.Select(participant => participant.Name.Value).ToList();
     }
 
+    internal static string DisplayNameOf(Session session, ParticipantId participantId)
+    {
+        var name =
+            session.Roster.Find(participantId)?.Name ?? ParticipantName.Of(null, participantId);
+
+        return name.Value;
+    }
+
     internal static IReadOnlyList<Group> Groups(Session session)
     {
         return session.Formation.IsFormed ? session.Formation.Groups : [];
-    }
-
-    internal static GroupWorkStatus WorkStatusOf(Group group)
-    {
-        return group.IsSubmitted ? GroupWorkStatus.Submitted : GroupWorkStatus.Editing;
     }
 
     internal static string? PresentedValueId(Session session)

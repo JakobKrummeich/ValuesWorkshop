@@ -6,6 +6,7 @@ namespace ValuesWorkshop.Host;
 
 public sealed class QuizCatalogFile : IQuizCatalog
 {
+    private const int QuestionCount = QuizProgress.QuestionCount;
     private const int AnswersPerQuestion = QuizProgress.AnswersPerQuestion;
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
@@ -50,11 +51,18 @@ public sealed class QuizCatalogFile : IQuizCatalog
             );
         }
 
-        return new QuizCatalogFile(
-            fileQuestions
-                .Select((fileQuestion, questionIndex) => ToQuestion(fileQuestion, questionIndex))
-                .ToList()
-        );
+        var questions = fileQuestions
+            .Select((fileQuestion, questionIndex) => ToQuestion(fileQuestion, questionIndex))
+            .ToList();
+
+        if (questions.Count != QuestionCount)
+        {
+            throw new InvalidOperationException(
+                $"Quiz content file '{path}' needs exactly {QuestionCount} questions but contains {questions.Count}."
+            );
+        }
+
+        return new QuizCatalogFile(questions);
     }
 
     private static QuizQuestion ToQuestion(FileQuestion fileQuestion, int questionIndex)

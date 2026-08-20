@@ -13,25 +13,28 @@ public class WireFormatTests
 {
     private static readonly TestQuizCatalog Catalog = new(5);
     private static readonly TestValuesCatalog ValuesCatalog = new(50);
+    private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
     private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(
         Catalog,
         ValuesCatalog,
-        RegisteredExitGuards.For(Catalog)
+        AnimalsCatalog
     );
     private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(
         Catalog,
-        ValuesCatalog
+        ValuesCatalog,
+        AnimalsCatalog
     );
     private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(
         Catalog,
-        ValuesCatalog
+        ValuesCatalog,
+        AnimalsCatalog
     );
 
     [Fact]
     public void Workshop_state_travels_as_camel_case_json_with_numeric_enums()
     {
         var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
         session.BumpRevision();
 
         var json = SerializeStateMessage(FacilitatorStateMapper.Map(session, 1));

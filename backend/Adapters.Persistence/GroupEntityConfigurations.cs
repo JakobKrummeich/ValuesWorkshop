@@ -30,6 +30,7 @@ internal sealed class GroupMemberEntityConfiguration : IEntityTypeConfiguration<
         builder.HasKey(member => new { member.GroupId, member.ParticipantId });
         builder.Property(member => member.GroupId).HasColumnName("group_id");
         builder.Property(member => member.ParticipantId).HasColumnName("participant_id");
+        builder.Property(member => member.SortOrder).HasColumnName("sort_order");
         builder
             .HasOne(member => member.Group)
             .WithMany(group => group.Members)
@@ -46,6 +47,7 @@ internal sealed class GroupAssignedValueEntityConfiguration
         builder.HasKey(assignedValue => new { assignedValue.GroupId, assignedValue.ValueId });
         builder.Property(assignedValue => assignedValue.GroupId).HasColumnName("group_id");
         builder.Property(assignedValue => assignedValue.ValueId).HasColumnName("value_id");
+        builder.Property(assignedValue => assignedValue.SortOrder).HasColumnName("sort_order");
         builder
             .HasOne(assignedValue => assignedValue.Group)
             .WithMany(group => group.AssignedValues)

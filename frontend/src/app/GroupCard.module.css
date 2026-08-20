@@ -1,0 +1,76 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  height: 100%;
+  min-height: 0;
+  padding: var(--space-gutter);
+  overflow: hidden;
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.name {
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.members {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-tight);
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member {
+  color: var(--color-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+  align-self: flex-end;
+  justify-content: flex-end;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.value {
+  padding: var(--space-tight) var(--space-gap);
+  border-radius: var(--radius-full);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.accent1 {
+  background: var(--color-value-accent-1-soft);
+  color: var(--color-value-accent-1);
+}
+
+.accent2 {
+  background: var(--color-value-accent-2-soft);
+  color: var(--color-value-accent-2);
+}
+
+.accent3 {
+  background: var(--color-value-accent-3-soft);
+  color: var(--color-value-accent-3);
+}
+
+.accent4 {
+  background: var(--color-value-accent-4-soft);
+  color: var(--color-value-accent-4);
+}

@@ -90,7 +90,7 @@ public sealed class SqliteSessionCreateTests : IAsyncLifetime, IDisposable
         var session = Session.Open(identity, facilitator, new SessionName("Monday"));
         await CreateSession(session);
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
         session.BumpRevision();
         await SaveSession(session, expectedRevision: 0);
 

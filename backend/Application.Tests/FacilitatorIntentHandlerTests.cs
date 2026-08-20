@@ -108,6 +108,62 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
+    public async Task Entering_group_formation_forms_the_groups()
+    {
+        var repository = FakeSessionRepository.Holding(SessionFixtures.InSelectionResults());
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.ShouldBe(IntentResult.Accepted());
+        var saved = repository.Saved.ShouldHaveSingleItem();
+        saved.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
+        saved.Formation.IsFormed.ShouldBeTrue();
+        var group = saved.Formation.Groups.ShouldHaveSingleItem();
+        group.Name.ShouldBe("tier-1");
+        group.Members.ShouldBe(
+            [SessionFixtures.Anna, SessionFixtures.Ben, SessionFixtures.Chris],
+            ignoreOrder: true
+        );
+        group.AssignedValues.ShouldBe(saved.Selection.TopValues, ignoreOrder: true);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Formation.IsFormed.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task Every_registered_phase_entry_action_runs_after_an_advance()
+    {
+        var repository = FakeSessionRepository.Holding(SessionFixtures.InPhase(Phase.Join));
+        var recorder = new RecordingPhaseEntryAction();
+        var handler = new FacilitatorIntentHandler(
+            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            [recorder]
+        );
+
+        var result = await handler.HandleAsync(
+            new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller)
+        );
+
+        result.ShouldBe(IntentResult.Accepted());
+        recorder.SeenPhases.ShouldHaveSingleItem().ShouldBe(Phase.Quiz);
+    }
+
+    [Fact]
+    public async Task A_failing_solver_propagates_loudly()
+    {
+        var repository = FakeSessionRepository.Holding(SessionFixtures.InSelectionResults());
+        var handler = HandlerOver(repository, new ThrowingGroupSolver());
+
+        await Should.ThrowAsync<InvalidOperationException>(() =>
+            handler.HandleAsync(
+                new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller)
+            )
+        );
+
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task An_advance_past_the_last_phase_stays_an_invariant_violation()
     {
         var repository = FakeSessionRepository.Holding(
@@ -180,7 +236,7 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
-    public async Task Another_subject_may_not_walk_the_quiz()
+    public async Task Another_subject_may_not_reveal_the_answer()
     {
         var repository = FakeSessionRepository.Holding(
             SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, false, false, []))
@@ -189,18 +245,69 @@ public class FacilitatorIntentHandlerTests
         var result = await HandlerOver(repository)
             .HandleAsync(new RevealAnswerCommand(KnownSession, new CallerSubject("someone-else")));
 
+        ShouldBeRejectedAsNotAuthorized(result, repository);
+    }
+
+    [Fact]
+    public async Task Another_subject_may_not_show_the_learning_text()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, true, false, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ShowLearningTextCommand(KnownSession, new CallerSubject("someone-else"))
+            );
+
+        ShouldBeRejectedAsNotAuthorized(result, repository);
+    }
+
+    [Fact]
+    public async Task Another_subject_may_not_pose_the_next_question()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.Quiz, quiz: QuizProgress.Restore(0, true, true, []))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new PoseNextQuestionCommand(KnownSession, new CallerSubject("someone-else"))
+            );
+
+        ShouldBeRejectedAsNotAuthorized(result, repository);
+    }
+
+    private void ShouldBeRejectedAsNotAuthorized(
+        IntentResult result,
+        FakeSessionRepository repository
+    )
+    {
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
         repository.Saved.ShouldBeEmpty();
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
-    private FacilitatorIntentHandler HandlerOver(FakeSessionRepository repository)
+    private FacilitatorIntentHandler HandlerOver(
+        FakeSessionRepository repository,
+        IGroupSolver? groupSolverPort = null
+    )
     {
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard()),
-            new TestQuizCatalog(5)
+            [new GroupFormation(groupSolverPort ?? new TestGroupSolver(), new TestGroupNames(8))]
         );
+    }
+
+    private sealed class RecordingPhaseEntryAction : IPhaseEntryAction
+    {
+        public List<Phase> SeenPhases { get; } = [];
+
+        public void ExecuteFor(Session session)
+        {
+            SeenPhases.Add(session.PhaseProgress.CurrentPhase);
+        }
     }
 }

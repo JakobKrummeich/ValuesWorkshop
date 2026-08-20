@@ -9,12 +9,6 @@ public enum QuizSubState
     LearningTextShown = 3,
 }
 
-public enum GroupWorkStatus
-{
-    Editing = 1,
-    Submitted = 2,
-}
-
 public sealed record LocalizedTextView(string De, string En);
 
 public sealed record ParticipantQuizView(
@@ -81,27 +75,24 @@ public sealed record SelectionProgressView(
         IReadOnlyList<string>? TopValueIds
 );
 
+public sealed record GroupNameView(string AnimalId, LocalizedTextView Text);
+
 public sealed record OwnGroupView(
-    string Name,
-    int MemberCount,
-    IReadOnlyList<string> AssignedValueIds,
-    bool IsCallerScribe,
-    GroupWorkStatus WorkStatus
+    GroupNameView Name,
+    IReadOnlyList<string> MemberDisplayNames,
+    IReadOnlyList<WorkshopValueView> AssignedValues
 );
 
 public sealed record FacilitatorGroupView(
-    string Name,
-    IReadOnlyList<Guid> MemberParticipantIds,
-    IReadOnlyList<string> AssignedValueIds,
-    Guid? ScribeParticipantId,
-    GroupWorkStatus WorkStatus
+    GroupNameView Name,
+    IReadOnlyList<RosterParticipantView> Members,
+    IReadOnlyList<WorkshopValueView> AssignedValues
 );
 
 public sealed record PresenterGroupView(
-    string Name,
-    int MemberCount,
-    IReadOnlyList<string> AssignedValueIds,
-    GroupWorkStatus WorkStatus
+    GroupNameView Name,
+    IReadOnlyList<string> MemberDisplayNames,
+    IReadOnlyList<WorkshopValueView> AssignedValues
 );
 
 public sealed record PresentationView(string? PresentingGroupName, string? PresentedValueId);

@@ -33,11 +33,10 @@ public class SessionChooseQuizAnswerTests
     public void Answers_to_an_earlier_question_stay_out_of_the_current_tallies()
     {
         var session = QuizSessionWith(Anna);
-        var facilitator = TestSessions.CallerOf(session);
         session.ChooseQuizAnswer(Anna, questionIndex: 0, answerIndex: 2);
-        session.RevealAnswer(facilitator);
-        session.ShowLearningText(facilitator);
-        session.PoseNextQuestion(facilitator, questionCount: 5);
+        session.RevealAnswer();
+        session.ShowLearningText();
+        session.PoseNextQuestion();
 
         session.Quiz.AnswerTallies.ShouldBe([0, 0, 0]);
         session.Quiz.AnsweredCount.ShouldBe(0);
@@ -74,7 +73,7 @@ public class SessionChooseQuizAnswerTests
     public void An_answer_after_the_reveal_is_refused()
     {
         var session = QuizSessionWith(Anna);
-        session.RevealAnswer(TestSessions.CallerOf(session));
+        session.RevealAnswer();
 
         Should.Throw<WrongPhaseException>(() =>
             session.ChooseQuizAnswer(Anna, questionIndex: 0, answerIndex: 0)
@@ -129,7 +128,7 @@ public class SessionChooseQuizAnswerTests
             session.Join(TestParticipants.Named(participant, "Anna"), Randomness.Fixed(0));
         }
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         return session;
     }

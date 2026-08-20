@@ -6,11 +6,6 @@ export enum QuizSubState {
   LearningTextShown = 3,
 }
 
-export enum GroupWorkStatus {
-  Editing = 1,
-  Submitted = 2,
-}
-
 const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
@@ -49,22 +44,24 @@ export const presenterQuizViewSchema = z.object({
   learningText: localizedTextSchema.optional(),
 });
 
+const rosterParticipantSchema = z.object({
+  participantId: participantIdSchema,
+  displayName: z.string(),
+});
+
 export const rosterViewSchema = z.object({
-  participants: z.array(
-    z.object({
-      participantId: participantIdSchema,
-      displayName: z.string(),
-    }),
-  ),
+  participants: z.array(rosterParticipantSchema),
   participantCount: z.int(),
 });
 
-const workshopValuesSchema = z.array(
-  z.object({
-    valueId: z.string(),
-    text: localizedTextSchema,
-  }),
-);
+const workshopValueSchema = z.object({
+  valueId: z.string(),
+  text: localizedTextSchema,
+});
+
+const workshopValuesSchema = z.array(workshopValueSchema);
+
+export type WorkshopValue = z.infer<typeof workshopValueSchema>;
 
 const selectionTalliesSchema = z.record(z.string(), z.int());
 
@@ -83,30 +80,32 @@ export const selectionProgressViewSchema = z.object({
   topValueIds: valueIdsSchema.optional(),
 });
 
+const groupNameSchema = z.object({
+  animalId: z.string(),
+  text: localizedTextSchema,
+});
+
+export type GroupName = z.infer<typeof groupNameSchema>;
+
 export const ownGroupViewSchema = z.object({
-  name: z.string(),
-  memberCount: z.int(),
-  assignedValueIds: valueIdsSchema,
-  isCallerScribe: z.boolean(),
-  workStatus: z.enum(GroupWorkStatus),
+  name: groupNameSchema,
+  memberDisplayNames: z.array(z.string()),
+  assignedValues: workshopValuesSchema,
 });
 
 export const facilitatorGroupsSchema = z.array(
   z.object({
-    name: z.string(),
-    memberParticipantIds: z.array(participantIdSchema),
-    assignedValueIds: valueIdsSchema,
-    scribeParticipantId: participantIdSchema.nullable(),
-    workStatus: z.enum(GroupWorkStatus),
+    name: groupNameSchema,
+    members: z.array(rosterParticipantSchema),
+    assignedValues: workshopValuesSchema,
   }),
 );
 
 export const presenterGroupsSchema = z.array(
   z.object({
-    name: z.string(),
-    memberCount: z.int(),
-    assignedValueIds: valueIdsSchema,
-    workStatus: z.enum(GroupWorkStatus),
+    name: groupNameSchema,
+    memberDisplayNames: z.array(z.string()),
+    assignedValues: workshopValuesSchema,
   }),
 );
 

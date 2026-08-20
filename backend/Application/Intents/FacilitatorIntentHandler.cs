@@ -1,21 +1,24 @@
-using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Intents;
 
 public sealed class FacilitatorIntentHandler(
     IntentPipeline pipeline,
-    PhaseExitGuards exitGuards,
-    IQuizCatalog quizCatalog
+    IEnumerable<IPhaseEntryAction> phaseEntryActions
 )
 {
     public Task<IntentResult> HandleAsync(AdvancePhaseCommand command)
     {
-        return pipeline.ExecuteAsync(
+        return ExecuteAsFacilitatorAsync(
             command.SessionIdentity,
+            command.Caller,
             session =>
             {
-                session.AdvancePhase(command.Caller, exitGuards);
+                session.AdvancePhase();
+                foreach (var phaseEntryAction in phaseEntryActions)
+                {
+                    phaseEntryAction.ExecuteFor(session);
+                }
                 return true;
             }
         );
@@ -23,12 +26,13 @@ public sealed class FacilitatorIntentHandler(
 
     public Task<IntentResult> HandleAsync(RevealAnswerCommand command)
     {
-        return pipeline.ExecuteAsync(
+        return ExecuteAsFacilitatorAsync(
             command.SessionIdentity,
+            command.Caller,
             session =>
             {
                 var was = session.Quiz.IsRevealed;
-                session.RevealAnswer(command.Caller);
+                session.RevealAnswer();
                 return !was;
             }
         );
@@ -36,12 +40,13 @@ public sealed class FacilitatorIntentHandler(
 
     public Task<IntentResult> HandleAsync(ShowLearningTextCommand command)
     {
-        return pipeline.ExecuteAsync(
+        return ExecuteAsFacilitatorAsync(
             command.SessionIdentity,
+            command.Caller,
             session =>
             {
                 var was = session.Quiz.IsLearningTextShown;
-                session.ShowLearningText(command.Caller);
+                session.ShowLearningText();
                 return !was;
             }
         );
@@ -49,12 +54,35 @@ public sealed class FacilitatorIntentHandler(
 
     public Task<IntentResult> HandleAsync(PoseNextQuestionCommand command)
     {
-        return pipeline.ExecuteAsync(
+        return ExecuteAsFacilitatorAsync(
             command.SessionIdentity,
+            command.Caller,
             session =>
             {
-                session.PoseNextQuestion(command.Caller, quizCatalog.Questions.Count);
+                session.PoseNextQuestion();
                 return true;
+            }
+        );
+    }
+
+    private Task<IntentResult> ExecuteAsFacilitatorAsync(
+        SessionIdentity sessionIdentity,
+        CallerSubject caller,
+        Func<Session, bool> intent
+    )
+    {
+        return pipeline.ExecuteAsync(
+            sessionIdentity,
+            session =>
+            {
+                if (!session.IsFacilitatedBy(caller))
+                {
+                    throw new NotAuthorizedException(
+                        "Only the facilitator of this session may command it."
+                    );
+                }
+
+                return intent(session);
             }
         );
     }

@@ -119,16 +119,17 @@ internal static class DomainEntityMapper
         );
 
         var groups = entity
-            .Groups.Select(groupEntity =>
+            .Groups.OrderBy(groupEntity => groupEntity.Id)
+            .Select(groupEntity =>
                 Group.Restore(
                     groupEntity.Name,
                     groupEntity
-                        .Members.Select(member => new ParticipantId(
-                            Guid.Parse(member.ParticipantId)
-                        ))
+                        .Members.OrderBy(member => member.SortOrder)
+                        .Select(member => new ParticipantId(Guid.Parse(member.ParticipantId)))
                         .ToList(),
                     groupEntity
-                        .AssignedValues.Select(assignedValue => new ValueId(assignedValue.ValueId))
+                        .AssignedValues.OrderBy(assignedValue => assignedValue.SortOrder)
+                        .Select(assignedValue => new ValueId(assignedValue.ValueId))
                         .ToList(),
                     groupEntity.ScribeParticipantId is not null
                         ? new ParticipantId(Guid.Parse(groupEntity.ScribeParticipantId))
@@ -192,16 +193,20 @@ internal static class DomainEntityMapper
             ScribeParticipantId = group.Scribe?.Value.ToString(),
             IsSubmitted = group.IsSubmitted,
             Members = group
-                .Members.Select(participantId => new GroupMemberEntity
-                {
-                    ParticipantId = participantId.Value.ToString(),
-                })
+                .Members.Select(
+                    (participantId, index) =>
+                        new GroupMemberEntity
+                        {
+                            ParticipantId = participantId.Value.ToString(),
+                            SortOrder = index,
+                        }
+                )
                 .ToList(),
             AssignedValues = group
-                .AssignedValues.Select(valueId => new GroupAssignedValueEntity
-                {
-                    ValueId = valueId.Value,
-                })
+                .AssignedValues.Select(
+                    (valueId, index) =>
+                        new GroupAssignedValueEntity { ValueId = valueId.Value, SortOrder = index }
+                )
                 .ToList(),
         };
     }

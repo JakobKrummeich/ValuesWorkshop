@@ -79,6 +79,18 @@ public sealed class QuizCatalogFileTests : IDisposable
     }
 
     [Fact]
+    public void A_file_with_fewer_questions_than_the_workshop_quiz_refuses_to_load()
+    {
+        var path = TemporaryFile(QuestionDocument(answerKinds: ["correct", "wrong", "funnyWrong"]));
+
+        var exception = Should.Throw<InvalidOperationException>(() =>
+            QuizCatalogFile.LoadFrom(path)
+        );
+
+        exception.Message.ShouldContain("exactly 5 questions");
+    }
+
+    [Fact]
     public void A_question_with_two_correct_answers_refuses_to_load()
     {
         var path = TemporaryFile(

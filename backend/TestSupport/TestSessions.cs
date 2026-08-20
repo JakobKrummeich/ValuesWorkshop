@@ -8,11 +8,6 @@ public static class TestSessions
     public static readonly CallerSubject FacilitatorCaller = new(Facilitator.Value);
     public static readonly SessionName Name = new("Test workshop");
 
-    public static CallerSubject CallerOf(Session session)
-    {
-        return new CallerSubject(session.Facilitator.Value);
-    }
-
     public static Session Open(SessionIdentity identity)
     {
         return Open(identity, Facilitator);
@@ -49,8 +44,17 @@ public static class TestSessions
         );
     }
 
-    public static void AdvanceToNextPhase(Session session)
+    public static void WalkQuizToCompletion(Session session)
     {
-        session.AdvancePhase(CallerOf(session), PhaseExitGuards.None);
+        for (var questionIndex = 0; questionIndex < QuizProgress.QuestionCount; questionIndex++)
+        {
+            session.RevealAnswer();
+            session.ShowLearningText();
+
+            if (questionIndex < QuizProgress.QuestionCount - 1)
+            {
+                session.PoseNextQuestion();
+            }
+        }
     }
 }

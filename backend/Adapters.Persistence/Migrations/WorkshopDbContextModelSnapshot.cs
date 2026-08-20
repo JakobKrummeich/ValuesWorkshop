@@ -58,6 +58,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("value_id");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sort_order");
+
                     b.HasKey("GroupId", "ValueId");
 
                     b.ToTable("group_assigned_values", (string)null);
@@ -104,6 +108,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.Property<string>("ParticipantId")
                         .HasColumnType("TEXT")
                         .HasColumnName("participant_id");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sort_order");
 
                     b.HasKey("GroupId", "ParticipantId");
 

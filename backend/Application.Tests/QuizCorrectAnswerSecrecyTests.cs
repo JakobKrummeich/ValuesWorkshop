@@ -13,6 +13,8 @@ public class QuizCorrectAnswerSecrecyTests
 
     private static readonly TestValuesCatalog ValuesCatalog = new(50);
 
+    private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
+
     [Fact]
     public void Participant_and_presenter_json_never_mention_the_correct_answer_before_the_reveal()
     {
@@ -70,11 +72,10 @@ public class QuizCorrectAnswerSecrecyTests
         );
 
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                Catalog,
-                ValuesCatalog,
-                RegisteredExitGuards.For(Catalog)
-            ).Map(session, 1),
+            new FacilitatorWorkshopStateMapper(Catalog, ValuesCatalog, AnimalsCatalog).Map(
+                session,
+                1
+            ),
             WireOptions
         );
 
@@ -85,7 +86,7 @@ public class QuizCorrectAnswerSecrecyTests
     private static string ParticipantJsonOf(Session session)
     {
         return JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(Catalog, ValuesCatalog).MapFor(
+            new ParticipantWorkshopStateMapper(Catalog, ValuesCatalog, AnimalsCatalog).MapFor(
                 session,
                 SessionFixtures.Anna,
                 1
@@ -97,7 +98,10 @@ public class QuizCorrectAnswerSecrecyTests
     private static string PresenterJsonOf(Session session)
     {
         return JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(Catalog, ValuesCatalog).Map(session, 1),
+            new PresenterWorkshopStateMapper(Catalog, ValuesCatalog, AnimalsCatalog).Map(
+                session,
+                1
+            ),
             WireOptions
         );
     }

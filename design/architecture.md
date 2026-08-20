@@ -62,15 +62,26 @@ layer** (not in a separate layer), and are implemented by adapters.
 
 ### 2.1 Backend Ports
 
-Port interfaces live in `ValuesWorkshop.Domain/Ports/`. Adapters implement
-them. Application layer references port interfaces from Domain to orchestrate
-use cases.
+Domain port interfaces live in `ValuesWorkshop.Domain/Ports/` or in the
+Domain root namespace (`ValuesWorkshop.Domain`) when they are passed into
+aggregate methods and a `Domain.Ports` sub-namespace would create a cycle
+under the ArchUnit slice rule (`IRandomness` precedent).
 
-Current ports:
+Current Domain ports:
 
 | Interface | File | Implemented by |
 |---|---|---|
 | `ISessionRepository` | `Domain/Ports/ISessionRepository.cs` | `SqliteSessionRepository` (Adapters.Persistence) |
+| `IGroupSolver` | `Domain/IGroupSolver.cs` | `CpSatGroupSolver` (Host) |
+| `IGroupNames` | `Domain/IGroupNames.cs` | `AnimalsCatalogFile` (Host) |
+
+Domain services own procedures that need ports; unlike aggregates they are
+container-built (constructor injection) and are sequenced by the intent
+handlers. Aggregates stay port-free and own state + invariants.
+
+| Service | File | Ports (ctor) | Called by |
+|---|---|---|---|
+| `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IGroupNames` | `FacilitatorIntentHandler` runs every registered `IPhaseEntryAction` after `Session.AdvancePhase()` — `GroupFormation` is one; it self-guards: no-op outside the group-formation phase and once groups are formed |
 
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):
@@ -81,7 +92,7 @@ concerns):
 | `IFacilitatorPassphrase` | `Application/Ports/Driven/IFacilitatorPassphrase.cs` | `FacilitatorPassphrase` (Host.Auth) |
 | `IQuizCatalog` | `Application/Ports/Driven/IQuizCatalog.cs` | `QuizCatalogFile` (Host) |
 | `IValuesCatalog` | `Application/Ports/Driven/IValuesCatalog.cs` | `ValuesCatalogFile` (Host) |
-| `IGroupSolver` | `Application/Ports/Driven/IGroupSolver.cs` | `CpSatGroupSolver` (Host) |
+| `IAnimalsCatalog` | `Application/Ports/Driven/IAnimalsCatalog.cs` | `AnimalsCatalogFile` (Host) |
 
 ### 2.2 Frontend Ports
 
@@ -173,8 +184,11 @@ There is no implementation inheritance in the backend. Shared contracts are
 expressed as interfaces implemented by sealed records: `IPhaseExitGuard`
 carries the `Phase` discriminator plus the `Refusal` / `IsSatisfiedBy`
 contract, and `QuizExitGuard`, `GroupWorkExitGuard`,
-`ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly
-and are registered in `PhaseExitGuards`.
+`ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly.
+The guards are stateless domain policy: the Domain-internal static registry
+`PhaseExitGuards` holds the registered ones, `Session.AdvancePhase()` consults
+it directly, and the facilitator `enabledIntents` computation reads the same
+registry — a single source.
 
 **Rationale:** Sealed classes communicate "this is a leaf type — extend
 behavior through composition, not subclassing." This prevents fragile base

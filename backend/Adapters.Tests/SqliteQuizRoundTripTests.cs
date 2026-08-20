@@ -43,15 +43,14 @@ public sealed class SqliteQuizRoundTripTests : IAsyncLifetime, IDisposable
         var session = TestSessions.InPhase(identity, Phase.Join);
         session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
         session.Join(TestParticipants.Named(ben, "Ben"), new FixedRandomness(0));
-        var facilitator = TestSessions.CallerOf(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
         session.ChooseQuizAnswer(anna, questionIndex: 0, answerIndex: 1);
-        session.RevealAnswer(facilitator);
-        session.ShowLearningText(facilitator);
-        session.PoseNextQuestion(facilitator, questionCount: 5);
+        session.RevealAnswer();
+        session.ShowLearningText();
+        session.PoseNextQuestion();
         session.ChooseQuizAnswer(ben, questionIndex: 1, answerIndex: 2);
         session.ChooseQuizAnswer(anna, questionIndex: 1, answerIndex: 2);
-        session.RevealAnswer(facilitator);
+        session.RevealAnswer();
 
         await CreateSession(session);
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
@@ -75,7 +74,7 @@ public sealed class SqliteQuizRoundTripTests : IAsyncLifetime, IDisposable
         var anna = new ParticipantId(Guid.NewGuid());
         var session = TestSessions.InPhase(identity, Phase.Join);
         session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
         session.ChooseQuizAnswer(anna, questionIndex: 0, answerIndex: 0);
         await CreateSession(session);
 

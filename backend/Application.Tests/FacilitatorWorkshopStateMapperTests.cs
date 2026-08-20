@@ -142,23 +142,61 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Group_work_state_names_members_and_scribes_of_every_group()
+    public void Groups_carry_animal_names_members_in_formation_order_and_value_texts()
     {
         var session = SessionFixtures.InPhase(
-            Phase.GroupWork,
+            Phase.GroupFormation,
             formation: SessionFixtures.TwoGroups()
         );
 
-        var groups = Map(session).ShouldBeOfType<FacilitatorGroupWorkState>().Groups;
+        var groups = Map(session).ShouldBeOfType<FacilitatorGroupFormationState>().Groups;
 
         groups.Count.ShouldBe(2);
-        groups[0].Name.ShouldBe("fox");
         groups[0]
-            .MemberParticipantIds.ShouldBe([SessionFixtures.Anna.Value, SessionFixtures.Ben.Value]);
-        groups[0].AssignedValueIds.ShouldBe(["honesty"]);
-        groups[0].ScribeParticipantId.ShouldBe(SessionFixtures.Anna.Value);
-        groups[0].WorkStatus.ShouldBe(GroupWorkStatus.Editing);
-        groups[1].WorkStatus.ShouldBe(GroupWorkStatus.Submitted);
+            .Name.ShouldBe(
+                new GroupNameView("tier-1", new LocalizedTextView("Tier 1", "Animal 1"))
+            );
+        groups[0]
+            .Members.ShouldBe([
+                new RosterParticipantView(SessionFixtures.Ben.Value, "Ben"),
+                new RosterParticipantView(SessionFixtures.Anna.Value, "Anna Schmidt"),
+            ]);
+        groups[0]
+            .AssignedValues.ShouldBe([
+                new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")),
+            ]);
+        groups[1].Name.AnimalId.ShouldBe("tier-2");
+        groups[1]
+            .Members.ShouldBe([new RosterParticipantView(SessionFixtures.Chris.Value, "#c3c3c3")]);
+    }
+
+    [Fact]
+    public void A_group_without_members_still_carries_its_name_and_values()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupFormation,
+            formation: FormationRecord.Restore(
+                true,
+                [Group.Restore("tier-1", [], [new ValueId("wert-1")], null, false)]
+            )
+        );
+
+        var groups = Map(session).ShouldBeOfType<FacilitatorGroupFormationState>().Groups;
+
+        groups.Count.ShouldBe(1);
+        groups[0].Members.ShouldBeEmpty();
+        groups[0].AssignedValues.Count.ShouldBe(1);
+    }
+
+    [Fact]
+    public void Group_formation_state_keeps_the_selection_progress_without_tallies()
+    {
+        var state = Map(SessionFixtures.InPhase(Phase.GroupFormation))
+            .ShouldBeOfType<FacilitatorGroupFormationState>();
+
+        state.Selection.Values.Count.ShouldBe(50);
+        state.Selection.SelectionTallies.ShouldBeNull();
+        state.Selection.TopValueIds.ShouldBeNull();
     }
 
     [Fact]
@@ -219,7 +257,7 @@ public class FacilitatorWorkshopStateMapperTests
         return new FacilitatorWorkshopStateMapper(
             catalog,
             new TestValuesCatalog(50),
-            RegisteredExitGuards.For(catalog)
+            new TestAnimalsCatalog(8)
         ).Map(session, revision);
     }
 }

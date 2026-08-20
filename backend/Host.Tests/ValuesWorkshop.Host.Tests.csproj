@@ -31,6 +31,11 @@
       Link="config\values.json"
       CopyToOutputDirectory="PreserveNewest"
     />
+    <Content
+      Include="..\..\config\animals.json"
+      Link="config\animals.json"
+      CopyToOutputDirectory="PreserveNewest"
+    />
   </ItemGroup>
 
   <ItemGroup>

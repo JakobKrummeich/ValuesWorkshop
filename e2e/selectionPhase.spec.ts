@@ -72,7 +72,7 @@ const EXPECTED_TOP_VALUE_IDS = [
 ];
 const EXPECTED_DISTINCT_SELECTED_COUNT = 19;
 
-test.describe.serial("phase 3 value selection", () => {
+test.describe.serial("value selection through group formation", () => {
   let facilitatorContext: BrowserContext;
   let participantContexts: BrowserContext[];
   let presenterContext: BrowserContext;
@@ -372,6 +372,58 @@ test.describe.serial("phase 3 value selection", () => {
     await expect(
       presenterPage.getByTestId("result-row-anpassungsfaehigkeit"),
     ).toHaveAttribute("data-top-value", "false");
+
+    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
+  });
+
+  test("the advance into phase 5 deals every participant into the otter group", async () => {
+    await advancePhaseButton(facilitatorPage).click();
+
+    for (const page of everyRolePage()) {
+      await expect(page.getByTestId("phase")).toHaveText("Phase 5");
+    }
+    for (const page of participantPages()) {
+      const ownGroupCard = page.getByTestId("own-group-card");
+      await expect(ownGroupCard.getByTestId("group-name")).toHaveText("Otter");
+      await expect(ownGroupCard.getByTestId("group-member")).toHaveText([
+        "Alice",
+        "Bob",
+        "Charlie",
+      ]);
+      await expect(ownGroupCard.getByTestId(/^group-value-/)).toHaveCount(
+        EXPECTED_TOP_VALUE_IDS.length,
+      );
+      await expect(
+        ownGroupCard.getByTestId("group-value-vertrauen"),
+      ).toHaveText("Trust");
+      await expect(
+        ownGroupCard.getByTestId("group-value-freiheit"),
+      ).toHaveText("Freedom");
+      await expect(
+        ownGroupCard.getByTestId("group-value-kompetenz"),
+      ).toHaveText("Competence");
+      await expect(page.getByTestId("own-group-waiting")).toHaveCount(0);
+    }
+  });
+
+  test("the facilitator and the presenter show the single group card", async () => {
+    for (const page of [facilitatorPage, presenterPage]) {
+      await expect(page.getByTestId(/^group-card-/)).toHaveCount(1);
+      const groupCard = page.getByTestId("group-card-otter");
+      await expect(groupCard.getByTestId("group-name")).toHaveText("Otter");
+      await expect(groupCard.getByTestId("group-member")).toHaveText([
+        "Alice",
+        "Bob",
+        "Charlie",
+      ]);
+      await expect(groupCard.getByTestId(/^group-value-/)).toHaveCount(
+        EXPECTED_TOP_VALUE_IDS.length,
+      );
+      await expect(groupCard.getByTestId("group-value-vertrauen")).toHaveText(
+        "Trust",
+      );
+      await expect(page.getByTestId("results-heading")).toHaveCount(0);
+    }
 
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
   });

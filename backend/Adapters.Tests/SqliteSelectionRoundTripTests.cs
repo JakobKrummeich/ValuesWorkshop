@@ -47,8 +47,9 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         var session = TestSessions.InPhase(identity, Phase.Join);
         session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
         session.Join(TestParticipants.Named(ben, "Ben"), new FixedRandomness(0));
-        TestSessions.AdvanceToNextPhase(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
+        TestSessions.WalkQuizToCompletion(session);
+        session.AdvancePhase();
         session.SubmitValueSelection(anna, TestValueIds.Numbered(1, 10), ValidValueIds);
         session.SubmitValueSelection(ben, TestValueIds.Numbered(3, 10), ValidValueIds);
 
@@ -82,11 +83,12 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         var session = TestSessions.InPhase(identity, Phase.Join);
         session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
         session.Join(TestParticipants.Named(ben, "Ben"), new FixedRandomness(0));
-        TestSessions.AdvanceToNextPhase(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
+        TestSessions.WalkQuizToCompletion(session);
+        session.AdvancePhase();
         session.SubmitValueSelection(anna, TestValueIds.Numbered(1, 10), ValidValueIds);
         session.SubmitValueSelection(ben, TestValueIds.Numbered(3, 10), ValidValueIds);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
         session.Selection.TopValues.Count.ShouldBe(12);
 
         await CreateSession(session);
@@ -103,8 +105,9 @@ public sealed class SqliteSelectionRoundTripTests : IAsyncLifetime, IDisposable
         var anna = new ParticipantId(Guid.NewGuid());
         var session = TestSessions.InPhase(identity, Phase.Join);
         session.Join(TestParticipants.Named(anna, "Anna"), new FixedRandomness(0));
-        TestSessions.AdvanceToNextPhase(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
+        TestSessions.WalkQuizToCompletion(session);
+        session.AdvancePhase();
         session.SubmitValueSelection(anna, TestValueIds.Numbered(1, 10), ValidValueIds);
         await CreateSession(session);
 

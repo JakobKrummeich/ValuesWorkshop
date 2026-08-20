@@ -4,14 +4,12 @@ public class SessionQuizWalkTests
 {
     private const int QuestionCount = 5;
 
-    private static readonly CallerSubject Stranger = new("not-the-facilitator");
-
     [Fact]
     public void Entering_the_quiz_phase_poses_the_first_question()
     {
         var session = TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Join);
 
-        session.AdvancePhase(TestSessions.CallerOf(session), PhaseExitGuards.None);
+        session.AdvancePhase();
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(0);
         session.Quiz.IsRevealed.ShouldBeFalse();
@@ -23,7 +21,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, false, false, []));
 
-        session.RevealAnswer(TestSessions.CallerOf(session));
+        session.RevealAnswer();
 
         session.Quiz.IsRevealed.ShouldBeTrue();
         session.Quiz.IsLearningTextShown.ShouldBeFalse();
@@ -34,7 +32,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
-        session.RevealAnswer(TestSessions.CallerOf(session));
+        session.RevealAnswer();
 
         session.Quiz.IsRevealed.ShouldBeTrue();
         session.Quiz.IsLearningTextShown.ShouldBeFalse();
@@ -45,9 +43,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(null, false, false, []));
 
-        Should.Throw<WrongPhaseException>(() =>
-            session.RevealAnswer(TestSessions.CallerOf(session))
-        );
+        Should.Throw<WrongPhaseException>(() => session.RevealAnswer());
     }
 
     [Fact]
@@ -59,19 +55,7 @@ public class SessionQuizWalkTests
             QuizProgress.Restore(4, true, true, [])
         );
 
-        Should.Throw<WrongPhaseException>(() =>
-            session.RevealAnswer(TestSessions.CallerOf(session))
-        );
-    }
-
-    [Fact]
-    public void Only_the_facilitator_reveals_the_answer()
-    {
-        var session = QuizSession(QuizProgress.Restore(0, false, false, []));
-
-        Should.Throw<NotAuthorizedException>(() => session.RevealAnswer(Stranger));
-
-        session.Quiz.IsRevealed.ShouldBeFalse();
+        Should.Throw<WrongPhaseException>(() => session.RevealAnswer());
     }
 
     [Fact]
@@ -79,7 +63,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
-        session.ShowLearningText(TestSessions.CallerOf(session));
+        session.ShowLearningText();
 
         session.Quiz.IsLearningTextShown.ShouldBeTrue();
     }
@@ -89,9 +73,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, false, false, []));
 
-        Should.Throw<WrongPhaseException>(() =>
-            session.ShowLearningText(TestSessions.CallerOf(session))
-        );
+        Should.Throw<WrongPhaseException>(() => session.ShowLearningText());
 
         session.Quiz.IsLearningTextShown.ShouldBeFalse();
     }
@@ -101,19 +83,9 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, true, true, []));
 
-        session.ShowLearningText(TestSessions.CallerOf(session));
+        session.ShowLearningText();
 
         session.Quiz.IsLearningTextShown.ShouldBeTrue();
-    }
-
-    [Fact]
-    public void Only_the_facilitator_shows_the_learning_text()
-    {
-        var session = QuizSession(QuizProgress.Restore(0, true, false, []));
-
-        Should.Throw<NotAuthorizedException>(() => session.ShowLearningText(Stranger));
-
-        session.Quiz.IsLearningTextShown.ShouldBeFalse();
     }
 
     [Fact]
@@ -121,7 +93,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, true, true, []));
 
-        session.PoseNextQuestion(TestSessions.CallerOf(session), QuestionCount);
+        session.PoseNextQuestion();
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(1);
         session.Quiz.IsRevealed.ShouldBeFalse();
@@ -133,9 +105,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
-        Should.Throw<WrongPhaseException>(() =>
-            session.PoseNextQuestion(TestSessions.CallerOf(session), QuestionCount)
-        );
+        Should.Throw<WrongPhaseException>(() => session.PoseNextQuestion());
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(0);
         session.Quiz.IsRevealed.ShouldBeTrue();
@@ -146,24 +116,10 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(QuestionCount - 1, true, true, []));
 
-        Should.Throw<WrongPhaseException>(() =>
-            session.PoseNextQuestion(TestSessions.CallerOf(session), QuestionCount)
-        );
+        Should.Throw<WrongPhaseException>(() => session.PoseNextQuestion());
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(QuestionCount - 1);
         session.Quiz.IsLearningTextShown.ShouldBeTrue();
-    }
-
-    [Fact]
-    public void Only_the_facilitator_poses_the_next_question()
-    {
-        var session = QuizSession(QuizProgress.Restore(0, true, true, []));
-
-        Should.Throw<NotAuthorizedException>(() =>
-            session.PoseNextQuestion(Stranger, QuestionCount)
-        );
-
-        session.Quiz.CurrentQuestionIndex.ShouldBe(0);
     }
 
     private static Session QuizSession(QuizProgress quiz)

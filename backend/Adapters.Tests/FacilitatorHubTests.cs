@@ -270,8 +270,7 @@ public class FacilitatorHubTests
             repository,
             new FacilitatorIntentHandler(
                 new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-                new PhaseExitGuards(new GroupWorkExitGuard(), new FinalVotingExitGuard()),
-                new TestQuizCatalog(5)
+                [new GroupFormation(new TestGroupSolver(), new TestGroupNames(8))]
             ),
             TestWorkshopStateCache.Create(),
             registry

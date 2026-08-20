@@ -17,7 +17,8 @@ import {
   votingViewSchema,
 } from "./workshopStateBlocks";
 
-export { GroupWorkStatus, QuizSubState } from "./workshopStateBlocks";
+export { QuizSubState } from "./workshopStateBlocks";
+export type { GroupName, WorkshopValue } from "./workshopStateBlocks";
 
 export enum FacilitatorIntent {
   AdvancePhase = "AdvancePhase",
@@ -258,4 +259,17 @@ export type FacilitatorSelectionResultsState = InPhase<
 export type PresenterSelectionResultsState = InPhase<
   PresenterWorkshopState,
   Phase.SelectionResults
+>;
+
+export type ParticipantGroupFormationState = InPhase<
+  ParticipantWorkshopState,
+  Phase.GroupFormation
+>;
+export type FacilitatorGroupFormationState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.GroupFormation
+>;
+export type PresenterGroupFormationState = InPhase<
+  PresenterWorkshopState,
+  Phase.GroupFormation
 >;

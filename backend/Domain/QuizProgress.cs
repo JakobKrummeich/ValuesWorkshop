@@ -2,6 +2,7 @@ namespace ValuesWorkshop.Domain;
 
 public sealed class QuizProgress
 {
+    public const int QuestionCount = 5;
     public const int AnswersPerQuestion = 3;
 
     private readonly List<CastAnswer> castAnswers = [];
@@ -41,10 +42,8 @@ public sealed class QuizProgress
     public int AnsweredCount =>
         castAnswers.Count(cast => cast.QuestionIndex == CurrentQuestionIndex);
 
-    public bool IsQuizComplete(int questionCount)
-    {
-        return CurrentQuestionIndex >= questionCount - 1 && IsRevealed && IsLearningTextShown;
-    }
+    public bool IsQuizComplete =>
+        CurrentQuestionIndex >= QuestionCount - 1 && IsRevealed && IsLearningTextShown;
 
     internal void PoseFirstQuestion()
     {
@@ -105,7 +104,7 @@ public sealed class QuizProgress
         castAnswers.Add(new CastAnswer(questionIndex, participantId, answerIndex));
     }
 
-    internal void PoseNextQuestion(int questionCount)
+    internal void PoseNextQuestion()
     {
         if (!IsLearningTextShown)
         {
@@ -114,7 +113,7 @@ public sealed class QuizProgress
             );
         }
 
-        if (CurrentQuestionIndex >= questionCount - 1)
+        if (CurrentQuestionIndex >= QuestionCount - 1)
         {
             throw new WrongPhaseException("No quiz question remains.");
         }

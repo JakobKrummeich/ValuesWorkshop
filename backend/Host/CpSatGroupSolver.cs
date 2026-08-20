@@ -1,5 +1,4 @@
 using Google.OrTools.Sat;
-using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Host;
