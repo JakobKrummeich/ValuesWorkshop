@@ -3,7 +3,7 @@ namespace ValuesWorkshop.Domain.Tests;
 public class SessionFormGroupsTests
 {
     [Fact]
-    public void Advancing_into_group_formation_forms_animal_named_groups_sized_by_the_sizing_rule()
+    public void Advancing_into_group_formation_forms_named_groups_sized_by_the_sizing_rule()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
@@ -153,25 +153,25 @@ public class SessionFormGroupsTests
     }
 
     [Fact]
-    public void A_formation_needing_more_animal_names_than_exist_is_refused()
+    public void A_formation_needing_more_group_names_than_exist_is_refused()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
         session.AdvancePhase();
 
         Should
             .Throw<InvariantViolationException>(() =>
-                new GroupFormation(new TestGroupSolver(), new TestAnimalNames(1)).EnsureFormedFor(
+                new GroupFormation(new TestGroupSolver(), new TestGroupNames(1)).EnsureFormedFor(
                     session
                 )
             )
-            .Message.ShouldContain("animal");
+            .Message.ShouldContain("group names");
 
         session.Formation.IsFormed.ShouldBeFalse();
         session.Formation.Groups.ShouldBeEmpty();
     }
 
     [Fact]
-    public void Thirty_participants_fit_within_the_eight_animal_names()
+    public void Thirty_participants_fit_within_the_eight_group_names()
     {
         var session = SessionAwaitingFormation(participantCount: 30, topValueCount: 10);
 
@@ -191,7 +191,7 @@ public class SessionFormGroupsTests
 
     private static GroupFormation FormationWith(IGroupSolver groupSolverPort)
     {
-        return new GroupFormation(groupSolverPort, new TestAnimalNames(8));
+        return new GroupFormation(groupSolverPort, new TestGroupNames(8));
     }
 
     private static ParticipantId ParticipantAt(int number)

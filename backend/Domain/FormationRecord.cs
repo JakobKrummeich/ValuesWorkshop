@@ -8,12 +8,12 @@ public sealed class FormationRecord
     public IReadOnlyList<Group> Groups => _groups;
     public bool IsEveryGroupSubmitted => _groups.TrueForAll(group => group.IsSubmitted);
 
-    internal void Form(GroupFormationResult formationResult, IReadOnlyList<string> animalNames)
+    internal void Form(GroupFormationResult formationResult, IReadOnlyList<string> groupNames)
     {
-        if (formationResult.Groups.Count > animalNames.Count)
+        if (formationResult.Groups.Count > groupNames.Count)
         {
             throw new InvariantViolationException(
-                $"Group formation needs {formationResult.Groups.Count} animal names but only {animalNames.Count} exist."
+                $"Group formation needs {formationResult.Groups.Count} group names but only {groupNames.Count} exist."
             );
         }
 
@@ -21,7 +21,7 @@ public sealed class FormationRecord
             formationResult.Groups.Select(
                 (formedGroup, groupIndex) =>
                     new Group(
-                        animalNames[groupIndex],
+                        groupNames[groupIndex],
                         formedGroup.Members,
                         formedGroup.AssignedValues
                     )

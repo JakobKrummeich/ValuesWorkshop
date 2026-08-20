@@ -434,7 +434,7 @@ best incumbent; no manual symmetry breaking (CP-SAT auto).
 ### Task 18: Phase 5 — Group formation ✅
 **Spec:** `tasks/specs/18-group-formation.md` (approved via Lavish).
 **Description:** Entering phase 5 forms the groups as a Domain procedure:
-the `GroupFormation` domain service (ctor-DI: `IGroupSolver`/`IAnimalNames`,
+the `GroupFormation` domain service (ctor-DI: `IGroupSolver`/`IGroupNames`,
 Domain ROOT namespace, `IRandomness` precedent — `Domain.Ports` would cycle
 with `Domain` under the ArchUnit slice rule) builds the solver request from
 session state (full roster, per-participant submitted selections, fixed top

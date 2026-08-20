@@ -1,6 +1,6 @@
 namespace ValuesWorkshop.Domain;
 
-public interface IAnimalNames
+public interface IGroupNames
 {
     IReadOnlyList<string> Names { get; }
 }

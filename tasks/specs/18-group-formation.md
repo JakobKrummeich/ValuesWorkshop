@@ -19,8 +19,8 @@ phase 5.
   Domain talks to the solver through an interface it owns.
   `IGroupSolver` moves from `Application/Ports/Driven/` to
   `Domain/Ports/` (`ISessionRepository` precedent; its records already
-  speak only Domain types). A second Domain port `IAnimalNames`
-  exposes the ordered animal ids.
+  speak only Domain types). A second Domain port `IGroupNames`
+  exposes the ordered group names.
 
   > **Amended in implementation:** both ports live in the Domain ROOT
   > namespace `ValuesWorkshop.Domain` (`IRandomness` precedent), not in
@@ -38,7 +38,7 @@ phase 5.
   > facilitator authorization is centralized in
   > `FacilitatorIntentHandler`; and `GroupFormation` is a
   > container-built domain service (ctor: `IGroupSolver`,
-  > `IAnimalNames`) that runs the solver and calls
+  > `IGroupNames`) that runs the solver and calls
   > `Session.FormGroups`. Aggregates own state + invariants and are
   > never container-built; domain services own procedures that need
   > ports; the handler sequences them (advance → ensure formed → one
@@ -48,7 +48,7 @@ phase 5.
   `GroupFormation.EnsureFormedFor(session)` no-ops outside phase 5,
   builds the solver request from session state (roster,
   per-participant selections, top values), calls the solver, and hands
-  the result plus the animal names to `Session.FormGroups`, which
+  the result plus the group names to `Session.FormGroups`, which
   creates `Group` instances (existing restore-shell aggregate) with
   animal labels in deterministic group order. I8 guard on the
   aggregate: groups-already-formed → no-op (idempotent-repeat; restore
@@ -56,7 +56,7 @@ phase 5.
 - Animal labels: ids from `config/animals.json` (8 ids ≥ max 7 groups
   for N=30), stable across restarts. Host loader `AnimalsCatalogFile`
   with fail-fast validation (values-catalog pattern) implements
-  `IAnimalNames` (ids, Domain) and the Application-side text lookup for
+  `IGroupNames` (ids, Domain) and the Application-side text lookup for
   views; TestSupport fake; group-count > animal count fails loudly.
 - Late joiner: verify the existing `Session.Join` →
   `PlaceIntoSmallestGroup` path against state-machine §2.5 (fewest
@@ -164,7 +164,7 @@ groups) beyond unit tests, solver fallback mechanism.
 
 1. **Group formation is a domain procedure** (review): trigger from
    the frontend, Domain calls the solver through a Domain-owned
-   interface — `IGroupSolver` (+ `IAnimalNames`) live in the Domain.
+   interface — `IGroupSolver` (+ `IGroupNames`) live in the Domain.
 
    > **Revised in lightspeed review:** the procedure lives in the
    > `GroupFormation` domain service (ctor-DI), not in an
@@ -172,8 +172,11 @@ groups) beyond unit tests, solver fallback mechanism.
    > guards sit in the internal `PhaseExitGuards` registry,
    > facilitator auth sits in the handler, and the handler calls
    > `groupFormation.EnsureFormedFor(session)` after every advance;
-   > `Session.FormGroups(result, animalNames)` keeps the I8 and
-   > animal-count invariants on the aggregate.
+   > `Session.FormGroups(result, groupNames)` keeps the I8 and
+   > group-name-count invariants on the aggregate. The Domain speaks
+   > `IGroupNames` and never mentions animals: that groups are named
+   > after animals is presentation flavor, owned by the Host
+   > implementation (`AnimalsCatalogFile`).
 2. **Animal names ride the wire** as id + `{de,en}` text (values
    precedent); client renders, never reads config.
 3. **Late-joiner placement is in scope** (state-machine §2.5 demands it

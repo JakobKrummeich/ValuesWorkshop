@@ -1,6 +1,6 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed class GroupFormation(IGroupSolver groupSolverPort, IAnimalNames animalNamesPort)
+public sealed class GroupFormation(IGroupSolver groupSolverPort, IGroupNames groupNamesPort)
 {
     public void EnsureFormedFor(Session session)
     {
@@ -23,6 +23,6 @@ public sealed class GroupFormation(IGroupSolver groupSolverPort, IAnimalNames an
             new GroupFormationRequest(participants, session.Selection.TopValues)
         );
 
-        session.FormGroups(formationResult, animalNamesPort.Names);
+        session.FormGroups(formationResult, groupNamesPort.Names);
     }
 }

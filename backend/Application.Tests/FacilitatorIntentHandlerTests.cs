@@ -279,7 +279,7 @@ public class FacilitatorIntentHandlerTests
     {
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            new GroupFormation(groupSolverPort ?? new TestGroupSolver(), new TestAnimalNames(8))
+            new GroupFormation(groupSolverPort ?? new TestGroupSolver(), new TestGroupNames(8))
         );
     }
 }

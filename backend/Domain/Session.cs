@@ -83,14 +83,14 @@ public sealed class Session
         }
     }
 
-    public void FormGroups(GroupFormationResult formationResult, IReadOnlyList<string> animalNames)
+    public void FormGroups(GroupFormationResult formationResult, IReadOnlyList<string> groupNames)
     {
         if (Formation.IsFormed)
         {
             return;
         }
 
-        Formation.Form(formationResult, animalNames);
+        Formation.Form(formationResult, groupNames);
     }
 
     public void RevealAnswer()

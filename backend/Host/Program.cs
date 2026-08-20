@@ -38,7 +38,7 @@ builder.Services.AddScoped<ParticipantIntentHandler>();
 builder.Services.AddSingleton<IQuizCatalog>(quizCatalog);
 builder.Services.AddSingleton<IValuesCatalog>(valuesCatalog);
 builder.Services.AddSingleton<IAnimalsCatalog>(animalsCatalog);
-builder.Services.AddSingleton<IAnimalNames>(animalsCatalog);
+builder.Services.AddSingleton<IGroupNames>(animalsCatalog);
 builder.Services.AddSingleton<IGroupSolver, CpSatGroupSolver>();
 builder.Services.AddSingleton<GroupFormation>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();

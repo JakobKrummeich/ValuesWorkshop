@@ -4,7 +4,7 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Host;
 
-public sealed class AnimalsCatalogFile : IAnimalsCatalog, IAnimalNames
+public sealed class AnimalsCatalogFile : IAnimalsCatalog, IGroupNames
 {
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {

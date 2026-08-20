@@ -73,7 +73,7 @@ Current Domain ports:
 |---|---|---|
 | `ISessionRepository` | `Domain/Ports/ISessionRepository.cs` | `SqliteSessionRepository` (Adapters.Persistence) |
 | `IGroupSolver` | `Domain/IGroupSolver.cs` | `CpSatGroupSolver` (Host) |
-| `IAnimalNames` | `Domain/IAnimalNames.cs` | `AnimalsCatalogFile` (Host) |
+| `IGroupNames` | `Domain/IGroupNames.cs` | `AnimalsCatalogFile` (Host) |
 
 Domain services own procedures that need ports; unlike aggregates they are
 container-built (constructor injection) and are sequenced by the intent
@@ -81,7 +81,7 @@ handlers. Aggregates stay port-free and own state + invariants.
 
 | Service | File | Ports (ctor) | Called by |
 |---|---|---|---|
-| `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IAnimalNames` | `FacilitatorIntentHandler` after every `Session.AdvancePhase()`; no-ops outside the group-formation phase and once groups are formed |
+| `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IGroupNames` | `FacilitatorIntentHandler` after every `Session.AdvancePhase()`; no-ops outside the group-formation phase and once groups are formed |
 
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):
