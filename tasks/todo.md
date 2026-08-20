@@ -443,8 +443,9 @@ values), calls the CP-SAT solver, and hands the result to
 `config/animals.json` order (host loader `AnimalsCatalogFile`, fail-fast
 validation). `FacilitatorIntentHandler` runs `session.AdvancePhase()`
 (argument-free; exit guards live in the Domain-internal static
-`PhaseExitGuards` registry, facilitator auth in the handler) and then
-`groupFormation.EnsureFormedFor(session)` in one atomic save. I8: formation
+`PhaseExitGuards` registry, facilitator auth in the handler) and then every
+registered `IPhaseEntryAction` — `GroupFormation` is the first — in one
+atomic save; the handler stays phase-agnostic. I8: formation
 is idempotent, restore never re-forms, restart keeps identical groups; late
 joiners from phase 5 on land in the smallest group, values untouched. Views:
 participant own-group card (animal name, members top-left, value chips
@@ -461,10 +462,11 @@ as absent until T19/T20.
 `Scribe`/`IsSubmitted` restore-only fields (`Group.Restore`) awaiting
 behavior; `AppointScribes` fires on P5→6 entry — the template is: pure
 self-contained hooks stay inside `AdvancePhase`, effectful entry actions
-needing ports are domain services called by the handler after the advance —
-Task 19's scribe appointment follows `GroupFormation`
-(`EnsureFormedFor`-style no-op outside its phase, invariant-owning mutation
-on the aggregate); the group
+needing ports are domain services implementing `IPhaseEntryAction`, run by
+the phase-agnostic handler after the advance — Task 19's `ScribeAppointment`
+is the second `IPhaseEntryAction` DI registration, zero handler change
+(self-guarding `ExecuteFor` no-op outside its phase, invariant-owning
+mutation on the aggregate); the group
 child tables (`group_members`, `group_assigned_values`, `group_actions`)
 carry `sort_order` columns, so ordering is durable; the wire group blocks
 (`ownGroup`, facilitator/presenter `groups`) are shared across phases 5/6/7

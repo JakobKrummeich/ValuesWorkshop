@@ -1,8 +1,9 @@
 namespace ValuesWorkshop.Domain;
 
 public sealed class GroupFormation(IGroupSolver groupSolverPort, IGroupNames groupNamesPort)
+    : IPhaseEntryAction
 {
-    public void EnsureFormedFor(Session session)
+    public void ExecuteFor(Session session)
     {
         if (
             session.PhaseProgress.CurrentPhase != Phase.GroupFormation

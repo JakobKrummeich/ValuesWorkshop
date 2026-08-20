@@ -102,7 +102,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
-        FormationWith(new ThrowingGroupSolver()).EnsureFormedFor(session);
+        FormationWith(new ThrowingGroupSolver()).ExecuteFor(session);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         session.Formation.IsFormed.ShouldBeFalse();
@@ -121,7 +121,7 @@ public class SessionFormGroupsTests
         );
 
         session.AdvancePhase();
-        FormationWith(new ThrowingGroupSolver()).EnsureFormedFor(session);
+        FormationWith(new ThrowingGroupSolver()).ExecuteFor(session);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupWork);
         session.Formation.Groups.ShouldHaveSingleItem().Name.ShouldBe("otter");
@@ -160,9 +160,7 @@ public class SessionFormGroupsTests
 
         Should
             .Throw<InvariantViolationException>(() =>
-                new GroupFormation(new TestGroupSolver(), new TestGroupNames(1)).EnsureFormedFor(
-                    session
-                )
+                new GroupFormation(new TestGroupSolver(), new TestGroupNames(1)).ExecuteFor(session)
             )
             .Message.ShouldContain("group names");
 
@@ -186,7 +184,7 @@ public class SessionFormGroupsTests
     private static void AdvanceIntoGroupFormation(Session session, IGroupSolver groupSolverPort)
     {
         session.AdvancePhase();
-        FormationWith(groupSolverPort).EnsureFormedFor(session);
+        FormationWith(groupSolverPort).ExecuteFor(session);
     }
 
     private static GroupFormation FormationWith(IGroupSolver groupSolverPort)

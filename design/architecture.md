@@ -81,7 +81,7 @@ handlers. Aggregates stay port-free and own state + invariants.
 
 | Service | File | Ports (ctor) | Called by |
 |---|---|---|---|
-| `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IGroupNames` | `FacilitatorIntentHandler` after every `Session.AdvancePhase()`; no-ops outside the group-formation phase and once groups are formed |
+| `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IGroupNames` | `FacilitatorIntentHandler` runs every registered `IPhaseEntryAction` after `Session.AdvancePhase()` — `GroupFormation` is one; it self-guards: no-op outside the group-formation phase and once groups are formed |
 
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):

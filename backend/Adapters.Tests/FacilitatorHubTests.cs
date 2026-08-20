@@ -270,7 +270,7 @@ public class FacilitatorHubTests
             repository,
             new FacilitatorIntentHandler(
                 new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-                new GroupFormation(new TestGroupSolver(), new TestGroupNames(8))
+                [new GroupFormation(new TestGroupSolver(), new TestGroupNames(8))]
             ),
             TestWorkshopStateCache.Create(),
             registry

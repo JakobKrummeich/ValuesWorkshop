@@ -2,7 +2,10 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Intents;
 
-public sealed class FacilitatorIntentHandler(IntentPipeline pipeline, GroupFormation groupFormation)
+public sealed class FacilitatorIntentHandler(
+    IntentPipeline pipeline,
+    IEnumerable<IPhaseEntryAction> phaseEntryActions
+)
 {
     public Task<IntentResult> HandleAsync(AdvancePhaseCommand command)
     {
@@ -12,7 +15,10 @@ public sealed class FacilitatorIntentHandler(IntentPipeline pipeline, GroupForma
             session =>
             {
                 session.AdvancePhase();
-                groupFormation.EnsureFormedFor(session);
+                foreach (var phaseEntryAction in phaseEntryActions)
+                {
+                    phaseEntryAction.ExecuteFor(session);
+                }
                 return true;
             }
         );

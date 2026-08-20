@@ -41,11 +41,13 @@ phase 5.
   > `IGroupNames`) that runs the solver and calls
   > `Session.FormGroups`. Aggregates own state + invariants and are
   > never container-built; domain services own procedures that need
-  > ports; the handler sequences them (advance → ensure formed → one
-  > save). Pure entry hooks (`PoseFirstQuestion`,
+  > ports; the handler sequences them (advance → entry actions → one
+  > save). The handler is phase-agnostic: it runs every registered
+  > `IPhaseEntryAction` after the advance, and `GroupFormation` is the
+  > first implementation. Pure entry hooks (`PoseFirstQuestion`,
   > `DetermineTopValues`) stay inside `AdvancePhase`.
 - Entry action for the `GroupFormation` phase:
-  `GroupFormation.EnsureFormedFor(session)` no-ops outside phase 5,
+  `GroupFormation.ExecuteFor(session)` no-ops outside phase 5,
   builds the solver request from session state (roster,
   per-participant selections, top values), calls the solver, and hands
   the result plus the group names to `Session.FormGroups`, which
@@ -170,8 +172,9 @@ groups) beyond unit tests, solver fallback mechanism.
    > `GroupFormation` domain service (ctor-DI), not in an
    > `AdvancePhase` entry hook — `AdvancePhase()` is argument-free,
    > guards sit in the internal `PhaseExitGuards` registry,
-   > facilitator auth sits in the handler, and the handler calls
-   > `groupFormation.EnsureFormedFor(session)` after every advance;
+   > facilitator auth sits in the handler, and the handler runs every
+   > registered `IPhaseEntryAction` after the advance — phase-agnostic;
+   > `GroupFormation` is the first, self-guarding implementation;
    > `Session.FormGroups(result, groupNames)` keeps the I8 and
    > group-name-count invariants on the aggregate. The Domain speaks
    > `IGroupNames` and never mentions animals: that groups are named

@@ -130,6 +130,24 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
+    public async Task Every_registered_phase_entry_action_runs_after_an_advance()
+    {
+        var repository = FakeSessionRepository.Holding(SessionFixtures.InPhase(Phase.Join));
+        var recorder = new RecordingPhaseEntryAction();
+        var handler = new FacilitatorIntentHandler(
+            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            [recorder]
+        );
+
+        var result = await handler.HandleAsync(
+            new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller)
+        );
+
+        result.ShouldBe(IntentResult.Accepted());
+        recorder.SeenPhases.ShouldHaveSingleItem().ShouldBe(Phase.Quiz);
+    }
+
+    [Fact]
     public async Task A_failing_solver_propagates_loudly()
     {
         var repository = FakeSessionRepository.Holding(SessionFixtures.InSelectionResults());
@@ -279,7 +297,17 @@ public class FacilitatorIntentHandlerTests
     {
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            new GroupFormation(groupSolverPort ?? new TestGroupSolver(), new TestGroupNames(8))
+            [new GroupFormation(groupSolverPort ?? new TestGroupSolver(), new TestGroupNames(8))]
         );
+    }
+
+    private sealed class RecordingPhaseEntryAction : IPhaseEntryAction
+    {
+        public List<Phase> SeenPhases { get; } = [];
+
+        public void ExecuteFor(Session session)
+        {
+            SeenPhases.Add(session.PhaseProgress.CurrentPhase);
+        }
     }
 }
