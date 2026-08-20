@@ -109,8 +109,7 @@ public class FacilitatorEnabledIntentsTests
         return new FacilitatorWorkshopStateMapper(
             catalog,
             new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8),
-            RegisteredExitGuards.For(catalog)
+            new TestAnimalsCatalog(8)
         ).Map(session, 1);
     }
 }

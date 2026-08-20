@@ -4,20 +4,16 @@ namespace ValuesWorkshop.Application.State;
 
 internal static class FacilitatorEnabledIntents
 {
-    internal static IReadOnlyList<FacilitatorIntent> Of(
-        Session session,
-        PhaseExitGuards exitGuards,
-        int questionCount
-    )
+    internal static IReadOnlyList<FacilitatorIntent> Of(Session session)
     {
         var enabledIntents = new List<FacilitatorIntent>();
 
         if (session.PhaseProgress.CurrentPhase == Phase.Quiz)
         {
-            AddQuizWalkIntent(enabledIntents, session.Quiz, questionCount);
+            AddQuizWalkIntent(enabledIntents, session.Quiz);
         }
 
-        if (session.PhaseProgress.HasNextPhase && exitGuards.PermitsExitOf(session))
+        if (session.PhaseProgress.HasNextPhase && PhaseExitGuards.PermitExitOf(session))
         {
             enabledIntents.Add(FacilitatorIntent.AdvancePhase);
         }
@@ -25,11 +21,7 @@ internal static class FacilitatorEnabledIntents
         return enabledIntents;
     }
 
-    private static void AddQuizWalkIntent(
-        List<FacilitatorIntent> enabledIntents,
-        QuizProgress quiz,
-        int questionCount
-    )
+    private static void AddQuizWalkIntent(List<FacilitatorIntent> enabledIntents, QuizProgress quiz)
     {
         if (!quiz.IsRevealed)
         {
@@ -39,7 +31,7 @@ internal static class FacilitatorEnabledIntents
         {
             enabledIntents.Add(FacilitatorIntent.ShowLearningText);
         }
-        else if (!quiz.IsQuizComplete(questionCount))
+        else if (!quiz.IsQuizComplete)
         {
             enabledIntents.Add(FacilitatorIntent.PoseNextQuestion);
         }

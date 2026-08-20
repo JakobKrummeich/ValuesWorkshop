@@ -121,8 +121,9 @@ public sealed class SqliteGroupFormationRoundTripTests : IAsyncLifetime, IDispos
             );
         }
 
-        TestSessions.AdvanceToNextPhase(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
+        TestSessions.WalkQuizToCompletion(session);
+        session.AdvancePhase();
         foreach (var participantId in participants)
         {
             session.SubmitValueSelection(
@@ -131,8 +132,9 @@ public sealed class SqliteGroupFormationRoundTripTests : IAsyncLifetime, IDispos
                 ValidValueIds
             );
         }
-        TestSessions.AdvanceToNextPhase(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
+        session.AdvancePhase();
+        new GroupFormation(new TestGroupSolver(), new TestAnimalNames(8)).EnsureFormedFor(session);
 
         return session;
     }

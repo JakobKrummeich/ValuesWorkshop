@@ -66,13 +66,9 @@ public sealed class Session
         return true;
     }
 
-    public void AdvancePhase(
-        PhaseExitGuards exitGuards,
-        IGroupSolver groupSolverPort,
-        IAnimalNames animalNamesPort
-    )
+    public void AdvancePhase()
     {
-        exitGuards.RequireSatisfied(this);
+        PhaseExitGuards.RequireSatisfiedBy(this);
 
         PhaseProgress.Advance();
 
@@ -85,32 +81,16 @@ public sealed class Session
         {
             Selection.DetermineTopValues();
         }
-
-        if (PhaseProgress.CurrentPhase == Phase.GroupFormation)
-        {
-            FormGroups(groupSolverPort, animalNamesPort);
-        }
     }
 
-    private void FormGroups(IGroupSolver groupSolverPort, IAnimalNames animalNamesPort)
+    public void FormGroups(GroupFormationResult formationResult, IReadOnlyList<string> animalNames)
     {
         if (Formation.IsFormed)
         {
             return;
         }
 
-        var participants = Roster
-            .Participants.Select(participant => new ParticipantSelection(
-                participant.Id,
-                Selection.SelectedValuesOf(participant.Id)
-            ))
-            .ToList();
-
-        var formationResult = groupSolverPort.Solve(
-            new GroupFormationRequest(participants, Selection.TopValues)
-        );
-
-        Formation.Form(formationResult, animalNamesPort);
+        Formation.Form(formationResult, animalNames);
     }
 
     public void RevealAnswer()
@@ -159,11 +139,11 @@ public sealed class Session
         Selection.Submit(participantId, valueIds, validValueIds);
     }
 
-    public void PoseNextQuestion(int questionCount)
+    public void PoseNextQuestion()
     {
         RequireQuizPhase();
 
-        Quiz.PoseNextQuestion(questionCount);
+        Quiz.PoseNextQuestion();
     }
 
     private void RequireQuizPhase()

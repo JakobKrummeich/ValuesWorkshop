@@ -17,8 +17,7 @@ public class WireFormatTests
     private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(
         Catalog,
         ValuesCatalog,
-        AnimalsCatalog,
-        RegisteredExitGuards.For(Catalog)
+        AnimalsCatalog
     );
     private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(
         Catalog,
@@ -35,7 +34,7 @@ public class WireFormatTests
     public void Workshop_state_travels_as_camel_case_json_with_numeric_enums()
     {
         var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
         session.BumpRevision();
 
         var json = SerializeStateMessage(FacilitatorStateMapper.Map(session, 1));

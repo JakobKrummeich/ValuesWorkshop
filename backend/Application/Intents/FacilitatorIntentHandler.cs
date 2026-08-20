@@ -1,15 +1,8 @@
-using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Intents;
 
-public sealed class FacilitatorIntentHandler(
-    IntentPipeline pipeline,
-    PhaseExitGuards exitGuards,
-    IQuizCatalog quizCatalog,
-    IGroupSolver groupSolverPort,
-    IAnimalNames animalNamesPort
-)
+public sealed class FacilitatorIntentHandler(IntentPipeline pipeline, GroupFormation groupFormation)
 {
     public Task<IntentResult> HandleAsync(AdvancePhaseCommand command)
     {
@@ -18,7 +11,8 @@ public sealed class FacilitatorIntentHandler(
             command.Caller,
             session =>
             {
-                session.AdvancePhase(exitGuards, groupSolverPort, animalNamesPort);
+                session.AdvancePhase();
+                groupFormation.EnsureFormedFor(session);
                 return true;
             }
         );
@@ -59,7 +53,7 @@ public sealed class FacilitatorIntentHandler(
             command.Caller,
             session =>
             {
-                session.PoseNextQuestion(quizCatalog.Questions.Count);
+                session.PoseNextQuestion();
                 return true;
             }
         );

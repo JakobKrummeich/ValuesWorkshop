@@ -434,13 +434,17 @@ best incumbent; no manual symmetry breaking (CP-SAT auto).
 ### Task 18: Phase 5 — Group formation ✅
 **Spec:** `tasks/specs/18-group-formation.md` (approved via Lavish).
 **Description:** Entering phase 5 forms the groups as a Domain procedure:
-`Session.AdvancePhase(caller, exitGuards, groupSolver, animalNames)` builds
-the solver request from its own state (full roster, per-participant submitted
-selections, fixed top values), calls the CP-SAT solver through the Domain
-ports `IGroupSolver`/`IAnimalNames` (Domain ROOT namespace, `IRandomness`
-precedent — `Domain.Ports` would cycle with `Domain` under the ArchUnit
-slice rule), and creates `Group` aggregates named by `config/animals.json`
-order (host loader `AnimalsCatalogFile`, fail-fast validation). I8: formation
+the `GroupFormation` domain service (ctor-DI: `IGroupSolver`/`IAnimalNames`,
+Domain ROOT namespace, `IRandomness` precedent — `Domain.Ports` would cycle
+with `Domain` under the ArchUnit slice rule) builds the solver request from
+session state (full roster, per-participant submitted selections, fixed top
+values), calls the CP-SAT solver, and hands the result to
+`Session.FormGroups`, which creates `Group` aggregates named by
+`config/animals.json` order (host loader `AnimalsCatalogFile`, fail-fast
+validation). `FacilitatorIntentHandler` runs `session.AdvancePhase()`
+(argument-free; exit guards live in the Domain-internal static
+`PhaseExitGuards` registry, facilitator auth in the handler) and then
+`groupFormation.EnsureFormedFor(session)` in one atomic save. I8: formation
 is idempotent, restore never re-forms, restart keeps identical groups; late
 joiners from phase 5 on land in the smallest group, values untouched. Views:
 participant own-group card (animal name, members top-left, value chips
@@ -455,9 +459,12 @@ as absent until T19/T20.
 - [x] Multi-client e2e extended through phase 5
 **Learnings for Task 19:** the `Group` aggregate already carries
 `Scribe`/`IsSubmitted` restore-only fields (`Group.Restore`) awaiting
-behavior; `AppointScribes` fires on P5→6 entry — the `AdvancePhase`
-double-dispatch port pattern (`groupSolver`/`animalNames` passed at the point
-of use, `IRandomness` already in the Domain root) is the template; the group
+behavior; `AppointScribes` fires on P5→6 entry — the template is: pure
+self-contained hooks stay inside `AdvancePhase`, effectful entry actions
+needing ports are domain services called by the handler after the advance —
+Task 19's scribe appointment follows `GroupFormation`
+(`EnsureFormedFor`-style no-op outside its phase, invariant-owning mutation
+on the aggregate); the group
 child tables (`group_members`, `group_assigned_values`, `group_actions`)
 carry `sort_order` columns, so ordering is durable; the wire group blocks
 (`ownGroup`, facilitator/presenter `groups`) are shared across phases 5/6/7

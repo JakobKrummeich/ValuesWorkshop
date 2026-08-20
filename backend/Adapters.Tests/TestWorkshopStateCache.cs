@@ -13,12 +13,7 @@ internal static class TestWorkshopStateCache
         var animalsCatalog = new TestAnimalsCatalog(8);
 
         return new WorkshopStateCache(
-            new FacilitatorWorkshopStateMapper(
-                catalog,
-                valuesCatalog,
-                animalsCatalog,
-                RegisteredExitGuards.For(catalog)
-            ),
+            new FacilitatorWorkshopStateMapper(catalog, valuesCatalog, animalsCatalog),
             new PresenterWorkshopStateMapper(catalog, valuesCatalog, animalsCatalog),
             new ParticipantWorkshopStateMapper(catalog, valuesCatalog, animalsCatalog)
         );

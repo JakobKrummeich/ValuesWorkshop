@@ -6,8 +6,7 @@ namespace ValuesWorkshop.Application.State;
 public sealed class FacilitatorWorkshopStateMapper(
     IQuizCatalog quizCatalog,
     IValuesCatalog valuesCatalog,
-    IAnimalsCatalog animalsCatalogPort,
-    PhaseExitGuards exitGuards
+    IAnimalsCatalog animalsCatalogPort
 )
 {
     private delegate FacilitatorWorkshopState StateFactory(
@@ -24,11 +23,7 @@ public sealed class FacilitatorWorkshopStateMapper(
 
     public FacilitatorWorkshopState Map(Session session, long revision)
     {
-        var enabledIntents = FacilitatorEnabledIntents.Of(
-            session,
-            exitGuards,
-            quizCatalog.Questions.Count
-        );
+        var enabledIntents = FacilitatorEnabledIntents.Of(session);
 
         return stateOfPhase[session.PhaseProgress.CurrentPhase](session, revision, enabledIntents);
     }

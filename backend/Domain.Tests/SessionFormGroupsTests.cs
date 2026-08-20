@@ -84,6 +84,31 @@ public class SessionFormGroupsTests
     }
 
     [Fact]
+    public void Forming_an_already_formed_session_again_changes_nothing()
+    {
+        var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
+        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+
+        session.FormGroups(
+            new GroupFormationResult([new FormedGroup([ParticipantAt(1)], [])]),
+            ["usurper"]
+        );
+
+        session.Formation.Groups.Select(group => group.Name).ShouldBe(["tier-1", "tier-2"]);
+    }
+
+    [Fact]
+    public void Formation_waits_until_the_group_formation_phase_is_reached()
+    {
+        var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
+
+        FormationWith(new ThrowingGroupSolver()).EnsureFormedFor(session);
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
+        session.Formation.IsFormed.ShouldBeFalse();
+    }
+
+    [Fact]
     public void Advancing_out_of_group_formation_re_forms_nothing()
     {
         var session = TestSessions.InPhase(
@@ -95,11 +120,8 @@ public class SessionFormGroupsTests
             )
         );
 
-        session.AdvancePhase(
-            PhaseExitGuards.None,
-            new ThrowingGroupSolver(),
-            new TestAnimalNames(8)
-        );
+        session.AdvancePhase();
+        FormationWith(new ThrowingGroupSolver()).EnsureFormedFor(session);
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupWork);
         session.Formation.Groups.ShouldHaveSingleItem().Name.ShouldBe("otter");
@@ -134,13 +156,12 @@ public class SessionFormGroupsTests
     public void A_formation_needing_more_animal_names_than_exist_is_refused()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
+        session.AdvancePhase();
 
         Should
             .Throw<InvariantViolationException>(() =>
-                session.AdvancePhase(
-                    PhaseExitGuards.None,
-                    new TestGroupSolver(),
-                    new TestAnimalNames(1)
+                new GroupFormation(new TestGroupSolver(), new TestAnimalNames(1)).EnsureFormedFor(
+                    session
                 )
             )
             .Message.ShouldContain("animal");
@@ -164,7 +185,13 @@ public class SessionFormGroupsTests
 
     private static void AdvanceIntoGroupFormation(Session session, IGroupSolver groupSolverPort)
     {
-        session.AdvancePhase(PhaseExitGuards.None, groupSolverPort, new TestAnimalNames(8));
+        session.AdvancePhase();
+        FormationWith(groupSolverPort).EnsureFormedFor(session);
+    }
+
+    private static GroupFormation FormationWith(IGroupSolver groupSolverPort)
+    {
+        return new GroupFormation(groupSolverPort, new TestAnimalNames(8));
     }
 
     private static ParticipantId ParticipantAt(int number)

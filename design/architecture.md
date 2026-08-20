@@ -75,6 +75,14 @@ Current Domain ports:
 | `IGroupSolver` | `Domain/IGroupSolver.cs` | `CpSatGroupSolver` (Host) |
 | `IAnimalNames` | `Domain/IAnimalNames.cs` | `AnimalsCatalogFile` (Host) |
 
+Domain services own procedures that need ports; unlike aggregates they are
+container-built (constructor injection) and are sequenced by the intent
+handlers. Aggregates stay port-free and own state + invariants.
+
+| Service | File | Ports (ctor) | Called by |
+|---|---|---|---|
+| `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IAnimalNames` | `FacilitatorIntentHandler` after every `Session.AdvancePhase()`; no-ops outside the group-formation phase and once groups are formed |
+
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):
 
@@ -176,8 +184,11 @@ There is no implementation inheritance in the backend. Shared contracts are
 expressed as interfaces implemented by sealed records: `IPhaseExitGuard`
 carries the `Phase` discriminator plus the `Refusal` / `IsSatisfiedBy`
 contract, and `QuizExitGuard`, `GroupWorkExitGuard`,
-`ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly
-and are registered in `PhaseExitGuards`.
+`ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly.
+The guards are stateless domain policy: the Domain-internal static registry
+`PhaseExitGuards` holds the registered ones, `Session.AdvancePhase()` consults
+it directly, and the facilitator `enabledIntents` computation reads the same
+registry — a single source.
 
 **Rationale:** Sealed classes communicate "this is a leaf type — extend
 behavior through composition, not subclassing." This prevents fragile base

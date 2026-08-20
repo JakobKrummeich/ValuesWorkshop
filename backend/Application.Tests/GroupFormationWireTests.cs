@@ -103,12 +103,10 @@ public class GroupFormationWireTests
     private static string FacilitatorJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                RegisteredExitGuards.For(QuizCatalog)
-            ).Map(session, 1),
+            new FacilitatorWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
+                session,
+                1
+            ),
             WireOptions
         );
     }

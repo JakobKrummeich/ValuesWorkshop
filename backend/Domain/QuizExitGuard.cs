@@ -1,6 +1,6 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed record QuizExitGuard(int QuizQuestionCount) : IPhaseExitGuard
+public sealed record QuizExitGuard : IPhaseExitGuard
 {
     public Phase Phase => Phase.Quiz;
 
@@ -9,6 +9,6 @@ public sealed record QuizExitGuard(int QuizQuestionCount) : IPhaseExitGuard
 
     public bool IsSatisfiedBy(Session session)
     {
-        return session.Quiz.IsQuizComplete(QuizQuestionCount);
+        return session.Quiz.IsQuizComplete;
     }
 }

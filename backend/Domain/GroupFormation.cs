@@ -1,18 +1,28 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed record GroupFormationRequest(
-    IReadOnlyList<ParticipantSelection> Participants,
-    IReadOnlyList<ValueId> TopValues
-);
+public sealed class GroupFormation(IGroupSolver groupSolverPort, IAnimalNames animalNamesPort)
+{
+    public void EnsureFormedFor(Session session)
+    {
+        if (
+            session.PhaseProgress.CurrentPhase != Phase.GroupFormation
+            || session.Formation.IsFormed
+        )
+        {
+            return;
+        }
 
-public sealed record ParticipantSelection(
-    ParticipantId ParticipantId,
-    IReadOnlyList<ValueId> SelectedValues
-);
+        var participants = session
+            .Roster.Participants.Select(participant => new ParticipantSelection(
+                participant.Id,
+                session.Selection.SelectedValuesOf(participant.Id)
+            ))
+            .ToList();
 
-public sealed record GroupFormationResult(IReadOnlyList<FormedGroup> Groups);
+        var formationResult = groupSolverPort.Solve(
+            new GroupFormationRequest(participants, session.Selection.TopValues)
+        );
 
-public sealed record FormedGroup(
-    IReadOnlyList<ParticipantId> Members,
-    IReadOnlyList<ValueId> AssignedValues
-);
+        session.FormGroups(formationResult, animalNamesPort.Names);
+    }
+}

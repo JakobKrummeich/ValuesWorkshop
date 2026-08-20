@@ -281,7 +281,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         var loaded = (await LoadSession(identity)).ShouldNotBeNull();
 
         loaded.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
-        loaded.Quiz.IsQuizComplete(questionCount: 5).ShouldBeTrue();
+        loaded.Quiz.IsQuizComplete.ShouldBeTrue();
         loaded.Formation.IsEveryGroupSubmitted.ShouldBeTrue();
         loaded.Presentation.ShownValueCount.ShouldBe(7);
         loaded.Presentation.IsPresentationComplete(presentedValueCount: 7).ShouldBeTrue();
@@ -399,7 +399,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         );
 
         var retried = (await writers.RepositoryTwo.LoadAsync(identity)).ShouldNotBeNull();
-        TestSessions.AdvanceToNextPhase(retried);
+        retried.AdvancePhase();
         retried.BumpRevision();
         await writers.RepositoryTwo.SaveAsync(retried, expectedRevision: 5);
 
@@ -511,7 +511,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
 
         sessionWithJoin.Join(TestParticipants.Named(joiner, "Late Lucy"), new FixedRandomness(0));
         sessionWithJoin.BumpRevision();
-        TestSessions.AdvanceToNextPhase(sessionWithAdvance);
+        sessionWithAdvance.AdvancePhase();
         sessionWithAdvance.BumpRevision();
 
         return new RacingWriters(

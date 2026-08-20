@@ -2,23 +2,22 @@ using System.Collections.Immutable;
 
 namespace ValuesWorkshop.Domain;
 
-public sealed record PhaseExitGuards
+public static class PhaseExitGuards
 {
-    private readonly ImmutableDictionary<Phase, IPhaseExitGuard> guardsByPhase;
+    private static readonly ImmutableDictionary<Phase, IPhaseExitGuard> GuardsByPhase =
+        new IPhaseExitGuard[]
+        {
+            new QuizExitGuard(),
+            new GroupWorkExitGuard(),
+            new FinalVotingExitGuard(),
+        }.ToImmutableDictionary(guard => guard.Phase);
 
-    public PhaseExitGuards(params IPhaseExitGuard[] guards)
-    {
-        guardsByPhase = guards.ToImmutableDictionary(guard => guard.Phase);
-    }
-
-    public static PhaseExitGuards None { get; } = new();
-
-    public bool PermitsExitOf(Session session)
+    public static bool PermitExitOf(Session session)
     {
         return BlockingGuardFor(session) is null;
     }
 
-    internal void RequireSatisfied(Session session)
+    internal static void RequireSatisfiedBy(Session session)
     {
         if (BlockingGuardFor(session) is { } blockingGuard)
         {
@@ -26,10 +25,10 @@ public sealed record PhaseExitGuards
         }
     }
 
-    private IPhaseExitGuard? BlockingGuardFor(Session session)
+    private static IPhaseExitGuard? BlockingGuardFor(Session session)
     {
         return
-            guardsByPhase.TryGetValue(session.PhaseProgress.CurrentPhase, out var guard)
+            GuardsByPhase.TryGetValue(session.PhaseProgress.CurrentPhase, out var guard)
             && !guard.IsSatisfiedBy(session)
             ? guard
             : null;

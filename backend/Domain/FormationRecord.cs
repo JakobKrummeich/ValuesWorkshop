@@ -8,10 +8,8 @@ public sealed class FormationRecord
     public IReadOnlyList<Group> Groups => _groups;
     public bool IsEveryGroupSubmitted => _groups.TrueForAll(group => group.IsSubmitted);
 
-    internal void Form(GroupFormationResult formationResult, IAnimalNames animalNamesPort)
+    internal void Form(GroupFormationResult formationResult, IReadOnlyList<string> animalNames)
     {
-        var animalNames = animalNamesPort.Names;
-
         if (formationResult.Groups.Count > animalNames.Count)
         {
             throw new InvariantViolationException(

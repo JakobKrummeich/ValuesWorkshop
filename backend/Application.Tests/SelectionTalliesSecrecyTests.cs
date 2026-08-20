@@ -35,12 +35,10 @@ public class SelectionTalliesSecrecyTests
     public void Facilitator_json_carries_no_tallies_and_no_top_values_during_the_selection_phase()
     {
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                RegisteredExitGuards.For(QuizCatalog)
-            ).Map(SelectionPhaseSession(), 1),
+            new FacilitatorWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
+                SelectionPhaseSession(),
+                1
+            ),
             WireOptions
         );
 
@@ -85,12 +83,10 @@ public class SelectionTalliesSecrecyTests
     public void Facilitator_json_carries_tallies_and_top_values_in_the_results_phase()
     {
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                RegisteredExitGuards.For(QuizCatalog)
-            ).Map(SessionFixtures.InSelectionResults(), 1),
+            new FacilitatorWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
+                SessionFixtures.InSelectionResults(),
+                1
+            ),
             WireOptions
         );
 
@@ -133,12 +129,10 @@ public class SelectionTalliesSecrecyTests
     public void Facilitator_results_json_keeps_empty_tallies_and_top_values_when_nobody_submitted()
     {
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                RegisteredExitGuards.For(QuizCatalog)
-            ).Map(SessionFixtures.InPhase(Phase.SelectionResults), 1),
+            new FacilitatorWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
+                SessionFixtures.InPhase(Phase.SelectionResults),
+                1
+            ),
             WireOptions
         );
 

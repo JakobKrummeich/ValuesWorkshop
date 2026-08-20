@@ -9,7 +9,7 @@ public class SessionQuizWalkTests
     {
         var session = TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Join);
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(0);
         session.Quiz.IsRevealed.ShouldBeFalse();
@@ -93,7 +93,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, true, true, []));
 
-        session.PoseNextQuestion(QuestionCount);
+        session.PoseNextQuestion();
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(1);
         session.Quiz.IsRevealed.ShouldBeFalse();
@@ -105,7 +105,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(0, true, false, []));
 
-        Should.Throw<WrongPhaseException>(() => session.PoseNextQuestion(QuestionCount));
+        Should.Throw<WrongPhaseException>(() => session.PoseNextQuestion());
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(0);
         session.Quiz.IsRevealed.ShouldBeTrue();
@@ -116,7 +116,7 @@ public class SessionQuizWalkTests
     {
         var session = QuizSession(QuizProgress.Restore(QuestionCount - 1, true, true, []));
 
-        Should.Throw<WrongPhaseException>(() => session.PoseNextQuestion(QuestionCount));
+        Should.Throw<WrongPhaseException>(() => session.PoseNextQuestion());
 
         session.Quiz.CurrentQuestionIndex.ShouldBe(QuestionCount - 1);
         session.Quiz.IsLearningTextShown.ShouldBeTrue();

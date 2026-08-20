@@ -116,7 +116,7 @@ public class SessionSubmitValueSelectionTests
     {
         var session = TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Join);
         session.Join(TestParticipants.Named(Anna, "Anna"), Randomness.Fixed(0));
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         Should.Throw<WrongPhaseException>(() =>
             session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, 10), ValidValueIds)
@@ -134,8 +134,9 @@ public class SessionSubmitValueSelectionTests
             session.Join(TestParticipants.Named(participant, "Anna"), Randomness.Fixed(0));
         }
 
-        TestSessions.AdvanceToNextPhase(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
+        TestSessions.WalkQuizToCompletion(session);
+        session.AdvancePhase();
 
         return session;
     }

@@ -18,7 +18,7 @@ public class SessionDetermineTopValuesTests
         session.SubmitValueSelection(Ben, TestValueIds.Numbered(3, 10), ValidValueIds);
         session.SubmitValueSelection(Chris, TestValueIds.Numbered(3, 10), ValidValueIds);
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         session.Selection.TopValues.ShouldBe(TestValueIds.Numbered(3, 10), ignoreOrder: true);
@@ -31,7 +31,7 @@ public class SessionDetermineTopValuesTests
         session.SubmitValueSelection(Anna, TestValueIds.Numbered(1, 10), ValidValueIds);
         session.SubmitValueSelection(Ben, TestValueIds.Numbered(3, 10), ValidValueIds);
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         session.Selection.TopValues.ShouldBe(
             TestValueIds
@@ -60,7 +60,7 @@ public class SessionDetermineTopValuesTests
             selection: selection
         );
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         session.Selection.TopValues.ShouldBe(TestValueIds.Numbered(1, 3), ignoreOrder: true);
     }
@@ -70,7 +70,7 @@ public class SessionDetermineTopValuesTests
     {
         var session = SelectionSessionWith();
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         session.Selection.TopValues.ShouldBeEmpty();
@@ -90,7 +90,7 @@ public class SessionDetermineTopValuesTests
             selection: selection
         );
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
         session.Selection.TopValues.ShouldBe(restoredTopValues);
@@ -105,8 +105,9 @@ public class SessionDetermineTopValuesTests
             session.Join(TestParticipants.Named(participant, "Anna"), Randomness.Fixed(0));
         }
 
-        TestSessions.AdvanceToNextPhase(session);
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
+        TestSessions.WalkQuizToCompletion(session);
+        session.AdvancePhase();
 
         return session;
     }

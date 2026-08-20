@@ -28,17 +28,31 @@ phase 5.
   > `ValuesWorkshop.Domain.Ports` namespace would form a cycle with
   > `ValuesWorkshop.Domain`, which the ArchUnit slice rule
   > (`ValuesWorkshop.(*)` slices free of cycles) forbids.
-- Both are passed into `Session.AdvancePhase(caller, exitGuards,
+- ~~Both are passed into `Session.AdvancePhase(caller, exitGuards,
   groupSolver, animalNames)` — collaborators like `exitGuards`, not
-  data fixtures (the 16a objection was threading *data*; interfaces
-  passed at the point of use are the established double-dispatch
-  shape).
-- Entry hook into `GroupFormation`: Session builds the solver request
-  from its own state (roster, per-participant selections, top values),
-  calls the solver, creates `Group` instances (existing restore-shell
-  aggregate) with animal labels in deterministic group order. I8
-  guard: groups-already-formed → no-op (idempotent-repeat; restore
-  path never re-forms); phase guard via the hook location itself.
+  data fixtures.~~
+
+  > **Revised in lightspeed review:** `AdvancePhase()` is
+  > argument-free; the exit guards live in a Domain-internal static
+  > registry (`PhaseExitGuards`) the Session consults itself;
+  > facilitator authorization is centralized in
+  > `FacilitatorIntentHandler`; and `GroupFormation` is a
+  > container-built domain service (ctor: `IGroupSolver`,
+  > `IAnimalNames`) that runs the solver and calls
+  > `Session.FormGroups`. Aggregates own state + invariants and are
+  > never container-built; domain services own procedures that need
+  > ports; the handler sequences them (advance → ensure formed → one
+  > save). Pure entry hooks (`PoseFirstQuestion`,
+  > `DetermineTopValues`) stay inside `AdvancePhase`.
+- Entry action for the `GroupFormation` phase:
+  `GroupFormation.EnsureFormedFor(session)` no-ops outside phase 5,
+  builds the solver request from session state (roster,
+  per-participant selections, top values), calls the solver, and hands
+  the result plus the animal names to `Session.FormGroups`, which
+  creates `Group` instances (existing restore-shell aggregate) with
+  animal labels in deterministic group order. I8 guard on the
+  aggregate: groups-already-formed → no-op (idempotent-repeat; restore
+  path never re-forms).
 - Animal labels: ids from `config/animals.json` (8 ids ≥ max 7 groups
   for N=30), stable across restarts. Host loader `AnimalsCatalogFile`
   with fail-fast validation (values-catalog pattern) implements
@@ -54,10 +68,10 @@ phase 5.
 
 ### 2. Application — wiring + phase-5 views
 
-- `FacilitatorIntentHandler` receives `IGroupSolver` + `IAnimalNames`
-  by DI and hands them to `AdvancePhase` — no request-building, no
-  orchestration in the handler; advance + formation persist atomically
-  in the existing single save. An Application test asserts
+- `FacilitatorIntentHandler` receives the `GroupFormation` domain
+  service by DI and calls it after every `AdvancePhase()` — no
+  request-building in the handler; advance + formation persist
+  atomically in the existing single save. An Application test asserts
   advance-into-5 forms groups.
 - Solver failure: fail loud (Task 17 decision — model always feasible;
   no fallback mechanism now).
@@ -150,11 +164,16 @@ groups) beyond unit tests, solver fallback mechanism.
 
 1. **Group formation is a domain procedure** (review): trigger from
    the frontend, Domain calls the solver through a Domain-owned
-   interface — `IGroupSolver` (+ `IAnimalNames`) move to
-   `Domain/Ports/` and are passed into `AdvancePhase` like
-   `exitGuards`; Session builds the request from its own state and
-   forms the groups in the entry hook. Collaborator interfaces, not
-   data fixtures — 16a stays honored.
+   interface — `IGroupSolver` (+ `IAnimalNames`) live in the Domain.
+
+   > **Revised in lightspeed review:** the procedure lives in the
+   > `GroupFormation` domain service (ctor-DI), not in an
+   > `AdvancePhase` entry hook — `AdvancePhase()` is argument-free,
+   > guards sit in the internal `PhaseExitGuards` registry,
+   > facilitator auth sits in the handler, and the handler calls
+   > `groupFormation.EnsureFormedFor(session)` after every advance;
+   > `Session.FormGroups(result, animalNames)` keeps the I8 and
+   > animal-count invariants on the aggregate.
 2. **Animal names ride the wire** as id + `{de,en}` text (values
    precedent); client renders, never reads config.
 3. **Late-joiner placement is in scope** (state-machine §2.5 demands it

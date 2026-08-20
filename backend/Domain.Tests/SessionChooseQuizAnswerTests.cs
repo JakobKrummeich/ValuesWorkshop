@@ -36,7 +36,7 @@ public class SessionChooseQuizAnswerTests
         session.ChooseQuizAnswer(Anna, questionIndex: 0, answerIndex: 2);
         session.RevealAnswer();
         session.ShowLearningText();
-        session.PoseNextQuestion(questionCount: 5);
+        session.PoseNextQuestion();
 
         session.Quiz.AnswerTallies.ShouldBe([0, 0, 0]);
         session.Quiz.AnsweredCount.ShouldBe(0);
@@ -128,7 +128,7 @@ public class SessionChooseQuizAnswerTests
             session.Join(TestParticipants.Named(participant, "Anna"), Randomness.Fixed(0));
         }
 
-        TestSessions.AdvanceToNextPhase(session);
+        session.AdvancePhase();
 
         return session;
     }
