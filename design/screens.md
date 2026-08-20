@@ -382,7 +382,7 @@ Facilitator phase 5: full list of groups with members and assigned values
 │ │ submtd │ │ working│ │ working│      │
 │ └────────┘ └────────┘ └────────┘      │
 │ ┌────────┐ ┌────────┐ ┌────────┐      │
-│ │ Hase  …│ │ Luchs ✓│ │ Biber …│      │
+│ │ Dachs …│ │ Luchs ✓│ │ Biber …│      │
 │ └────────┘ └────────┘ └────────┘      │
 │                                       │
 │ same 3×2 paginated cards as phase 5,  │

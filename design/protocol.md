@@ -32,17 +32,16 @@ transition referenced as `T*` is defined in `design/state-machine.md`.
    that constructs the adapters. It appears in no port signature, no UI
    prop, and no domain type (SPEC.md “Session binding at the edge”).
 7. **Content is not state.** The wire carries identifiers (`valueId`,
-   `animalId`); the localized texts live in `config/*.json`, are loaded by
-   the frontend, and are resolved there (de/en). Group names are animal
-   identifiers from `config/animals.json` and are localized the same way.
-   Three exceptions: participant-written action text, which is free text and
-   travels verbatim; the quiz block, whose question and answer texts are
-   served from the server's `config/quiz.json` as `{de, en}` pairs (Task 13:
-   the frontend never reads the quiz config, and the correct answer must not
-   reach a client before the reveal); and the selection block, whose `values`
-   catalog is served from the server's `config/values.json` as
-   `[{valueId, text: {de, en}}]` in config order (Task 15: the frontend
-   never reads the values config either).
+   `animalId`) together with their localized texts as `{de, en}` pairs.
+   The frontend never reads `config/*.json` content files; every content
+   block is served by the backend: the quiz block (question and answer
+   texts from `config/quiz.json` as `{de, en}` — Task 13; the correct
+   answer must not reach a client before the reveal); the selection block
+   (values catalog from `config/values.json` as `[{valueId, text: {de,
+   en}}]` in config order — Task 15); and the group-name block (animal
+   names from `config/animals.json` as `{animalId, text: {de, en}}` —
+   Task 18; same values-catalog precedent). Participant-written action
+   text is free text and travels verbatim.
 
 ---
 
