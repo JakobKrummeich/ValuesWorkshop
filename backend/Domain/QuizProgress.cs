@@ -2,6 +2,7 @@ namespace ValuesWorkshop.Domain;
 
 public sealed class QuizProgress
 {
+    public const int QuestionCount = 5;
     public const int AnswersPerQuestion = 3;
 
     private readonly List<CastAnswer> castAnswers = [];
