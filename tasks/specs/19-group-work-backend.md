@@ -161,3 +161,18 @@ FE and e2e untouched)
 5. **Action text: trim, refuse blank, truncate at 200** —
    `ParticipantName` truncation precedent rather than a rejection,
    sized for a pragmatic action sentence.
+
+---
+
+> **Revised during implementation (slice 1):** the six Session entry
+> points became the static Domain facade `GroupWork` (`AddAction`,
+> `EditAction`, `RemoveAction`, `Submit`, `Reopen`, `ReassignScribe`,
+> each taking the session as first argument). Putting them on
+> `Session` would break the 12-public-method ArchUnit cap
+> (`design/architecture.md` §6, Ask-first), and domain-model §4
+> assigns these commands to the `Group` aggregate anyway — the wrapper
+> is pure routing (roster guard + phase guard + group lookup via
+> membership), following the stateless-static precedent of
+> `PhaseExitGuards` and `GroupSizing`. Guards as specified: actions,
+> submit and reopen locked to phase 6; `ReassignScribe` allowed
+> phase 6 onward.
