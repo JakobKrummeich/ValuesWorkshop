@@ -134,7 +134,8 @@ internal static class DomainEntityMapper
                     groupEntity.ScribeParticipantId is not null
                         ? new ParticipantId(Guid.Parse(groupEntity.ScribeParticipantId))
                         : null,
-                    groupEntity.IsSubmitted
+                    groupEntity.IsSubmitted,
+                    []
                 )
             )
             .ToList();

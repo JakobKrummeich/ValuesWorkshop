@@ -106,8 +106,8 @@ public class SessionJoinTests
             FormationRecord.Restore(
                 true,
                 [
-                    Group.Restore("fox", [Anna, Chris], [new ValueId("wert-1")], Anna, false),
-                    Group.Restore("owl", [Ben], [new ValueId("wert-2")], Ben, false),
+                    Group.Restore("fox", [Anna, Chris], [new ValueId("wert-1")], Anna, false, []),
+                    Group.Restore("owl", [Ben], [new ValueId("wert-2")], Ben, false, []),
                 ]
             )
         );
@@ -159,8 +159,8 @@ public class SessionJoinTests
         return FormationRecord.Restore(
             true,
             [
-                Group.Restore("fox", [Anna, Chris, Dana], [], Anna, false),
-                Group.Restore("owl", [Ben], [], Ben, true),
+                Group.Restore("fox", [Anna, Chris, Dana], [], Anna, false, []),
+                Group.Restore("owl", [Ben], [], Ben, true, []),
             ]
         );
     }
@@ -170,8 +170,8 @@ public class SessionJoinTests
         return FormationRecord.Restore(
             true,
             [
-                Group.Restore("fox", [Anna], [], Anna, false),
-                Group.Restore("owl", [Ben], [], Ben, false),
+                Group.Restore("fox", [Anna], [], Anna, false, []),
+                Group.Restore("owl", [Ben], [], Ben, false, []),
             ]
         );
     }

@@ -66,7 +66,7 @@ public class SessionFormGroupsTests
     {
         var alreadyFormed = FormationRecord.Restore(
             true,
-            [Group.Restore("otter", [ParticipantAt(1)], [new ValueId("wert-1")], null, false)]
+            [Group.Restore("otter", [ParticipantAt(1)], [new ValueId("wert-1")], null, false, [])]
         );
         var session = SessionAwaitingFormation(
             participantCount: 9,
@@ -116,7 +116,16 @@ public class SessionFormGroupsTests
             Phase.GroupFormation,
             formation: FormationRecord.Restore(
                 true,
-                [Group.Restore("otter", [ParticipantAt(1)], [new ValueId("wert-1")], null, false)]
+                [
+                    Group.Restore(
+                        "otter",
+                        [ParticipantAt(1)],
+                        [new ValueId("wert-1")],
+                        null,
+                        false,
+                        []
+                    ),
+                ]
             )
         );
 

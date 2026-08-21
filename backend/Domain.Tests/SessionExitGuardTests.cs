@@ -67,6 +67,30 @@ public class SessionExitGuardTests
     }
 
     [Fact]
+    public void Group_work_becomes_leavable_once_every_scribe_submits()
+    {
+        var session = SessionInPhase(
+            Phase.GroupWork,
+            formation: FormationOf(submittedStates: [false, false])
+        );
+        ShouldRefuseToAdvance(session, Phase.GroupWork);
+
+        foreach (var group in session.Formation.Groups)
+        {
+            group.AddAction(
+                Anna,
+                new ActionId(Guid.NewGuid()),
+                group.AssignedValues[0],
+                GroupActionText.Of("Talk openly about mistakes")
+            );
+            group.Submit(Anna);
+        }
+        session.AdvancePhase();
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
+    }
+
+    [Fact]
     public void The_value_presentation_guard_is_unsatisfied_before_every_value_is_shown()
     {
         var session = SessionInPhase(
@@ -164,7 +188,8 @@ public class SessionExitGuardTests
                     [Anna],
                     [new ValueId($"value-{index}")],
                     Anna,
-                    isSubmitted
+                    isSubmitted,
+                    []
                 )
         );
 

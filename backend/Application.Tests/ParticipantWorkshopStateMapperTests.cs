@@ -349,7 +349,8 @@ public class ParticipantWorkshopStateMapperTests
                         [SessionFixtures.Anna],
                         [new ValueId("wert-1")],
                         null,
-                        false
+                        false,
+                        []
                     ),
                 ]
             )
@@ -373,7 +374,8 @@ public class ParticipantWorkshopStateMapperTests
                         [SessionFixtures.Anna],
                         [new ValueId("wert-999")],
                         null,
-                        false
+                        false,
+                        []
                     ),
                 ]
             )

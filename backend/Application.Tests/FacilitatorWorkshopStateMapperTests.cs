@@ -177,7 +177,7 @@ public class FacilitatorWorkshopStateMapperTests
             Phase.GroupFormation,
             formation: FormationRecord.Restore(
                 true,
-                [Group.Restore("tier-1", [], [new ValueId("wert-1")], null, false)]
+                [Group.Restore("tier-1", [], [new ValueId("wert-1")], null, false, [])]
             )
         );
 

@@ -85,7 +85,8 @@ public class FacilitatorEnabledIntentsTests
                         [SessionFixtures.Anna],
                         [new ValueId("wert-1")],
                         SessionFixtures.Anna,
-                        true
+                        true,
+                        []
                     ),
                 ]
             )
