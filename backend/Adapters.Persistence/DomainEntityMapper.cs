@@ -135,7 +135,14 @@ internal static class DomainEntityMapper
                         ? new ParticipantId(Guid.Parse(groupEntity.ScribeParticipantId))
                         : null,
                     groupEntity.IsSubmitted,
-                    []
+                    groupEntity
+                        .Actions.OrderBy(action => action.SortOrder)
+                        .Select(action => new GroupAction(
+                            new ActionId(Guid.Parse(action.ActionId)),
+                            new ValueId(action.ValueId),
+                            GroupActionText.Of(action.Text)
+                        ))
+                        .ToList()
                 )
             )
             .ToList();
@@ -207,6 +214,18 @@ internal static class DomainEntityMapper
                 .AssignedValues.Select(
                     (valueId, index) =>
                         new GroupAssignedValueEntity { ValueId = valueId.Value, SortOrder = index }
+                )
+                .ToList(),
+            Actions = group
+                .Actions.Select(
+                    (action, index) =>
+                        new GroupActionEntity
+                        {
+                            ActionId = action.ActionId.Value.ToString(),
+                            ValueId = action.ValueId.Value,
+                            Text = action.Text.Value,
+                            SortOrder = index,
+                        }
                 )
                 .ToList(),
         };
