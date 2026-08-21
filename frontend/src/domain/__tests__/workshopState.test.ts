@@ -375,6 +375,18 @@ describe("facilitator workshop state schema", () => {
     expect(state.enabledIntents).toEqual([FacilitatorIntent.RevealAnswer]);
   });
 
+  it("accepts the reassign-scribe intent the backend enables from group work on", () => {
+    const state = facilitatorWorkshopStateSchema.parse({
+      revision: 6,
+      phase: 6,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["AdvancePhase", "ReassignScribe"],
+      groups: [],
+    });
+
+    expect(state.enabledIntents).toContain(FacilitatorIntent.ReassignScribe);
+  });
+
   it("rejects an intent name that is no facilitator hub method", () => {
     const result = facilitatorWorkshopStateSchema.safeParse({
       revision: 1,

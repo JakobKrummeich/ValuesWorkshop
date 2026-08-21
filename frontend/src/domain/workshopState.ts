@@ -25,6 +25,7 @@ export enum FacilitatorIntent {
   RevealAnswer = "RevealAnswer",
   ShowLearningText = "ShowLearningText",
   PoseNextQuestion = "PoseNextQuestion",
+  ReassignScribe = "ReassignScribe",
 }
 
 export enum ParticipantIntent {

@@ -176,3 +176,11 @@ FE and e2e untouched)
 > `PhaseExitGuards` and `GroupSizing`. Guards as specified: actions,
 > submit and reopen locked to phase 6; `ReassignScribe` allowed
 > phase 6 onward.
+
+> **Revised during implementation (slice 4 follow-up):** one FE line
+> after all — `FacilitatorIntent.ReassignScribe` in
+> `frontend/src/domain/workshopState.ts`. `enabledIntents` is
+> validated with `z.enum(FacilitatorIntent)`, which rejects unknown
+> names (it is not an ignorable optional field): without the enum
+> value, a facilitator client in phase 6+ fails to parse the whole
+> state. The T20 screens still own every visible use of the intent.
