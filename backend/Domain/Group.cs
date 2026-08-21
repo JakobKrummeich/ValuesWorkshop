@@ -32,7 +32,7 @@ public sealed class Group
 
     internal void AppointScribe(IRandomness randomness)
     {
-        if (Scribe is not null)
+        if (Scribe is not null || _members.Count == 0)
         {
             return;
         }

@@ -64,6 +64,20 @@ public class ScribeAppointmentTests
     }
 
     [Fact]
+    public void A_group_without_members_stays_scribeless_instead_of_crashing_the_entry()
+    {
+        var session = GroupWorkSession(
+            Group.Restore("fox", [], [new ValueId("wert-1")], null, false, []),
+            Group.Restore("owl", [Chris, Dana], [new ValueId("wert-2")], null, false, [])
+        );
+
+        new ScribeAppointment(Randomness.Fixed(0)).ExecuteFor(session);
+
+        session.Formation.Groups[0].Scribe.ShouldBeNull();
+        session.Formation.Groups[1].Scribe.ShouldBe(Chris);
+    }
+
+    [Fact]
     public void A_group_that_already_has_a_scribe_is_skipped_while_others_get_one()
     {
         var session = GroupWorkSession(
