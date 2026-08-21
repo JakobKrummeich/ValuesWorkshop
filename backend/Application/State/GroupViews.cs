@@ -53,7 +53,7 @@ internal sealed class GroupViews(
             .ToList();
     }
 
-    internal static GroupWorkStatus? WorkStatusOf(Group group, Session session)
+    internal GroupWorkStatus? WorkStatusOf(Group group, Session session)
     {
         if (!IsWorkUnderway(session))
         {
@@ -63,7 +63,7 @@ internal sealed class GroupViews(
         return group.IsSubmitted ? GroupWorkStatus.Submitted : GroupWorkStatus.Editing;
     }
 
-    internal static bool? IsCallerScribeOf(Group group, Session session, ParticipantId caller)
+    internal bool? IsCallerScribeOf(Group group, Session session, ParticipantId caller)
     {
         if (!IsWorkUnderway(session) || group.Scribe is null)
         {
@@ -73,7 +73,7 @@ internal sealed class GroupViews(
         return group.Scribe == caller;
     }
 
-    internal static string? ScribeNameOf(Group group, Session session)
+    internal string? ScribeNameOf(Group group, Session session)
     {
         if (!IsWorkUnderway(session) || group.Scribe is not { } scribe)
         {
@@ -83,7 +83,7 @@ internal sealed class GroupViews(
         return SessionViews.DisplayNameOf(session, scribe);
     }
 
-    internal static Guid? ScribeParticipantIdOf(Group group, Session session)
+    internal Guid? ScribeParticipantIdOf(Group group, Session session)
     {
         if (!IsWorkUnderway(session))
         {
@@ -93,7 +93,7 @@ internal sealed class GroupViews(
         return group.Scribe?.Value;
     }
 
-    internal static IReadOnlyList<GroupActionView>? ActionsOf(Group group, Session session)
+    internal IReadOnlyList<GroupActionView>? ActionsOf(Group group, Session session)
     {
         if (!IsWorkUnderway(session))
         {
@@ -113,10 +113,7 @@ internal sealed class GroupViews(
             .ToList();
     }
 
-    internal static IReadOnlyDictionary<string, int>? ActionCountPerValueOf(
-        Group group,
-        Session session
-    )
+    internal IReadOnlyDictionary<string, int>? ActionCountPerValueOf(Group group, Session session)
     {
         if (!IsWorkUnderway(session))
         {
