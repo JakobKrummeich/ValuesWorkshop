@@ -76,7 +76,7 @@ public sealed class Group
             );
         }
 
-        if (_actions.Count(action => action.ValueId == valueId) == MaximumActionsPerValue)
+        if (_actions.Count(action => action.ValueId == valueId) >= MaximumActionsPerValue)
         {
             throw new InvariantViolationException(
                 $"A value holds at most {MaximumActionsPerValue} actions."

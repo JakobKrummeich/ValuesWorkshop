@@ -175,6 +175,26 @@ public class GroupTests
     }
 
     [Fact]
+    public void A_value_restored_beyond_the_bound_accepts_no_further_action()
+    {
+        var overfullActions = Enumerable
+            .Range(1, 6)
+            .Select(number => new GroupAction(
+                new ActionId(Guid.NewGuid()),
+                Trust,
+                GroupActionText.Of($"Action {number}")
+            ))
+            .ToList();
+        var group = Group.Restore("fox", [Anna, Ben], [Trust], Anna, false, overfullActions);
+
+        Should.Throw<InvariantViolationException>(() =>
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("More"))
+        );
+
+        group.Actions.Count.ShouldBe(6);
+    }
+
+    [Fact]
     public void A_sixth_action_still_fits_when_it_belongs_to_another_value()
     {
         var group = GroupWithScribe();
