@@ -82,6 +82,7 @@ handlers. Aggregates stay port-free and own state + invariants.
 | Service | File | Ports (ctor) | Called by |
 |---|---|---|---|
 | `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IGroupNames` | `FacilitatorIntentHandler` runs every registered `IPhaseEntryAction` after `Session.AdvancePhase()` — `GroupFormation` is one; it self-guards: no-op outside the group-formation phase and once groups are formed |
+| `ScribeAppointment` | `Domain/ScribeAppointment.cs` | `IRandomness` | The second `IPhaseEntryAction`: appoints one random scribe per group on entry into group work; self-guards (no-op outside phase 6, skips groups that already have a scribe so restore/restart never re-appoints) |
 
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):
