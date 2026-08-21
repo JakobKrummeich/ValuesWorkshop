@@ -5,6 +5,20 @@ namespace ValuesWorkshop.Application.Intents;
 
 public sealed class IntentPipeline(SessionCommandHandler commandHandler)
 {
+    private static readonly IReadOnlyDictionary<
+        Type,
+        IntentRejectionCode
+    > rejectionCodeOfExceptionType = new Dictionary<Type, IntentRejectionCode>
+    {
+        [typeof(UnknownSessionException)] = IntentRejectionCode.UnknownSession,
+        [typeof(WrongPhaseException)] = IntentRejectionCode.WrongPhase,
+        [typeof(NotAuthorizedException)] = IntentRejectionCode.NotAuthorized,
+        [typeof(UnknownParticipantException)] = IntentRejectionCode.UnknownParticipant,
+        [typeof(InvariantViolationException)] = IntentRejectionCode.InvariantViolated,
+        [typeof(MalformedPayloadException)] = IntentRejectionCode.MalformedPayload,
+        [typeof(ConcurrencyConflictException)] = IntentRejectionCode.ConcurrencyConflict,
+    };
+
     public async Task<IntentResult> ExecuteAsync(
         SessionIdentity sessionIdentity,
         Func<Session, bool> intent
@@ -14,32 +28,10 @@ public sealed class IntentPipeline(SessionCommandHandler commandHandler)
         {
             await commandHandler.HandleAsync(sessionIdentity, intent);
         }
-        catch (UnknownSessionException exception)
+        catch (Exception exception)
+            when (rejectionCodeOfExceptionType.TryGetValue(exception.GetType(), out var code))
         {
-            return IntentResult.Rejected(IntentRejectionCode.UnknownSession, exception.Message);
-        }
-        catch (WrongPhaseException exception)
-        {
-            return IntentResult.Rejected(IntentRejectionCode.WrongPhase, exception.Message);
-        }
-        catch (NotAuthorizedException exception)
-        {
-            return IntentResult.Rejected(IntentRejectionCode.NotAuthorized, exception.Message);
-        }
-        catch (InvariantViolationException exception)
-        {
-            return IntentResult.Rejected(IntentRejectionCode.InvariantViolated, exception.Message);
-        }
-        catch (MalformedPayloadException exception)
-        {
-            return IntentResult.Rejected(IntentRejectionCode.MalformedPayload, exception.Message);
-        }
-        catch (ConcurrencyConflictException exception)
-        {
-            return IntentResult.Rejected(
-                IntentRejectionCode.ConcurrencyConflict,
-                exception.Message
-            );
+            return IntentResult.Rejected(code, exception.Message);
         }
 
         return IntentResult.Accepted();

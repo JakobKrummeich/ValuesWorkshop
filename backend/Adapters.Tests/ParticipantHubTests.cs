@@ -210,6 +210,129 @@ public class ParticipantHubTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
+    private static readonly ActionId KnownAction = new(
+        Guid.Parse("00000000-0000-0000-0000-00000000ac10")
+    );
+
+    private void SessionInGroupWork(bool isSubmitted, params GroupAction[] actions)
+    {
+        var session = Session.Restore(
+            KnownSession,
+            TestSessions.Facilitator,
+            TestSessions.Name,
+            Roster.Restore([TestParticipants.Named(Anna, "Anna Schmidt")]),
+            PhaseProgress.Restore(Phase.GroupWork),
+            QuizProgress.Restore(null, false, false, []),
+            SelectionRound.Restore([], []),
+            FormationRecord.Restore(
+                true,
+                [
+                    Group.Restore(
+                        "tier-1",
+                        [Anna],
+                        [new ValueId("wert-1")],
+                        Anna,
+                        isSubmitted,
+                        actions
+                    ),
+                ]
+            ),
+            PresentationWalk.Restore(null, null, 0),
+            VotingRounds.Restore(false, 0, []),
+            revision: 1
+        );
+        repository.Add(session);
+    }
+
+    private static GroupAction TierOneAction(string text)
+    {
+        return new GroupAction(KnownAction, new ValueId("wert-1"), GroupActionText.Of(text));
+    }
+
+    [Fact]
+    public async Task Adding_an_action_mutates_persists_and_broadcasts()
+    {
+        SessionInGroupWork(isSubmitted: false);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.AddAction("wert-1", "Talk daily.");
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Formation.Groups[0]
+            .Actions.ShouldHaveSingleItem()
+            .Text.Value.ShouldBe("Talk daily.");
+        broadcaster.Broadcasts.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task Adding_an_action_without_a_payload_is_rejected_as_a_malformed_payload()
+    {
+        SessionInGroupWork(isSubmitted: false);
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.AddAction(null, null);
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Editing_an_action_mutates_persists_and_broadcasts()
+    {
+        SessionInGroupWork(isSubmitted: false, TierOneAction("Old wording"));
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.EditAction(KnownAction.Value.ToString(), "New wording");
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Formation.Groups[0]
+            .Actions.ShouldHaveSingleItem()
+            .Text.Value.ShouldBe("New wording");
+    }
+
+    [Fact]
+    public async Task Removing_an_action_mutates_persists_and_broadcasts()
+    {
+        SessionInGroupWork(isSubmitted: false, TierOneAction("Obsolete"));
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.RemoveAction(KnownAction.Value.ToString());
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Formation.Groups[0].Actions.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Submitting_the_group_work_mutates_persists_and_broadcasts()
+    {
+        SessionInGroupWork(isSubmitted: false, TierOneAction("Talk"));
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitGroupWork();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Formation.Groups[0].IsSubmitted.ShouldBeTrue();
+        broadcaster.Broadcasts.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task Reopening_the_group_work_mutates_persists_and_broadcasts()
+    {
+        SessionInGroupWork(isSubmitted: true, TierOneAction("Talk"));
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.ReopenGroupWork();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Formation.Groups[0].IsSubmitted.ShouldBeFalse();
+        broadcaster.Broadcasts.ShouldHaveSingleItem();
+    }
+
     [Fact]
     public async Task Choosing_an_answer_without_an_authenticated_subject_is_refused()
     {

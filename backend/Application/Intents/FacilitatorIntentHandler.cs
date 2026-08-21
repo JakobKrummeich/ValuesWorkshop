@@ -65,6 +65,32 @@ public sealed class FacilitatorIntentHandler(
         );
     }
 
+    public Task<IntentResult> HandleAsync(ReassignScribeCommand command)
+    {
+        return ExecuteAsFacilitatorAsync(
+            command.SessionIdentity,
+            command.Caller,
+            session =>
+            {
+                var newScribe = RequiredParticipantId(command.ParticipantId);
+                var wasAlreadyScribe = session.Formation.Groups.Any(group =>
+                    group.Scribe == newScribe
+                );
+                GroupWork.ReassignScribe(session, newScribe);
+                return !wasAlreadyScribe;
+            }
+        );
+    }
+
+    private static ParticipantId RequiredParticipantId(string participantId)
+    {
+        return Guid.TryParse(participantId, out var value)
+            ? new ParticipantId(value)
+            : throw new MalformedPayloadException(
+                "The participant identifier is not a well-formed UUID."
+            );
+    }
+
     private Task<IntentResult> ExecuteAsFacilitatorAsync(
         SessionIdentity sessionIdentity,
         CallerSubject caller,

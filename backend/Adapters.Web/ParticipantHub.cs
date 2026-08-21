@@ -78,4 +78,54 @@ public sealed class ParticipantHub(
             new SubmitValueSelectionCommand(sessionIdentity, participantId, valueIds ?? [])
         );
     }
+
+    public Task<IntentResult> AddAction(string? valueId, string? text)
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        return intentHandler.HandleAsync(
+            new AddActionCommand(sessionIdentity, participantId, valueId ?? "", text ?? "")
+        );
+    }
+
+    public Task<IntentResult> EditAction(string? actionId, string? text)
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        return intentHandler.HandleAsync(
+            new EditActionCommand(sessionIdentity, participantId, actionId ?? "", text ?? "")
+        );
+    }
+
+    public Task<IntentResult> RemoveAction(string? actionId)
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        return intentHandler.HandleAsync(
+            new RemoveActionCommand(sessionIdentity, participantId, actionId ?? "")
+        );
+    }
+
+    public Task<IntentResult> SubmitGroupWork()
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        return intentHandler.HandleAsync(
+            new SubmitGroupWorkCommand(sessionIdentity, participantId)
+        );
+    }
+
+    public Task<IntentResult> ReopenGroupWork()
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        return intentHandler.HandleAsync(
+            new ReopenGroupWorkCommand(sessionIdentity, participantId)
+        );
+    }
 }

@@ -146,7 +146,7 @@ public class GroupWorkTests
     {
         var session = SessionInPhase(Phase.GroupWork);
 
-        Should.Throw<NotAuthorizedException>(() =>
+        Should.Throw<UnknownParticipantException>(() =>
             GroupWork.ReassignScribe(session, new ParticipantId(Guid.NewGuid()))
         );
     }

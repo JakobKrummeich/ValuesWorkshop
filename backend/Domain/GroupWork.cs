@@ -42,8 +42,8 @@ public static class GroupWork
     {
         if (!session.Roster.Contains(newScribe))
         {
-            throw new NotAuthorizedException(
-                "Only a joined participant can be handed the scribe role."
+            throw new UnknownParticipantException(
+                "The scribe role can only be handed to a participant on the roster."
             );
         }
 

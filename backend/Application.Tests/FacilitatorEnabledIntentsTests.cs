@@ -62,14 +62,39 @@ public class FacilitatorEnabledIntentsTests
     }
 
     [Fact]
-    public void A_blocked_exit_guard_enables_nothing()
+    public void A_blocked_exit_guard_withholds_the_phase_advance()
     {
         var session = SessionFixtures.InPhase(
             Phase.GroupWork,
             formation: SessionFixtures.TwoGroups()
         );
 
-        Map(session).EnabledIntents.ShouldBeEmpty();
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.ReassignScribe]);
+    }
+
+    [Theory]
+    [InlineData(Phase.Join)]
+    [InlineData(Phase.Quiz)]
+    [InlineData(Phase.ValueSelection)]
+    [InlineData(Phase.SelectionResults)]
+    [InlineData(Phase.GroupFormation)]
+    public void Scribe_reassignment_is_absent_before_the_group_work_phase(Phase phase)
+    {
+        var session = SessionFixtures.InPhase(phase);
+
+        Map(session).EnabledIntents.ShouldNotContain(FacilitatorIntent.ReassignScribe);
+    }
+
+    [Theory]
+    [InlineData(Phase.GroupWork)]
+    [InlineData(Phase.ValuePresentation)]
+    [InlineData(Phase.FinalVoting)]
+    [InlineData(Phase.FinalPresentation)]
+    public void Scribe_reassignment_is_enabled_from_the_group_work_phase_on(Phase phase)
+    {
+        var session = SessionFixtures.InPhase(phase, formation: SessionFixtures.TwoGroups());
+
+        Map(session).EnabledIntents.ShouldContain(FacilitatorIntent.ReassignScribe);
     }
 
     [Fact]
@@ -92,15 +117,19 @@ public class FacilitatorEnabledIntentsTests
             )
         );
 
-        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.AdvancePhase]);
+        Map(session)
+            .EnabledIntents.ShouldBe([
+                FacilitatorIntent.ReassignScribe,
+                FacilitatorIntent.AdvancePhase,
+            ]);
     }
 
     [Fact]
-    public void The_final_phase_enables_nothing_because_no_phase_follows()
+    public void The_final_phase_enables_no_phase_advance_because_no_phase_follows()
     {
         var session = SessionFixtures.InPhase(Phase.FinalPresentation);
 
-        Map(session).EnabledIntents.ShouldBeEmpty();
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.ReassignScribe]);
     }
 
     private static FacilitatorWorkshopState Map(Session session)

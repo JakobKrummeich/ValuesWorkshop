@@ -278,6 +278,228 @@ public class FacilitatorIntentHandlerTests
         ShouldBeRejectedAsNotAuthorized(result, repository);
     }
 
+    [Fact]
+    public async Task The_facilitator_hands_the_scribe_role_to_another_member()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: SessionFixtures.TwoGroups())
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    SessionFixtures.Ben.Value.ToString()
+                )
+            );
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Formation.Groups[0]
+            .Scribe.ShouldBe(SessionFixtures.Ben);
+        broadcaster.Broadcasts.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task Reassigning_the_current_scribe_changes_nothing()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: SessionFixtures.TwoGroups())
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    SessionFixtures.Anna.Value.ToString()
+                )
+            );
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_reassign_target_off_the_roster_is_rejected_as_an_unknown_participant()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: SessionFixtures.TwoGroups())
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    Guid.NewGuid().ToString()
+                )
+            );
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.UnknownParticipant);
+        result.Detail.ShouldNotBeNullOrWhiteSpace();
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_reassign_target_outside_every_group_is_rejected_as_an_invariant_violation()
+    {
+        var groupsWithoutChris = FormationRecord.Restore(
+            true,
+            [
+                Group.Restore(
+                    "tier-1",
+                    [SessionFixtures.Ben, SessionFixtures.Anna],
+                    [new ValueId("wert-1")],
+                    SessionFixtures.Anna,
+                    false,
+                    []
+                ),
+            ]
+        );
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: groupsWithoutChris)
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    SessionFixtures.Chris.Value.ToString()
+                )
+            );
+
+        result.Code.ShouldBe(IntentRejectionCode.InvariantViolated);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_participant_identifier_that_is_not_a_uuid_is_rejected_as_a_malformed_payload()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: SessionFixtures.TwoGroups())
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    "not-a-uuid"
+                )
+            );
+
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Reassigning_before_the_group_work_phase_is_rejected_as_a_wrong_phase()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupFormation, formation: SessionFixtures.TwoGroups())
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    SessionFixtures.Ben.Value.ToString()
+                )
+            );
+
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Reassigning_stays_available_after_the_group_work_phase()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.ValuePresentation, formation: SessionFixtures.TwoGroups())
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    SessionFixtures.Ben.Value.ToString()
+                )
+            );
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Formation.Groups[0]
+            .Scribe.ShouldBe(SessionFixtures.Ben);
+    }
+
+    [Fact]
+    public async Task Another_subject_may_not_reassign_the_scribe()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: SessionFixtures.TwoGroups())
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    new CallerSubject("someone-else"),
+                    SessionFixtures.Ben.Value.ToString()
+                )
+            );
+
+        ShouldBeRejectedAsNotAuthorized(result, repository);
+    }
+
+    [Fact]
+    public async Task A_reassigned_scribe_loses_the_role_the_moment_the_new_one_gains_it()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: SessionFixtures.TwoGroups())
+        );
+
+        var reassignment = await HandlerOver(repository)
+            .HandleAsync(
+                new ReassignScribeCommand(
+                    KnownSession,
+                    TestSessions.FacilitatorCaller,
+                    SessionFixtures.Ben.Value.ToString()
+                )
+            );
+        reassignment.ShouldBe(IntentResult.Accepted());
+
+        var reassignedRepository = FakeSessionRepository.Holding(repository.Saved.Single());
+        var participantHandler = new ParticipantIntentHandler(
+            new IntentPipeline(new SessionCommandHandler(reassignedRepository, broadcaster)),
+            new TestValuesCatalog(50)
+        );
+
+        var oldScribeAttempt = await participantHandler.HandleAsync(
+            new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1", "Talk")
+        );
+        oldScribeAttempt.IsAccepted.ShouldBeFalse();
+        oldScribeAttempt.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
+
+        var newScribeAttempt = await participantHandler.HandleAsync(
+            new AddActionCommand(KnownSession, SessionFixtures.Ben, "wert-1", "Talk")
+        );
+        newScribeAttempt.ShouldBe(IntentResult.Accepted());
+        reassignedRepository
+            .Saved.ShouldHaveSingleItem()
+            .Formation.Groups[0]
+            .Actions.ShouldHaveSingleItem();
+    }
+
     private void ShouldBeRejectedAsNotAuthorized(
         IntentResult result,
         FakeSessionRepository repository
