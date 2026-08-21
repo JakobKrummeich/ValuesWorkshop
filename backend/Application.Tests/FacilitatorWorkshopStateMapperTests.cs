@@ -189,6 +189,54 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Groups_carry_no_group_work_fields_before_the_group_work_phase()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupFormation,
+            formation: SessionFixtures.TwoGroups()
+        );
+
+        var groups = Map(session).ShouldBeOfType<FacilitatorGroupFormationState>().Groups;
+
+        groups[0].ScribeParticipantId.ShouldBeNull();
+        groups[0].WorkStatus.ShouldBeNull();
+        groups[0].ActionCountPerValue.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Groups_carry_scribe_work_status_and_action_counts_during_group_work()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupWork,
+            formation: SessionFixtures.TwoGroups(
+                new GroupAction(
+                    new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac01")),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("Talk")
+                ),
+                new GroupAction(
+                    new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac02")),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("Listen")
+                )
+            )
+        );
+
+        var groups = Map(session).ShouldBeOfType<FacilitatorGroupWorkState>().Groups;
+
+        groups[0].ScribeParticipantId.ShouldBe(SessionFixtures.Anna.Value);
+        groups[0].WorkStatus.ShouldBe(GroupWorkStatus.Editing);
+        groups[0]
+            .ActionCountPerValue.ShouldNotBeNull()
+            .ShouldBe(new Dictionary<string, int> { ["wert-1"] = 2 });
+        groups[1].ScribeParticipantId.ShouldBe(SessionFixtures.Chris.Value);
+        groups[1].WorkStatus.ShouldBe(GroupWorkStatus.Submitted);
+        groups[1]
+            .ActionCountPerValue.ShouldNotBeNull()
+            .ShouldBe(new Dictionary<string, int> { ["wert-2"] = 0 });
+    }
+
+    [Fact]
     public void Group_formation_state_keeps_the_selection_progress_without_tallies()
     {
         var state = Map(SessionFixtures.InPhase(Phase.GroupFormation))

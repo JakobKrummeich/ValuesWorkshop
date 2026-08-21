@@ -105,7 +105,8 @@ public sealed class PresenterWorkshopStateMapper(
             .Select(group => new PresenterGroupView(
                 groupViews.NameOf(group),
                 groupViews.MemberDisplayNamesOf(group, session),
-                groupViews.AssignedValuesOf(group)
+                groupViews.AssignedValuesOf(group),
+                GroupViews.WorkStatusOf(group, session)
             ))
             .ToList();
     }

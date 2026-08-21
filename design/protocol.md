@@ -261,7 +261,7 @@ the caller's authenticated principal, so no client can act as another.
 | T6 | `RevealAnswer` | — | phase Quiz; a question is posed (repeat reveal is a no-op) | `WrongPhase` |
 | T7 | `ShowLearningText` | — | phase Quiz; answer revealed (repeat show is a no-op) | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
-| T13 | `ReassignScribe` | `{ groupName, participantId }` | phase Group work; target is a member of that group (I9) | `WrongPhase`, `InvariantViolated`, `UnknownParticipant` |
+| T13 | `ReassignScribe` | `{ participantId }` | phase Group work onward; target is a grouped participant — the group derives from membership (I9) | `WrongPhase`, `MalformedPayload`, `InvariantViolated`, `UnknownParticipant` |
 | T17 | `GoToNextValue` | — | phase Value presentation; values remain (I12) | `WrongPhase` |
 | T17a | `CorrectActionWording` | `{ actionId, text }` | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | `WrongPhase`, `InvariantViolated`, `MalformedPayload` |
 | T19 | `CloseVoting` | — | phase Final voting; round open | `WrongPhase` |
@@ -356,7 +356,7 @@ variant carries it.
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex?`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
-| ownGroup | `name: {animalId, text: {de, en}}` (the animal label rides the wire — values-catalog precedent, the client never reads `config/`), `memberDisplayNames` (formation order), `assignedValues: [{valueId, text: {de, en}}]` (deal order; texts embedded because the participant variant carries no values catalog in phase 5), `isCallerScribe?`, `scribeName?` (absent until scribes are appointed on entry into phase 6 — T19), `workStatus?` (`editing` \| `submitted`; absent until group work ships — T19), `actions?: [{ actionId, valueId, text, sortOrder }]` (absent until T20) |
+| ownGroup | `name: {animalId, text: {de, en}}` (the animal label rides the wire — values-catalog precedent, the client never reads `config/`), `memberDisplayNames` (formation order), `assignedValues: [{valueId, text: {de, en}}]` (deal order; texts embedded because the participant variant carries no values catalog in phase 5), `isCallerScribe?`, `scribeName?`, `workStatus?` (`editing` \| `submitted`), `actions?: [{ actionId, valueId, text, sortOrder }]` (all four absent until scribes are appointed on entry into phase 6 — shipped in T19) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
@@ -373,7 +373,7 @@ join lobby shows back to the person who just signed in.
 | roster | `participants: [{ participantId, displayName }]`, `participantCount` |
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
-| groups | `[{ name: {animalId, text: {de, en}}, members: [{participantId, displayName}] (formation order), assignedValues: [{valueId, text: {de, en}}], scribeParticipantId?, workStatus?, actionCountPerValue? }]` — scribe and work-status fields absent until T19, action counts until T20 |
+| groups | `[{ name: {animalId, text: {de, en}}, members: [{participantId, displayName}] (formation order), assignedValues: [{valueId, text: {de, en}}], scribeParticipantId?, workStatus?, actionCountPerValue? }]` — `scribeParticipantId?`, `workStatus?` and `actionCountPerValue?` absent until scribes are appointed on entry into phase 6 (shipped in T19) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
 | conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
@@ -392,7 +392,7 @@ what they answered, selected, or voted for.
 |---|---|
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
-| groups | `[{ name: {animalId, text: {de, en}}, memberDisplayNames (formation order), assignedValues: [{valueId, text: {de, en}}], workStatus? }]` — `workStatus` absent until T19 |
+| groups | `[{ name: {animalId, text: {de, en}}, memberDisplayNames (formation order), assignedValues: [{valueId, text: {de, en}}], workStatus? }]` — `workStatus` absent until phase 6 (shipped in T19) |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |

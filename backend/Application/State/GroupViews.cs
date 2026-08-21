@@ -53,6 +53,87 @@ internal sealed class GroupViews(
             .ToList();
     }
 
+    internal static GroupWorkStatus? WorkStatusOf(Group group, Session session)
+    {
+        if (!IsWorkUnderway(session))
+        {
+            return null;
+        }
+
+        return group.IsSubmitted ? GroupWorkStatus.Submitted : GroupWorkStatus.Editing;
+    }
+
+    internal static bool? IsCallerScribeOf(Group group, Session session, ParticipantId caller)
+    {
+        if (!IsWorkUnderway(session) || group.Scribe is null)
+        {
+            return null;
+        }
+
+        return group.Scribe == caller;
+    }
+
+    internal static string? ScribeNameOf(Group group, Session session)
+    {
+        if (!IsWorkUnderway(session) || group.Scribe is not { } scribe)
+        {
+            return null;
+        }
+
+        return SessionViews.DisplayNameOf(session, scribe);
+    }
+
+    internal static Guid? ScribeParticipantIdOf(Group group, Session session)
+    {
+        if (!IsWorkUnderway(session))
+        {
+            return null;
+        }
+
+        return group.Scribe?.Value;
+    }
+
+    internal static IReadOnlyList<GroupActionView>? ActionsOf(Group group, Session session)
+    {
+        if (!IsWorkUnderway(session))
+        {
+            return null;
+        }
+
+        return group
+            .Actions.Select(
+                (action, index) =>
+                    new GroupActionView(
+                        action.ActionId.Value,
+                        action.ValueId.Value,
+                        action.Text.Value,
+                        index
+                    )
+            )
+            .ToList();
+    }
+
+    internal static IReadOnlyDictionary<string, int>? ActionCountPerValueOf(
+        Group group,
+        Session session
+    )
+    {
+        if (!IsWorkUnderway(session))
+        {
+            return null;
+        }
+
+        return group.AssignedValues.ToDictionary(
+            valueId => valueId.Value,
+            valueId => group.Actions.Count(action => action.ValueId == valueId)
+        );
+    }
+
+    private static bool IsWorkUnderway(Session session)
+    {
+        return session.PhaseProgress.CurrentPhase >= Phase.GroupWork;
+    }
+
     private WorkshopValueView ValueViewOf(ValueId valueId)
     {
         if (!valueOfId.TryGetValue(valueId.Value, out var value))
