@@ -13,11 +13,15 @@ function nextPhaseViewModel<TState extends PhasedWorkshopState>(
   previous: PhaseViewModel<TState>,
   state: TState,
 ): PhaseViewModel<TState> {
-  if (previous.state !== null && previous.state.phase === state.phase) {
+  if (previous.state === null) {
+    return { state, isPhaseEntryObserved: false };
+  }
+
+  if (previous.state.phase === state.phase) {
     return { state, isPhaseEntryObserved: previous.isPhaseEntryObserved };
   }
 
-  return { state, isPhaseEntryObserved: previous.state !== null };
+  return { state, isPhaseEntryObserved: true };
 }
 
 export function usePhaseView<TState extends PhasedWorkshopState>(
