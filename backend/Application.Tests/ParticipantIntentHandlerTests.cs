@@ -147,6 +147,20 @@ public class ParticipantIntentHandlerTests
     }
 
     [Fact]
+    public async Task A_null_selection_is_rejected_as_a_malformed_payload_without_a_fallback()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.ValueSelection)
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new SubmitValueSelectionCommand(KnownSession, SessionFixtures.Anna, null));
+
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task Submitting_a_second_selection_is_rejected_as_an_invariant_violation()
     {
         var repository = FakeSessionRepository.Holding(

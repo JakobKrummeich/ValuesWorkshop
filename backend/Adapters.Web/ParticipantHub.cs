@@ -75,7 +75,7 @@ public sealed class ParticipantHub(
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
         return intentHandler.HandleAsync(
-            new SubmitValueSelectionCommand(sessionIdentity, participantId, valueIds ?? [])
+            new SubmitValueSelectionCommand(sessionIdentity, participantId, valueIds)
         );
     }
 

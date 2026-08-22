@@ -29,7 +29,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
             {
                 session.SubmitValueSelection(
                     command.ParticipantId,
-                    command.ValueIds.Select(valueId => new ValueId(valueId)).ToList(),
+                    IntentPayload.RequiredValueIds(command.ValueIds),
                     CatalogValueIds()
                 );
                 return true;
@@ -47,7 +47,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                     session,
                     command.ParticipantId,
                     new ActionId(Guid.NewGuid()),
-                    RequiredValueId(command.ValueId),
+                    IntentPayload.RequiredValueId(command.ValueId),
                     GroupActionText.Of(command.Text)
                 );
                 return true;
@@ -64,7 +64,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                 GroupWork.EditAction(
                     session,
                     command.ParticipantId,
-                    RequiredActionId(command.ActionId),
+                    IntentPayload.RequiredActionId(command.ActionId),
                     GroupActionText.Of(command.Text)
                 );
                 return true;
@@ -81,7 +81,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                 GroupWork.RemoveAction(
                     session,
                     command.ParticipantId,
-                    RequiredActionId(command.ActionId)
+                    IntentPayload.RequiredActionId(command.ActionId)
                 );
                 return true;
             }
@@ -119,25 +119,6 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
         return session.Formation.Groups.Any(group =>
             group.Members.Contains(participantId) && group.IsSubmitted
         );
-    }
-
-    private static ValueId RequiredValueId(string? valueId)
-    {
-        if (string.IsNullOrWhiteSpace(valueId))
-        {
-            throw new MalformedPayloadException("An action needs a value identifier.");
-        }
-
-        return new ValueId(valueId);
-    }
-
-    private static ActionId RequiredActionId(string? actionId)
-    {
-        return Guid.TryParse(actionId, out var value)
-            ? new ActionId(value)
-            : throw new MalformedPayloadException(
-                "The action identifier is not a well-formed UUID."
-            );
     }
 
     private IReadOnlySet<ValueId> CatalogValueIds()
