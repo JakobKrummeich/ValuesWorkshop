@@ -489,6 +489,33 @@ create/edit/delete; group submit + un-submit (scribe-only).
 **Verification:** BE group-work suite.
 **Dependencies:** 18. **Size:** M
 
+### Task 19a: Participant attention screens
+**Description:** Encode the attention rule (participant device never mirrors
+presenter content): shared `WaitingScreen` component (extracted from phase 4);
+quiz post-answer becomes "your answer: X" confirmation (participant view drops
+`correctAnswerIndex`/`learningText` from the wire); selection post-submit
+becomes "submission successful" screen; SPEC.md + `design/screens.md` updated
+for phases 2, 3, 5, 7, 8, 9. Spec: `tasks/specs/19a-participant-attention-screens.md`.
+**Acceptance criteria:**
+- [ ] Phase 4 renders shared `WaitingScreen`; component reusable for 7/9
+- [ ] Quiz: after answering only own answer shown; reveal/learning text absent
+      from participant wire and screen; next question resets
+- [ ] Selection: post-submit confirmation replaces grid
+- [ ] E2e phases 2–3 updated
+**Verification:** FE + BE suites, e2e.
+**Dependencies:** 19. **Size:** M
+
+### Task 19b: Group formation progress bar
+**Description:** On phase-5 entry, fixed 3-second progress bar on presenter
+AND participant screens (regardless of solve time), then existing cycling
+group cards / own-group card. Facilitator still advances to phase 6 — no
+auto-advance. Decision recorded in spec 19a §D1.
+**Acceptance criteria:**
+- [ ] Both screens show 3 s progress bar on entry, then current phase-5 UI
+- [ ] No state-machine change; facilitator advance unchanged
+**Verification:** FE tests + e2e phase-5 timing check.
+**Dependencies:** 19a. **Size:** S
+
 ### Task 20: Group work frontend
 **Description:** Scribe editor (actions per value, submit/un-submit);
 read-only live view for other members; facilitator overview with per-group
@@ -498,7 +525,7 @@ submit status + scribe reassignment control.
 - [ ] Facilitator reassignment swaps editor/read-only roles without reload
 - [ ] Multi-client e2e extended through phase 6
 **Verification:** FE tests + Playwright two-participant scribe scenario.
-**Dependencies:** 19. **Size:** M
+**Dependencies:** 19b. **Size:** M
 
 ### Checkpoint D
 - [ ] Playwright: 8 participants → 2 groups, solver <3 s, scribe reassign,
