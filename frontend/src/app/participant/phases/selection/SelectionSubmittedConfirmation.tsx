@@ -30,7 +30,7 @@ export function SelectionSubmittedConfirmation() {
         {translate(MessageKey.SelectionSubmittedHeading)}
       </h2>
       <p className={styles.body}>
-        {translate(MessageKey.SelectionSubmittedNotice)}
+        {translate(MessageKey.SelectionSubmittedBody)}
       </p>
     </div>
   );

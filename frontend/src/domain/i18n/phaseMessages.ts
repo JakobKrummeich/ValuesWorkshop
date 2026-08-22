@@ -3,55 +3,6 @@ import type { Message } from "./message";
 import { MessageKey } from "./messageKey";
 
 export const phaseMessages = {
-  [MessageKey.OpenSessionTitle]: {
-    [Language.German]: "ValuesWorkshop · Workshop eröffnen",
-    [Language.English]: "ValuesWorkshop · Open a session",
-  },
-  [MessageKey.OpenSessionName]: {
-    [Language.German]: "Workshop-Name",
-    [Language.English]: "Session name",
-  },
-  [MessageKey.OpenSessionPassphrase]: {
-    [Language.German]: "Moderations-Passwort",
-    [Language.English]: "Facilitator passphrase",
-  },
-  [MessageKey.OpenSessionSubmit]: {
-    [Language.German]: "Workshop eröffnen",
-    [Language.English]: "Open session",
-  },
-  [MessageKey.OpenSessionSubmitting]: {
-    [Language.German]: "Wird eröffnet\u2026",
-    [Language.English]: "Opening\u2026",
-  },
-  [MessageKey.OpenSessionNameRequired]: {
-    [Language.German]: "Bitte einen Workshop-Namen eingeben.",
-    [Language.English]: "Enter a session name.",
-  },
-  [MessageKey.OpenSessionSignInExpired]: {
-    [Language.German]:
-      "Die Anmeldung ist abgelaufen. Bitte erneut anmelden, um einen Workshop zu eröffnen.",
-    [Language.English]:
-      "Your sign-in has expired. Sign in again to open a session.",
-  },
-  [MessageKey.OpenSessionPassphraseRejected]: {
-    [Language.German]: "Dieses Moderations-Passwort wurde nicht akzeptiert.",
-    [Language.English]: "That facilitator passphrase was not accepted.",
-  },
-  [MessageKey.OpenSessionNameRejected]: {
-    [Language.German]:
-      "Dieser Workshop-Name wurde nicht akzeptiert. Bitte höchstens {limit} Zeichen verwenden.",
-    [Language.English]:
-      "That session name was not accepted. Use up to {limit} characters.",
-  },
-  [MessageKey.OpenSessionUnexpected]: {
-    [Language.German]:
-      "Der Workshop konnte nicht eröffnet werden. Bitte erneut versuchen.",
-    [Language.English]: "The session could not be opened. Please try again.",
-  },
-  [MessageKey.AdvancePhase]: {
-    [Language.German]: "Phase weiterschalten",
-    [Language.English]: "Advance phase",
-  },
   [MessageKey.JoinYouAreIn]: {
     [Language.German]: "Du bist dabei, {name}.",
     [Language.English]: "You are in, {name}.",
@@ -160,7 +111,7 @@ export const phaseMessages = {
     [Language.German]: "Abgabe erfolgreich",
     [Language.English]: "Submission successful",
   },
-  [MessageKey.SelectionSubmittedNotice]: {
+  [MessageKey.SelectionSubmittedBody]: {
     [Language.German]: "Deine Auswahl ist abgegeben.",
     [Language.English]: "Your selection has been submitted.",
   },
@@ -179,10 +130,6 @@ export const phaseMessages = {
   [MessageKey.SelectionResultsNoSubmissions]: {
     [Language.German]: "Niemand hat eine Auswahl abgegeben.",
     [Language.English]: "Nobody submitted a selection.",
-  },
-  [MessageKey.WaitingWatchWall]: {
-    [Language.German]: "Schaut auf die Präsentationswand",
-    [Language.English]: "Look at the presenter wall",
   },
   [MessageKey.GroupFormationWaitingForGroup]: {
     [Language.German]: "Deine Gruppe wird gerade gebildet\u2026",

@@ -2,6 +2,8 @@ import { ConnectionState } from "../../connectionState";
 import { connectionStateMessage } from "../connectionStateMessage";
 import { Language, defaultLanguage, readLanguage } from "../language";
 import { MessageKey, messages } from "../messages";
+import { phaseMessages } from "../phaseMessages";
+import { shellMessages } from "../shellMessages";
 import { translate } from "../translate";
 
 describe("translation", () => {
@@ -34,6 +36,14 @@ describe("translation", () => {
     );
 
     expect(untranslated).toEqual([]);
+  });
+
+  it("keeps the shell and phase catalogs disjoint", () => {
+    const claimedTwice = Object.keys(shellMessages).filter(
+      (key) => key in phaseMessages,
+    );
+
+    expect(claimedTwice).toEqual([]);
   });
 
   it("names a message for every connection state", () => {

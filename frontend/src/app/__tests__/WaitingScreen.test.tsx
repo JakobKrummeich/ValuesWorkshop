@@ -35,7 +35,7 @@ describe("waiting screen", () => {
     render(<WaitingScreen />, { wrapper: languageWrapper(Language.German) });
 
     expect(screen.getByTestId("waiting-screen")).toHaveAccessibleName(
-      "Schaut auf die Präsentationswand",
+      "Schau auf die Präsentationswand",
     );
   });
 });
