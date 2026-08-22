@@ -15,51 +15,65 @@ public class QuizCorrectAnswerSecrecyTests
 
     private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
 
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public void Participant_json_never_mentions_the_correct_answer_or_the_learning_text(
+        bool isRevealed,
+        bool isLearningTextShown
+    )
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.Quiz,
+            quiz: QuizProgress.Restore(0, isRevealed, isLearningTextShown, [])
+        );
+
+        ParticipantJsonOf(session).ShouldNotContain("correctAnswerIndex");
+        ParticipantJsonOf(session).ShouldNotContain("learningText");
+    }
+
     [Fact]
-    public void Participant_and_presenter_json_never_mention_the_correct_answer_before_the_reveal()
+    public void Presenter_json_never_mentions_the_correct_answer_before_the_reveal()
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
             quiz: QuizProgress.Restore(0, false, false, [])
         );
 
-        ParticipantJsonOf(session).ShouldNotContain("correctAnswerIndex");
         PresenterJsonOf(session).ShouldNotContain("correctAnswerIndex");
     }
 
     [Fact]
-    public void Participant_and_presenter_json_never_mention_the_learning_text_before_it_is_shown()
+    public void Presenter_json_never_mentions_the_learning_text_before_it_is_shown()
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
             quiz: QuizProgress.Restore(0, true, false, [])
         );
 
-        ParticipantJsonOf(session).ShouldNotContain("learningText");
         PresenterJsonOf(session).ShouldNotContain("learningText");
     }
 
     [Fact]
-    public void Once_shown_participant_and_presenter_json_carry_the_learning_text()
+    public void Once_shown_presenter_json_carries_the_learning_text()
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
             quiz: QuizProgress.Restore(0, true, true, [])
         );
 
-        ParticipantJsonOf(session).ShouldContain("\"learningText\"");
         PresenterJsonOf(session).ShouldContain("\"learningText\"");
     }
 
     [Fact]
-    public void Once_revealed_participant_and_presenter_json_carry_the_correct_answer()
+    public void Once_revealed_presenter_json_carries_the_correct_answer()
     {
         var session = SessionFixtures.InPhase(
             Phase.Quiz,
             quiz: QuizProgress.Restore(0, true, false, [])
         );
 
-        ParticipantJsonOf(session).ShouldContain("\"correctAnswerIndex\":1");
         PresenterJsonOf(session).ShouldContain("\"correctAnswerIndex\":1");
     }
 

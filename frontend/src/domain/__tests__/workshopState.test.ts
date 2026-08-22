@@ -207,10 +207,9 @@ describe("participant workshop state schema", () => {
     }
     expect(state.quiz.subState).toBe(QuizSubState.Answering);
     expect(state.quiz.questionCount).toBe(5);
-    expect(state.quiz.correctAnswerIndex).toBeUndefined();
   });
 
-  it("accepts a revealed quiz question that carries the correct answer", () => {
+  it("accepts a revealed quiz question and carries no reveal data", () => {
     const state = participantWorkshopStateSchema.parse({
       revision: 4,
       phase: 2,
@@ -222,14 +221,16 @@ describe("participant workshop state schema", () => {
         question: { de: "Frage", en: "Question" },
         answers: [{ de: "Richtig", en: "Right" }],
         ownAnswerIndex: 0,
-        correctAnswerIndex: 0,
       },
     });
 
     if (state.phase !== Phase.Quiz) {
       throw new Error("expected a quiz state");
     }
-    expect(state.quiz.correctAnswerIndex).toBe(0);
+    expect(state.quiz.subState).toBe(QuizSubState.Revealed);
+    expect(state.quiz.ownAnswerIndex).toBe(0);
+    expect("correctAnswerIndex" in state.quiz).toBe(false);
+    expect("learningText" in state.quiz).toBe(false);
   });
 
   it("rejects a quiz state without a posed question", () => {

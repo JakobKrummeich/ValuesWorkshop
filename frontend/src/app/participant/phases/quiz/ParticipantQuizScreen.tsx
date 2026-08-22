@@ -3,20 +3,10 @@
 import { localizedText } from "../../../../domain/i18n/localizedText";
 import type { ParticipantQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
-import { QuizLearningText } from "../../../QuizLearningText";
 import { QuizQuestion } from "../../../QuizQuestion";
 import styles from "./ParticipantQuizScreen.module.css";
-import {
-  AnswerStatus,
-  useParticipantQuizScreen,
-} from "./useParticipantQuizScreen";
-
-const answerStatusClasses: Readonly<Record<AnswerStatus, string>> = {
-  [AnswerStatus.Neutral]: styles.answer,
-  [AnswerStatus.Own]: `${styles.answer} ${styles.own}`,
-  [AnswerStatus.Correct]: `${styles.answer} ${styles.correct}`,
-  [AnswerStatus.OwnIncorrect]: `${styles.answer} ${styles.ownIncorrect}`,
-};
+import { QuizAnswerConfirmation } from "./QuizAnswerConfirmation";
+import { useParticipantQuizScreen } from "./useParticipantQuizScreen";
 
 export function ParticipantQuizScreen({
   state,
@@ -27,6 +17,7 @@ export function ParticipantQuizScreen({
   const {
     questionNumber,
     answers,
+    ownAnswer,
     isAnswerable,
     chooseAnswer,
     rejectionMessage,
@@ -39,28 +30,28 @@ export function ParticipantQuizScreen({
         questionCount={state.quiz.questionCount}
         question={state.quiz.question}
       />
-      <div className={styles.answers}>
-        {answers.map((answer, answerIndex) => (
-          <button
-            key={answerIndex}
-            type="button"
-            className={answerStatusClasses[answer.status]}
-            data-testid={`answer-button-${answerIndex}`}
-            data-answer-status={answer.status}
-            disabled={!isAnswerable}
-            onClick={() => chooseAnswer(answerIndex)}
-          >
-            {localizedText(language, answer.text)}
-          </button>
-        ))}
-      </div>
+      {ownAnswer === null ? (
+        <div className={styles.answers}>
+          {answers.map((answer, answerIndex) => (
+            <button
+              key={answerIndex}
+              type="button"
+              className={styles.answer}
+              data-testid={`answer-button-${answerIndex}`}
+              disabled={!isAnswerable}
+              onClick={() => chooseAnswer(answerIndex)}
+            >
+              {localizedText(language, answer)}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <QuizAnswerConfirmation answer={ownAnswer} />
+      )}
       {rejectionMessage !== null && (
         <p className={styles.rejection} role="status">
           {translate(rejectionMessage)}
         </p>
-      )}
-      {state.quiz.learningText !== undefined && (
-        <QuizLearningText learningText={state.quiz.learningText} />
       )}
     </section>
   );

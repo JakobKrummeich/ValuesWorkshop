@@ -1,0 +1,25 @@
+.confirmation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
+  margin-top: var(--space-gap);
+  padding: var(--space-gutter);
+  border: var(--border-hairline) solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+}
+
+.label {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+}
+
+.answer {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+}

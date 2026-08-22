@@ -25,8 +25,6 @@ const quizViewBase = {
 export const participantQuizViewSchema = z.object({
   ...quizViewBase,
   ownAnswerIndex: z.int().nullable(),
-  correctAnswerIndex: z.int().optional(),
-  learningText: localizedTextSchema.optional(),
 });
 
 export const facilitatorQuizViewSchema = z.object({

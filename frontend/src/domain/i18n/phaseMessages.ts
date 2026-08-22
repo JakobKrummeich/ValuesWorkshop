@@ -92,6 +92,10 @@ export const phaseMessages = {
     [Language.German]: "Frage {n} von {total}",
     [Language.English]: "Question {n} of {total}",
   },
+  [MessageKey.QuizOwnAnswerLabel]: {
+    [Language.German]: "Deine Antwort:",
+    [Language.English]: "Your answer:",
+  },
   [MessageKey.QuizAnsweredCount]: {
     [Language.German]: "{answered} von {total} haben geantwortet",
     [Language.English]: "{answered} of {total} have answered",

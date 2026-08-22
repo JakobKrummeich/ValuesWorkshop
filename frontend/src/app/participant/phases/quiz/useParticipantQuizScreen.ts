@@ -8,21 +8,10 @@ import { QuizSubState } from "../../../../domain/workshopState";
 import { useIntentSender } from "../../../useIntentSender";
 import { useParticipantDependencies } from "../../dependencies";
 
-export enum AnswerStatus {
-  Neutral = "neutral",
-  Own = "own",
-  Correct = "correct",
-  OwnIncorrect = "ownIncorrect",
-}
-
-export interface ParticipantQuizAnswer {
-  text: LocalizedText;
-  status: AnswerStatus;
-}
-
 export interface ParticipantQuizScreenModel {
   questionNumber: number;
-  answers: ParticipantQuizAnswer[];
+  answers: LocalizedText[];
+  ownAnswer: LocalizedText | null;
   isAnswerable: boolean;
   chooseAnswer: (answerIndex: number) => void;
   rejectionMessage: MessageKey | null;
@@ -44,10 +33,9 @@ export function useParticipantQuizScreen(
 
   return {
     questionNumber: questionIndex + 1,
-    answers: quiz.answers.map((text, answerIndex) => ({
-      text,
-      status: answerStatus(quiz, answerIndex),
-    })),
+    answers: quiz.answers,
+    ownAnswer:
+      quiz.ownAnswerIndex === null ? null : quiz.answers[quiz.ownAnswerIndex],
     isAnswerable:
       quiz.subState === QuizSubState.Answering &&
       quiz.ownAnswerIndex === null &&
@@ -55,18 +43,4 @@ export function useParticipantQuizScreen(
     chooseAnswer,
     rejectionMessage,
   };
-}
-
-function answerStatus(
-  quiz: ParticipantQuizView,
-  answerIndex: number,
-): AnswerStatus {
-  const isOwn = quiz.ownAnswerIndex === answerIndex;
-  if (quiz.correctAnswerIndex === undefined) {
-    return isOwn ? AnswerStatus.Own : AnswerStatus.Neutral;
-  }
-  if (quiz.correctAnswerIndex === answerIndex) {
-    return AnswerStatus.Correct;
-  }
-  return isOwn ? AnswerStatus.OwnIncorrect : AnswerStatus.Neutral;
 }

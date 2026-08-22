@@ -21,9 +21,7 @@ internal static class QuizViews
             SubStateOf(quiz),
             ViewOf(question.Question),
             AnswerViewsOf(question),
-            quiz.AnswerIndexOf(caller),
-            quiz.IsRevealed ? question.CorrectAnswerIndex : null,
-            quiz.IsLearningTextShown ? ViewOf(question.LearningText) : null
+            quiz.AnswerIndexOf(caller)
         );
     }
 

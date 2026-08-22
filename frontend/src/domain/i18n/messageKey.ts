@@ -44,6 +44,7 @@ export enum MessageKey {
   JoinUrlCopied = "join.urlCopied",
   JoinUrlCopyFailed = "join.urlCopyFailed",
   QuizQuestionHeading = "quiz.questionHeading",
+  QuizOwnAnswerLabel = "quiz.ownAnswerLabel",
   QuizAnsweredCount = "quiz.answeredCount",
   QuizVoteCount = "quiz.voteCount",
   QuizCorrectAnswer = "quiz.correctAnswer",
