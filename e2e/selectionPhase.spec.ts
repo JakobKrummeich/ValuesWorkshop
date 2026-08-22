@@ -435,9 +435,8 @@ test.describe.serial("value selection through group formation", () => {
   });
 
   test("a reload during group formation shows the groups without the progress bar", async () => {
-    await Promise.all([alicePage.reload(), presenterPage.reload()]);
-
     for (const page of [alicePage, presenterPage]) {
+      await page.reload();
       await expect(page.getByTestId("phase")).toHaveText("Phase 5", {
         timeout: 15_000,
       });
