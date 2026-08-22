@@ -313,8 +313,9 @@ question, live tallies, sub-controls (next question, reveal, learning text).
       `questionIndex` wire field, no number/index conversion anywhere
 **Learnings for Task 14:** per-role quiz view blocks already carry catalog
 content (question/answer/learning texts, both locales) on the wire — FE never
-reads `config/`; participant/presenter get `correctAnswerIndex`/`learningText`
-only once revealed/shown; facilitator always sees both.
+reads `config/`; presenter gets `correctAnswerIndex`/`learningText` once
+revealed/shown; facilitator always sees both; participant gets neither
+(Task 19a — data a screen must not show is data not sent).
 **Verification:** BE quiz suite; JSON schema validation test on config.
 **Dependencies:** 11. **Size:** M
 
