@@ -5,5 +5,5 @@ namespace ValuesWorkshop.Application.Intents;
 public sealed record ReassignScribeCommand(
     SessionIdentity SessionIdentity,
     CallerSubject Caller,
-    string ParticipantId
+    string? ParticipantId
 );

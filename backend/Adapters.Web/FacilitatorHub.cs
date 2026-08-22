@@ -91,7 +91,7 @@ public sealed class FacilitatorHub(
             new ReassignScribeCommand(
                 HubSessionBinding.SessionIdentityOf(Context),
                 Caller(),
-                participantId ?? ""
+                participantId
             )
         );
     }

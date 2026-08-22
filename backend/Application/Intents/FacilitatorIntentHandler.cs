@@ -82,7 +82,7 @@ public sealed class FacilitatorIntentHandler(
         );
     }
 
-    private static ParticipantId RequiredParticipantId(string participantId)
+    private static ParticipantId RequiredParticipantId(string? participantId)
     {
         return Guid.TryParse(participantId, out var value)
             ? new ParticipantId(value)

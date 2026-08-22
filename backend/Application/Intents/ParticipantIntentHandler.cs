@@ -121,7 +121,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
         );
     }
 
-    private static ValueId RequiredValueId(string valueId)
+    private static ValueId RequiredValueId(string? valueId)
     {
         if (string.IsNullOrWhiteSpace(valueId))
         {
@@ -131,7 +131,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
         return new ValueId(valueId);
     }
 
-    private static ActionId RequiredActionId(string actionId)
+    private static ActionId RequiredActionId(string? actionId)
     {
         return Guid.TryParse(actionId, out var value)
             ? new ActionId(value)

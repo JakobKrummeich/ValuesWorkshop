@@ -239,6 +239,28 @@ public class ParticipantIntentHandlerTests
     }
 
     [Fact]
+    public async Task A_null_payload_is_rejected_as_a_malformed_payload_without_a_fallback()
+    {
+        var repository = FakeSessionRepository.Holding(GroupWorkSession());
+        var handler = HandlerOver(repository);
+
+        var addResult = await handler.HandleAsync(
+            new AddActionCommand(KnownSession, SessionFixtures.Anna, null, null)
+        );
+        var editResult = await handler.HandleAsync(
+            new EditActionCommand(KnownSession, SessionFixtures.Anna, null, null)
+        );
+        var removeResult = await handler.HandleAsync(
+            new RemoveActionCommand(KnownSession, SessionFixtures.Anna, null)
+        );
+
+        addResult.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        editResult.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        removeResult.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task A_blank_value_identifier_is_rejected_as_a_malformed_payload()
     {
         var repository = FakeSessionRepository.Holding(GroupWorkSession());

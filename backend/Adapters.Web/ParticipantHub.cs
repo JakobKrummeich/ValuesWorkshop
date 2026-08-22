@@ -85,7 +85,7 @@ public sealed class ParticipantHub(
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
         return intentHandler.HandleAsync(
-            new AddActionCommand(sessionIdentity, participantId, valueId ?? "", text ?? "")
+            new AddActionCommand(sessionIdentity, participantId, valueId, text)
         );
     }
 
@@ -95,7 +95,7 @@ public sealed class ParticipantHub(
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
         return intentHandler.HandleAsync(
-            new EditActionCommand(sessionIdentity, participantId, actionId ?? "", text ?? "")
+            new EditActionCommand(sessionIdentity, participantId, actionId, text)
         );
     }
 
@@ -105,7 +105,7 @@ public sealed class ParticipantHub(
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
         return intentHandler.HandleAsync(
-            new RemoveActionCommand(sessionIdentity, participantId, actionId ?? "")
+            new RemoveActionCommand(sessionIdentity, participantId, actionId)
         );
     }
 
