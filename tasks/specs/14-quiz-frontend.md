@@ -55,10 +55,9 @@ Task 14 therefore includes a small backend slice adding it.
   - Answer buttons enabled only while `subState = Answering` and
     `ownAnswerIndex = null`; one tap casts, in-flight disables, rejection
     shown via existing `intentRejectionMessage`.
-  - Own answer stays visually marked from `ownAnswerIndex`.
-  - After reveal: correct answer highlighted; own wrong answer marked.
-  - Learning text panel rendered when `learningText` present.
-  - No tallies, ever (per protocol).
+  - After answering: own-answer confirmation ("Your answer: X") — no
+    correct-answer display, no learning text on participant device
+    (Task 19a; see design/screens.md).
 
 ### 3. Facilitator quiz screen + morph button
 
