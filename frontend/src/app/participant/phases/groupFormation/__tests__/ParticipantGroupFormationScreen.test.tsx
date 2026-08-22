@@ -23,6 +23,11 @@ beforeEach(() => {
     isFormationProgressRunning: false,
     completeFormationProgress,
   });
+  jest.useFakeTimers();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
 });
 
 function state(
@@ -141,7 +146,6 @@ describe("participant group formation screen", () => {
   });
 
   it("reports the finished progress bar back to the progress gate", () => {
-    jest.useFakeTimers();
     screenHook.mockReturnValue({
       isFormationProgressRunning: true,
       completeFormationProgress,
@@ -157,7 +161,5 @@ describe("participant group formation screen", () => {
     act(() => jest.advanceTimersByTime(formationProgressMilliseconds));
 
     expect(completeFormationProgress).toHaveBeenCalledTimes(1);
-
-    jest.useRealTimers();
   });
 });

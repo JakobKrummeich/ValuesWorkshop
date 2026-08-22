@@ -45,7 +45,14 @@ const state: PresenterGroupFormationState = {
 
 const completeFormationProgress = jest.fn();
 
-beforeEach(() => completeFormationProgress.mockClear());
+beforeEach(() => {
+  completeFormationProgress.mockClear();
+  jest.useFakeTimers();
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+});
 
 function model(
   currentPageGroups: PresenterGroupFormationState["groups"],
@@ -122,7 +129,6 @@ describe("presenter group formation screen", () => {
   });
 
   it("reveals the cards once the progress bar reports it is done", () => {
-    jest.useFakeTimers();
     screenHook.mockReturnValue(model(groups, true));
 
     render(
@@ -132,7 +138,5 @@ describe("presenter group formation screen", () => {
     act(() => jest.advanceTimersByTime(formationProgressMilliseconds));
 
     expect(completeFormationProgress).toHaveBeenCalledTimes(1);
-
-    jest.useRealTimers();
   });
 });
