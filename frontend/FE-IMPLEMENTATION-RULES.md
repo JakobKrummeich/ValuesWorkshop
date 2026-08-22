@@ -166,6 +166,8 @@ the returned values to JSX. All logic lives in the hook.
 
 - `"use client"` only when the component uses hooks, browser APIs, or event
   handlers.
+- `async` components only where Next.js requires them (server layouts/pages
+  that await framework data) — never elsewhere.
 - Default exports for Next.js pages/layouts. Named exports for everything else.
 - Keep components under 300 lines (enforced by eslint `max-lines`).
 
