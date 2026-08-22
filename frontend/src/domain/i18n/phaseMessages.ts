@@ -156,6 +156,10 @@ export const phaseMessages = {
     [Language.German]: "Abbrechen",
     [Language.English]: "Cancel",
   },
+  [MessageKey.SelectionSubmittedHeading]: {
+    [Language.German]: "Abgabe erfolgreich",
+    [Language.English]: "Submission successful",
+  },
   [MessageKey.SelectionSubmittedNotice]: {
     [Language.German]: "Deine Auswahl ist abgegeben.",
     [Language.English]: "Your selection has been submitted.",

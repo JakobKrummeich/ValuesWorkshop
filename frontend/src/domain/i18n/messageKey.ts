@@ -60,6 +60,7 @@ export enum MessageKey {
   SelectionConfirmBody = "selection.confirmBody",
   SelectionConfirmSubmit = "selection.confirmSubmit",
   SelectionConfirmCancel = "selection.confirmCancel",
+  SelectionSubmittedHeading = "selection.submittedHeading",
   SelectionSubmittedNotice = "selection.submittedNotice",
   SelectionSubmittedCount = "selection.submittedCount",
   SelectionResultsHeading = "selectionResults.heading",

@@ -1,0 +1,28 @@
+.confirmation {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-tight);
+  text-align: center;
+}
+
+.icon {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: var(--space-gap);
+  color: var(--color-success);
+}
+
+.heading {
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.body {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
