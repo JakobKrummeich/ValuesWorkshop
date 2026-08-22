@@ -24,7 +24,7 @@ workshop's native language), English term used in model and code.
 |---|---|---|
 | Moderator:in | **Facilitator** | Runs the workshop. Opens the session, advances phases, operates all sub-controls (next question, reveal, learning text, presenting group, close voting, tiebreak), may reassign a scribe. Exactly one per session. |
 | Teilnehmer:in | **Participant** | Joins a session, answers quiz questions, selects values, works in a group, casts final votes. Up to ~30 per session. |
-| Schreiber:in | **Scribe** | The one participant per group who writes: creates, edits, removes actions and submits / reopens the group's work. Appointed at random when group work begins; the facilitator may reassign the role at any time (e.g. dead phone). |
+| Schreiber:in | **Scribe** | The one participant per group who writes: creates, edits, removes actions and submits / reopens the group's work. Appointed at random when group work begins; the facilitator may reassign the role during group work (e.g. dead phone). |
 | Präsentationsansicht | **Presenter view** | Not a person: the shared big-screen view of the session (projector). Shows the invitation to join, live charts, group presentations, final results. Purely observing — it never issues commands. |
 
 ### Session & flow
