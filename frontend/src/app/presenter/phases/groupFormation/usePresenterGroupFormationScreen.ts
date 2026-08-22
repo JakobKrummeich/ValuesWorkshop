@@ -11,7 +11,6 @@ type PresenterGroups = PresenterGroupFormationState["groups"];
 
 export interface PresenterGroupFormationScreenModel {
   isFormationProgressRunning: boolean;
-  completeFormationProgress: () => void;
   currentPageGroups: PresenterGroups;
 }
 
@@ -19,7 +18,7 @@ export function usePresenterGroupFormationScreen(
   groups: PresenterGroups,
   isPhaseEntryObserved: boolean,
 ): PresenterGroupFormationScreenModel {
-  const { isFormationProgressRunning, completeFormationProgress } =
+  const { isFormationProgressRunning } =
     useFormationProgressGate(isPhaseEntryObserved);
   const [pageIndex, setPageIndex] = useState(0);
   const pages = splitIntoGroupPages(groups);
@@ -38,7 +37,6 @@ export function usePresenterGroupFormationScreen(
 
   return {
     isFormationProgressRunning,
-    completeFormationProgress,
     currentPageGroups: pageCount === 0 ? [] : pages[pageIndex % pageCount],
   };
 }

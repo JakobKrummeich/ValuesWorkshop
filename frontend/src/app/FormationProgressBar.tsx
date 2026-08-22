@@ -3,15 +3,9 @@
 import { MessageKey } from "../domain/i18n/messages";
 import styles from "./FormationProgressBar.module.css";
 import { useTranslation } from "./i18n/useTranslation";
-import { useFormationProgressBar } from "./useFormationProgressBar";
 
-export function FormationProgressBar({
-  onProgressComplete,
-}: {
-  onProgressComplete: () => void;
-}) {
+export function FormationProgressBar() {
   const { translate } = useTranslation();
-  useFormationProgressBar(onProgressComplete);
 
   const label = translate(MessageKey.GroupFormationFormingGroups);
 

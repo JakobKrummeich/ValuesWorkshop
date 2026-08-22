@@ -1,45 +1,9 @@
-import { act, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { Language } from "../../../../../domain/i18n/language";
-import { formationProgressMilliseconds } from "../../../../useFormationProgressBar";
 import { Phase } from "../../../../../domain/phases";
 import type { ParticipantGroupFormationState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
-import { useFormationProgressGate } from "../../../../useFormationProgressGate";
 import { ParticipantGroupFormationScreen } from "../ParticipantGroupFormationScreen";
-
-jest.mock("../../../../useFormationProgressGate", () => ({
-  useFormationProgressGate: jest.fn(),
-}));
-
-const screenHook = useFormationProgressGate as jest.MockedFunction<
-  typeof useFormationProgressGate
->;
-
-const completeFormationProgress = jest.fn();
-
-beforeEach(() => {
-  completeFormationProgress.mockClear();
-  screenHook.mockReturnValue({
-    isFormationProgressRunning: false,
-    completeFormationProgress,
-  });
-  jest.useFakeTimers();
-});
-
-afterEach(() => {
-  jest.useRealTimers();
-});
-
-function state(
-  ownGroup: ParticipantGroupFormationState["ownGroup"],
-): ParticipantGroupFormationState {
-  return {
-    phase: Phase.GroupFormation,
-    revision: 30,
-    participantCount: 3,
-    ownGroup,
-  };
-}
 
 const ownGroup: NonNullable<ParticipantGroupFormationState["ownGroup"]> = {
   name: { animalId: "fox", text: { de: "Fuchs", en: "Fox" } },
@@ -50,15 +14,29 @@ const ownGroup: NonNullable<ParticipantGroupFormationState["ownGroup"]> = {
   ],
 };
 
+function renderScreen(
+  group: ParticipantGroupFormationState["ownGroup"],
+  { language = Language.English, isPhaseEntryObserved = false } = {},
+) {
+  const state: ParticipantGroupFormationState = {
+    phase: Phase.GroupFormation,
+    revision: 30,
+    participantCount: 3,
+    ownGroup: group,
+  };
+
+  return render(
+    <ParticipantGroupFormationScreen
+      state={state}
+      isPhaseEntryObserved={isPhaseEntryObserved}
+    />,
+    { wrapper: languageWrapper(language) },
+  );
+}
+
 describe("participant group formation screen", () => {
   it("shows the own group card with name, members, and values", () => {
-    render(
-      <ParticipantGroupFormationScreen
-        state={state(ownGroup)}
-        isPhaseEntryObserved={false}
-      />,
-      { wrapper: languageWrapper() },
-    );
+    renderScreen(ownGroup);
 
     expect(screen.getByTestId("own-group-card")).toBeInTheDocument();
     expect(screen.getByTestId("group-name")).toHaveTextContent("Fox");
@@ -72,13 +50,7 @@ describe("participant group formation screen", () => {
   });
 
   it("speaks German when German is chosen", () => {
-    render(
-      <ParticipantGroupFormationScreen
-        state={state(ownGroup)}
-        isPhaseEntryObserved={false}
-      />,
-      { wrapper: languageWrapper(Language.German) },
-    );
+    renderScreen(ownGroup, { language: Language.German });
 
     expect(screen.getByTestId("group-name")).toHaveTextContent("Fuchs");
     expect(screen.getByTestId("group-value-trust")).toHaveTextContent(
@@ -87,13 +59,7 @@ describe("participant group formation screen", () => {
   });
 
   it("notes that the group is being formed while no group is assigned", () => {
-    render(
-      <ParticipantGroupFormationScreen
-        state={state(null)}
-        isPhaseEntryObserved={false}
-      />,
-      { wrapper: languageWrapper() },
-    );
+    renderScreen(null);
 
     expect(screen.queryByTestId("own-group-card")).not.toBeInTheDocument();
     expect(screen.getByTestId("own-group-waiting")).toHaveTextContent(
@@ -102,64 +68,17 @@ describe("participant group formation screen", () => {
   });
 
   it("notes the forming group in German when German is chosen", () => {
-    render(
-      <ParticipantGroupFormationScreen
-        state={state(null)}
-        isPhaseEntryObserved={false}
-      />,
-      { wrapper: languageWrapper(Language.German) },
-    );
+    renderScreen(null, { language: Language.German });
 
     expect(screen.getByTestId("own-group-waiting")).toHaveTextContent(
       "Deine Gruppe wird gerade gebildet\u2026",
     );
   });
 
-  it("hands the observed entry to the progress gate", () => {
-    render(
-      <ParticipantGroupFormationScreen
-        state={state(ownGroup)}
-        isPhaseEntryObserved
-      />,
-      { wrapper: languageWrapper() },
-    );
-
-    expect(screenHook).toHaveBeenCalledWith(true);
-  });
-
   it("holds the group card back while the progress bar runs", () => {
-    screenHook.mockReturnValue({
-      isFormationProgressRunning: true,
-      completeFormationProgress,
-    });
-
-    render(
-      <ParticipantGroupFormationScreen
-        state={state(ownGroup)}
-        isPhaseEntryObserved
-      />,
-      { wrapper: languageWrapper() },
-    );
+    renderScreen(ownGroup, { isPhaseEntryObserved: true });
 
     expect(screen.getByTestId("formation-progress")).toBeInTheDocument();
     expect(screen.queryByTestId("own-group-card")).not.toBeInTheDocument();
-  });
-
-  it("reports the finished progress bar back to the progress gate", () => {
-    screenHook.mockReturnValue({
-      isFormationProgressRunning: true,
-      completeFormationProgress,
-    });
-
-    render(
-      <ParticipantGroupFormationScreen
-        state={state(ownGroup)}
-        isPhaseEntryObserved
-      />,
-      { wrapper: languageWrapper() },
-    );
-    act(() => jest.advanceTimersByTime(formationProgressMilliseconds));
-
-    expect(completeFormationProgress).toHaveBeenCalledTimes(1);
   });
 });

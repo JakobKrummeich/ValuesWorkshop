@@ -13,16 +13,13 @@ export function PresenterGroupFormationScreen({
   state: PresenterGroupFormationState;
   isPhaseEntryObserved: boolean;
 }) {
-  const {
-    isFormationProgressRunning,
-    completeFormationProgress,
-    currentPageGroups,
-  } = usePresenterGroupFormationScreen(state.groups, isPhaseEntryObserved);
+  const { isFormationProgressRunning, currentPageGroups } =
+    usePresenterGroupFormationScreen(state.groups, isPhaseEntryObserved);
 
   if (isFormationProgressRunning) {
     return (
       <section className={styles.screen}>
-        <FormationProgressBar onProgressComplete={completeFormationProgress} />
+        <FormationProgressBar />
       </section>
     );
   }

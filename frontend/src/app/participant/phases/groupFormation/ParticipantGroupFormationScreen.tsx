@@ -16,13 +16,13 @@ export function ParticipantGroupFormationScreen({
   isPhaseEntryObserved: boolean;
 }) {
   const { translate } = useTranslation();
-  const { isFormationProgressRunning, completeFormationProgress } =
+  const { isFormationProgressRunning } =
     useFormationProgressGate(isPhaseEntryObserved);
 
   if (isFormationProgressRunning) {
     return (
       <section className={styles.screen}>
-        <FormationProgressBar onProgressComplete={completeFormationProgress} />
+        <FormationProgressBar />
       </section>
     );
   }

@@ -1,5 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import type { PresenterGroupFormationState } from "../../../../../domain/workshopState";
+import { formationProgressMilliseconds } from "../../../../useFormationProgressGate";
 import {
   groupPageCycleMilliseconds,
   usePresenterGroupFormationScreen,
@@ -105,22 +106,21 @@ describe("presenter group formation screen hook", () => {
     expect(result.current.isFormationProgressRunning).toBe(true);
   });
 
-  it("shows the groups once the progress bar is done", () => {
+  it("holds the page cycle back while the progress bar runs", () => {
     const { result } = renderScreen(7, true);
 
-    act(() => result.current.completeFormationProgress());
+    act(() => jest.advanceTimersByTime(formationProgressMilliseconds - 1));
 
-    expect(result.current.isFormationProgressRunning).toBe(false);
+    expect(result.current.isFormationProgressRunning).toBe(true);
+    expect(jest.getTimerCount()).toBe(1);
   });
 
-  it("holds the page cycle back until the progress bar is done", () => {
+  it("cycles the pages once the progress bar is done", () => {
     const { result } = renderScreen(7, true);
 
-    expect(jest.getTimerCount()).toBe(0);
+    act(() => jest.advanceTimersByTime(formationProgressMilliseconds));
 
-    act(() => result.current.completeFormationProgress());
-
-    expect(jest.getTimerCount()).toBe(1);
+    expect(result.current.isFormationProgressRunning).toBe(false);
 
     act(() => jest.advanceTimersByTime(groupPageCycleMilliseconds));
 

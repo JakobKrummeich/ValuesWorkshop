@@ -1,6 +1,5 @@
-import { act, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { Phase } from "../../../../../domain/phases";
-import { formationProgressMilliseconds } from "../../../../useFormationProgressBar";
 import type { PresenterGroupFormationState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { PresenterGroupFormationScreen } from "../PresenterGroupFormationScreen";
@@ -43,39 +42,24 @@ const state: PresenterGroupFormationState = {
   groups,
 };
 
-const completeFormationProgress = jest.fn();
-
-beforeEach(() => {
-  completeFormationProgress.mockClear();
-  jest.useFakeTimers();
-});
-
-afterEach(() => {
-  jest.useRealTimers();
-});
-
-function model(
+function renderScreen(
   currentPageGroups: PresenterGroupFormationState["groups"],
-  isFormationProgressRunning = false,
+  { isFormationProgressRunning = false, isPhaseEntryObserved = false } = {},
 ) {
-  return {
-    isFormationProgressRunning,
-    completeFormationProgress,
-    currentPageGroups,
-  };
+  screenHook.mockReturnValue({ isFormationProgressRunning, currentPageGroups });
+
+  return render(
+    <PresenterGroupFormationScreen
+      state={state}
+      isPhaseEntryObserved={isPhaseEntryObserved}
+    />,
+    { wrapper: languageWrapper() },
+  );
 }
 
 describe("presenter group formation screen", () => {
   it("renders a card for every group on the current page", () => {
-    screenHook.mockReturnValue(model(groups));
-
-    render(
-      <PresenterGroupFormationScreen
-        state={state}
-        isPhaseEntryObserved={false}
-      />,
-      { wrapper: languageWrapper() },
-    );
+    renderScreen(groups);
 
     const fox = screen.getByTestId("group-card-fox");
     expect(within(fox).getByTestId("group-name")).toHaveTextContent("Fox");
@@ -91,52 +75,25 @@ describe("presenter group formation screen", () => {
   });
 
   it("leaves groups beyond the current page off the wall", () => {
-    screenHook.mockReturnValue(model([groups[0]]));
-
-    render(
-      <PresenterGroupFormationScreen
-        state={state}
-        isPhaseEntryObserved={false}
-      />,
-      { wrapper: languageWrapper() },
-    );
+    renderScreen([groups[0]]);
 
     expect(screen.getByTestId("group-card-fox")).toBeInTheDocument();
     expect(screen.queryByTestId("group-card-owl")).not.toBeInTheDocument();
   });
 
   it("hands the wire groups and the observed entry to the paging hook", () => {
-    screenHook.mockReturnValue(model(groups));
-
-    render(
-      <PresenterGroupFormationScreen state={state} isPhaseEntryObserved />,
-      { wrapper: languageWrapper() },
-    );
+    renderScreen(groups, { isPhaseEntryObserved: true });
 
     expect(screenHook).toHaveBeenCalledWith(groups, true);
   });
 
   it("holds the cards back while the progress bar runs", () => {
-    screenHook.mockReturnValue(model(groups, true));
-
-    render(
-      <PresenterGroupFormationScreen state={state} isPhaseEntryObserved />,
-      { wrapper: languageWrapper() },
-    );
+    renderScreen(groups, {
+      isFormationProgressRunning: true,
+      isPhaseEntryObserved: true,
+    });
 
     expect(screen.getByTestId("formation-progress")).toBeInTheDocument();
     expect(screen.queryByTestId("group-card-fox")).not.toBeInTheDocument();
-  });
-
-  it("reveals the cards once the progress bar reports it is done", () => {
-    screenHook.mockReturnValue(model(groups, true));
-
-    render(
-      <PresenterGroupFormationScreen state={state} isPhaseEntryObserved />,
-      { wrapper: languageWrapper() },
-    );
-    act(() => jest.advanceTimersByTime(formationProgressMilliseconds));
-
-    expect(completeFormationProgress).toHaveBeenCalledTimes(1);
   });
 });
