@@ -109,7 +109,10 @@ public sealed class FacilitatorWorkshopStateMapper(
             .Select(group => new FacilitatorGroupView(
                 groupViews.NameOf(group),
                 groupViews.MembersOf(group, session),
-                groupViews.AssignedValuesOf(group)
+                groupViews.AssignedValuesOf(group),
+                groupViews.ScribeParticipantIdOf(group, session),
+                groupViews.WorkStatusOf(group, session),
+                groupViews.ActionCountPerValueOf(group, session)
             ))
             .ToList();
     }

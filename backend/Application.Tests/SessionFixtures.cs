@@ -68,13 +68,20 @@ internal static class SessionFixtures
         );
     }
 
-    internal static FormationRecord TwoGroups()
+    internal static FormationRecord TwoGroups(params GroupAction[] tierOneActions)
     {
         return FormationRecord.Restore(
             true,
             [
-                Group.Restore("tier-1", [Ben, Anna], [new ValueId("wert-1")], Anna, false),
-                Group.Restore("tier-2", [Chris], [new ValueId("wert-2")], Chris, true),
+                Group.Restore(
+                    "tier-1",
+                    [Ben, Anna],
+                    [new ValueId("wert-1")],
+                    Anna,
+                    false,
+                    tierOneActions
+                ),
+                Group.Restore("tier-2", [Chris], [new ValueId("wert-2")], Chris, true, []),
             ]
         );
     }

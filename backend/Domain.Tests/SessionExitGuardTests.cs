@@ -2,10 +2,6 @@ namespace ValuesWorkshop.Domain.Tests;
 
 public class SessionExitGuardTests
 {
-    private static readonly ParticipantId Anna = new(
-        Guid.Parse("00000000-0000-0000-0000-0000000000a1")
-    );
-
     [Fact]
     public void The_quiz_may_not_be_left_before_the_last_question_is_walked()
     {
@@ -61,6 +57,31 @@ public class SessionExitGuardTests
             formation: FormationOf(submittedStates: [true, true])
         );
 
+        session.AdvancePhase();
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
+    }
+
+    [Fact]
+    public void Group_work_becomes_leavable_once_every_scribe_submits()
+    {
+        var session = SessionInPhase(
+            Phase.GroupWork,
+            formation: FormationOf(submittedStates: [false, false])
+        );
+        ShouldRefuseToAdvance(session, Phase.GroupWork);
+
+        foreach (var group in session.Formation.Groups)
+        {
+            var scribe = group.Scribe.ShouldNotBeNull();
+            group.AddAction(
+                scribe,
+                new ActionId(Guid.NewGuid()),
+                group.AssignedValues[0],
+                GroupActionText.Of("Talk openly about mistakes")
+            );
+            group.Submit(scribe);
+        }
         session.AdvancePhase();
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
@@ -159,13 +180,17 @@ public class SessionExitGuardTests
     {
         var groups = submittedStates.Select(
             (isSubmitted, index) =>
-                Group.Restore(
+            {
+                var scribe = new ParticipantId(Guid.NewGuid());
+                return Group.Restore(
                     $"group-{index}",
-                    [Anna],
+                    [scribe],
                     [new ValueId($"value-{index}")],
-                    Anna,
-                    isSubmitted
-                )
+                    scribe,
+                    isSubmitted,
+                    []
+                );
+            }
         );
 
         return FormationRecord.Restore(true, groups);

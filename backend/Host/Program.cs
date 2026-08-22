@@ -41,6 +41,7 @@ builder.Services.AddSingleton<IAnimalsCatalog>(animalsCatalog);
 builder.Services.AddSingleton<IGroupNames>(animalsCatalog);
 builder.Services.AddSingleton<IGroupSolver, CpSatGroupSolver>();
 builder.Services.AddSingleton<IPhaseEntryAction, GroupFormation>();
+builder.Services.AddSingleton<IPhaseEntryAction, ScribeAppointment>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
     new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))

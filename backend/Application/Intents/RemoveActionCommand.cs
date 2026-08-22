@@ -2,8 +2,8 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Intents;
 
-public sealed record SubmitValueSelectionCommand(
+public sealed record RemoveActionCommand(
     SessionIdentity SessionIdentity,
     ParticipantId ParticipantId,
-    IReadOnlyList<string>? ValueIds
+    string? ActionId
 );

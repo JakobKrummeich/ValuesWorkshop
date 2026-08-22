@@ -29,11 +29,95 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
             {
                 session.SubmitValueSelection(
                     command.ParticipantId,
-                    command.ValueIds.Select(valueId => new ValueId(valueId)).ToList(),
+                    IntentPayloadValidator.RequiredValueIds(command.ValueIds),
                     CatalogValueIds()
                 );
                 return true;
             }
+        );
+    }
+
+    public Task<IntentResult> HandleAsync(AddActionCommand command)
+    {
+        return pipeline.ExecuteAsync(
+            command.SessionIdentity,
+            session =>
+            {
+                GroupWork.AddAction(
+                    session,
+                    command.ParticipantId,
+                    new ActionId(Guid.NewGuid()),
+                    IntentPayloadValidator.RequiredValueId(command.ValueId),
+                    GroupActionText.Of(command.Text)
+                );
+                return true;
+            }
+        );
+    }
+
+    public Task<IntentResult> HandleAsync(EditActionCommand command)
+    {
+        return pipeline.ExecuteAsync(
+            command.SessionIdentity,
+            session =>
+            {
+                GroupWork.EditAction(
+                    session,
+                    command.ParticipantId,
+                    IntentPayloadValidator.RequiredActionId(command.ActionId),
+                    GroupActionText.Of(command.Text)
+                );
+                return true;
+            }
+        );
+    }
+
+    public Task<IntentResult> HandleAsync(RemoveActionCommand command)
+    {
+        return pipeline.ExecuteAsync(
+            command.SessionIdentity,
+            session =>
+            {
+                GroupWork.RemoveAction(
+                    session,
+                    command.ParticipantId,
+                    IntentPayloadValidator.RequiredActionId(command.ActionId)
+                );
+                return true;
+            }
+        );
+    }
+
+    public Task<IntentResult> HandleAsync(SubmitGroupWorkCommand command)
+    {
+        return pipeline.ExecuteAsync(
+            command.SessionIdentity,
+            session =>
+            {
+                var wasSubmitted = IsCallerGroupSubmitted(session, command.ParticipantId);
+                GroupWork.Submit(session, command.ParticipantId);
+                return !wasSubmitted;
+            }
+        );
+    }
+
+    public Task<IntentResult> HandleAsync(ReopenGroupWorkCommand command)
+    {
+        return pipeline.ExecuteAsync(
+            command.SessionIdentity,
+            session =>
+            {
+                var wasSubmitted = IsCallerGroupSubmitted(session, command.ParticipantId);
+                GroupWork.Reopen(session, command.ParticipantId);
+                return wasSubmitted;
+            }
+        );
+    }
+
+    private static bool IsCallerGroupSubmitted(Session session, ParticipantId participantId)
+    {
+        return session.Formation.Groups.Any(group =>
+            group.Members.Contains(participantId) && group.IsSubmitted
         );
     }
 

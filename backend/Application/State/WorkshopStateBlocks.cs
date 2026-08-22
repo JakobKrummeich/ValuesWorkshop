@@ -77,22 +77,48 @@ public sealed record SelectionProgressView(
 
 public sealed record GroupNameView(string AnimalId, LocalizedTextView Text);
 
+[JsonConverter(typeof(JsonStringEnumConverter<GroupWorkStatus>))]
+public enum GroupWorkStatus
+{
+    [JsonStringEnumMemberName("editing")]
+    Editing = 1,
+
+    [JsonStringEnumMemberName("submitted")]
+    Submitted = 2,
+}
+
+public sealed record GroupActionView(Guid ActionId, string ValueId, string Text, int SortOrder);
+
 public sealed record OwnGroupView(
     GroupNameView Name,
     IReadOnlyList<string> MemberDisplayNames,
-    IReadOnlyList<WorkshopValueView> AssignedValues
+    IReadOnlyList<WorkshopValueView> AssignedValues,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? IsCallerScribe,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? ScribeName,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        GroupWorkStatus? WorkStatus,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        IReadOnlyList<GroupActionView>? Actions
 );
 
 public sealed record FacilitatorGroupView(
     GroupNameView Name,
     IReadOnlyList<RosterParticipantView> Members,
-    IReadOnlyList<WorkshopValueView> AssignedValues
+    IReadOnlyList<WorkshopValueView> AssignedValues,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        Guid? ScribeParticipantId,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        GroupWorkStatus? WorkStatus,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        IReadOnlyDictionary<string, int>? ActionCountPerValue
 );
 
 public sealed record PresenterGroupView(
     GroupNameView Name,
     IReadOnlyList<string> MemberDisplayNames,
-    IReadOnlyList<WorkshopValueView> AssignedValues
+    IReadOnlyList<WorkshopValueView> AssignedValues,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        GroupWorkStatus? WorkStatus
 );
 
 public sealed record PresentationView(string? PresentingGroupName, string? PresentedValueId);

@@ -324,6 +324,85 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Own_group_carries_no_group_work_fields_before_the_group_work_phase()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupFormation,
+            formation: SessionFixtures.TwoGroups()
+        );
+
+        var ownGroup = Map(session, caller: SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantGroupFormationState>()
+            .OwnGroup.ShouldNotBeNull();
+
+        ownGroup.IsCallerScribe.ShouldBeNull();
+        ownGroup.ScribeName.ShouldBeNull();
+        ownGroup.WorkStatus.ShouldBeNull();
+        ownGroup.Actions.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Own_group_names_the_scribe_and_flags_the_scribe_caller_during_group_work()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupWork,
+            formation: SessionFixtures.TwoGroups()
+        );
+
+        var scribeView = Map(session, caller: SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantGroupWorkState>()
+            .OwnGroup.ShouldNotBeNull();
+        var memberView = Map(session, caller: SessionFixtures.Ben)
+            .ShouldBeOfType<ParticipantGroupWorkState>()
+            .OwnGroup.ShouldNotBeNull();
+
+        scribeView.IsCallerScribe.ShouldBe(true);
+        scribeView.ScribeName.ShouldBe("Anna Schmidt");
+        scribeView.WorkStatus.ShouldBe(GroupWorkStatus.Editing);
+        scribeView.Actions.ShouldNotBeNull().ShouldBeEmpty();
+        memberView.IsCallerScribe.ShouldBe(false);
+        memberView.ScribeName.ShouldBe("Anna Schmidt");
+    }
+
+    [Fact]
+    public void Own_group_reports_a_submitted_work_status()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupWork,
+            formation: SessionFixtures.TwoGroups()
+        );
+
+        var ownGroup = Map(session, caller: SessionFixtures.Chris)
+            .ShouldBeOfType<ParticipantGroupWorkState>()
+            .OwnGroup.ShouldNotBeNull();
+
+        ownGroup.WorkStatus.ShouldBe(GroupWorkStatus.Submitted);
+    }
+
+    [Fact]
+    public void Own_group_actions_ride_in_group_order_with_their_sort_order()
+    {
+        var firstAction = new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac01"));
+        var secondAction = new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac02"));
+        var session = SessionFixtures.InPhase(
+            Phase.GroupWork,
+            formation: SessionFixtures.TwoGroups(
+                new GroupAction(firstAction, new ValueId("wert-1"), GroupActionText.Of("Talk")),
+                new GroupAction(secondAction, new ValueId("wert-1"), GroupActionText.Of("Listen"))
+            )
+        );
+
+        var ownGroup = Map(session, caller: SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantGroupWorkState>()
+            .OwnGroup.ShouldNotBeNull();
+
+        ownGroup.Actions.ShouldBe([
+            new GroupActionView(firstAction.Value, "wert-1", "Talk", 0),
+            new GroupActionView(secondAction.Value, "wert-1", "Listen", 1),
+        ]);
+    }
+
+    [Fact]
     public void A_caller_who_is_in_no_group_gets_no_own_group()
     {
         var session = SessionFixtures.InPhase(
@@ -349,7 +428,8 @@ public class ParticipantWorkshopStateMapperTests
                         [SessionFixtures.Anna],
                         [new ValueId("wert-1")],
                         null,
-                        false
+                        false,
+                        []
                     ),
                 ]
             )
@@ -373,7 +453,8 @@ public class ParticipantWorkshopStateMapperTests
                         [SessionFixtures.Anna],
                         [new ValueId("wert-999")],
                         null,
-                        false
+                        false,
+                        []
                     ),
                 ]
             )

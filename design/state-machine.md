@@ -171,8 +171,9 @@ Guards in words:
   actions on a value.
 - **SubmitGroupWork** — refused unless every assigned value carries one to
   five actions (I11).
-- **ReassignScribe** — facilitator only, any time, target must be a member
-  of that group (I9); the previous scribe's rights end immediately (I10).
+- **ReassignScribe** — facilitator only, during group work only, target must
+  be a member of that group (I9); the previous scribe's rights end
+  immediately (I10).
 - **AdvancePhase** out of Group work — guard: every group is Submitted
   (only submitted results can be presented, I12).
 

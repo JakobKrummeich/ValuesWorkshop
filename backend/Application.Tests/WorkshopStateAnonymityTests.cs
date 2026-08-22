@@ -12,6 +12,7 @@ public class WorkshopStateAnonymityTests
         "DisplayName",
         "DisplayNames",
         "ParticipantName",
+        "ScribeName",
     ];
 
     [Fact]
@@ -20,10 +21,16 @@ public class WorkshopStateAnonymityTests
         ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState))
             .ShouldBe(
                 [
+                    "ParticipantGroupFormationState.OwnGroup.Actions[].ActionId",
                     "ParticipantGroupFormationState.OwnGroup.MemberDisplayNames[]",
+                    "ParticipantGroupFormationState.OwnGroup.ScribeName",
+                    "ParticipantGroupWorkState.OwnGroup.Actions[].ActionId",
                     "ParticipantGroupWorkState.OwnGroup.MemberDisplayNames[]",
+                    "ParticipantGroupWorkState.OwnGroup.ScribeName",
                     "ParticipantJoinState.OwnDisplayName",
+                    "ParticipantValuePresentationState.OwnGroup.Actions[].ActionId",
                     "ParticipantValuePresentationState.OwnGroup.MemberDisplayNames[]",
+                    "ParticipantValuePresentationState.OwnGroup.ScribeName",
                 ],
                 ignoreOrder: false
             );
@@ -56,10 +63,12 @@ public class WorkshopStateAnonymityTests
                     "FacilitatorFinalVotingState.Roster.Participants[].ParticipantId",
                     "FacilitatorGroupFormationState.Groups[].Members[].DisplayName",
                     "FacilitatorGroupFormationState.Groups[].Members[].ParticipantId",
+                    "FacilitatorGroupFormationState.Groups[].ScribeParticipantId",
                     "FacilitatorGroupFormationState.Roster.Participants[].DisplayName",
                     "FacilitatorGroupFormationState.Roster.Participants[].ParticipantId",
                     "FacilitatorGroupWorkState.Groups[].Members[].DisplayName",
                     "FacilitatorGroupWorkState.Groups[].Members[].ParticipantId",
+                    "FacilitatorGroupWorkState.Groups[].ScribeParticipantId",
                     "FacilitatorGroupWorkState.Roster.Participants[].DisplayName",
                     "FacilitatorGroupWorkState.Roster.Participants[].ParticipantId",
                     "FacilitatorJoinState.Roster.Participants[].DisplayName",
@@ -70,6 +79,7 @@ public class WorkshopStateAnonymityTests
                     "FacilitatorSelectionResultsState.Roster.Participants[].ParticipantId",
                     "FacilitatorValuePresentationState.Groups[].Members[].DisplayName",
                     "FacilitatorValuePresentationState.Groups[].Members[].ParticipantId",
+                    "FacilitatorValuePresentationState.Groups[].ScribeParticipantId",
                     "FacilitatorValuePresentationState.Roster.Participants[].DisplayName",
                     "FacilitatorValuePresentationState.Roster.Participants[].ParticipantId",
                     "FacilitatorValueSelectionState.Roster.Participants[].DisplayName",

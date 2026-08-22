@@ -197,6 +197,7 @@ CREATE TABLE group_assigned_values (
 
 CREATE TABLE group_actions (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    action_id  TEXT    NOT NULL,
     group_id   INTEGER NOT NULL REFERENCES groups(id),
     value_id   TEXT    NOT NULL,
     text       TEXT    NOT NULL,

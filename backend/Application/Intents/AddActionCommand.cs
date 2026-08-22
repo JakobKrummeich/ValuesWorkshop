@@ -2,8 +2,9 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Intents;
 
-public sealed record SubmitValueSelectionCommand(
+public sealed record AddActionCommand(
     SessionIdentity SessionIdentity,
     ParticipantId ParticipantId,
-    IReadOnlyList<string>? ValueIds
+    string? ValueId,
+    string? Text
 );

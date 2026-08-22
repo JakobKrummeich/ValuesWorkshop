@@ -3,6 +3,7 @@ namespace ValuesWorkshop.Adapters.Persistence.Entities;
 public sealed class GroupActionEntity
 {
     public int Id { get; set; }
+    public string ActionId { get; set; } = "";
     public int GroupId { get; set; }
     public string ValueId { get; set; } = "";
     public string Text { get; set; } = "";

@@ -236,6 +236,54 @@ public class FacilitatorHubTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task Reassigning_the_scribe_mutates_persists_and_broadcasts()
+    {
+        var anna = new ParticipantId(Guid.Parse("00000000-0000-0000-0000-0000000000a1"));
+        var ben = new ParticipantId(Guid.Parse("00000000-0000-0000-0000-0000000000b2"));
+        var session = Session.Restore(
+            KnownSession,
+            TestSessions.Facilitator,
+            TestSessions.Name,
+            Roster.Restore([
+                TestParticipants.Named(anna, "Anna Schmidt"),
+                TestParticipants.Named(ben, "Ben"),
+            ]),
+            PhaseProgress.Restore(Phase.GroupWork),
+            QuizProgress.Restore(null, false, false, []),
+            SelectionRound.Restore([], []),
+            FormationRecord.Restore(
+                true,
+                [Group.Restore("tier-1", [anna, ben], [new ValueId("wert-1")], anna, false, [])]
+            ),
+            PresentationWalk.Restore(null, null, 0),
+            VotingRounds.Restore(false, 0, []),
+            revision: 1
+        );
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.ReassignScribe(ben.Value.ToString());
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Formation.Groups[0].Scribe.ShouldBe(ben);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Reassigning_without_a_participant_identifier_is_rejected_as_a_malformed_payload()
+    {
+        repository.Add(SessionInPhase(Phase.GroupWork));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.ReassignScribe(null);
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
     private static Session SessionInQuiz(QuizProgress quiz)
     {
         var session = TestSessions.InPhase(KnownSession, Phase.Quiz, quiz);

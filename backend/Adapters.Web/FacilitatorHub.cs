@@ -84,4 +84,15 @@ public sealed class FacilitatorHub(
             new PoseNextQuestionCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
         );
     }
+
+    public Task<IntentResult> ReassignScribe(string? participantId)
+    {
+        return intentHandler.HandleAsync(
+            new ReassignScribeCommand(
+                HubSessionBinding.SessionIdentityOf(Context),
+                Caller(),
+                participantId
+            )
+        );
+    }
 }

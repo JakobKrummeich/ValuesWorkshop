@@ -9,4 +9,5 @@ public enum FacilitatorIntent
     RevealAnswer,
     ShowLearningText,
     PoseNextQuestion,
+    ReassignScribe,
 }

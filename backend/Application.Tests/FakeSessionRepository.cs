@@ -56,7 +56,8 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
             [.. group.Members],
             [.. group.AssignedValues],
             group.Scribe,
-            group.IsSubmitted
+            group.IsSubmitted,
+            [.. group.Actions]
         );
     }
 

@@ -167,13 +167,41 @@ public class PresenterWorkshopStateMapperTests
     }
 
     [Fact]
+    public void Groups_carry_no_work_status_before_the_group_work_phase()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupFormation,
+            formation: SessionFixtures.TwoGroups()
+        );
+
+        var state = Map(session).ShouldBeOfType<PresenterGroupFormationState>();
+
+        state.Groups[0].WorkStatus.ShouldBeNull();
+        state.Groups[1].WorkStatus.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Groups_carry_only_the_work_status_during_group_work()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupWork,
+            formation: SessionFixtures.TwoGroups()
+        );
+
+        var state = Map(session).ShouldBeOfType<PresenterGroupWorkState>();
+
+        state.Groups[0].WorkStatus.ShouldBe(GroupWorkStatus.Editing);
+        state.Groups[1].WorkStatus.ShouldBe(GroupWorkStatus.Submitted);
+    }
+
+    [Fact]
     public void A_group_without_members_still_carries_its_name_and_values()
     {
         var session = SessionFixtures.InPhase(
             Phase.GroupFormation,
             formation: FormationRecord.Restore(
                 true,
-                [Group.Restore("tier-1", [], [new ValueId("wert-1")], null, false)]
+                [Group.Restore("tier-1", [], [new ValueId("wert-1")], null, false, [])]
             )
         );
 

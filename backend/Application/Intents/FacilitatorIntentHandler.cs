@@ -65,6 +65,23 @@ public sealed class FacilitatorIntentHandler(
         );
     }
 
+    public Task<IntentResult> HandleAsync(ReassignScribeCommand command)
+    {
+        return ExecuteAsFacilitatorAsync(
+            command.SessionIdentity,
+            command.Caller,
+            session =>
+            {
+                var newScribe = IntentPayloadValidator.RequiredParticipantId(command.ParticipantId);
+                var wasAlreadyScribe = session.Formation.Groups.Any(group =>
+                    group.Scribe == newScribe
+                );
+                GroupWork.ReassignScribe(session, newScribe);
+                return !wasAlreadyScribe;
+            }
+        );
+    }
+
     private Task<IntentResult> ExecuteAsFacilitatorAsync(
         SessionIdentity sessionIdentity,
         CallerSubject caller,

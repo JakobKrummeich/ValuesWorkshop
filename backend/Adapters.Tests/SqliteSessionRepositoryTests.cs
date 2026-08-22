@@ -185,7 +185,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
         var memberOne = new ParticipantId(Guid.NewGuid());
         var memberTwo = new ParticipantId(Guid.NewGuid());
         var value = new ValueId("honesty");
-        var group = Group.Restore("Otter", [memberOne, memberTwo], [value], memberOne, true);
+        var group = Group.Restore("Otter", [memberOne, memberTwo], [value], memberOne, true, []);
 
         var session = Session.Restore(
             identity,
@@ -270,7 +270,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             SelectionRound.Restore([], []),
             FormationRecord.Restore(
                 true,
-                [Group.Restore("Otter", [member], [new ValueId("honesty")], member, true)]
+                [Group.Restore("Otter", [member], [new ValueId("honesty")], member, true, [])]
             ),
             PresentationWalk.Restore("Otter", new ValueId("honesty"), 7),
             VotingRounds.Restore(false, 1, Winners),

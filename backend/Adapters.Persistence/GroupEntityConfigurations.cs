@@ -62,6 +62,7 @@ internal sealed class GroupActionEntityConfiguration : IEntityTypeConfiguration<
         builder.ToTable("group_actions");
         builder.HasKey(action => action.Id);
         builder.Property(action => action.Id).HasColumnName("id").ValueGeneratedOnAdd();
+        builder.Property(action => action.ActionId).HasColumnName("action_id");
         builder.Property(action => action.GroupId).HasColumnName("group_id");
         builder.Property(action => action.ValueId).HasColumnName("value_id");
         builder.Property(action => action.Text).HasColumnName("text");

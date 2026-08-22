@@ -115,7 +115,11 @@ public sealed class ParticipantWorkshopStateMapper(
         return new OwnGroupView(
             groupViews.NameOf(ownGroup),
             groupViews.MemberDisplayNamesOf(ownGroup, session),
-            groupViews.AssignedValuesOf(ownGroup)
+            groupViews.AssignedValuesOf(ownGroup),
+            groupViews.IsCallerScribeOf(ownGroup, session, caller),
+            groupViews.ScribeNameOf(ownGroup, session),
+            groupViews.WorkStatusOf(ownGroup, session),
+            groupViews.ActionsOf(ownGroup, session)
         );
     }
 }
