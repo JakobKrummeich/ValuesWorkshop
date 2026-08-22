@@ -29,7 +29,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
             {
                 session.SubmitValueSelection(
                     command.ParticipantId,
-                    IntentPayload.RequiredValueIds(command.ValueIds),
+                    IntentPayloadValidator.RequiredValueIds(command.ValueIds),
                     CatalogValueIds()
                 );
                 return true;
@@ -47,7 +47,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                     session,
                     command.ParticipantId,
                     new ActionId(Guid.NewGuid()),
-                    IntentPayload.RequiredValueId(command.ValueId),
+                    IntentPayloadValidator.RequiredValueId(command.ValueId),
                     GroupActionText.Of(command.Text)
                 );
                 return true;
@@ -64,7 +64,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                 GroupWork.EditAction(
                     session,
                     command.ParticipantId,
-                    IntentPayload.RequiredActionId(command.ActionId),
+                    IntentPayloadValidator.RequiredActionId(command.ActionId),
                     GroupActionText.Of(command.Text)
                 );
                 return true;
@@ -81,7 +81,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                 GroupWork.RemoveAction(
                     session,
                     command.ParticipantId,
-                    IntentPayload.RequiredActionId(command.ActionId)
+                    IntentPayloadValidator.RequiredActionId(command.ActionId)
                 );
                 return true;
             }

@@ -72,7 +72,7 @@ public sealed class FacilitatorIntentHandler(
             command.Caller,
             session =>
             {
-                var newScribe = IntentPayload.RequiredParticipantId(command.ParticipantId);
+                var newScribe = IntentPayloadValidator.RequiredParticipantId(command.ParticipantId);
                 var wasAlreadyScribe = session.Formation.Groups.Any(group =>
                     group.Scribe == newScribe
                 );

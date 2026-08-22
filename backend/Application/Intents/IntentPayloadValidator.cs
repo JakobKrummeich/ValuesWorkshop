@@ -2,7 +2,7 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Intents;
 
-internal static class IntentPayload
+internal static class IntentPayloadValidator
 {
     internal static ValueId RequiredValueId(string? valueId)
     {
