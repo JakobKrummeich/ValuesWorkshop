@@ -52,7 +52,9 @@ collections or custom equality where equality matters). Aggregate style
    made its own changes: `lightspeed start <branch> main --intent "<why this
    branch exists>"` (repeat `--intent` per reason), print the URL,
    `lightspeed poll`, fix what comes back, re-run `start` per round — approved
-   files carry over. The user reviews here, not on GitHub. Code fixed from this
+   files carry over. A review comment phrased as a question wants an answer,
+   not a commit: reply via `lightspeed poll --agent-reply` first, and change
+   code only once direction is explicit. The user reviews here, not on GitHub. Code fixed from this
    feedback goes back through step 6 before merge. Skill:
    `.pi/skills/lightspeed/SKILL.md`.
 
