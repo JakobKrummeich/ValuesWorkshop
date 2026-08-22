@@ -1,10 +1,8 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
-import { focusOnMount } from "../../../focusOnMount";
 
 export interface SelectionConfirmDialogBehavior {
-  focusOnMount: (element: HTMLElement | null) => void;
   trapKeyboardFocus: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
 
@@ -12,7 +10,6 @@ export function useSelectionConfirmDialog(
   onCancel: () => void,
 ): SelectionConfirmDialogBehavior {
   return {
-    focusOnMount,
     trapKeyboardFocus: (event) => {
       if (event.key === "Escape") {
         onCancel();
