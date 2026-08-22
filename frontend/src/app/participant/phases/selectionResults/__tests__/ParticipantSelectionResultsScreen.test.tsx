@@ -1,28 +1,15 @@
 import { render, screen } from "@testing-library/react";
-import { Language } from "../../../../../domain/i18n/language";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { ParticipantSelectionResultsScreen } from "../ParticipantSelectionResultsScreen";
 
 describe("participant selection results screen", () => {
-  it("shows the waiting screen with the pulsating icon", () => {
+  it("shows the shared waiting screen", () => {
     const { container } = render(<ParticipantSelectionResultsScreen />, {
       wrapper: languageWrapper(),
     });
 
+    expect(screen.getByTestId("waiting-screen")).toBeInTheDocument();
     expect(container.querySelector("svg")).toBeInTheDocument();
-    expect(screen.getByTestId("results-waiting")).toHaveAccessibleName(
-      "Look at the presenter wall",
-    );
-  });
-
-  it("speaks German when German is chosen", () => {
-    render(<ParticipantSelectionResultsScreen />, {
-      wrapper: languageWrapper(Language.German),
-    });
-
-    expect(screen.getByTestId("results-waiting")).toHaveAccessibleName(
-      "Schaut auf die Präsentationswand",
-    );
   });
 
   it("renders no chart elements", () => {

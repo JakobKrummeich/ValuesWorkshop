@@ -277,7 +277,7 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
     [Language.German]: "Niemand hat eine Auswahl abgegeben.",
     [Language.English]: "Nobody submitted a selection.",
   },
-  [MessageKey.SelectionResultsWatchWall]: {
+  [MessageKey.WaitingWatchWall]: {
     [Language.German]: "Schaut auf die Präsentationswand",
     [Language.English]: "Look at the presenter wall",
   },

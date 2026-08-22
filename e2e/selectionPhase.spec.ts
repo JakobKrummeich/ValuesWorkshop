@@ -332,7 +332,7 @@ test.describe.serial("value selection through group formation", () => {
       );
     }
     for (const page of participantPages()) {
-      await expect(page.getByTestId("results-waiting")).toBeVisible();
+      await expect(page.getByTestId("waiting-screen")).toBeVisible();
       await expect(page.getByTestId("results-heading")).toHaveCount(0);
     }
     await expect(alicePage.getByTestId("submitted-notice")).toHaveCount(0);
