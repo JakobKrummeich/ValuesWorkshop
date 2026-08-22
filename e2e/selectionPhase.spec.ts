@@ -150,16 +150,14 @@ test.describe.serial("value selection through group formation", () => {
     return page.getByTestId("submitted-count");
   }
 
-  async function expectEveryChipDisabled(page: Page): Promise<void> {
-    for (const chip of await page.getByTestId(/^value-chip-/).all()) {
-      await expect(chip).toBeDisabled();
-    }
+  function submittedConfirmation(page: Page): Locator {
+    return page.getByTestId("selection-submitted-confirmation");
   }
 
   async function submitThroughConfirmationDialog(page: Page): Promise<void> {
     await page.getByTestId("submit-selection-button").click();
     await page.getByTestId("confirm-submit-button").click();
-    await expect(page.getByTestId("submitted-notice")).toBeVisible();
+    await expect(submittedConfirmation(page)).toBeVisible();
   }
 
   test("the quiz fast-forwards from the join phase to its last learning text", async () => {
@@ -237,7 +235,7 @@ test.describe.serial("value selection through group formation", () => {
     );
   });
 
-  test("the confirmed submit locks the grid and raises the progress", async () => {
+  test("the confirmed submit replaces the grid with the confirmation and raises the progress", async () => {
     await alicePage.getByTestId("submit-selection-button").click();
 
     const dialog = alicePage.getByRole("dialog");
@@ -253,17 +251,17 @@ test.describe.serial("value selection through group formation", () => {
 
     await alicePage.getByTestId("confirm-submit-button").click();
 
-    await expect(alicePage.getByTestId("submitted-notice")).toHaveText(
+    await expect(submittedConfirmation(alicePage)).toContainText(
+      "Submission successful",
+    );
+    await expect(submittedConfirmation(alicePage)).toContainText(
       "Your selection has been submitted.",
     );
     await expect(alicePage.getByTestId("submit-selection-button")).toHaveCount(
       0,
     );
-    await expectEveryChipDisabled(alicePage);
-    await expect(valueChip(alicePage, TRUST_VALUE_ID)).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    await expect(alicePage.getByTestId(/^value-chip-/)).toHaveCount(0);
+    await expect(alicePage.getByTestId("selected-count")).toHaveCount(0);
     await expect(submittedCount(facilitatorPage)).toHaveText(
       "1 of 3 have submitted",
     );
@@ -292,29 +290,16 @@ test.describe.serial("value selection through group formation", () => {
     );
   });
 
-  test("a reload restores the submitted selection still locked", async () => {
+  test("a reload restores the submission confirmation", async () => {
     await alicePage.reload();
 
-    await expect(alicePage.getByTestId("submitted-notice")).toBeVisible({
+    await expect(submittedConfirmation(alicePage)).toBeVisible({
       timeout: 15_000,
     });
-    await expect(selectedCount(alicePage)).toHaveText("Selected: 10/10");
-    await expect(valueChip(alicePage, TRUST_VALUE_ID)).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    await expect(valueChip(alicePage, SWAP_IN_VALUE_ID)).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    await expect(valueChip(alicePage, SWAP_OUT_VALUE_ID)).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    );
+    await expect(alicePage.getByTestId(/^value-chip-/)).toHaveCount(0);
     await expect(alicePage.getByTestId("submit-selection-button")).toHaveCount(
       0,
     );
-    await expectEveryChipDisabled(alicePage);
   });
 
   test("the advance into phase 4 shows the chart on the wall and a waiting screen on phones", async () => {
@@ -335,7 +320,7 @@ test.describe.serial("value selection through group formation", () => {
       await expect(page.getByTestId("waiting-screen")).toBeVisible();
       await expect(page.getByTestId("results-heading")).toHaveCount(0);
     }
-    await expect(alicePage.getByTestId("submitted-notice")).toHaveCount(0);
+    await expect(submittedConfirmation(alicePage)).toHaveCount(0);
     await expect(submittedCount(facilitatorPage)).toHaveCount(0);
     await expect(submittedCount(presenterPage)).toHaveCount(0);
   });

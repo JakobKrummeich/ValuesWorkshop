@@ -101,6 +101,12 @@ verified by a multi-client Playwright e2e test.
 | Presenter | Beamer, fullscreen, zero interactivity, unauthenticated. QR code, live charts, group presentations, final results. |
 | Participant | Portrait mobile-first, easy interactivity; must also render well on landscape laptop screens. |
 
+Participant attention rule: the participant device never mirrors presenter or
+beamer content. Whenever a participant has no pending input, their device
+shows either the shared calm waiting screen (pulsating circle, zero
+interactivity, no caption) or a minimal confirmation of their own submission
+— the room's attention belongs up front, not on the phone.
+
 ## Design System
 
 - Fresh palette and typography (deliberately different from any prior work).
