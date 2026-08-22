@@ -1,11 +1,19 @@
+import { generalMessages } from "./generalMessages";
 import type { Message } from "./message";
 import { MessageKey } from "./messageKey";
-import { phaseMessages } from "./phaseMessages";
-import { shellMessages } from "./shellMessages";
+import { groupFormationMessages } from "./phases/groupFormationMessages";
+import { joinMessages } from "./phases/joinMessages";
+import { quizMessages } from "./phases/quizMessages";
+import { selectionMessages } from "./phases/selectionMessages";
+import { selectionResultsMessages } from "./phases/selectionResultsMessages";
 
 export { MessageKey } from "./messageKey";
 
 export const messages: Readonly<Record<MessageKey, Message>> = {
-  ...shellMessages,
-  ...phaseMessages,
+  ...generalMessages,
+  ...joinMessages,
+  ...quizMessages,
+  ...selectionMessages,
+  ...selectionResultsMessages,
+  ...groupFormationMessages,
 };

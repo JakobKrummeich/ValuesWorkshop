@@ -2,7 +2,7 @@ import { Language } from "./language";
 import type { Message } from "./message";
 import { MessageKey } from "./messageKey";
 
-export const shellMessages = {
+export const generalMessages = {
   [MessageKey.AuthChecking]: {
     [Language.German]: "Anmeldung wird geprüft\u2026",
     [Language.English]: "Checking authentication\u2026",
