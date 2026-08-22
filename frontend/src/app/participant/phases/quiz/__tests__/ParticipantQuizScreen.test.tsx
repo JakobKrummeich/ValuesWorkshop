@@ -7,11 +7,13 @@ import { QuizSubState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { ParticipantQuizScreen } from "../ParticipantQuizScreen";
 import {
+  QuizScreenKind,
   useParticipantQuizScreen,
   type ParticipantQuizScreenModel,
 } from "../useParticipantQuizScreen";
 
 jest.mock("../useParticipantQuizScreen", () => ({
+  ...jest.requireActual("../useParticipantQuizScreen"),
   useParticipantQuizScreen: jest.fn(),
 }));
 
@@ -42,9 +44,11 @@ function model(
 ): ParticipantQuizScreenModel {
   return {
     questionNumber: 2,
-    answers: state.quiz.answers,
-    ownAnswer: null,
-    isAnswerable: true,
+    view: {
+      kind: QuizScreenKind.Answering,
+      answers: state.quiz.answers,
+      isAnswerable: true,
+    },
     chooseAnswer: jest.fn(),
     rejectionMessage: null,
     ...overrides,
@@ -82,7 +86,15 @@ describe("participant quiz screen", () => {
   });
 
   it("locks the answer buttons when answering is closed", () => {
-    screenHook.mockReturnValue(model({ isAnswerable: false }));
+    screenHook.mockReturnValue(
+      model({
+        view: {
+          kind: QuizScreenKind.Answering,
+          answers: state.quiz.answers,
+          isAnswerable: false,
+        },
+      }),
+    );
 
     render(<ParticipantQuizScreen state={state} />, {
       wrapper: languageWrapper(),
@@ -93,7 +105,12 @@ describe("participant quiz screen", () => {
 
   it("replaces the answer buttons with the own-answer confirmation once cast", () => {
     screenHook.mockReturnValue(
-      model({ ownAnswer: { de: "Zwei", en: "Two" }, isAnswerable: false }),
+      model({
+        view: {
+          kind: QuizScreenKind.OwnAnswer,
+          ownAnswer: { de: "Zwei", en: "Two" },
+        },
+      }),
     );
 
     render(<ParticipantQuizScreen state={state} />, {
@@ -106,6 +123,23 @@ describe("participant quiz screen", () => {
     expect(screen.getByTestId("own-answer-text")).toHaveTextContent("Two");
     expect(screen.queryByTestId("answer-button-0")).not.toBeInTheDocument();
     expect(screen.queryByTestId("learning-text")).not.toBeInTheDocument();
+  });
+
+  it("shows nothing but the waiting screen while the participant waits", () => {
+    screenHook.mockReturnValue(
+      model({ view: { kind: QuizScreenKind.Waiting } }),
+    );
+
+    render(<ParticipantQuizScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("waiting-screen")).toBeInTheDocument();
+    expect(screen.queryByTestId("question-heading")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("answer-button-0")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("own-answer-confirmation"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the rejection message", () => {

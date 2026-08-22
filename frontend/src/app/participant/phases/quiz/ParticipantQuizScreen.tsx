@@ -4,9 +4,13 @@ import { localizedText } from "../../../../domain/i18n/localizedText";
 import type { ParticipantQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { QuizQuestion } from "../../../QuizQuestion";
+import { WaitingScreen } from "../../../WaitingScreen";
 import styles from "./ParticipantQuizScreen.module.css";
 import { QuizAnswerConfirmation } from "./QuizAnswerConfirmation";
-import { useParticipantQuizScreen } from "./useParticipantQuizScreen";
+import {
+  QuizScreenKind,
+  useParticipantQuizScreen,
+} from "./useParticipantQuizScreen";
 
 export function ParticipantQuizScreen({
   state,
@@ -14,14 +18,12 @@ export function ParticipantQuizScreen({
   state: ParticipantQuizState;
 }) {
   const { language, translate } = useTranslation();
-  const {
-    questionNumber,
-    answers,
-    ownAnswer,
-    isAnswerable,
-    chooseAnswer,
-    rejectionMessage,
-  } = useParticipantQuizScreen(state.quiz);
+  const { questionNumber, view, chooseAnswer, rejectionMessage } =
+    useParticipantQuizScreen(state.quiz);
+
+  if (view.kind === QuizScreenKind.Waiting) {
+    return <WaitingScreen />;
+  }
 
   return (
     <section className={styles.quiz}>
@@ -30,15 +32,15 @@ export function ParticipantQuizScreen({
         questionCount={state.quiz.questionCount}
         question={state.quiz.question}
       />
-      {ownAnswer === null ? (
+      {view.kind === QuizScreenKind.Answering ? (
         <div className={styles.answers}>
-          {answers.map((answer, answerIndex) => (
+          {view.answers.map((answer, answerIndex) => (
             <button
               key={answerIndex}
               type="button"
               className={styles.answer}
               data-testid={`answer-button-${answerIndex}`}
-              disabled={!isAnswerable}
+              disabled={!view.isAnswerable}
               onClick={() => chooseAnswer(answerIndex)}
             >
               {localizedText(language, answer)}
@@ -46,7 +48,7 @@ export function ParticipantQuizScreen({
           ))}
         </div>
       ) : (
-        <QuizAnswerConfirmation answer={ownAnswer} />
+        <QuizAnswerConfirmation answer={view.ownAnswer} />
       )}
       {rejectionMessage !== null && (
         <p className={styles.rejection} role="status">

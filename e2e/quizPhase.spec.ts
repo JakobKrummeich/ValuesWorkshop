@@ -169,6 +169,16 @@ test.describe.serial("phase 2 quiz", () => {
     await expect(bobPage.getByTestId(/^answer-button-/)).toHaveCount(0);
   });
 
+  test("a reload restores the own-answer confirmation", async () => {
+    await alicePage.reload();
+
+    await expect(alicePage.getByTestId("own-answer-text")).toHaveText(
+      CORRECT_ANSWER_TEXT,
+      { timeout: 15_000 },
+    );
+    await expect(alicePage.getByTestId(/^answer-button-/)).toHaveCount(0);
+  });
+
   test("the reveal highlights the correct answer on the wall while phones keep the confirmation", async () => {
     await quizControlButton(facilitatorPage).click();
 
@@ -234,12 +244,48 @@ test.describe.serial("phase 2 quiz", () => {
     await expect.poll(() => barWidth(0)).toBe(0);
   });
 
+  test("a participant who never answered sees the waiting screen after the reveal", async () => {
+    await answerButton(alicePage, CORRECT_ANSWER_INDEX).click();
+    await answerButton(bobPage, WRONG_ANSWER_INDEX).click();
+    await expect(facilitatorPage.getByTestId("answered-count")).toHaveText(
+      "2 of 3 have answered",
+    );
+
+    await quizControlButton(facilitatorPage).click();
+
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Show learning text",
+    );
+    await expect(charliePage.getByTestId("waiting-screen")).toBeVisible();
+    await expect(charliePage.getByTestId("question-heading")).toHaveCount(0);
+    await expect(charliePage.getByTestId(/^answer-button-/)).toHaveCount(0);
+    await expect(
+      charliePage.getByTestId("own-answer-confirmation"),
+    ).toHaveCount(0);
+    await expect(alicePage.getByTestId("own-answer-confirmation")).toBeVisible();
+  });
+
+  test("the next question brings the silent participant back to the answers", async () => {
+    await quizControlButton(facilitatorPage).click();
+
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Next question",
+    );
+    await expect(charliePage.getByTestId("waiting-screen")).toBeVisible();
+
+    await quizControlButton(facilitatorPage).click();
+
+    await expectQuestionHeading(everyRolePage(), 3);
+    await expect(charliePage.getByTestId("waiting-screen")).toHaveCount(0);
+    await expect(answerButton(charliePage, 0)).toBeEnabled();
+  });
+
   test("the advance stays disabled until the last learning text is shown", async () => {
     await fastForwardQuizQuestions(
       facilitatorPage,
       alicePage,
       everyRolePage(),
-      2,
+      3,
     );
   });
 

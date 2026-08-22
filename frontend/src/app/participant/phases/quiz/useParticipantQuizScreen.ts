@@ -8,11 +8,24 @@ import { QuizSubState } from "../../../../domain/workshopState";
 import { useIntentSender } from "../../../useIntentSender";
 import { useParticipantDependencies } from "../../dependencies";
 
+export enum QuizScreenKind {
+  Answering = "answering",
+  OwnAnswer = "ownAnswer",
+  Waiting = "waiting",
+}
+
+export type ParticipantQuizScreenView =
+  | {
+      kind: QuizScreenKind.Answering;
+      answers: LocalizedText[];
+      isAnswerable: boolean;
+    }
+  | { kind: QuizScreenKind.OwnAnswer; ownAnswer: LocalizedText }
+  | { kind: QuizScreenKind.Waiting };
+
 export interface ParticipantQuizScreenModel {
   questionNumber: number;
-  answers: LocalizedText[];
-  ownAnswer: LocalizedText | null;
-  isAnswerable: boolean;
+  view: ParticipantQuizScreenView;
   chooseAnswer: (answerIndex: number) => void;
   rejectionMessage: MessageKey | null;
 }
@@ -33,14 +46,28 @@ export function useParticipantQuizScreen(
 
   return {
     questionNumber: questionIndex + 1,
-    answers: quiz.answers,
-    ownAnswer:
-      quiz.ownAnswerIndex === null ? null : quiz.answers[quiz.ownAnswerIndex],
-    isAnswerable:
-      quiz.subState === QuizSubState.Answering &&
-      quiz.ownAnswerIndex === null &&
-      !isSending,
+    view: screenView(quiz, isSending),
     chooseAnswer,
     rejectionMessage,
+  };
+}
+
+function screenView(
+  quiz: ParticipantQuizView,
+  isSending: boolean,
+): ParticipantQuizScreenView {
+  if (quiz.ownAnswerIndex !== null) {
+    return {
+      kind: QuizScreenKind.OwnAnswer,
+      ownAnswer: quiz.answers[quiz.ownAnswerIndex],
+    };
+  }
+  if (quiz.subState !== QuizSubState.Answering) {
+    return { kind: QuizScreenKind.Waiting };
+  }
+  return {
+    kind: QuizScreenKind.Answering,
+    answers: quiz.answers,
+    isAnswerable: !isSending,
   };
 }
