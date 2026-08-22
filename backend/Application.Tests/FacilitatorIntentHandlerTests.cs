@@ -420,7 +420,7 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
-    public async Task Reassigning_stays_available_after_the_group_work_phase()
+    public async Task Reassigning_is_refused_after_the_group_work_phase()
     {
         var repository = FakeSessionRepository.Holding(
             SessionFixtures.InPhase(Phase.ValuePresentation, formation: SessionFixtures.TwoGroups())
@@ -435,11 +435,8 @@ public class FacilitatorIntentHandlerTests
                 )
             );
 
-        result.ShouldBe(IntentResult.Accepted());
-        repository
-            .Saved.ShouldHaveSingleItem()
-            .Formation.Groups[0]
-            .Scribe.ShouldBe(SessionFixtures.Ben);
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        repository.Saved.ShouldBeEmpty();
     }
 
     [Fact]

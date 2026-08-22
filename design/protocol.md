@@ -261,7 +261,7 @@ the caller's authenticated principal, so no client can act as another.
 | T6 | `RevealAnswer` | — | phase Quiz; a question is posed (repeat reveal is a no-op) | `WrongPhase` |
 | T7 | `ShowLearningText` | — | phase Quiz; answer revealed (repeat show is a no-op) | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
-| T13 | `ReassignScribe` | `{ participantId }` | phase Group work onward; target is a grouped participant — the group derives from membership (I9) | `WrongPhase`, `MalformedPayload`, `InvariantViolated`, `UnknownParticipant` |
+| T13 | `ReassignScribe` | `{ participantId }` | phase Group work only; target is a grouped participant — the group derives from membership (I9) | `WrongPhase`, `MalformedPayload`, `InvariantViolated`, `UnknownParticipant` |
 | T17 | `GoToNextValue` | — | phase Value presentation; values remain (I12) | `WrongPhase` |
 | T17a | `CorrectActionWording` | `{ actionId, text }` | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | `WrongPhase`, `InvariantViolated`, `MalformedPayload` |
 | T19 | `CloseVoting` | — | phase Final voting; round open | `WrongPhase` |

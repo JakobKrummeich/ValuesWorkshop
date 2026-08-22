@@ -174,7 +174,7 @@ public class GroupWorkTests
     }
 
     [Fact]
-    public void The_scribe_role_exists_only_from_the_group_work_phase_on()
+    public void The_scribe_role_is_not_reassigned_before_group_work()
     {
         var session = SessionInPhase(Phase.GroupFormation);
 
@@ -182,13 +182,11 @@ public class GroupWorkTests
     }
 
     [Fact]
-    public void The_scribe_role_is_still_reassigned_after_group_work()
+    public void The_scribe_role_is_not_reassigned_after_group_work()
     {
         var session = SessionInPhase(Phase.ValuePresentation);
 
-        GroupWork.ReassignScribe(session, Ben);
-
-        GroupNamed(session, "fox").Scribe.ShouldBe(Ben);
+        Should.Throw<WrongPhaseException>(() => GroupWork.ReassignScribe(session, Ben));
     }
 
     private static Group GroupNamed(Session session, string name)

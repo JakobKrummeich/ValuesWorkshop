@@ -13,7 +13,7 @@ internal static class FacilitatorEnabledIntents
             AddQuizWalkIntent(enabledIntents, session.Quiz);
         }
 
-        if (session.PhaseProgress.CurrentPhase >= Phase.GroupWork)
+        if (session.PhaseProgress.CurrentPhase == Phase.GroupWork)
         {
             enabledIntents.Add(FacilitatorIntent.ReassignScribe);
         }

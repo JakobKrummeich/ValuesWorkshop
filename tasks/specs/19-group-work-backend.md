@@ -184,3 +184,10 @@ FE and e2e untouched)
 > names (it is not an ignorable optional field): without the enum
 > value, a facilitator client in phase 6+ fails to parse the whole
 > state. The T20 screens still own every visible use of the intent.
+
+> **Revised after lightspeed round 1:** scribe reassignment is locked to
+> phase 6 like every other scribe intent — the role is irrelevant once
+> group work has ended, so "anytime" collapses to "anytime during group
+> work". Decision 3's "allowed phase 6+" is superseded; `reassignScribe`
+> leaves `FacilitatorEnabledIntents` outside phase 6 and protocol T13
+> reads "phase Group work only".

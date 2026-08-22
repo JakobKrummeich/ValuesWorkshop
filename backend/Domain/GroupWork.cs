@@ -47,10 +47,10 @@ public static class GroupWork
             );
         }
 
-        if (session.PhaseProgress.CurrentPhase < Phase.GroupWork)
+        if (session.PhaseProgress.CurrentPhase != Phase.GroupWork)
         {
             throw new WrongPhaseException(
-                "The scribe role exists only from the group-work phase on."
+                "The scribe role is reassigned during the group-work phase only."
             );
         }
 

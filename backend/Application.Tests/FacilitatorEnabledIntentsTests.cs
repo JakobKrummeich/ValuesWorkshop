@@ -85,16 +85,27 @@ public class FacilitatorEnabledIntentsTests
         Map(session).EnabledIntents.ShouldNotContain(FacilitatorIntent.ReassignScribe);
     }
 
+    [Fact]
+    public void Scribe_reassignment_is_enabled_during_the_group_work_phase()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.GroupWork,
+            formation: SessionFixtures.TwoGroups()
+        );
+
+        Map(session).EnabledIntents.ShouldContain(FacilitatorIntent.ReassignScribe);
+    }
+
     [Theory]
-    [InlineData(Phase.GroupWork)]
+    [InlineData(Phase.GroupFormation)]
     [InlineData(Phase.ValuePresentation)]
     [InlineData(Phase.FinalVoting)]
     [InlineData(Phase.FinalPresentation)]
-    public void Scribe_reassignment_is_enabled_from_the_group_work_phase_on(Phase phase)
+    public void Scribe_reassignment_is_withheld_outside_the_group_work_phase(Phase phase)
     {
         var session = SessionFixtures.InPhase(phase, formation: SessionFixtures.TwoGroups());
 
-        Map(session).EnabledIntents.ShouldContain(FacilitatorIntent.ReassignScribe);
+        Map(session).EnabledIntents.ShouldNotContain(FacilitatorIntent.ReassignScribe);
     }
 
     [Fact]
@@ -129,7 +140,7 @@ public class FacilitatorEnabledIntentsTests
     {
         var session = SessionFixtures.InPhase(Phase.FinalPresentation);
 
-        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.ReassignScribe]);
+        Map(session).EnabledIntents.ShouldBeEmpty();
     }
 
     private static FacilitatorWorkshopState Map(Session session)
