@@ -6,6 +6,7 @@ import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./ParticipantSelectionScreen.module.css";
 import { SelectionChipGrid } from "./SelectionChipGrid";
 import { SelectionConfirmDialog } from "./SelectionConfirmDialog";
+import { SelectionSubmittedConfirmation } from "./SelectionSubmittedConfirmation";
 import {
   requiredSelectionCount,
   useParticipantSelectionScreen,
@@ -31,6 +32,14 @@ export function ParticipantSelectionScreen({
     submitButtonRef,
   } = useParticipantSelectionScreen(state.selection);
 
+  if (isSubmitted) {
+    return (
+      <section className={styles.selection}>
+        <SelectionSubmittedConfirmation />
+      </section>
+    );
+  }
+
   return (
     <section className={styles.selection}>
       <h2 className={styles.prompt}>
@@ -43,26 +52,16 @@ export function ParticipantSelectionScreen({
         })}
       </p>
       <SelectionChipGrid chips={chips} onToggle={toggleValue} />
-      {isSubmitted ? (
-        <p
-          className={styles.submittedNotice}
-          role="status"
-          data-testid="submitted-notice"
-        >
-          {translate(MessageKey.SelectionSubmittedNotice)}
-        </p>
-      ) : (
-        <button
-          type="button"
-          className={styles.submitButton}
-          data-testid="submit-selection-button"
-          ref={submitButtonRef}
-          disabled={!canSubmit}
-          onClick={requestSubmission}
-        >
-          {translate(MessageKey.SelectionSubmit)}
-        </button>
-      )}
+      <button
+        type="button"
+        className={styles.submitButton}
+        data-testid="submit-selection-button"
+        ref={submitButtonRef}
+        disabled={!canSubmit}
+        onClick={requestSubmission}
+      >
+        {translate(MessageKey.SelectionSubmit)}
+      </button>
       {rejectionMessage !== null && (
         <p className={styles.rejection} role="status">
           {translate(rejectionMessage)}

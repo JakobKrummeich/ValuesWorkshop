@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageKey } from "../../../../domain/i18n/messages";
+import { focusOnMount } from "../../../focusOnMount";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./SelectionConfirmDialog.module.css";
 import { useSelectionConfirmDialog } from "./useSelectionConfirmDialog";
@@ -13,8 +14,7 @@ export function SelectionConfirmDialog({
   onConfirm: () => void;
 }) {
   const { translate } = useTranslation();
-  const { focusOnMount, trapKeyboardFocus } =
-    useSelectionConfirmDialog(onCancel);
+  const { trapKeyboardFocus } = useSelectionConfirmDialog(onCancel);
 
   return (
     <div className={styles.dialogBackdrop}>

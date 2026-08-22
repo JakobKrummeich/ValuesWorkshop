@@ -153,7 +153,7 @@ describe("participant selection screen", () => {
     expect(cancelSubmission).toHaveBeenCalled();
   });
 
-  it("replaces the submit button with a notice once submitted", () => {
+  it("replaces the whole grid with the submitted confirmation once submitted", () => {
     screenHook.mockReturnValue(model({ isSubmitted: true }));
 
     render(<ParticipantSelectionScreen state={state} />, {
@@ -161,11 +161,16 @@ describe("participant selection screen", () => {
     });
 
     expect(
+      screen.getByTestId("selection-submitted-confirmation"),
+    ).toHaveTextContent("Submission successful");
+    expect(
       screen.queryByTestId("submit-selection-button"),
     ).not.toBeInTheDocument();
-    expect(screen.getByTestId("submitted-notice")).toHaveTextContent(
-      "Your selection has been submitted.",
-    );
+    expect(screen.queryByTestId(/^value-chip-/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("selected-count")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Pick exactly 10 values"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the rejection message", () => {

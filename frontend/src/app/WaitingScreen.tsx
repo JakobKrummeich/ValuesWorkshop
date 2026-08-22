@@ -1,17 +1,17 @@
 "use client";
 
-import { MessageKey } from "../../../../domain/i18n/messages";
-import { useTranslation } from "../../../i18n/useTranslation";
-import styles from "./ParticipantSelectionResultsScreen.module.css";
+import { MessageKey } from "../domain/i18n/messages";
+import { useTranslation } from "./i18n/useTranslation";
+import styles from "./WaitingScreen.module.css";
 
-export function ParticipantSelectionResultsScreen() {
+export function WaitingScreen() {
   const { translate } = useTranslation();
 
   return (
     <section
       className={styles.screen}
-      data-testid="results-waiting"
-      aria-label={translate(MessageKey.SelectionResultsWatchWall)}
+      data-testid="waiting-screen"
+      aria-label={translate(MessageKey.WaitingWatchWall)}
     >
       <div className={styles.pulse}>
         <svg

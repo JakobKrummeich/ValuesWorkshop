@@ -113,6 +113,28 @@ describe("participant screen group", () => {
     );
   });
 
+  it("shows the waiting screen while the selection results are on the wall", async () => {
+    await renderScreen();
+
+    act(() => {
+      workshopState.next({
+        revision: 9,
+        phase: Phase.SelectionResults,
+        participantCount: 3,
+        selection: {
+          values: [{ valueId: "mut", text: { de: "Mut", en: "Courage" } }],
+          ownSelectedValueIds: ["mut"],
+          isSubmitted: true,
+          selectionTallies: { mut: 3 },
+          topValueIds: ["mut"],
+        },
+      });
+    });
+
+    expect(screen.getByTestId("waiting-screen")).toBeInTheDocument();
+    expect(screen.queryByTestId("results-heading")).not.toBeInTheDocument();
+  });
+
   it("explains a link that carries no session", async () => {
     sessionIdentity.mockReturnValue(null);
 

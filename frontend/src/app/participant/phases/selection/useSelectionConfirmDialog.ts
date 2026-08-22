@@ -3,7 +3,6 @@
 import type { KeyboardEvent } from "react";
 
 export interface SelectionConfirmDialogBehavior {
-  focusOnMount: (button: HTMLButtonElement | null) => void;
   trapKeyboardFocus: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
 
@@ -11,7 +10,6 @@ export function useSelectionConfirmDialog(
   onCancel: () => void,
 ): SelectionConfirmDialogBehavior {
   return {
-    focusOnMount,
     trapKeyboardFocus: (event) => {
       if (event.key === "Escape") {
         onCancel();
@@ -20,10 +18,6 @@ export function useSelectionConfirmDialog(
       }
     },
   };
-}
-
-function focusOnMount(button: HTMLButtonElement | null) {
-  button?.focus();
 }
 
 function cycleTabFocus(event: KeyboardEvent<HTMLDivElement>) {

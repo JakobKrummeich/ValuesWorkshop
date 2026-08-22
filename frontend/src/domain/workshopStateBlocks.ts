@@ -22,12 +22,19 @@ const quizViewBase = {
   answers: z.array(localizedTextSchema),
 };
 
-export const participantQuizViewSchema = z.object({
-  ...quizViewBase,
-  ownAnswerIndex: z.int().nullable(),
-  correctAnswerIndex: z.int().optional(),
-  learningText: localizedTextSchema.optional(),
-});
+export const participantQuizViewSchema = z
+  .object({
+    ...quizViewBase,
+    ownAnswerIndex: z.int().nonnegative().nullable(),
+  })
+  .refine(
+    ({ ownAnswerIndex, answers }) =>
+      ownAnswerIndex === null || ownAnswerIndex < answers.length,
+    {
+      error: "The own answer index must point at one of the posed answers.",
+      path: ["ownAnswerIndex"],
+    },
+  );
 
 export const facilitatorQuizViewSchema = z.object({
   ...quizViewBase,

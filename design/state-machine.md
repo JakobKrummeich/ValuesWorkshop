@@ -136,7 +136,10 @@ values are fixed from the selection tally, widened on a tenth-place tie
 On entry: `FormGroups [System] / GroupsFormed` — participants partitioned
 and top values dealt out per the sizing rule and the formation aim; the
 value-to-group assignment is fixed from then on (I8). No further sub-states;
-groups and assignments are shown until `AdvancePhase`.
+groups and assignments are shown until `AdvancePhase`. The fixed 3-second
+entry progress bar on presenter and participant (Task 19b) is presentation
+only — it triggers no transition; the advance to group work stays
+facilitator-triggered.
 
 From this phase on, `JoinSession` carries a second effect:
 `AddParticipantToGroup [System] / ParticipantAddedToGroup` puts the joiner

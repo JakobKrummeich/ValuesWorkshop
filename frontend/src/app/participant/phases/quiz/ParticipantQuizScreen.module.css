@@ -10,7 +10,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-gap);
-  margin-top: var(--space-gap);
 }
 
 .answer {
@@ -25,21 +24,9 @@
   text-align: left;
 }
 
-.own {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-  font-weight: var(--weight-bold);
-}
-
-.correct {
-  border-color: var(--color-success);
-  background: var(--color-primary-soft);
-  font-weight: var(--weight-bold);
-}
-
-.ownIncorrect {
-  border-color: var(--color-danger);
-  background: var(--color-danger-soft);
+.answer:disabled {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
 }
 
 .rejection {

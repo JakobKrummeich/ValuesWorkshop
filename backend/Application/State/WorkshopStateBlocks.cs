@@ -17,10 +17,7 @@ public sealed record ParticipantQuizView(
     QuizSubState SubState,
     LocalizedTextView Question,
     IReadOnlyList<LocalizedTextView> Answers,
-    int? OwnAnswerIndex,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] int? CorrectAnswerIndex,
-    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        LocalizedTextView? LearningText
+    int? OwnAnswerIndex
 );
 
 public sealed record FacilitatorQuizView(

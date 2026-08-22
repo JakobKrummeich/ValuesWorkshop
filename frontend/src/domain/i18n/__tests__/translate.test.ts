@@ -1,8 +1,23 @@
 import { ConnectionState } from "../../connectionState";
 import { connectionStateMessage } from "../connectionStateMessage";
+import { generalMessages } from "../generalMessages";
 import { Language, defaultLanguage, readLanguage } from "../language";
 import { MessageKey, messages } from "../messages";
+import { groupFormationMessages } from "../phases/groupFormationMessages";
+import { joinMessages } from "../phases/joinMessages";
+import { quizMessages } from "../phases/quizMessages";
+import { selectionMessages } from "../phases/selectionMessages";
+import { selectionResultsMessages } from "../phases/selectionResultsMessages";
 import { translate } from "../translate";
+
+const catalogs = {
+  general: generalMessages,
+  join: joinMessages,
+  quiz: quizMessages,
+  selection: selectionMessages,
+  selectionResults: selectionResultsMessages,
+  groupFormation: groupFormationMessages,
+};
 
 describe("translation", () => {
   it("renders a message in the requested language", () => {
@@ -34,6 +49,24 @@ describe("translation", () => {
     );
 
     expect(untranslated).toEqual([]);
+  });
+
+  it("defines every message in exactly one catalog", () => {
+    const catalogsByKey = new Map<string, string[]>();
+    Object.entries(catalogs).forEach(([catalogName, catalog]) =>
+      Object.keys(catalog).forEach((key) =>
+        catalogsByKey.set(key, [
+          ...(catalogsByKey.get(key) ?? []),
+          catalogName,
+        ]),
+      ),
+    );
+
+    const claimedTwice = [...catalogsByKey].filter(
+      ([, catalogNames]) => catalogNames.length > 1,
+    );
+
+    expect(claimedTwice).toEqual([]);
   });
 
   it("names a message for every connection state", () => {

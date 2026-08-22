@@ -7,7 +7,7 @@ import { QuizSubState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { ParticipantQuizScreen } from "../ParticipantQuizScreen";
 import {
-  AnswerStatus,
+  QuizScreenKind,
   useParticipantQuizScreen,
   type ParticipantQuizScreenModel,
 } from "../useParticipantQuizScreen";
@@ -39,16 +39,18 @@ const state: ParticipantQuizState = {
   },
 };
 
+const answeringView = {
+  kind: QuizScreenKind.Answering,
+  answers: state.quiz.answers,
+  isAnswerable: true,
+} as const;
+
 function model(
   overrides: Partial<ParticipantQuizScreenModel> = {},
 ): ParticipantQuizScreenModel {
   return {
     questionNumber: 2,
-    answers: state.quiz.answers.map((text) => ({
-      text,
-      status: AnswerStatus.Neutral,
-    })),
-    isAnswerable: true,
+    view: answeringView,
     chooseAnswer: jest.fn(),
     rejectionMessage: null,
     ...overrides,
@@ -68,6 +70,9 @@ describe("participant quiz screen", () => {
     );
     expect(screen.getByTestId("question-text")).toHaveTextContent("How many?");
     expect(screen.getByTestId("answer-button-2")).toHaveTextContent("Three");
+    expect(
+      screen.queryByTestId("own-answer-confirmation"),
+    ).not.toBeInTheDocument();
   });
 
   it("casts the tapped answer", () => {
@@ -83,7 +88,9 @@ describe("participant quiz screen", () => {
   });
 
   it("locks the answer buttons when answering is closed", () => {
-    screenHook.mockReturnValue(model({ isAnswerable: false }));
+    screenHook.mockReturnValue(
+      model({ view: { ...answeringView, isAnswerable: false } }),
+    );
 
     render(<ParticipantQuizScreen state={state} />, {
       wrapper: languageWrapper(),
@@ -92,14 +99,13 @@ describe("participant quiz screen", () => {
     expect(screen.getByTestId("answer-button-0")).toBeDisabled();
   });
 
-  it("exposes each answer's status for styling", () => {
+  it("replaces the answer buttons with the own-answer confirmation once cast", () => {
     screenHook.mockReturnValue(
       model({
-        answers: [
-          { text: state.quiz.answers[0], status: AnswerStatus.Correct },
-          { text: state.quiz.answers[1], status: AnswerStatus.Neutral },
-          { text: state.quiz.answers[2], status: AnswerStatus.OwnIncorrect },
-        ],
+        view: {
+          kind: QuizScreenKind.OwnAnswer,
+          ownAnswer: { de: "Zwei", en: "Two" },
+        },
       }),
     );
 
@@ -107,14 +113,29 @@ describe("participant quiz screen", () => {
       wrapper: languageWrapper(),
     });
 
-    expect(screen.getByTestId("answer-button-0")).toHaveAttribute(
-      "data-answer-status",
-      "correct",
+    expect(screen.getByTestId("own-answer-confirmation")).toHaveTextContent(
+      "Your answer:",
     );
-    expect(screen.getByTestId("answer-button-2")).toHaveAttribute(
-      "data-answer-status",
-      "ownIncorrect",
+    expect(screen.getByTestId("own-answer-text")).toHaveTextContent("Two");
+    expect(screen.queryByTestId("answer-button-0")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("learning-text")).not.toBeInTheDocument();
+  });
+
+  it("shows nothing but the waiting screen while the participant waits", () => {
+    screenHook.mockReturnValue(
+      model({ view: { kind: QuizScreenKind.Waiting } }),
     );
+
+    render(<ParticipantQuizScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("waiting-screen")).toBeInTheDocument();
+    expect(screen.queryByTestId("question-heading")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("answer-button-0")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("own-answer-confirmation"),
+    ).not.toBeInTheDocument();
   });
 
   it("shows the rejection message", () => {
@@ -127,35 +148,6 @@ describe("participant quiz screen", () => {
     });
 
     screen.getByText("The workshop does not allow that step right now.");
-  });
-
-  it("shows the learning text panel when it is present", () => {
-    screenHook.mockReturnValue(model());
-    const revealed: ParticipantQuizState = {
-      ...state,
-      quiz: {
-        ...state.quiz,
-        learningText: { de: "Weil darum.", en: "Because reasons." },
-      },
-    };
-
-    render(<ParticipantQuizScreen state={revealed} />, {
-      wrapper: languageWrapper(),
-    });
-
-    expect(screen.getByTestId("learning-text")).toHaveTextContent(
-      "Because reasons.",
-    );
-  });
-
-  it("hides the learning text panel while there is none", () => {
-    screenHook.mockReturnValue(model());
-
-    render(<ParticipantQuizScreen state={state} />, {
-      wrapper: languageWrapper(),
-    });
-
-    expect(screen.queryByTestId("learning-text")).not.toBeInTheDocument();
   });
 
   it("speaks German when German is chosen", () => {

@@ -20,6 +20,10 @@ const PARTICIPANT_ACCOUNTS = ["participant1", "participant2", "participant3"];
 const SESSION_NAME = "Playwright quiz session";
 const CORRECT_ANSWER_INDEX = 0;
 const WRONG_ANSWER_INDEX = 1;
+const CORRECT_ANSWER_TEXT =
+  "They give orientation for decisions when no rule applies.";
+const WRONG_ANSWER_TEXT =
+  "They replace employment contracts and process descriptions.";
 const FIRST_LEARNING_TEXT =
   "Values work where rules end: they help teams decide consistently in everyday situations.";
 const PHONE_VIEWPORT = { width: 390, height: 844 };
@@ -153,38 +157,33 @@ test.describe.serial("phase 2 quiz", () => {
     expect(await isPageStillMarked(presenterPage)).toBe(true);
   });
 
-  test("a participant who voted is locked out of voting again", async () => {
-    await expect(answerButton(alicePage, CORRECT_ANSWER_INDEX)).toHaveAttribute(
-      "data-answer-status",
-      "own",
+  test("a participant who voted sees the own-answer confirmation instead of the buttons", async () => {
+    await expect(alicePage.getByTestId("own-answer-confirmation")).toBeVisible();
+    await expect(alicePage.getByTestId("own-answer-text")).toHaveText(
+      CORRECT_ANSWER_TEXT,
     );
-    for (let answerIndex = 0; answerIndex < 3; answerIndex += 1) {
-      await expect(answerButton(alicePage, answerIndex)).toBeDisabled();
-      await expect(answerButton(bobPage, answerIndex)).toBeDisabled();
-    }
-    await expect(answerButton(bobPage, WRONG_ANSWER_INDEX)).toHaveAttribute(
-      "data-answer-status",
-      "own",
+    await expect(alicePage.getByTestId(/^answer-button-/)).toHaveCount(0);
+    await expect(bobPage.getByTestId("own-answer-text")).toHaveText(
+      WRONG_ANSWER_TEXT,
     );
+    await expect(bobPage.getByTestId(/^answer-button-/)).toHaveCount(0);
   });
 
-  test("the reveal highlights the correct answer for every role", async () => {
+  test("a reload restores the own-answer confirmation", async () => {
+    await alicePage.reload();
+
+    await expect(alicePage.getByTestId("own-answer-text")).toHaveText(
+      CORRECT_ANSWER_TEXT,
+      { timeout: 15_000 },
+    );
+    await expect(alicePage.getByTestId(/^answer-button-/)).toHaveCount(0);
+  });
+
+  test("the reveal highlights the correct answer on the wall while phones keep the confirmation", async () => {
     await quizControlButton(facilitatorPage).click();
 
     await expect(quizControlButton(facilitatorPage)).toHaveText(
       "Show learning text",
-    );
-    await expect(answerButton(alicePage, CORRECT_ANSWER_INDEX)).toHaveAttribute(
-      "data-answer-status",
-      "correct",
-    );
-    await expect(answerButton(bobPage, CORRECT_ANSWER_INDEX)).toHaveAttribute(
-      "data-answer-status",
-      "correct",
-    );
-    await expect(answerButton(bobPage, WRONG_ANSWER_INDEX)).toHaveAttribute(
-      "data-answer-status",
-      "ownIncorrect",
     );
     await expect(presenterPage.getByTestId("answer-bar-0")).toHaveClass(
       /correctBar/,
@@ -192,19 +191,20 @@ test.describe.serial("phase 2 quiz", () => {
     await expect(presenterPage.getByTestId("answer-bar-1")).toHaveClass(
       /dimmedBar/,
     );
-    await expect(alicePage.getByTestId("learning-text")).toHaveCount(0);
+    for (const page of participantPages()) {
+      await expect(page.getByTestId("own-answer-confirmation")).toBeVisible();
+      await expect(page.getByTestId(/^answer-button-/)).toHaveCount(0);
+      await expect(page.getByTestId("learning-text")).toHaveCount(0);
+    }
     await expect(presenterPage.getByTestId("learning-text")).toHaveCount(0);
     await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
   });
 
-  test("the learning text appears for every role on the facilitator's command", async () => {
+  test("the learning text appears on the wall while phones keep the confirmation", async () => {
     await quizControlButton(facilitatorPage).click();
 
     await expect(quizControlButton(facilitatorPage)).toHaveText(
       "Next question",
-    );
-    await expect(alicePage.getByTestId("learning-text")).toContainText(
-      FIRST_LEARNING_TEXT,
     );
     await expect(presenterPage.getByTestId("learning-text")).toContainText(
       FIRST_LEARNING_TEXT,
@@ -212,6 +212,8 @@ test.describe.serial("phase 2 quiz", () => {
     await expect(facilitatorPage.getByTestId("learning-text")).toContainText(
       FIRST_LEARNING_TEXT,
     );
+    await expect(alicePage.getByTestId("learning-text")).toHaveCount(0);
+    await expect(alicePage.getByTestId("own-answer-confirmation")).toBeVisible();
     await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
   });
 
@@ -222,12 +224,11 @@ test.describe.serial("phase 2 quiz", () => {
     await expect(quizControlButton(facilitatorPage)).toHaveText(
       "Reveal answer",
     );
+    await expect(alicePage.getByTestId("own-answer-confirmation")).toHaveCount(
+      0,
+    );
     for (let answerIndex = 0; answerIndex < 3; answerIndex += 1) {
       await expect(answerButton(alicePage, answerIndex)).toBeEnabled();
-      await expect(answerButton(alicePage, answerIndex)).toHaveAttribute(
-        "data-answer-status",
-        "neutral",
-      );
       await expect(
         facilitatorPage.getByTestId(`answer-tally-${answerIndex}`),
       ).toHaveText("Votes: 0");
@@ -243,12 +244,48 @@ test.describe.serial("phase 2 quiz", () => {
     await expect.poll(() => barWidth(0)).toBe(0);
   });
 
+  test("a participant who never answered sees the waiting screen after the reveal", async () => {
+    await answerButton(alicePage, CORRECT_ANSWER_INDEX).click();
+    await answerButton(bobPage, WRONG_ANSWER_INDEX).click();
+    await expect(facilitatorPage.getByTestId("answered-count")).toHaveText(
+      "2 of 3 have answered",
+    );
+
+    await quizControlButton(facilitatorPage).click();
+
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Show learning text",
+    );
+    await expect(charliePage.getByTestId("waiting-screen")).toBeVisible();
+    await expect(charliePage.getByTestId("question-heading")).toHaveCount(0);
+    await expect(charliePage.getByTestId(/^answer-button-/)).toHaveCount(0);
+    await expect(
+      charliePage.getByTestId("own-answer-confirmation"),
+    ).toHaveCount(0);
+    await expect(alicePage.getByTestId("own-answer-confirmation")).toBeVisible();
+  });
+
+  test("the next question brings the silent participant back to the answers", async () => {
+    await quizControlButton(facilitatorPage).click();
+
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Next question",
+    );
+    await expect(charliePage.getByTestId("waiting-screen")).toBeVisible();
+
+    await quizControlButton(facilitatorPage).click();
+
+    await expectQuestionHeading(everyRolePage(), 3);
+    await expect(charliePage.getByTestId("waiting-screen")).toHaveCount(0);
+    await expect(answerButton(charliePage, 0)).toBeEnabled();
+  });
+
   test("the advance stays disabled until the last learning text is shown", async () => {
     await fastForwardQuizQuestions(
       facilitatorPage,
       alicePage,
       everyRolePage(),
-      2,
+      3,
     );
   });
 

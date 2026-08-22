@@ -55,10 +55,9 @@ Task 14 therefore includes a small backend slice adding it.
   - Answer buttons enabled only while `subState = Answering` and
     `ownAnswerIndex = null`; one tap casts, in-flight disables, rejection
     shown via existing `intentRejectionMessage`.
-  - Own answer stays visually marked from `ownAnswerIndex`.
-  - After reveal: correct answer highlighted; own wrong answer marked.
-  - Learning text panel rendered when `learningText` present.
-  - No tallies, ever (per protocol).
+  - After answering: own-answer confirmation ("Your answer: X") — no
+    correct-answer display, no learning text on participant device
+    (Task 19a; see design/screens.md).
 
 ### 3. Facilitator quiz screen + morph button
 
@@ -91,8 +90,9 @@ Task 14 therefore includes a small backend slice adding it.
 - New `e2e/quizPhase.spec.ts` (serial, reusing join-flow helpers): join 3
   participants, advance to Quiz, then per question: participants vote,
   facilitator tallies and presenter bars reflect counts live (no reload),
-  voted participant's buttons lock, reveal highlights the correct answer on
-  participant + presenter, learning text appears, next question resets.
+  voted participant sees own-answer confirmation (Task 19a: no correct-answer
+  highlight, no learning text on participant), presenter bars + reveal +
+  learning text, next question resets.
   Fast-forward the remaining questions; after the last learning text,
   Advance moves to phase 3 (exit-guard proof: Advance disabled mid-quiz).
 - Runs in the existing CI Playwright job (wiring landed with Task 12).

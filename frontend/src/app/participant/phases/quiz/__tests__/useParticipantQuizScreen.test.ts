@@ -8,7 +8,7 @@ import { QuizSubState } from "../../../../../domain/workshopState";
 import type { Single } from "../../../../../shared/reactiveTypes";
 import { useParticipantDependencies } from "../../../dependencies";
 import {
-  AnswerStatus,
+  QuizScreenKind,
   useParticipantQuizScreen,
 } from "../useParticipantQuizScreen";
 
@@ -33,6 +33,12 @@ function withChooseAnswer(
   });
 }
 
+const answers = [
+  { de: "Eins", en: "One" },
+  { de: "Zwei", en: "Two" },
+  { de: "Drei", en: "Three" },
+];
+
 function quizView(
   overrides: Partial<ParticipantQuizView> = {},
 ): ParticipantQuizView {
@@ -41,11 +47,7 @@ function quizView(
     questionCount: 3,
     subState: QuizSubState.Answering,
     question: { de: "Wie viele?", en: "How many?" },
-    answers: [
-      { de: "Eins", en: "One" },
-      { de: "Zwei", en: "Two" },
-      { de: "Drei", en: "Three" },
-    ],
+    answers,
     ownAnswerIndex: null,
     ...overrides,
   };
@@ -62,17 +64,16 @@ describe("participant quiz screen logic", () => {
     expect(result.current.questionNumber).toBe(2);
   });
 
-  it("offers all answers neutrally while nothing is cast", () => {
+  it("offers all answers while nothing is cast", () => {
     withChooseAnswer(() => NEVER);
 
     const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
 
-    expect(result.current.isAnswerable).toBe(true);
-    expect(result.current.answers.map((answer) => answer.status)).toEqual([
-      AnswerStatus.Neutral,
-      AnswerStatus.Neutral,
-      AnswerStatus.Neutral,
-    ]);
+    expect(result.current.view).toEqual({
+      kind: QuizScreenKind.Answering,
+      answers,
+      isAnswerable: true,
+    });
   });
 
   it("casts the chosen answer for the posed question", () => {
@@ -91,70 +92,77 @@ describe("participant quiz screen logic", () => {
 
     act(() => result.current.chooseAnswer(0));
 
-    expect(result.current.isAnswerable).toBe(false);
+    expect(result.current.view).toEqual({
+      kind: QuizScreenKind.Answering,
+      answers,
+      isAnswerable: false,
+    });
   });
 
-  it("keeps the own answer marked and locked once cast", () => {
+  it("confirms the own answer once cast", () => {
     withChooseAnswer(() => NEVER);
 
     const { result } = renderHook(() =>
       useParticipantQuizScreen(quizView({ ownAnswerIndex: 2 })),
     );
 
-    expect(result.current.isAnswerable).toBe(false);
-    expect(result.current.answers[2].status).toBe(AnswerStatus.Own);
+    expect(result.current.view).toEqual({
+      kind: QuizScreenKind.OwnAnswer,
+      ownAnswer: { de: "Drei", en: "Three" },
+    });
   });
 
-  it("locks the answers once the reveal has happened", () => {
-    withChooseAnswer(() => NEVER);
+  it.each([QuizSubState.Revealed, QuizSubState.LearningTextShown])(
+    "keeps the own-answer confirmation through sub-state %s",
+    (subState) => {
+      withChooseAnswer(() => NEVER);
 
-    const { result } = renderHook(() =>
-      useParticipantQuizScreen(
-        quizView({ subState: QuizSubState.Revealed, correctAnswerIndex: 0 }),
-      ),
+      const { result } = renderHook(() =>
+        useParticipantQuizScreen(quizView({ subState, ownAnswerIndex: 1 })),
+      );
+
+      expect(result.current.view).toEqual({
+        kind: QuizScreenKind.OwnAnswer,
+        ownAnswer: { de: "Zwei", en: "Two" },
+      });
+    },
+  );
+
+  it.each([QuizSubState.Revealed, QuizSubState.LearningTextShown])(
+    "waits calmly in sub-state %s when the participant stayed silent",
+    (subState) => {
+      withChooseAnswer(() => NEVER);
+
+      const { result } = renderHook(() =>
+        useParticipantQuizScreen(quizView({ subState })),
+      );
+
+      expect(result.current.view).toEqual({ kind: QuizScreenKind.Waiting });
+    },
+  );
+
+  it("returns to the answer buttons when the next question is posed", () => {
+    withChooseAnswer(() => NEVER);
+    const { result, rerender } = renderHook(
+      ({ quiz }: { quiz: ParticipantQuizView }) =>
+        useParticipantQuizScreen(quiz),
+      {
+        initialProps: {
+          quiz: quizView({
+            subState: QuizSubState.LearningTextShown,
+            ownAnswerIndex: 0,
+          }),
+        },
+      },
     );
 
-    expect(result.current.isAnswerable).toBe(false);
-  });
+    rerender({ quiz: quizView({ questionIndex: 2 }) });
 
-  it("highlights the revealed correct answer", () => {
-    withChooseAnswer(() => NEVER);
-
-    const { result } = renderHook(() =>
-      useParticipantQuizScreen(
-        quizView({
-          subState: QuizSubState.Revealed,
-          ownAnswerIndex: 0,
-          correctAnswerIndex: 0,
-        }),
-      ),
-    );
-
-    expect(result.current.answers.map((answer) => answer.status)).toEqual([
-      AnswerStatus.Correct,
-      AnswerStatus.Neutral,
-      AnswerStatus.Neutral,
-    ]);
-  });
-
-  it("marks the own answer distinctly when it turned out wrong", () => {
-    withChooseAnswer(() => NEVER);
-
-    const { result } = renderHook(() =>
-      useParticipantQuizScreen(
-        quizView({
-          subState: QuizSubState.Revealed,
-          ownAnswerIndex: 2,
-          correctAnswerIndex: 0,
-        }),
-      ),
-    );
-
-    expect(result.current.answers.map((answer) => answer.status)).toEqual([
-      AnswerStatus.Correct,
-      AnswerStatus.Neutral,
-      AnswerStatus.OwnIncorrect,
-    ]);
+    expect(result.current.view).toEqual({
+      kind: QuizScreenKind.Answering,
+      answers,
+      isAnswerable: true,
+    });
   });
 
   it("reopens the answers with a message when the cast is rejected", () => {
@@ -172,7 +180,11 @@ describe("participant quiz screen logic", () => {
     expect(result.current.rejectionMessage).toBe(
       MessageKey.IntentInvariantViolated,
     );
-    expect(result.current.isAnswerable).toBe(true);
+    expect(result.current.view).toEqual({
+      kind: QuizScreenKind.Answering,
+      answers,
+      isAnswerable: true,
+    });
   });
 
   it("shows a transport failure as a generic failure message", () => {

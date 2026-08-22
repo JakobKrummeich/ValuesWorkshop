@@ -75,9 +75,9 @@ Replace the shared placeholder `QuizView` with per-role views carrying quiz
 content from the catalog (question + answer texts, both locales) so Task 14
 never reads `config/` from the frontend:
 
-- participant: `questionIndex, subState, question, answers, ownAnswerIndex?,
-  correctAnswerIndex?, learningText?` (correct index only once revealed — no
-  pre-reveal leak; learning text only once shown)
+- participant: `questionIndex, subState, question, answers, ownAnswerIndex?`
+  (Task 19a removed `correctAnswerIndex`/`learningText` from the participant
+  view — data a screen must not show is data not sent; see protocol.md)
 - facilitator: `questionIndex, subState, question, answers, answerTallies,
   answeredCount, correctAnswerIndex, learningText` (facilitator may always
   see both)
