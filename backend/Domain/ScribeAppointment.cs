@@ -1,6 +1,6 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed class ScribeAppointment(IRandomness randomnessPort) : IPhaseEntryAction
+public sealed class ScribeAppointment(IRandomness randomness) : IPhaseEntryAction
 {
     public void ExecuteFor(Session session)
     {
@@ -11,7 +11,7 @@ public sealed class ScribeAppointment(IRandomness randomnessPort) : IPhaseEntryA
 
         foreach (var group in session.Formation.Groups)
         {
-            group.AppointScribe(randomnessPort);
+            group.AppointScribe(randomness);
         }
     }
 }
