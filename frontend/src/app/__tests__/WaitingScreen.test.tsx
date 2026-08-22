@@ -4,20 +4,13 @@ import { languageWrapper } from "../../testing/languageWrapper";
 import { WaitingScreen } from "../WaitingScreen";
 
 describe("waiting screen", () => {
-  it("shows the pulsating icon and nothing else", () => {
+  it("shows the pulsating icon, no text and nothing to interact with", () => {
     const { container } = render(<WaitingScreen />, {
       wrapper: languageWrapper(),
     });
 
     expect(container.querySelector("svg")).toBeInTheDocument();
     expect(screen.getByTestId("waiting-screen")).toHaveTextContent("");
-  });
-
-  it("offers zero interactivity", () => {
-    const { container } = render(<WaitingScreen />, {
-      wrapper: languageWrapper(),
-    });
-
     expect(
       container.querySelector("button, a, input, select, textarea"),
     ).not.toBeInTheDocument();

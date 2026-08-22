@@ -39,16 +39,18 @@ const state: ParticipantQuizState = {
   },
 };
 
+const answeringView = {
+  kind: QuizScreenKind.Answering,
+  answers: state.quiz.answers,
+  isAnswerable: true,
+} as const;
+
 function model(
   overrides: Partial<ParticipantQuizScreenModel> = {},
 ): ParticipantQuizScreenModel {
   return {
     questionNumber: 2,
-    view: {
-      kind: QuizScreenKind.Answering,
-      answers: state.quiz.answers,
-      isAnswerable: true,
-    },
+    view: answeringView,
     chooseAnswer: jest.fn(),
     rejectionMessage: null,
     ...overrides,
@@ -87,13 +89,7 @@ describe("participant quiz screen", () => {
 
   it("locks the answer buttons when answering is closed", () => {
     screenHook.mockReturnValue(
-      model({
-        view: {
-          kind: QuizScreenKind.Answering,
-          answers: state.quiz.answers,
-          isAnswerable: false,
-        },
-      }),
+      model({ view: { ...answeringView, isAnswerable: false } }),
     );
 
     render(<ParticipantQuizScreen state={state} />, {
