@@ -29,8 +29,10 @@ public class QuizCorrectAnswerSecrecyTests
             quiz: QuizProgress.Restore(0, isRevealed, isLearningTextShown, [])
         );
 
-        ParticipantJsonOf(session).ShouldNotContain("correctAnswerIndex");
-        ParticipantJsonOf(session).ShouldNotContain("learningText");
+        var json = ParticipantJsonOf(session);
+
+        json.ShouldNotContain("correctAnswerIndex");
+        json.ShouldNotContain("learningText");
     }
 
     [Fact]
