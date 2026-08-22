@@ -13,6 +13,7 @@
 }
 
 .name {
+  flex-shrink: 0;
   color: var(--color-text);
   font-size: var(--text-heading);
   font-weight: var(--weight-bold);
@@ -25,8 +26,10 @@
   flex-direction: column;
   gap: var(--space-tight);
   align-self: flex-start;
+  min-height: 0;
   margin: 0;
   padding: 0;
+  overflow: hidden;
   list-style: none;
 }
 
@@ -38,6 +41,7 @@
 
 .values {
   display: flex;
+  flex-shrink: 0;
   flex-wrap: wrap;
   gap: var(--space-tight);
   align-self: flex-end;
