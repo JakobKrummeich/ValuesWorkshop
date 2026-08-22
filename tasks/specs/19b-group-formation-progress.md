@@ -32,6 +32,15 @@ group work stays **facilitator-triggered** — the bar triggers no transition.
 - **D4 — shared component.** One `FormationProgressBar` used by both
   screens, sized by its container; design tokens only, no bespoke colors.
 
+## Known behavior
+
+A client that drops its connection before the 4 → 5 advance and reconnects
+after it stays mounted, so it watches the phase change and plays the full
+3 s bar — minutes late, saying "Forming groups…" for groups that already
+exist. Accepted: the bar is a fixed beat for the room, and the extra
+machinery to tell a late reconnect from a live advance costs more than the
+rare stale bar. A reload or a late join in phase 5 still skips the bar (D2).
+
 ## Slices
 
 1. `FormationProgressBar` component + hook (3 s timer, cleanup on unmount).
