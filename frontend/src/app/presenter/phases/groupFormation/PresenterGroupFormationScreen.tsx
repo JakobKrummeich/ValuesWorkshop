@@ -21,7 +21,7 @@ export function PresenterGroupFormationScreen({
 
   if (isFormationProgressRunning) {
     return (
-      <section className={styles.progressScreen}>
+      <section className={styles.screen}>
         <FormationProgressBar onProgressComplete={completeFormationProgress} />
       </section>
     );

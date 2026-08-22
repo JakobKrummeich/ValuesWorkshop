@@ -2,20 +2,11 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  width: 100%;
-  min-height: 0;
-  padding: var(--space-gutter);
-  overflow: hidden;
-}
-
-.progressScreen {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
   justify-content: center;
   width: 100%;
   min-height: 0;
   padding: var(--space-gutter);
+  overflow: hidden;
 }
 
 .grid {
