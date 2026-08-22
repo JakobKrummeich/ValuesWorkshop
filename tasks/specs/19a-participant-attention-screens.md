@@ -17,7 +17,8 @@ content.
 | Phase | Sub-state | Screen |
 |---|---|---|
 | 1 Join | — | join confirmation (unchanged) |
-| 2 Quiz | not yet answered | answer buttons (unchanged) |
+| 2 Quiz | question open, not yet answered | answer buttons (unchanged) |
+| 2 Quiz | revealed / learning text, never answered | **calm waiting screen — no question, no dead buttons** |
 | 2 Quiz | answered / revealed / learning text | **"your answer: X" confirmation — no correct-answer display, no learning text on device; resets on next question** |
 | 3 Selection | not yet submitted | value grid (unchanged) |
 | 3 Selection | after submit | **"submission successful" confirmation (replaces grid + notice)** |
