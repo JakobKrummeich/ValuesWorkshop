@@ -191,3 +191,10 @@ FE and e2e untouched)
 > work". Decision 3's "allowed phase 6+" is superseded; `reassignScribe`
 > leaves `FacilitatorEnabledIntents` outside phase 6 and protocol T13
 > reads "phase Group work only".
+
+> **Revised after lightspeed round 2:** the group-work wire optionals
+> are present during phase 6 only — outside it no group-work data rides
+> the wire at all (`GroupViews.IsWorkUnderway` is an exact phase
+> match). The spec's "absent before phase 6" tightens to "absent
+> outside phase 6"; phase 7+ consumers get their data from the
+> `presentation` block (T21). Protocol §5.2–5.4 annotations updated.

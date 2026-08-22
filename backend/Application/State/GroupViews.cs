@@ -128,7 +128,7 @@ internal sealed class GroupViews(
 
     private static bool IsWorkUnderway(Session session)
     {
-        return session.PhaseProgress.CurrentPhase >= Phase.GroupWork;
+        return session.PhaseProgress.CurrentPhase == Phase.GroupWork;
     }
 
     private WorkshopValueView ValueViewOf(ValueId valueId)

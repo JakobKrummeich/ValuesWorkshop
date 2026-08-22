@@ -51,6 +51,38 @@ public class GroupWorkWireTests
         json.ShouldNotContain("participantId");
     }
 
+    [Fact]
+    public void After_group_work_no_role_carries_group_work_data_anymore()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValuePresentation,
+            formation: SessionFixtures.TwoGroups(
+                new GroupAction(
+                    new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac01")),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("Talk")
+                )
+            ),
+            presentation: PresentationWalk.Restore("tier-1", new ValueId("wert-1"), 1)
+        );
+
+        foreach (
+            var json in new[]
+            {
+                ParticipantJson(session),
+                FacilitatorJson(session),
+                PresenterJson(session),
+            }
+        )
+        {
+            json.ShouldNotContain("workStatus");
+            json.ShouldNotContain("scribe");
+            json.ShouldNotContain("isCallerScribe");
+            json.ShouldNotContain("actionCountPerValue");
+            json.ShouldNotContain("\"actions\"");
+        }
+    }
+
     private static Session GroupWorkSession()
     {
         return SessionFixtures.InPhase(
