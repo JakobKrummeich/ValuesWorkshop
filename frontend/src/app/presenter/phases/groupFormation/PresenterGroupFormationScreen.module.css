@@ -7,6 +7,15 @@
   overflow: hidden;
 }
 
+.progressScreen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  padding: var(--space-gutter);
+}
+
 .grid {
   display: grid;
   flex: 1;

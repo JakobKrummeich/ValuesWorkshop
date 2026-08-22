@@ -16,7 +16,7 @@ export interface AdvancePhaseButtonResult {
 
 export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
   const { lifecyclePort, sessionStatePort } = useFacilitatorDependencies();
-  const state = usePhaseView(sessionStatePort);
+  const { state } = usePhaseView(sessionStatePort);
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
 
   const advancePhase = useCallback(() => {

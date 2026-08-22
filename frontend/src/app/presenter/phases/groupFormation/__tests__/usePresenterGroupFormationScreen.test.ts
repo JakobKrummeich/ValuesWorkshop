@@ -30,29 +30,29 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+function renderScreen(groupCount: number, isPhaseEntryObserved = false) {
+  return renderHook(() =>
+    usePresenterGroupFormationScreen(groups(groupCount), isPhaseEntryObserved),
+  );
+}
+
 describe("presenter group formation screen hook", () => {
   it("shows every group without cycling when they fit one page", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(6)),
-    );
+    const { result } = renderScreen(6);
 
     expect(result.current.currentPageGroups).toHaveLength(6);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("shows no groups when none exist", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(0)),
-    );
+    const { result } = renderScreen(0);
 
     expect(result.current.currentPageGroups).toEqual([]);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("advances to the next page after the cycle interval", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(7)),
-    );
+    const { result } = renderScreen(7);
 
     expect(animalIds(result.current.currentPageGroups)).toEqual([
       "animal-1",
@@ -69,9 +69,7 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("wraps around to the first page after the last one", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(7)),
-    );
+    const { result } = renderScreen(7);
 
     act(() => jest.advanceTimersByTime(2 * groupPageCycleMilliseconds));
 
@@ -86,14 +84,46 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("clears the cycle timer on unmount", () => {
-    const { unmount } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(7)),
-    );
+    const { unmount } = renderScreen(7);
 
     expect(jest.getTimerCount()).toBe(1);
 
     unmount();
 
     expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it("shows the groups right away when it did not watch the phase begin", () => {
+    const { result } = renderScreen(7);
+
+    expect(result.current.isFormationProgressRunning).toBe(false);
+  });
+
+  it("runs the progress bar when it watched the phase begin", () => {
+    const { result } = renderScreen(7, true);
+
+    expect(result.current.isFormationProgressRunning).toBe(true);
+  });
+
+  it("shows the groups once the progress bar is done", () => {
+    const { result } = renderScreen(7, true);
+
+    act(() => result.current.completeFormationProgress());
+
+    expect(result.current.isFormationProgressRunning).toBe(false);
+  });
+
+  it("holds the page cycle back until the progress bar is done", () => {
+    const { result } = renderScreen(7, true);
+
+    expect(jest.getTimerCount()).toBe(0);
+
+    act(() => result.current.completeFormationProgress());
+
+    expect(jest.getTimerCount()).toBe(1);
+
+    act(() => jest.advanceTimersByTime(groupPageCycleMilliseconds));
+
+    expect(animalIds(result.current.currentPageGroups)).toEqual(["animal-7"]);
   });
 });

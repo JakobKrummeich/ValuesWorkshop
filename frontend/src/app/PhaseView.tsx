@@ -9,6 +9,7 @@ import { usePhaseView } from "./usePhaseView";
 export type PhaseComponents<TState extends PhasedWorkshopState> = Readonly<{
   [TPhase in Phase]: ComponentType<{
     state: Extract<TState, { phase: TPhase }>;
+    isPhaseEntryObserved: boolean;
   }>;
 }>;
 
@@ -19,7 +20,7 @@ export function PhaseView<TState extends PhasedWorkshopState>({
   sessionStatePort: SessionStatePort<TState>;
   components: PhaseComponents<TState>;
 }) {
-  const state = usePhaseView(sessionStatePort);
+  const { state, isPhaseEntryObserved } = usePhaseView(sessionStatePort);
 
   if (state === null) {
     return null;
@@ -27,7 +28,10 @@ export function PhaseView<TState extends PhasedWorkshopState>({
 
   const CurrentPhase = components[state.phase] as ComponentType<{
     state: TState;
+    isPhaseEntryObserved: boolean;
   }>;
 
-  return <CurrentPhase state={state} />;
+  return (
+    <CurrentPhase state={state} isPhaseEntryObserved={isPhaseEntryObserved} />
+  );
 }
