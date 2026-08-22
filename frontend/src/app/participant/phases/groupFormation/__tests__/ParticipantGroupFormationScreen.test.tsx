@@ -4,15 +4,15 @@ import { formationProgressMilliseconds } from "../../../../useFormationProgressB
 import { Phase } from "../../../../../domain/phases";
 import type { ParticipantGroupFormationState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
+import { useFormationProgressGate } from "../../../../useFormationProgressGate";
 import { ParticipantGroupFormationScreen } from "../ParticipantGroupFormationScreen";
-import { useParticipantGroupFormationScreen } from "../useParticipantGroupFormationScreen";
 
-jest.mock("../useParticipantGroupFormationScreen", () => ({
-  useParticipantGroupFormationScreen: jest.fn(),
+jest.mock("../../../../useFormationProgressGate", () => ({
+  useFormationProgressGate: jest.fn(),
 }));
 
-const screenHook = useParticipantGroupFormationScreen as jest.MockedFunction<
-  typeof useParticipantGroupFormationScreen
+const screenHook = useFormationProgressGate as jest.MockedFunction<
+  typeof useFormationProgressGate
 >;
 
 const completeFormationProgress = jest.fn();
@@ -110,7 +110,7 @@ describe("participant group formation screen", () => {
     );
   });
 
-  it("hands the observed entry to the screen hook", () => {
+  it("hands the observed entry to the progress gate", () => {
     render(
       <ParticipantGroupFormationScreen
         state={state(ownGroup)}
@@ -140,7 +140,7 @@ describe("participant group formation screen", () => {
     expect(screen.queryByTestId("own-group-card")).not.toBeInTheDocument();
   });
 
-  it("reports the finished progress bar back to the screen hook", () => {
+  it("reports the finished progress bar back to the progress gate", () => {
     jest.useFakeTimers();
     screenHook.mockReturnValue({
       isFormationProgressRunning: true,

@@ -56,7 +56,7 @@ describe("phase view state", () => {
     expect(result.current.isPhaseEntryObserved).toBe(true);
   });
 
-  it("does not count a later state of the same phase as another entry", () => {
+  it("keeps the observed entry across later states of the same phase", () => {
     const workshopState = new Subject<PhasedWorkshopState>();
     const { result } = renderHook(() =>
       usePhaseView({ workshopState, connectionState: NEVER }),
@@ -72,7 +72,24 @@ describe("phase view state", () => {
       workshopState.next({ revision: 31, phase: Phase.GroupFormation }),
     );
 
-    expect(result.current.isPhaseEntryObserved).toBe(false);
+    expect(result.current.isPhaseEntryObserved).toBe(true);
+  });
+
+  it("keeps the observed entry when the phase change and a later state arrive together", () => {
+    const workshopState = new Subject<PhasedWorkshopState>();
+    const { result } = renderHook(() =>
+      usePhaseView({ workshopState, connectionState: NEVER }),
+    );
+
+    act(() =>
+      workshopState.next({ revision: 29, phase: Phase.SelectionResults }),
+    );
+    act(() => {
+      workshopState.next({ revision: 30, phase: Phase.GroupFormation });
+      workshopState.next({ revision: 31, phase: Phase.GroupFormation });
+    });
+
+    expect(result.current.isPhaseEntryObserved).toBe(true);
   });
 
   it("stops listening once the caller is gone", () => {

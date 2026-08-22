@@ -5,8 +5,8 @@ import type { ParticipantGroupFormationState } from "../../../../domain/workshop
 import { FormationProgressBar } from "../../../FormationProgressBar";
 import { GroupCard } from "../../../GroupCard";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { useFormationProgressGate } from "../../../useFormationProgressGate";
 import styles from "./ParticipantGroupFormationScreen.module.css";
-import { useParticipantGroupFormationScreen } from "./useParticipantGroupFormationScreen";
 
 export function ParticipantGroupFormationScreen({
   state,
@@ -17,7 +17,7 @@ export function ParticipantGroupFormationScreen({
 }) {
   const { translate } = useTranslation();
   const { isFormationProgressRunning, completeFormationProgress } =
-    useParticipantGroupFormationScreen(isPhaseEntryObserved);
+    useFormationProgressGate(isPhaseEntryObserved);
 
   if (isFormationProgressRunning) {
     return (

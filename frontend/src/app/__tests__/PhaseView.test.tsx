@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { useState } from "react";
 import { NEVER } from "rxjs";
 import { Phase } from "../../domain/phases";
 import type { SessionStatePort } from "../../domain/ports/sessionStatePort";
@@ -78,6 +79,62 @@ describe("phase view", () => {
     render(<PhaseView sessionStatePort={port} components={components} />);
 
     screen.getByText("lobby of Ada Lovelace just entered");
+  });
+
+  it("gives every phase its own instance of a shared screen", () => {
+    let instanceCount = 0;
+    function CountingPhase() {
+      const [instance] = useState(() => ++instanceCount);
+      return <p>instance {instance}</p>;
+    }
+    const selection = {
+      values: [],
+      ownSelectedValueIds: [],
+      isSubmitted: false,
+    };
+    phaseState.mockReturnValue({
+      state: {
+        revision: 4,
+        phase: Phase.ValueSelection,
+        participantCount: 1,
+        selection,
+      },
+      isPhaseEntryObserved: false,
+    });
+
+    const { rerender } = render(
+      <PhaseView
+        sessionStatePort={port}
+        components={{
+          ...components,
+          [Phase.ValueSelection]: CountingPhase,
+          [Phase.SelectionResults]: CountingPhase,
+        }}
+      />,
+    );
+    screen.getByText("instance 1");
+
+    phaseState.mockReturnValue({
+      state: {
+        revision: 5,
+        phase: Phase.SelectionResults,
+        participantCount: 1,
+        selection,
+      },
+      isPhaseEntryObserved: true,
+    });
+    rerender(
+      <PhaseView
+        sessionStatePort={port}
+        components={{
+          ...components,
+          [Phase.ValueSelection]: CountingPhase,
+          [Phase.SelectionResults]: CountingPhase,
+        }}
+      />,
+    );
+
+    screen.getByText("instance 2");
   });
 
   it("renders nothing for a phase that has no screen yet", () => {

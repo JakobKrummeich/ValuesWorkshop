@@ -32,6 +32,10 @@ export function PhaseView<TState extends PhasedWorkshopState>({
   }>;
 
   return (
-    <CurrentPhase state={state} isPhaseEntryObserved={isPhaseEntryObserved} />
+    <CurrentPhase
+      key={state.phase}
+      state={state}
+      isPhaseEntryObserved={isPhaseEntryObserved}
+    />
   );
 }

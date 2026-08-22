@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { splitIntoGroupPages } from "../../../../domain/groupFormation";
 import type { PresenterGroupFormationState } from "../../../../domain/workshopState";
+import { useFormationProgressGate } from "../../../useFormationProgressGate";
 
 export const groupPageCycleMilliseconds = 7000;
 
@@ -18,16 +19,11 @@ export function usePresenterGroupFormationScreen(
   groups: PresenterGroups,
   isPhaseEntryObserved: boolean,
 ): PresenterGroupFormationScreenModel {
-  const [isFormationProgressRunning, setIsFormationProgressRunning] =
-    useState(isPhaseEntryObserved);
+  const { isFormationProgressRunning, completeFormationProgress } =
+    useFormationProgressGate(isPhaseEntryObserved);
   const [pageIndex, setPageIndex] = useState(0);
   const pages = splitIntoGroupPages(groups);
   const pageCount = pages.length;
-
-  const completeFormationProgress = useCallback(
-    () => setIsFormationProgressRunning(false),
-    [],
-  );
 
   useEffect(() => {
     if (isFormationProgressRunning || pageCount <= 1) {
