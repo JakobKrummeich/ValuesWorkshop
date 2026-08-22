@@ -47,12 +47,45 @@ the rule out instead: "Each participant submits a value selection exactly
 once." The invariant number belongs in the spec and in test names, not on
 the wire.
 
-## A port is named as one ⟲
+## A port is named as one — outside the domain ⟲
 
-A field, prop or variable holding a port ends in `Port`:
+In app/FE wiring (fields, props, DI), a value holding a port ends in `Port`:
 `sessionStatePort`, `quizPort`, `selectionPort`. A bare `quiz` or
 `sessionState` next to state objects reads as data and misleads the reader
-about what is being passed.
+about what is being passed. Inside the domain, "port" is architecture
+vocabulary, not domain vocabulary: a parameter is named for the capability it
+provides — `randomness`, not `randomnessPort`.
+
+## A general operation never names its special cases
+
+Code performing a general operation — advancing a phase, dispatching an
+intent — reads identically no matter which case passes through: it mentions
+no specific phase, and its signature carries no dependency that only one case
+needs. A case-specific effect (forming groups on entering GroupFormation)
+implements a case-owned hook (`IPhaseEntryAction`) that decides *itself*
+whether it applies; the general path just runs every hook.
+
+## A phase's data and roles exist exactly in that phase
+
+Group-work data is on the wire during group work, and a scribe can be
+reassigned during group work — not from that phase onward. The default
+comparison is `==`, not `>=`: a view carries a phase's data only while that
+phase is live, a role exists only while its phase is live, and any "from here
+on" semantics needs the spec to say so.
+
+## One named validator at the boundary
+
+Hub methods accept raw nullable payloads and pass them through untouched — no
+`?? ""` defaults that paper over missing fields. All payload validation lives
+in one class whose name states its job (`IntentPayloadValidator`); a vaguer
+name that hides the validating fails review.
+
+## An agreed pattern retrofits everywhere
+
+When review establishes a pattern, existing occurrences of the old shape are
+converted in the same branch — "pre-existing, out of scope" is not an answer.
+Consistency beats diff minimalism; a reviewer-agreed retrofit is by
+definition not "unrelated to the diff".
 
 ## Repeating a reached state is a no-op
 
