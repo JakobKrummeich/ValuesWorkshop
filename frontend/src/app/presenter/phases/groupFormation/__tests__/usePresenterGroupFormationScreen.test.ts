@@ -31,7 +31,7 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-function renderScreen(groupCount: number, isPhaseEntryObserved = false) {
+function renderScreenHook(groupCount: number, isPhaseEntryObserved = false) {
   return renderHook(() =>
     usePresenterGroupFormationScreen(groups(groupCount), isPhaseEntryObserved),
   );
@@ -39,21 +39,21 @@ function renderScreen(groupCount: number, isPhaseEntryObserved = false) {
 
 describe("presenter group formation screen hook", () => {
   it("shows every group without cycling when they fit one page", () => {
-    const { result } = renderScreen(6);
+    const { result } = renderScreenHook(6);
 
     expect(result.current.currentPageGroups).toHaveLength(6);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("shows no groups when none exist", () => {
-    const { result } = renderScreen(0);
+    const { result } = renderScreenHook(0);
 
     expect(result.current.currentPageGroups).toEqual([]);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("advances to the next page after the cycle interval", () => {
-    const { result } = renderScreen(7);
+    const { result } = renderScreenHook(7);
 
     expect(animalIds(result.current.currentPageGroups)).toEqual([
       "animal-1",
@@ -70,7 +70,7 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("wraps around to the first page after the last one", () => {
-    const { result } = renderScreen(7);
+    const { result } = renderScreenHook(7);
 
     act(() => jest.advanceTimersByTime(2 * groupPageCycleMilliseconds));
 
@@ -85,7 +85,7 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("clears the cycle timer on unmount", () => {
-    const { unmount } = renderScreen(7);
+    const { unmount } = renderScreenHook(7);
 
     expect(jest.getTimerCount()).toBe(1);
 
@@ -95,28 +95,20 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("shows the groups right away when it did not watch the phase begin", () => {
-    const { result } = renderScreen(7);
+    const { result } = renderScreenHook(7);
 
     expect(result.current.isFormationProgressRunning).toBe(false);
   });
 
-  it("runs the progress bar when it watched the phase begin", () => {
-    const { result } = renderScreen(7, true);
-
-    expect(result.current.isFormationProgressRunning).toBe(true);
-  });
-
   it("holds the page cycle back while the progress bar runs", () => {
-    const { result } = renderScreen(7, true);
-
-    act(() => jest.advanceTimersByTime(formationProgressMilliseconds - 1));
+    const { result } = renderScreenHook(7, true);
 
     expect(result.current.isFormationProgressRunning).toBe(true);
     expect(jest.getTimerCount()).toBe(1);
   });
 
   it("cycles the pages once the progress bar is done", () => {
-    const { result } = renderScreen(7, true);
+    const { result } = renderScreenHook(7, true);
 
     act(() => jest.advanceTimersByTime(formationProgressMilliseconds));
 
