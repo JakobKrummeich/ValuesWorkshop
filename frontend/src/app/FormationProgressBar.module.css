@@ -15,7 +15,7 @@
 
 .track {
   width: 100%;
-  height: var(--control-height);
+  height: var(--progress-track-height);
   overflow: hidden;
   border-radius: var(--radius-full);
   background: var(--color-border);
@@ -28,7 +28,7 @@
   background: var(--color-primary);
   transform: scaleX(0);
   transform-origin: left;
-  animation: fill 3s linear forwards;
+  animation: fill var(--duration-formation-progress) linear forwards;
 }
 
 @keyframes fill {

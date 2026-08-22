@@ -8,6 +8,8 @@
   --text-body: clamp(var(--base-text-24), 3.5vh, var(--base-text-32));
   --text-heading: clamp(var(--base-text-32), 6vh, var(--base-text-40));
 
+  --progress-track-height: 64px;
+
   --space-tight: var(--base-space-16);
   --space-gap: var(--base-space-24);
   --space-gutter: var(--base-space-48);

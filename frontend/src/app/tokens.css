@@ -98,7 +98,10 @@
   --space-gutter: var(--base-space-16);
 
   --control-height: 32px;
+  --progress-track-height: 48px;
   --border-hairline: var(--base-border-hairline);
+
+  --duration-formation-progress: 3s;
 
   --radius-sm: var(--base-radius-sm);
   --radius-md: var(--base-radius-md);
