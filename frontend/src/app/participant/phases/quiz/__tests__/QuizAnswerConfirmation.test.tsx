@@ -17,6 +17,14 @@ describe("quiz answer confirmation", () => {
     expect(screen.getByTestId("own-answer-text")).toHaveTextContent("Two");
   });
 
+  it("takes the focus the vanished answer buttons left behind", () => {
+    render(<QuizAnswerConfirmation answer={answer} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("own-answer-confirmation")).toHaveFocus();
+  });
+
   it("speaks German when German is chosen", () => {
     render(<QuizAnswerConfirmation answer={answer} />, {
       wrapper: languageWrapper(Language.German),

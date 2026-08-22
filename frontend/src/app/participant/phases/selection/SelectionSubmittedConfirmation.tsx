@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageKey } from "../../../../domain/i18n/messages";
+import { focusOnMount } from "../../../focusOnMount";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./SelectionSubmittedConfirmation.module.css";
 
@@ -12,6 +13,8 @@ export function SelectionSubmittedConfirmation() {
       className={styles.confirmation}
       role="status"
       data-testid="selection-submitted-confirmation"
+      tabIndex={-1}
+      ref={focusOnMount}
     >
       <svg
         className={styles.icon}

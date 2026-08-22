@@ -1,9 +1,10 @@
 "use client";
 
 import type { KeyboardEvent } from "react";
+import { focusOnMount } from "../../../focusOnMount";
 
 export interface SelectionConfirmDialogBehavior {
-  focusOnMount: (button: HTMLButtonElement | null) => void;
+  focusOnMount: (element: HTMLElement | null) => void;
   trapKeyboardFocus: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
 
@@ -20,10 +21,6 @@ export function useSelectionConfirmDialog(
       }
     },
   };
-}
-
-function focusOnMount(button: HTMLButtonElement | null) {
-  button?.focus();
 }
 
 function cycleTabFocus(event: KeyboardEvent<HTMLDivElement>) {

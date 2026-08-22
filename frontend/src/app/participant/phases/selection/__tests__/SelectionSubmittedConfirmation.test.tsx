@@ -17,6 +17,16 @@ describe("selection submitted confirmation", () => {
     expect(container.querySelector("svg")).toBeInTheDocument();
   });
 
+  it("takes the focus the vanished grid left behind", () => {
+    render(<SelectionSubmittedConfirmation />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(
+      screen.getByTestId("selection-submitted-confirmation"),
+    ).toHaveFocus();
+  });
+
   it("speaks German when German is chosen", () => {
     render(<SelectionSubmittedConfirmation />, {
       wrapper: languageWrapper(Language.German),
