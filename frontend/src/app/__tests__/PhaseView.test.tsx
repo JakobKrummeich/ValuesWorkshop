@@ -38,45 +38,52 @@ const port: SessionStatePort<ParticipantWorkshopState> = {
   connectionState: NEVER,
 };
 
+const joinState: ParticipantWorkshopState = {
+  revision: 4,
+  phase: Phase.Join,
+  participantCount: 1,
+  ownDisplayName: "Ada Lovelace",
+};
+
+const emptySelection = {
+  values: [],
+  ownSelectedValueIds: [],
+  isSubmitted: false,
+};
+
+function phaseView(
+  phaseComponents: PhaseComponents<ParticipantWorkshopState> = components,
+) {
+  return <PhaseView sessionStatePort={port} components={phaseComponents} />;
+}
+
 describe("phase view", () => {
   it("renders nothing until the first state arrives", () => {
     phaseState.mockReturnValue({ state: null, isPhaseEntryObserved: false });
 
-    const { container } = render(
-      <PhaseView sessionStatePort={port} components={components} />,
-    );
+    const { container } = render(phaseView());
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it("renders the component the current phase maps to", () => {
     phaseState.mockReturnValue({
-      state: {
-        revision: 4,
-        phase: Phase.Join,
-        participantCount: 1,
-        ownDisplayName: "Ada Lovelace",
-      },
+      state: joinState,
       isPhaseEntryObserved: false,
     });
 
-    render(<PhaseView sessionStatePort={port} components={components} />);
+    render(phaseView());
 
     screen.getByText("lobby of Ada Lovelace already running");
   });
 
   it("tells the phase component that it watched the phase begin", () => {
     phaseState.mockReturnValue({
-      state: {
-        revision: 4,
-        phase: Phase.Join,
-        participantCount: 1,
-        ownDisplayName: "Ada Lovelace",
-      },
+      state: joinState,
       isPhaseEntryObserved: true,
     });
 
-    render(<PhaseView sessionStatePort={port} components={components} />);
+    render(phaseView());
 
     screen.getByText("lobby of Ada Lovelace just entered");
   });
@@ -87,31 +94,22 @@ describe("phase view", () => {
       const [instance] = useState(() => ++instanceCount);
       return <p>instance {instance}</p>;
     }
-    const selection = {
-      values: [],
-      ownSelectedValueIds: [],
-      isSubmitted: false,
+    const sharedScreen = {
+      ...components,
+      [Phase.ValueSelection]: CountingPhase,
+      [Phase.SelectionResults]: CountingPhase,
     };
     phaseState.mockReturnValue({
       state: {
         revision: 4,
         phase: Phase.ValueSelection,
         participantCount: 1,
-        selection,
+        selection: emptySelection,
       },
       isPhaseEntryObserved: false,
     });
 
-    const { rerender } = render(
-      <PhaseView
-        sessionStatePort={port}
-        components={{
-          ...components,
-          [Phase.ValueSelection]: CountingPhase,
-          [Phase.SelectionResults]: CountingPhase,
-        }}
-      />,
-    );
+    const { rerender } = render(phaseView(sharedScreen));
     screen.getByText("instance 1");
 
     phaseState.mockReturnValue({
@@ -119,20 +117,11 @@ describe("phase view", () => {
         revision: 5,
         phase: Phase.SelectionResults,
         participantCount: 1,
-        selection,
+        selection: emptySelection,
       },
       isPhaseEntryObserved: true,
     });
-    rerender(
-      <PhaseView
-        sessionStatePort={port}
-        components={{
-          ...components,
-          [Phase.ValueSelection]: CountingPhase,
-          [Phase.SelectionResults]: CountingPhase,
-        }}
-      />,
-    );
+    rerender(phaseView(sharedScreen));
 
     screen.getByText("instance 2");
   });
@@ -148,9 +137,7 @@ describe("phase view", () => {
       isPhaseEntryObserved: false,
     });
 
-    const { container } = render(
-      <PhaseView sessionStatePort={port} components={components} />,
-    );
+    const { container } = render(phaseView());
 
     expect(container).toBeEmptyDOMElement();
   });
