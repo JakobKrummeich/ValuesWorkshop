@@ -1,13 +1,9 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { MessageKey } from "../domain/i18n/messages";
+import { cssCustomProperty } from "../shared/cssCustomProperty";
 import styles from "./FormationProgressBar.module.css";
 import { useTranslation } from "./i18n/useTranslation";
-
-function progressFraction(progress: number): CSSProperties {
-  return { "--progress-fraction": progress } as CSSProperties;
-}
 
 export function FormationProgressBar({ progress }: { progress: number }) {
   const { translate } = useTranslation();
@@ -26,7 +22,7 @@ export function FormationProgressBar({ progress }: { progress: number }) {
       <div className={styles.track}>
         <div
           className={styles.fill}
-          style={progressFraction(progress)}
+          style={cssCustomProperty("--progress-fraction", progress)}
           data-testid="formation-progress-fill"
         />
       </div>

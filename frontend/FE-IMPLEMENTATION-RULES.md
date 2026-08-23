@@ -121,6 +121,14 @@ One co-located `Component.module.css` per component (restated from
 `AGENTS.md`). No inline `style={}` props — use CSS module classes. No shared
 or global component stylesheets beyond `tokens.css` and `globals.css`.
 
+One carve-out: `style` may inject **CSS custom properties only** — a value
+that exists at runtime (a progress fraction, a bar width) and that CSS must
+consume through `calc(var(--name))` in the component's own module. No CSS
+property is ever set inline; the class still carries every visual property.
+Build the object with `cssCustomProperty()` from
+`src/shared/cssCustomProperty.ts`, so the `CSSProperties` cast lives in one
+file instead of in every component.
+
 ## Hooks
 
 Reach for plain React state first. `useState` is the default; a `useRef` plus a
