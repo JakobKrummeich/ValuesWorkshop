@@ -208,7 +208,7 @@ justification in this document.
 There is no implementation inheritance in the backend. Shared contracts are
 expressed as interfaces implemented by sealed records: `IPhaseExitGuard`
 carries the `Phase` discriminator plus the `Refusal` / `IsSatisfiedBy`
-contract, and `QuizExitGuard`, `GroupWorkExitGuard`,
+contract, and `QuizExitGuard`, `GroupFormationExitGuard`, `GroupWorkExitGuard`,
 `ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly.
 The guards are stateless domain policy: the Domain-internal static registry
 `PhaseExitGuards` holds the registered ones, `Session.AdvancePhase()` consults

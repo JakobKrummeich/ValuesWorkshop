@@ -530,7 +530,7 @@ arrives within 500 ms).
 ### 6.4 `enabledIntents` — no guard logic on the client
 
 The facilitator screen must disable “Advance” exactly when the state machine
-would refuse it (T2a–T2c) and morph its quiz sub-control button (T6→T7→T8).
+would refuse it (T2a–T2d) and morph its quiz sub-control button (T6→T7→T8).
 Duplicating those guards in the frontend would mean two implementations of
 the same rules. Instead the server evaluates them once and ships the answer:
 `enabledIntents` names the facilitator hub methods that would be accepted

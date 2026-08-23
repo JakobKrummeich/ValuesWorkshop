@@ -52,7 +52,7 @@ presenter × phase 0 (no session exists to show yet).
 | ShowLearningText | Facilitator | Facilitator · quiz morphing button, "Show learning text" state |
 | SubmitValueSelection | Participant | Participant · selection grid, "Submit selection" button |
 | DetermineTopValues | System | — fires on entering Selection results |
-| FormGroups | System | — fires on entering Group formation |
+| FormGroups | System | — fires when the formation window is over (T19b) |
 | AppointScribes | System | — fires on entering Group work |
 | ReassignScribe | Facilitator | Facilitator · group-work table, scribe dropdown per group |
 | AddAction | Scribe | Participant (scribe) · "+ add action" under active value tab |
@@ -583,7 +583,7 @@ tiebreak round brings the voting UI back (tied values only).
   rejoin screen, no lost place.
 - **Facilitator control bar:** every facilitator screen carries the phase
   name and the Advance button; per-phase disable guards mirror the
-  state-machine exit guards (T2a–T2c). Sub-controls sit below the bar.
+  state-machine exit guards (T2a–T2d). Sub-controls sit below the bar.
 - **Presenter view:** fullscreen, zero interactivity, reachable without
   sign-in (its address names the session). Never shows anything that links
   a person to an answer, selection, or vote.
