@@ -64,6 +64,8 @@ migrations run at startup and evolve an existing volume in place.
 | `OIDC_AUTHORITY` / `OIDC_METADATA_URL` | no | `http://localhost:9000` |
 | `CORS_ORIGINS` | no | `http://localhost:3000` |
 | `STATE_RESEND_INTERVAL_MS` | no (`500`) | `500` |
+| `GROUP_FORMATION_WINDOW_MS` | no (`3000`) | `3000` |
+| `GROUP_FORMATION_TICK_INTERVAL_MS` | no (`50`) | `50` |
 | `SESSION_CREATION_ATTEMPTS_PER_WINDOW` | no (`5`) | `30` |
 | `SESSION_CREATION_ATTEMPT_WINDOW_SECONDS` | no (`60`) | `60` |
 

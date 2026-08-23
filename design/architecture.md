@@ -81,8 +81,12 @@ handlers. Aggregates stay port-free and own state + invariants.
 
 | Service | File | Ports (ctor) | Called by |
 |---|---|---|---|
-| `GroupFormation` | `Domain/GroupFormation.cs` | `IGroupSolver`, `IGroupNames` | `FacilitatorIntentHandler` runs every registered `IPhaseEntryAction` after `Session.AdvancePhase()` — `GroupFormation` is one; it self-guards: no-op outside the group-formation phase and once groups are formed |
-| `ScribeAppointment` | `Domain/ScribeAppointment.cs` | `IRandomness` | The second `IPhaseEntryAction`: appoints one random scribe per group on entry into group work; self-guards (no-op outside phase 6, skips groups that already have a scribe so restore/restart never re-appoints) |
+| `ScribeAppointment` | `Domain/ScribeAppointment.cs` | `IRandomness` | The one registered `IPhaseEntryAction`: `FacilitatorIntentHandler` runs them after `Session.AdvancePhase()`; it appoints one random scribe per group on entry into group work and self-guards (no-op outside phase 6, skips groups that already have a scribe so restore/restart never re-appoints) |
+
+Group formation is deliberately *not* one of them: phase 5 is entered
+unformed and the formation runs on a clock (`design/state-machine.md` § 2.5),
+which is orchestration over time — an application concern, `GroupFormationRuns`
+below.
 
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):
@@ -94,6 +98,20 @@ concerns):
 | `IQuizCatalog` | `Application/Ports/Driven/IQuizCatalog.cs` | `QuizCatalogFile` (Host) |
 | `IValuesCatalog` | `Application/Ports/Driven/IValuesCatalog.cs` | `ValuesCatalogFile` (Host) |
 | `IAnimalsCatalog` | `Application/Ports/Driven/IAnimalsCatalog.cs` | `AnimalsCatalogFile` (Host) |
+| `IGroupFormationProgress` | `Application/Formation/IGroupFormationProgress.cs` | `GroupFormationRuns` (Application) — driven by the three state mappers, which need the elapsed fraction and nothing else |
+
+Application services:
+
+| Service | File | Ports (ctor) | Lifetime | Called by |
+|---|---|---|---|---|
+| `GroupFormationRuns` | `Application/Formation/GroupFormationRuns.cs` | `IGroupSolver`, `IGroupNames`, `IRandomness`, `TimeProvider` | singleton | `WorkshopStateCache` starts a run the first time it maps an unformed phase-5 session; `GroupFormationService` (Adapters.Web hosted service, sibling of `StateResendService`) ticks it every 50 ms, pushes the progress, and applies the assignment once the window is over |
+
+`GroupFormationRuns` holds the one thing the domain must not hold: work in
+flight. The solver call runs off-thread, the elapsed fraction comes from
+`TimeProvider`, and the window ends with the solver's assignment or, when it
+did not finish, `RandomGroupAssignment` — pure domain either way
+(`Domain/RandomGroupAssignment.cs`). Nothing about a run is persisted, so a
+restart mid-window just starts a new one.
 
 ### 2.2 Frontend Ports
 
@@ -154,7 +172,7 @@ Records are the default for all new C# types (AGENTS.md hard rule). A mutable
 
 Future DTOs, commands, and events → records.
 
-### 4.2 Aggregates & Building Blocks → Mutable Sealed Classes
+### 4.2 Aggregates, Building Blocks & In-Flight State → Mutable Sealed Classes
 
 | Type | Declaration | Justification |
 |---|---|---|
@@ -167,12 +185,15 @@ Future DTOs, commands, and events → records.
 | `PresentationWalk` | `sealed class` | Mutable presenting-group cursor. |
 | `VotingRounds` | `sealed class` | Mutable vote tallies, tiebreak rounds. Anonymity invariant. |
 | `Group` | `sealed class` | Mutable scribe assignment, submission state, actions collection. |
+| `GroupFormationRuns` | `sealed class` | Not an aggregate — an application service holding the group formations currently in flight: start timestamp and, once the solver returns, its assignment. The mutation is inherently concurrent (a background solve writing while state mappers read), guarded by a single `Lock`; a record would have to be swapped atomically for no benefit. The state is memory-only and never persisted. |
 
-**Common justification:** These types hold mutable internal collections,
-enforce invariants through methods, and are composed inside Session
-(identity-based, not value-based). Immutable record transitions would require
-copying large nested structures on every state change with no correctness
-benefit — the session is a single-writer aggregate.
+**Common justification** (every row but the last): these types hold mutable
+internal collections, enforce invariants through methods, and are composed
+inside Session (identity-based, not value-based). Immutable record transitions
+would require copying large nested structures on every state change with no
+correctness benefit — the session is a single-writer aggregate.
+`GroupFormationRuns` carries its own justification in the table: it is not part
+of the aggregate at all.
 
 ---
 

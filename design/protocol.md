@@ -222,6 +222,15 @@ each of the three role groups. Between mutations this is pure serialization:
 the three mapped role states are cached and re-mapped only when `revision`
 changes; no repository read, no domain work, no SQLite traffic.
 
+A session whose group formation is running (phase 5, `Forming` — § 5.1) is
+the one exception: its state changes while `revision` stands still, so it is
+never cached. A second hosted service, the formation ticker, runs every
+`GROUP_FORMATION_TICK_INTERVAL_MS` (default **50**), re-maps that session
+fresh and pushes it, so the progress bar moves smoothly instead of stepping
+every 500 ms. When `GROUP_FORMATION_WINDOW_MS` (default **3000**) is up the
+same tick applies the assignment (T11) and the session goes back to the
+ordinary cached resend.
+
 ```mermaid
 sequenceDiagram
   autonumber
@@ -240,10 +249,19 @@ sequenceDiagram
 ### 3.4 `revision`
 
 Every state record carries `revision`: a monotonic counter on the session,
-incremented once per persisted mutation. Client rule: **apply the state only
-if `revision` is greater than the last applied revision**; otherwise drop it.
-Consequences: unchanged resends cause no re-render and no flicker, and a late
-or duplicated message can never move a screen backwards.
+incremented once per persisted mutation. Client rule: **apply the state if
+its `revision` is greater than the last applied revision, or equal to it and
+the state differs from the applied one**; otherwise drop it.
+
+The equal-revision clause exists for state that moves without a persisted
+mutation: formation progress (§ 3.3) advances every 50 ms while `revision`
+stands still. It is safe because messages of one revision arrive in order on
+a connection, and the only thing that can differ between them is that
+progress.
+
+Consequences: identical resends cause no re-render and no flicker, and a late
+or duplicated message can never move a screen backwards — it is either older
+by revision or identical to what is already applied.
 
 ---
 
@@ -257,7 +275,7 @@ the caller's authenticated principal, so no client can act as another.
 
 | # | Method | Payload | Guard (server-checked) | Rejection |
 |---|---|---|---|---|
-| T2 | `AdvancePhase` | — | facilitator (I2); forward only (I1); phase-exit guards T2a–T2c | `WrongPhase`, `NotAuthorized` |
+| T2 | `AdvancePhase` | — | facilitator (I2); forward only (I1); phase-exit guards T2a–T2d (phase 5: groups formed) | `WrongPhase`, `NotAuthorized` |
 | T6 | `RevealAnswer` | — | phase Quiz; a question is posed (repeat reveal is a no-op) | `WrongPhase` |
 | T7 | `ShowLearningText` | — | phase Quiz; answer revealed (repeat show is a no-op) | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
@@ -299,11 +317,16 @@ They fire inside the server as part of the transition that triggers them
 (phase entry, or voting close) and are visible only as changed state. This is
 deliberate: nothing a client sends can influence them.
 
+T11 `FormGroups` is the one fired by the server clock rather than by a
+transition: entering phase 5 leaves the session unformed, and the formation
+ticker (§ 3.3) applies the assignment when the window is over. Its only wire
+trace is the `formation` block flipping `forming` → `formed` (§ 5.1).
+
 ### 4.5 Coverage check
 
-T1 → § 2 (HTTP) · T2, T2a–T2c, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
+T1 → § 2 (HTTP) · T2, T2a–T2d, T6, T7, T8, T13, T17, T17a, T19, T21, T22 →
 § 4.1 · T3, T4 → § 3.1 · T5, T9, T14, T15, T16, T18 → § 4.2 · T4a, T10, T11,
-T12, T20, T23 → § 4.4. All 28 transitions of `design/state-machine.md` § 3
+T12, T20, T23 → § 4.4. All 29 transitions of `design/state-machine.md` § 3
 are accounted for.
 
 ---
@@ -337,15 +360,30 @@ the facilitator, `participantCount` for participant and presenter.
 | 2 Quiz | `quiz` | `quiz` | `quiz` |
 | 3 ValueSelection | `selection` | `selection` | `selection` |
 | 4 SelectionResults | `selection` | `selection` | `selection` |
-| 5 GroupFormation | `ownGroup?` | `selection`, `groups` | `selection`, `groups` |
+| 5 GroupFormation | `formation` | `selection`, `formation` | `selection`, `formation` |
 | 6 GroupWork | `ownGroup?` | `groups` | `groups` |
 | 7 ValuePresentation | `ownGroup?`, `presentation` | `groups`, `presentation` | `groups`, `presentation` |
 | 8 FinalVoting | `voting` | `voting` | `voting` |
 | 9 FinalPresentation | `conclusion` | `conclusion` | `conclusion` |
 
 `ownGroup?` is the one genuinely optional block: a participant who has not
-been placed in a group yet has none. `groups` is a list and is empty until
-the formation has run — never null.
+been placed in a group yet has none. `groups` is a list and is never null.
+
+Phase 5 carries neither directly. It carries `formation`, a **nested
+sub-state union** tagged by `subState` — same mechanism as the phase
+discriminator one level up (`JsonPolymorphic` on the server,
+`z.discriminatedUnion("subState", …)` on the client), and the same word the
+quiz block already uses for its walk:
+
+- `forming` — `progress`, a double in `[0,1]` saying how far the formation
+  window has run (§ 3.3). **No group data at all**: while the groups do not
+  exist, nothing about them is sent.
+- `formed` — the role's group data: `ownGroup` for the participant (`null`
+  when the caller has no group yet), `groups` for facilitator and presenter.
+
+So `progress` exists only while `forming` and group data only once `formed`;
+neither is ever a null placeholder for the other. `AdvancePhase` is absent
+from the facilitator's `enabledIntents` while `forming` (T2d).
 
 §§ 5.2–5.4 give the shape of each block; the matrix above says which
 variant carries it.
@@ -357,6 +395,7 @@ variant carries it.
 | quiz | `questionIndex`, `questionCount`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex` (`null` until the participant casts) — never `correctAnswerIndex` or `learningText`: the participant device shows only the participant's own answer after casting (Task 19a), and data a screen must not show is data not sent |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | ownGroup | `name: {animalId, text: {de, en}}` (the animal label rides the wire — values-catalog precedent, the client never reads `config/`), `memberDisplayNames` (formation order), `assignedValues: [{valueId, text: {de, en}}]` (deal order; texts embedded because the participant variant carries no values catalog in phase 5), `isCallerScribe?`, `scribeName?`, `workStatus?` (`editing` \| `submitted`), `actions?: [{ actionId, valueId, text, sortOrder }]` (all four present during phase 6 only — group-work data leaves the wire when the phase ends; T19) |
+| formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `ownGroup` (the block above, `null` when the caller has not been placed) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
@@ -374,6 +413,7 @@ join lobby shows back to the person who just signed in.
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `answeredCount`, `correctAnswerIndex`, `learningText: {de, en}` (both always — the facilitator runs the workshop and may see them ahead) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | groups | `[{ name: {animalId, text: {de, en}}, members: [{participantId, displayName}] (formation order), assignedValues: [{valueId, text: {de, en}}], scribeParticipantId?, workStatus?, actionCountPerValue? }]` — `scribeParticipantId?`, `workStatus?` and `actionCountPerValue?` present during phase 6 only (T19) |
+| formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
 | conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
@@ -393,6 +433,7 @@ what they answered, selected, or voted for.
 | quiz | `questionIndex`, `questionCount`, `subState`, `question: {de, en}`, `answers: [{de, en}]`, `answerTallies`, `correctAnswerIndex` (absent until revealed), `learningText: {de, en}` (absent until shown) |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | groups | `[{ name: {animalId, text: {de, en}}, memberDisplayNames (formation order), assignedValues: [{valueId, text: {de, en}}], workStatus? }]` — `workStatus` present during phase 6 only (T19) |
+| formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
 | presentation | `presentedValueId`, `presentedActions: [{ text }]` |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
@@ -422,7 +463,8 @@ tallies before the winners are revealed.
    mistake — it is not part of the type it receives.
 4. Tests: each mapper is asserted against the full domain state, and a
    reflection test walks every variant of each union and asserts, per
-   variant, exactly where a person can be identified: `ownDisplayName` on
+   variant — descending into nested unions such as phase 5's `formation` —
+   exactly where a person can be identified: `ownDisplayName` on
    `ParticipantJoinState`, `participantDisplayNames` on
    `PresenterJoinState`, the roster on every facilitator variant, group
    membership on the facilitator variants that carry groups, and group

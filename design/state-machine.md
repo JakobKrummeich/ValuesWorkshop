@@ -15,8 +15,10 @@ when a condition is met — no person issues them.
 ## 1. Top-level: the nine phases
 
 Forward-only (I1); only the facilitator advances (I2). Every
-`AdvancePhase` emits `PhaseAdvanced`. Entering phases 4, 5, and 6 triggers
-a System command before anything else happens in that phase.
+`AdvancePhase` emits `PhaseAdvanced`. Entering phases 4 and 6 triggers a
+System command before anything else happens in that phase. Phase 5 is the
+exception: it is entered unformed and its System command fires later, on the
+server clock (§ 2.5).
 
 ```mermaid
 stateDiagram-v2
@@ -34,8 +36,8 @@ stateDiagram-v2
     P1 --> P2 : AdvancePhase [Facilitator] / PhaseAdvanced
     P2 --> P3 : AdvancePhase [Facilitator] / PhaseAdvanced
     P3 --> P4 : AdvancePhase [Facilitator] / PhaseAdvanced · entry - DetermineTopValues [System] / TopValuesDetermined
-    P4 --> P5 : AdvancePhase [Facilitator] / PhaseAdvanced · entry - FormGroups [System] / GroupsFormed
-    P5 --> P6 : AdvancePhase [Facilitator] / PhaseAdvanced · entry - AppointScribes [System] / ScribeAppointed (per group)
+    P4 --> P5 : AdvancePhase [Facilitator] / PhaseAdvanced · entered unformed, see § 2.5
+    P5 --> P6 : AdvancePhase [Facilitator] / PhaseAdvanced · guard - groups formed (I8) · entry - AppointScribes [System] / ScribeAppointed (per group)
     P6 --> P7 : AdvancePhase [Facilitator] / PhaseAdvanced
     P7 --> P8 : AdvancePhase [Facilitator] / PhaseAdvanced
     P8 --> P9 : AdvancePhase [Facilitator] / PhaseAdvanced · guard - winning values determined (I15)
@@ -44,7 +46,7 @@ stateDiagram-v2
     note right of P1
       Join - any phase:
       latecomers are welcome (I4);
-      from phase 5 on the joiner is placed
+      once groups exist the joiner is placed
       into a group with the fewest members
       (ParticipantAddedToGroup, I8).
 
@@ -60,7 +62,7 @@ Session-wide commands, allowed in any phase:
 
 | Command | Actor | Guard | Event |
 |---|---|---|---|
-| JoinSession | Participant | not already on the roster (I4) — allowed in every phase; from phase 5 on it also places the joiner into a group (see § 2.5) | ParticipantJoined |
+| JoinSession | Participant | not already on the roster (I4) — allowed in every phase; once groups exist it also places the joiner into a group (see § 2.5) | ParticipantJoined |
 | (return after interruption) | Facilitator / Participant | already on the roster (I4) | ParticipantRejoined |
 | AdvancePhase | Facilitator | forward only; next phase's entry guard holds | PhaseAdvanced |
 
@@ -133,20 +135,47 @@ values are fixed from the selection tally, widened on a tenth-place tie
 
 ### 2.5 Phase 5 — Group formation
 
-On entry: `FormGroups [System] / GroupsFormed` — participants partitioned
-and top values dealt out per the sizing rule and the formation aim; the
-value-to-group assignment is fixed from then on (I8). No further sub-states;
-groups and assignments are shown until `AdvancePhase`. The fixed 3-second
-entry progress bar on presenter and participant (Task 19b) is presentation
-only — it triggers no transition; the advance to group work stays
-facilitator-triggered.
+The phase is entered **unformed** and walks one sub-state forward. Forming
+the groups is not an entry action: the session sits in `Forming` for a fixed
+window (3 seconds, Task 19b) while the solver works, and the formation is
+applied when that window is over.
 
-From this phase on, `JoinSession` carries a second effect:
+```mermaid
+stateDiagram-v2
+    state "Forming" as Forming
+    state "Formed" as Formed
+
+    [*] --> Forming : phase entry — no groups yet, solver starts
+    Forming --> Formed : FormGroups [System] / GroupsFormed · trigger - formation window over · the solver's assignment, or a random assignment when the solver did not finish in time
+    Formed --> [*] : groups and assignments shown · awaits AdvancePhase
+```
+
+Guards in words:
+
+- **FormGroups** — participants partitioned and top values dealt out per the
+  sizing rule and the formation aim; the value-to-group assignment is fixed
+  from then on (I8). It fires once, on the server clock, never on a person's
+  command; a random assignment stands in when the solver has produced none by
+  the deadline, so the window always ends formed.
+- **AdvancePhase** out of Group formation — refused while `Forming`: only
+  formed groups can be worked in (I8). The advance itself stays
+  facilitator-triggered.
+
+While `Forming` no group data exists, so none is shown or sent
+(`design/protocol.md` § 5.1); the elapsed fraction of the window is emitted
+instead, and the presenter and participant screens render their progress bar
+from it. The run is memory-only: a server restarting mid-window finds an
+unformed phase-5 session and starts a fresh window, while a session that was
+already formed simply keeps its groups.
+
+Once formed, `JoinSession` carries a second effect:
 `AddParticipantToGroup [System] / ParticipantAddedToGroup` puts the joiner
 into a group with the fewest members (ties random). Sizes therefore stay
 within one of each other, no top value is re-dealt, and the joiner is never
 that group's scribe — scribes are appointed once, on entry to phase 6 (I9),
-and a group that has already submitted stays submitted.
+and a group that has already submitted stays submitted. A participant who
+joins while `Forming` has no group to be added to yet; `FormGroups` places
+them with everyone else on the roster when the window closes.
 
 ### 2.6 Phase 6 — Group work
 
@@ -272,10 +301,11 @@ facilitator sub-controls are marked ◆.
 | # | Phase | Transition | Actor | Guard | Event |
 |---|---|---|---|---|---|
 | T1 | — | Open session | Facilitator | facilitator passphrase (I3) | SessionOpened |
-| T2 | any | Advance phase ◆ | Facilitator | forward only (I1); phase-exit guards T2a–T2c | PhaseAdvanced |
+| T2 | any | Advance phase ◆ | Facilitator | forward only (I1); phase-exit guards T2a–T2d | PhaseAdvanced |
 | T2a | 6→7 | — exit guard | — | every group Submitted (I12) | — |
 | T2b | 8→9 | — exit guard | — | winners stand (I15) | — |
 | T2c | 2→3, 7→8 | — exit guard | — | walk complete (all questions / all values shown) | — |
+| T2d | 5→6 | — exit guard | — | groups formed (I8) | — |
 | T3 | any | Return after interruption | Facilitator / Participant | on the roster (I4) | ParticipantRejoined |
 | T4 | any | Join | Participant | not already on the roster (I4) | ParticipantJoined |
 | T4a | 5–9 | — joiner placed into a group | System | groups exist; group with the fewest members, ties random (I8) | ParticipantAddedToGroup |
@@ -285,7 +315,7 @@ facilitator sub-controls are marked ◆.
 | T8 | 2 | Pose next question ◆ | Facilitator | learning text shown; questions remain | QuestionPosed |
 | T9 | 3 | Submit value selection | Participant | exactly ten distinct; not yet submitted (I6) | ValuesSelected |
 | T10 | →4 | Determine top values | System | on phase entry; widen on tenth-place tie (I7) | TopValuesDetermined |
-| T11 | →5 | Form groups | System | on phase entry; sizing rule + formation aim (I8) | GroupsFormed |
+| T11 | 5 | Form groups | System | formation window over; sizing rule + formation aim (I8); random assignment when the solver did not finish | GroupsFormed |
 | T12 | →6 | Appoint scribes | System | on phase entry; one random member per group (I9) | ScribeAppointed |
 | T13 | 6 | Reassign scribe ◆ | Facilitator | target is a group member (I9) | ScribeReassigned |
 | T14 | 6 | Add / edit / remove action | Scribe | own group; Editing; ≤ five per value (I10, I11) | ActionAdded / ActionEdited / ActionRemoved |
@@ -314,7 +344,8 @@ Each phase has at least one exit and every exit guard is satisfiable:
 3. **Value selection** → submissions optional for exit; advance any time.
 4. **Selection results** → entry command always succeeds (tally may widen
    the set); advance any time.
-5. **Group formation** → sizing rule guarantees ≥ 1 group; advance any time.
+5. **Group formation** → the window always ends and always yields ≥ 1 group
+   (solver assignment or random fallback); exit guard satisfiable.
 6. **Group work** → every group can reach Submitted (scribe reassignment
    rescues a dead phone); exit guard satisfiable.
 7. **Value presentation** → finite values, walk terminates; advance.
