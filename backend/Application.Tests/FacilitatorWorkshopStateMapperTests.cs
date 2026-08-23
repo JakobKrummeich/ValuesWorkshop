@@ -312,13 +312,6 @@ public class FacilitatorWorkshopStateMapperTests
 
     private static FacilitatorWorkshopState Map(Session session, long revision = 1)
     {
-        var catalog = new TestQuizCatalog(5);
-
-        return new FacilitatorWorkshopStateMapper(
-            catalog,
-            new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8),
-            new TestFormationProgress(0.25)
-        ).Map(session, revision);
+        return TestMappers.Facilitator(formationProgress: 0.25).Map(session, revision);
     }
 }

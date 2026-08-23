@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Tests;
@@ -7,12 +6,6 @@ namespace ValuesWorkshop.Application.Tests;
 public class GroupWorkWireTests
 {
     private static readonly JsonSerializerOptions WireOptions = new(JsonSerializerDefaults.Web);
-
-    private static readonly TestQuizCatalog QuizCatalog = new(5);
-
-    private static readonly TestValuesCatalog ValuesCatalog = new(50);
-
-    private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
 
     [Fact]
     public void Participant_json_carries_the_scribe_the_work_status_and_the_actions()
@@ -100,39 +93,18 @@ public class GroupWorkWireTests
     private static string ParticipantJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).MapFor(session, SessionFixtures.Anna, 1),
+            TestMappers.Participant().MapFor(session, SessionFixtures.Anna, 1),
             WireOptions
         );
     }
 
     private static string FacilitatorJson(Session session)
     {
-        return JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).Map(session, 1),
-            WireOptions
-        );
+        return JsonSerializer.Serialize(TestMappers.Facilitator().Map(session, 1), WireOptions);
     }
 
     private static string PresenterJson(Session session)
     {
-        return JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).Map(session, 1),
-            WireOptions
-        );
+        return JsonSerializer.Serialize(TestMappers.Presenter().Map(session, 1), WireOptions);
     }
 }

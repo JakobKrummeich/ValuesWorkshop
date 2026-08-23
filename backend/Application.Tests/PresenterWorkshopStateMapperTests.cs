@@ -267,11 +267,6 @@ public class PresenterWorkshopStateMapperTests
 
     private static PresenterWorkshopState Map(Session session, long revision = 1)
     {
-        return new PresenterWorkshopStateMapper(
-            new TestQuizCatalog(5),
-            new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8),
-            new TestFormationProgress(0.25)
-        ).Map(session, revision);
+        return TestMappers.Presenter(formationProgress: 0.25).Map(session, revision);
     }
 }

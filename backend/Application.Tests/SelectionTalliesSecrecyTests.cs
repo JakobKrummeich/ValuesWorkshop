@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Tests;
@@ -8,22 +7,11 @@ public class SelectionTalliesSecrecyTests
 {
     private static readonly JsonSerializerOptions WireOptions = new(JsonSerializerDefaults.Web);
 
-    private static readonly TestQuizCatalog QuizCatalog = new(5);
-
-    private static readonly TestValuesCatalog ValuesCatalog = new(50);
-
-    private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
-
     [Fact]
     public void Participant_json_carries_no_tallies_and_no_top_values_during_the_selection_phase()
     {
         var json = JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).MapFor(SelectionPhaseSession(), SessionFixtures.Anna, 1),
+            TestMappers.Participant().MapFor(SelectionPhaseSession(), SessionFixtures.Anna, 1),
             WireOptions
         );
 
@@ -36,12 +24,7 @@ public class SelectionTalliesSecrecyTests
     public void Facilitator_json_carries_no_tallies_and_no_top_values_during_the_selection_phase()
     {
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).Map(SelectionPhaseSession(), 1),
+            TestMappers.Facilitator().Map(SelectionPhaseSession(), 1),
             WireOptions
         );
 
@@ -54,12 +37,7 @@ public class SelectionTalliesSecrecyTests
     public void Presenter_json_carries_no_tallies_and_no_top_values_during_the_selection_phase()
     {
         var json = JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).Map(SelectionPhaseSession(), 1),
+            TestMappers.Presenter().Map(SelectionPhaseSession(), 1),
             WireOptions
         );
 
@@ -72,12 +50,9 @@ public class SelectionTalliesSecrecyTests
     public void Participant_json_carries_tallies_and_top_values_in_the_results_phase()
     {
         var json = JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).MapFor(SessionFixtures.InSelectionResults(), SessionFixtures.Anna, 1),
+            TestMappers
+                .Participant()
+                .MapFor(SessionFixtures.InSelectionResults(), SessionFixtures.Anna, 1),
             WireOptions
         );
 
@@ -89,12 +64,7 @@ public class SelectionTalliesSecrecyTests
     public void Facilitator_json_carries_tallies_and_top_values_in_the_results_phase()
     {
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).Map(SessionFixtures.InSelectionResults(), 1),
+            TestMappers.Facilitator().Map(SessionFixtures.InSelectionResults(), 1),
             WireOptions
         );
 
@@ -106,12 +76,7 @@ public class SelectionTalliesSecrecyTests
     public void Presenter_json_carries_tallies_and_top_values_in_the_results_phase()
     {
         var json = JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).Map(SessionFixtures.InSelectionResults(), 1),
+            TestMappers.Presenter().Map(SessionFixtures.InSelectionResults(), 1),
             WireOptions
         );
 
@@ -123,12 +88,9 @@ public class SelectionTalliesSecrecyTests
     public void Participant_results_json_keeps_empty_tallies_and_top_values_when_nobody_submitted()
     {
         var json = JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).MapFor(SessionFixtures.InPhase(Phase.SelectionResults), SessionFixtures.Anna, 1),
+            TestMappers
+                .Participant()
+                .MapFor(SessionFixtures.InPhase(Phase.SelectionResults), SessionFixtures.Anna, 1),
             WireOptions
         );
 
@@ -140,12 +102,7 @@ public class SelectionTalliesSecrecyTests
     public void Facilitator_results_json_keeps_empty_tallies_and_top_values_when_nobody_submitted()
     {
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0)
-            ).Map(SessionFixtures.InPhase(Phase.SelectionResults), 1),
+            TestMappers.Facilitator().Map(SessionFixtures.InPhase(Phase.SelectionResults), 1),
             WireOptions
         );
 

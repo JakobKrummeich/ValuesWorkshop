@@ -490,11 +490,8 @@ public class ParticipantWorkshopStateMapperTests
         long revision = 1
     )
     {
-        return new ParticipantWorkshopStateMapper(
-            new TestQuizCatalog(5),
-            new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8),
-            new TestFormationProgress(0.25)
-        ).MapFor(session, caller ?? SessionFixtures.Anna, revision);
+        return TestMappers
+            .Participant(formationProgress: 0.25)
+            .MapFor(session, caller ?? SessionFixtures.Anna, revision);
     }
 }

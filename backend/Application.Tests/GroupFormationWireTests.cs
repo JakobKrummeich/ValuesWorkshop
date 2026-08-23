@@ -1,5 +1,4 @@
 using System.Text.Json;
-using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Tests;
@@ -7,12 +6,6 @@ namespace ValuesWorkshop.Application.Tests;
 public class GroupFormationWireTests
 {
     private static readonly JsonSerializerOptions WireOptions = new(JsonSerializerDefaults.Web);
-
-    private static readonly TestQuizCatalog QuizCatalog = new(5);
-
-    private static readonly TestValuesCatalog ValuesCatalog = new(50);
-
-    private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
 
     [Fact]
     public void A_running_formation_carries_its_progress_and_no_group_at_all()
@@ -121,12 +114,9 @@ public class GroupFormationWireTests
     private static string ParticipantJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0.25)
-            ).MapFor(session, SessionFixtures.Anna, 1),
+            TestMappers
+                .Participant(formationProgress: 0.25)
+                .MapFor(session, SessionFixtures.Anna, 1),
             WireOptions
         );
     }
@@ -134,12 +124,7 @@ public class GroupFormationWireTests
     private static string FacilitatorJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0.25)
-            ).Map(session, 1),
+            TestMappers.Facilitator(formationProgress: 0.25).Map(session, 1),
             WireOptions
         );
     }
@@ -147,12 +132,7 @@ public class GroupFormationWireTests
     private static string PresenterJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(
-                QuizCatalog,
-                ValuesCatalog,
-                AnimalsCatalog,
-                new TestFormationProgress(0.25)
-            ).Map(session, 1),
+            TestMappers.Presenter(formationProgress: 0.25).Map(session, 1),
             WireOptions
         );
     }
