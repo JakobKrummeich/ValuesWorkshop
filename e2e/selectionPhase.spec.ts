@@ -383,14 +383,13 @@ test.describe.serial("value selection through group formation", () => {
   });
 
   test("the bar follows the progress the server keeps sending", async () => {
-    const startedAt = await formationPercent(presenterPage);
+    for (const page of [presenterPage, alicePage]) {
+      const shownFirst = await formationPercent(page);
 
-    await expect
-      .poll(() => formationPercent(presenterPage))
-      .toBeGreaterThan(startedAt);
-    await expect
-      .poll(() => formationPercent(alicePage))
-      .toBeGreaterThan(startedAt);
+      await expect
+        .poll(() => formationPercent(page))
+        .toBeGreaterThan(shownFirst);
+    }
   });
 
   test("a client that reloads during the window rejoins the running bar", async () => {
