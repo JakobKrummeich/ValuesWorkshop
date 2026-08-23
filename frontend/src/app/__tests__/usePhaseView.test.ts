@@ -10,8 +10,7 @@ describe("phase view state", () => {
       usePhaseView({ workshopState: NEVER, connectionState: NEVER }),
     );
 
-    expect(result.current.state).toBeNull();
-    expect(result.current.isPhaseEntryObserved).toBe(false);
+    expect(result.current).toBeNull();
   });
 
   it("delivers every state the port publishes", () => {
@@ -21,50 +20,18 @@ describe("phase view state", () => {
     );
 
     act(() => workshopState.next({ revision: 1, phase: Phase.Join }));
-    expect(result.current.state).toEqual({ revision: 1, phase: Phase.Join });
+    expect(result.current).toEqual({ revision: 1, phase: Phase.Join });
 
     act(() => workshopState.next({ revision: 2, phase: Phase.Quiz }));
-    expect(result.current.state).toEqual({ revision: 2, phase: Phase.Quiz });
+    expect(result.current).toEqual({ revision: 2, phase: Phase.Quiz });
   });
 
-  it("counts the phase it starts in as entered before it was watching", () => {
+  it("delivers a later state of the phase it is already in", () => {
     const workshopState = new Subject<PhasedWorkshopState>();
     const { result } = renderHook(() =>
       usePhaseView({ workshopState, connectionState: NEVER }),
     );
 
-    act(() =>
-      workshopState.next({ revision: 30, phase: Phase.GroupFormation }),
-    );
-
-    expect(result.current.isPhaseEntryObserved).toBe(false);
-  });
-
-  it("counts a phase change it watched as an observed entry", () => {
-    const workshopState = new Subject<PhasedWorkshopState>();
-    const { result } = renderHook(() =>
-      usePhaseView({ workshopState, connectionState: NEVER }),
-    );
-
-    act(() =>
-      workshopState.next({ revision: 29, phase: Phase.SelectionResults }),
-    );
-    act(() =>
-      workshopState.next({ revision: 30, phase: Phase.GroupFormation }),
-    );
-
-    expect(result.current.isPhaseEntryObserved).toBe(true);
-  });
-
-  it("keeps the observed entry across later states of the same phase", () => {
-    const workshopState = new Subject<PhasedWorkshopState>();
-    const { result } = renderHook(() =>
-      usePhaseView({ workshopState, connectionState: NEVER }),
-    );
-
-    act(() =>
-      workshopState.next({ revision: 29, phase: Phase.SelectionResults }),
-    );
     act(() =>
       workshopState.next({ revision: 30, phase: Phase.GroupFormation }),
     );
@@ -72,24 +39,10 @@ describe("phase view state", () => {
       workshopState.next({ revision: 31, phase: Phase.GroupFormation }),
     );
 
-    expect(result.current.isPhaseEntryObserved).toBe(true);
-  });
-
-  it("keeps the observed entry when the phase change and a later state arrive together", () => {
-    const workshopState = new Subject<PhasedWorkshopState>();
-    const { result } = renderHook(() =>
-      usePhaseView({ workshopState, connectionState: NEVER }),
-    );
-
-    act(() =>
-      workshopState.next({ revision: 29, phase: Phase.SelectionResults }),
-    );
-    act(() => {
-      workshopState.next({ revision: 30, phase: Phase.GroupFormation });
-      workshopState.next({ revision: 31, phase: Phase.GroupFormation });
+    expect(result.current).toEqual({
+      revision: 31,
+      phase: Phase.GroupFormation,
     });
-
-    expect(result.current.isPhaseEntryObserved).toBe(true);
   });
 
   it("stops listening once the caller is gone", () => {

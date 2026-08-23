@@ -17,12 +17,7 @@ const phaseState = usePhaseView as jest.MockedFunction<
 >;
 
 const components: PhaseComponents<ParticipantWorkshopState> = {
-  [Phase.Join]: ({ state, isPhaseEntryObserved }) => (
-    <p>
-      lobby of {state.ownDisplayName}
-      {isPhaseEntryObserved ? " just entered" : " already running"}
-    </p>
-  ),
+  [Phase.Join]: ({ state }) => <p>lobby of {state.ownDisplayName}</p>,
   [Phase.Quiz]: EmptyPhase,
   [Phase.ValueSelection]: EmptyPhase,
   [Phase.SelectionResults]: EmptyPhase,
@@ -59,7 +54,7 @@ function phaseView(
 
 describe("phase view", () => {
   it("renders nothing until the first state arrives", () => {
-    phaseState.mockReturnValue({ state: null, isPhaseEntryObserved: false });
+    phaseState.mockReturnValue(null);
 
     const { container } = render(phaseView());
 
@@ -67,25 +62,11 @@ describe("phase view", () => {
   });
 
   it("renders the component the current phase maps to", () => {
-    phaseState.mockReturnValue({
-      state: joinState,
-      isPhaseEntryObserved: false,
-    });
+    phaseState.mockReturnValue(joinState);
 
     render(phaseView());
 
-    screen.getByText("lobby of Ada Lovelace already running");
-  });
-
-  it("tells the phase component that it watched the phase begin", () => {
-    phaseState.mockReturnValue({
-      state: joinState,
-      isPhaseEntryObserved: true,
-    });
-
-    render(phaseView());
-
-    screen.getByText("lobby of Ada Lovelace just entered");
+    screen.getByText("lobby of Ada Lovelace");
   });
 
   it("gives every phase its own instance of a shared screen", () => {
@@ -100,26 +81,20 @@ describe("phase view", () => {
       [Phase.SelectionResults]: CountingPhase,
     };
     phaseState.mockReturnValue({
-      state: {
-        revision: 4,
-        phase: Phase.ValueSelection,
-        participantCount: 1,
-        selection: emptySelection,
-      },
-      isPhaseEntryObserved: false,
+      revision: 4,
+      phase: Phase.ValueSelection,
+      participantCount: 1,
+      selection: emptySelection,
     });
 
     const { rerender } = render(phaseView(sharedScreen));
     screen.getByText("instance 1");
 
     phaseState.mockReturnValue({
-      state: {
-        revision: 5,
-        phase: Phase.SelectionResults,
-        participantCount: 1,
-        selection: emptySelection,
-      },
-      isPhaseEntryObserved: true,
+      revision: 5,
+      phase: Phase.SelectionResults,
+      participantCount: 1,
+      selection: emptySelection,
     });
     rerender(phaseView(sharedScreen));
 
@@ -128,13 +103,10 @@ describe("phase view", () => {
 
   it("renders nothing for a phase that has no screen yet", () => {
     phaseState.mockReturnValue({
-      state: {
-        revision: 4,
-        phase: Phase.GroupWork,
-        participantCount: 1,
-        ownGroup: null,
-      },
-      isPhaseEntryObserved: false,
+      revision: 4,
+      phase: Phase.GroupWork,
+      participantCount: 1,
+      ownGroup: null,
     });
 
     const { container } = render(phaseView());
