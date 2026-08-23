@@ -100,11 +100,12 @@ public class GroupWorkWireTests
     private static string ParticipantJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).MapFor(
-                session,
-                SessionFixtures.Anna,
-                1
-            ),
+            new ParticipantWorkshopStateMapper(
+                QuizCatalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0)
+            ).MapFor(session, SessionFixtures.Anna, 1),
             WireOptions
         );
     }
@@ -112,10 +113,12 @@ public class GroupWorkWireTests
     private static string FacilitatorJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
-                session,
-                1
-            ),
+            new FacilitatorWorkshopStateMapper(
+                QuizCatalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0)
+            ).Map(session, 1),
             WireOptions
         );
     }
@@ -123,10 +126,12 @@ public class GroupWorkWireTests
     private static string PresenterJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
-                session,
-                1
-            ),
+            new PresenterWorkshopStateMapper(
+                QuizCatalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0)
+            ).Map(session, 1),
             WireOptions
         );
     }

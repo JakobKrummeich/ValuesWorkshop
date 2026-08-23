@@ -150,7 +150,8 @@ public class FacilitatorEnabledIntentsTests
         return new FacilitatorWorkshopStateMapper(
             catalog,
             new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8)
+            new TestAnimalsCatalog(8),
+            new TestFormationProgress(0)
         ).Map(session, 1);
     }
 }

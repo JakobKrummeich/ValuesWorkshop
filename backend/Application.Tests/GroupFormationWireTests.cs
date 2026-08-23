@@ -15,6 +15,46 @@ public class GroupFormationWireTests
     private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
 
     [Fact]
+    public void A_running_formation_carries_its_progress_and_no_group_at_all()
+    {
+        var session = SessionFixtures.InPhase(Phase.GroupFormation);
+
+        foreach (
+            var json in new[]
+            {
+                ParticipantJson(session),
+                FacilitatorJson(session),
+                PresenterJson(session),
+            }
+        )
+        {
+            json.ShouldContain("\"formation\":{\"subState\":\"forming\",\"progress\":0.25}");
+            json.ShouldNotContain("groups");
+            json.ShouldNotContain("ownGroup");
+            json.ShouldNotContain("memberDisplayNames");
+        }
+    }
+
+    [Fact]
+    public void A_finished_formation_carries_its_groups_and_no_progress()
+    {
+        var session = FormedSession();
+
+        foreach (
+            var json in new[]
+            {
+                ParticipantJson(session),
+                FacilitatorJson(session),
+                PresenterJson(session),
+            }
+        )
+        {
+            json.ShouldContain("\"formation\":{\"subState\":\"formed\"");
+            json.ShouldNotContain("progress");
+        }
+    }
+
+    [Fact]
     public void Participant_json_carries_the_own_group_with_localized_texts()
     {
         var json = ParticipantJson(FormedSession());
@@ -70,16 +110,6 @@ public class GroupFormationWireTests
         }
     }
 
-    [Fact]
-    public void Formation_that_has_not_run_serializes_empty_groups_and_no_own_group()
-    {
-        var session = SessionFixtures.InPhase(Phase.GroupFormation);
-
-        ParticipantJson(session).ShouldContain("\"ownGroup\":null");
-        FacilitatorJson(session).ShouldContain("\"groups\":[]");
-        PresenterJson(session).ShouldContain("\"groups\":[]");
-    }
-
     private static Session FormedSession()
     {
         return SessionFixtures.InPhase(
@@ -91,11 +121,12 @@ public class GroupFormationWireTests
     private static string ParticipantJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).MapFor(
-                session,
-                SessionFixtures.Anna,
-                1
-            ),
+            new ParticipantWorkshopStateMapper(
+                QuizCatalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0.25)
+            ).MapFor(session, SessionFixtures.Anna, 1),
             WireOptions
         );
     }
@@ -103,10 +134,12 @@ public class GroupFormationWireTests
     private static string FacilitatorJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
-                session,
-                1
-            ),
+            new FacilitatorWorkshopStateMapper(
+                QuizCatalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0.25)
+            ).Map(session, 1),
             WireOptions
         );
     }
@@ -114,10 +147,12 @@ public class GroupFormationWireTests
     private static string PresenterJson(Session session)
     {
         return JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(QuizCatalog, ValuesCatalog, AnimalsCatalog).Map(
-                session,
-                1
-            ),
+            new PresenterWorkshopStateMapper(
+                QuizCatalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0.25)
+            ).Map(session, 1),
             WireOptions
         );
     }

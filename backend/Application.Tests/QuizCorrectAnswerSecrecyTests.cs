@@ -88,10 +88,12 @@ public class QuizCorrectAnswerSecrecyTests
         );
 
         var json = JsonSerializer.Serialize(
-            new FacilitatorWorkshopStateMapper(Catalog, ValuesCatalog, AnimalsCatalog).Map(
-                session,
-                1
-            ),
+            new FacilitatorWorkshopStateMapper(
+                Catalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0)
+            ).Map(session, 1),
             WireOptions
         );
 
@@ -102,11 +104,12 @@ public class QuizCorrectAnswerSecrecyTests
     private static string ParticipantJsonOf(Session session)
     {
         return JsonSerializer.Serialize(
-            new ParticipantWorkshopStateMapper(Catalog, ValuesCatalog, AnimalsCatalog).MapFor(
-                session,
-                SessionFixtures.Anna,
-                1
-            ),
+            new ParticipantWorkshopStateMapper(
+                Catalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0)
+            ).MapFor(session, SessionFixtures.Anna, 1),
             WireOptions
         );
     }
@@ -114,10 +117,12 @@ public class QuizCorrectAnswerSecrecyTests
     private static string PresenterJsonOf(Session session)
     {
         return JsonSerializer.Serialize(
-            new PresenterWorkshopStateMapper(Catalog, ValuesCatalog, AnimalsCatalog).Map(
-                session,
-                1
-            ),
+            new PresenterWorkshopStateMapper(
+                Catalog,
+                ValuesCatalog,
+                AnimalsCatalog,
+                new TestFormationProgress(0)
+            ).Map(session, 1),
             WireOptions
         );
     }

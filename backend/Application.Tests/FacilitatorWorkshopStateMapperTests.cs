@@ -149,7 +149,10 @@ public class FacilitatorWorkshopStateMapperTests
             formation: SessionFixtures.TwoGroups()
         );
 
-        var groups = Map(session).ShouldBeOfType<FacilitatorGroupFormationState>().Groups;
+        var groups = Map(session)
+            .ShouldBeOfType<FacilitatorGroupFormationState>()
+            .Formation.ShouldBeOfType<FacilitatorFormedView>()
+            .Groups;
 
         groups.Count.ShouldBe(2);
         groups[0]
@@ -181,7 +184,10 @@ public class FacilitatorWorkshopStateMapperTests
             )
         );
 
-        var groups = Map(session).ShouldBeOfType<FacilitatorGroupFormationState>().Groups;
+        var groups = Map(session)
+            .ShouldBeOfType<FacilitatorGroupFormationState>()
+            .Formation.ShouldBeOfType<FacilitatorFormedView>()
+            .Groups;
 
         groups.Count.ShouldBe(1);
         groups[0].Members.ShouldBeEmpty();
@@ -196,7 +202,10 @@ public class FacilitatorWorkshopStateMapperTests
             formation: SessionFixtures.TwoGroups()
         );
 
-        var groups = Map(session).ShouldBeOfType<FacilitatorGroupFormationState>().Groups;
+        var groups = Map(session)
+            .ShouldBeOfType<FacilitatorGroupFormationState>()
+            .Formation.ShouldBeOfType<FacilitatorFormedView>()
+            .Groups;
 
         groups[0].ScribeParticipantId.ShouldBeNull();
         groups[0].WorkStatus.ShouldBeNull();
@@ -248,11 +257,14 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Groups_are_empty_until_the_formation_has_run()
+    public void No_group_travels_while_the_formation_is_still_running()
     {
         var state = Map(SessionFixtures.InPhase(Phase.GroupFormation));
 
-        state.ShouldBeOfType<FacilitatorGroupFormationState>().Groups.ShouldBeEmpty();
+        state
+            .ShouldBeOfType<FacilitatorGroupFormationState>()
+            .Formation.ShouldBeOfType<FacilitatorFormingView>()
+            .Progress.ShouldBe(0.25);
     }
 
     [Fact]
@@ -305,7 +317,8 @@ public class FacilitatorWorkshopStateMapperTests
         return new FacilitatorWorkshopStateMapper(
             catalog,
             new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8)
+            new TestAnimalsCatalog(8),
+            new TestFormationProgress(0.25)
         ).Map(session, revision);
     }
 }

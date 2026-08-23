@@ -258,6 +258,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var ownGroup = Map(session, caller: SessionFixtures.Anna)
             .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormedView>()
             .OwnGroup.ShouldNotBeNull();
 
         ownGroup.Name.ShouldBe(
@@ -279,6 +280,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var ownGroup = Map(session, caller: SessionFixtures.Chris)
             .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormedView>()
             .OwnGroup.ShouldNotBeNull();
 
         ownGroup.Name.AnimalId.ShouldBe("tier-2");
@@ -295,6 +297,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var ownGroup = Map(session, caller: SessionFixtures.Anna)
             .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormedView>()
             .OwnGroup.ShouldNotBeNull();
 
         ownGroup.IsCallerScribe.ShouldBeNull();
@@ -365,6 +368,15 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
+    public void No_group_travels_while_the_formation_is_still_running()
+    {
+        Map(SessionFixtures.InPhase(Phase.GroupFormation))
+            .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormingView>()
+            .Progress.ShouldBe(0.25);
+    }
+
+    [Fact]
     public void A_caller_who_is_in_no_group_gets_no_own_group()
     {
         var session = SessionFixtures.InPhase(
@@ -374,6 +386,7 @@ public class ParticipantWorkshopStateMapperTests
 
         Map(session, caller: new ParticipantId(Guid.NewGuid()))
             .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormedView>()
             .OwnGroup.ShouldBeNull();
     }
 
@@ -479,7 +492,8 @@ public class ParticipantWorkshopStateMapperTests
         return new ParticipantWorkshopStateMapper(
             new TestQuizCatalog(5),
             new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8)
+            new TestAnimalsCatalog(8),
+            new TestFormationProgress(0.25)
         ).MapFor(session, caller ?? SessionFixtures.Anna, revision);
     }
 }

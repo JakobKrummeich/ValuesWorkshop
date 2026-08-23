@@ -149,20 +149,19 @@ public class PresenterWorkshopStateMapperTests
         );
 
         var state = Map(session).ShouldBeOfType<PresenterGroupFormationState>();
+        var groups = state.Formation.ShouldBeOfType<PresenterFormedView>().Groups;
 
-        state.Groups.Count.ShouldBe(2);
-        state
-            .Groups[0]
+        groups.Count.ShouldBe(2);
+        groups[0]
             .Name.ShouldBe(
                 new GroupNameView("tier-1", new LocalizedTextView("Tier 1", "Animal 1"))
             );
-        state.Groups[0].MemberDisplayNames.ShouldBe(["Ben", "Anna Schmidt"]);
-        state
-            .Groups[0]
+        groups[0].MemberDisplayNames.ShouldBe(["Ben", "Anna Schmidt"]);
+        groups[0]
             .AssignedValues.ShouldBe([
                 new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")),
             ]);
-        state.Groups[1].MemberDisplayNames.ShouldBe(["#c3c3c3"]);
+        groups[1].MemberDisplayNames.ShouldBe(["#c3c3c3"]);
         state.Selection.SelectionTallies.ShouldBeNull();
     }
 
@@ -174,10 +173,13 @@ public class PresenterWorkshopStateMapperTests
             formation: SessionFixtures.TwoGroups()
         );
 
-        var state = Map(session).ShouldBeOfType<PresenterGroupFormationState>();
+        var groups = Map(session)
+            .ShouldBeOfType<PresenterGroupFormationState>()
+            .Formation.ShouldBeOfType<PresenterFormedView>()
+            .Groups;
 
-        state.Groups[0].WorkStatus.ShouldBeNull();
-        state.Groups[1].WorkStatus.ShouldBeNull();
+        groups[0].WorkStatus.ShouldBeNull();
+        groups[1].WorkStatus.ShouldBeNull();
     }
 
     [Fact]
@@ -205,7 +207,10 @@ public class PresenterWorkshopStateMapperTests
             )
         );
 
-        var groups = Map(session).ShouldBeOfType<PresenterGroupFormationState>().Groups;
+        var groups = Map(session)
+            .ShouldBeOfType<PresenterGroupFormationState>()
+            .Formation.ShouldBeOfType<PresenterFormedView>()
+            .Groups;
 
         groups.Count.ShouldBe(1);
         groups[0].MemberDisplayNames.ShouldBeEmpty();
@@ -213,11 +218,14 @@ public class PresenterWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Groups_are_empty_until_the_formation_has_run()
+    public void No_group_travels_while_the_formation_is_still_running()
     {
         var state = Map(SessionFixtures.InPhase(Phase.GroupFormation));
 
-        state.ShouldBeOfType<PresenterGroupFormationState>().Groups.ShouldBeEmpty();
+        state
+            .ShouldBeOfType<PresenterGroupFormationState>()
+            .Formation.ShouldBeOfType<PresenterFormingView>()
+            .Progress.ShouldBe(0.25);
     }
 
     [Fact]
@@ -262,7 +270,8 @@ public class PresenterWorkshopStateMapperTests
         return new PresenterWorkshopStateMapper(
             new TestQuizCatalog(5),
             new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8)
+            new TestAnimalsCatalog(8),
+            new TestFormationProgress(0.25)
         ).Map(session, revision);
     }
 }

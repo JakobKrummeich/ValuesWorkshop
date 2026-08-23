@@ -13,9 +13,24 @@ internal static class TestWorkshopStateCache
         var animalsCatalog = new TestAnimalsCatalog(8);
 
         return new WorkshopStateCache(
-            new FacilitatorWorkshopStateMapper(catalog, valuesCatalog, animalsCatalog),
-            new PresenterWorkshopStateMapper(catalog, valuesCatalog, animalsCatalog),
-            new ParticipantWorkshopStateMapper(catalog, valuesCatalog, animalsCatalog)
+            new FacilitatorWorkshopStateMapper(
+                catalog,
+                valuesCatalog,
+                animalsCatalog,
+                new TestFormationProgress(0)
+            ),
+            new PresenterWorkshopStateMapper(
+                catalog,
+                valuesCatalog,
+                animalsCatalog,
+                new TestFormationProgress(0)
+            ),
+            new ParticipantWorkshopStateMapper(
+                catalog,
+                valuesCatalog,
+                animalsCatalog,
+                new TestFormationProgress(0)
+            )
         );
     }
 }

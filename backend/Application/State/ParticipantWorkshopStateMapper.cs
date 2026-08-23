@@ -1,3 +1,4 @@
+using ValuesWorkshop.Application.Formation;
 using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
@@ -6,7 +7,8 @@ namespace ValuesWorkshop.Application.State;
 public sealed class ParticipantWorkshopStateMapper(
     IQuizCatalog quizCatalog,
     IValuesCatalog valuesCatalog,
-    IAnimalsCatalog animalsCatalogPort
+    IAnimalsCatalog animalsCatalogPort,
+    IGroupFormationProgress formationProgressPort
 )
 {
     private readonly IReadOnlyDictionary<
@@ -15,7 +17,8 @@ public sealed class ParticipantWorkshopStateMapper(
     > stateOfPhase = BuildStateMap(
         quizCatalog,
         SelectionViews.CatalogOf(valuesCatalog),
-        new GroupViews(animalsCatalogPort, valuesCatalog)
+        new GroupViews(animalsCatalogPort, valuesCatalog),
+        formationProgressPort
     );
 
     public ParticipantWorkshopState MapFor(Session session, ParticipantId caller, long revision)
@@ -29,7 +32,8 @@ public sealed class ParticipantWorkshopStateMapper(
     > BuildStateMap(
         IQuizCatalog quizCatalog,
         IReadOnlyList<WorkshopValueView> catalogView,
-        GroupViews groupViews
+        GroupViews groupViews,
+        IGroupFormationProgress formationProgressPort
     )
     {
         return new Dictionary<Phase, Func<Session, ParticipantId, long, ParticipantWorkshopState>>
@@ -62,7 +66,11 @@ public sealed class ParticipantWorkshopStateMapper(
                 new ParticipantGroupFormationState(
                     revision,
                     ParticipantCount(session),
-                    OwnGroup(session, caller, groupViews)
+                    session.Formation.IsFormed
+                        ? new ParticipantFormedView(OwnGroup(session, caller, groupViews))
+                        : new ParticipantFormingView(
+                            formationProgressPort.ProgressOf(session.Identity)
+                        )
                 ),
             [Phase.GroupWork] = (session, caller, revision) =>
                 new ParticipantGroupWorkState(
