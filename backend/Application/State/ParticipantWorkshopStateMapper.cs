@@ -69,7 +69,7 @@ public sealed class ParticipantWorkshopStateMapper(
                     session.Formation.IsFormed
                         ? new ParticipantFormedView(OwnGroup(session, caller, groupViews))
                         : new ParticipantFormingView(
-                            formationProgressPort.ProgressOf(session.Identity)
+                            formationProgressPort.ProgressOf(session.Identity).Value
                         )
                 ),
             [Phase.GroupWork] = (session, caller, revision) =>

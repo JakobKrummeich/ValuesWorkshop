@@ -72,7 +72,7 @@ public sealed class FacilitatorWorkshopStateMapper(
                     session.Formation.IsFormed
                         ? new FacilitatorFormedView(Groups(session, groupViews))
                         : new FacilitatorFormingView(
-                            formationProgressPort.ProgressOf(session.Identity)
+                            formationProgressPort.ProgressOf(session.Identity).Value
                         )
                 ),
             [Phase.GroupWork] = (session, revision, enabledIntents) =>

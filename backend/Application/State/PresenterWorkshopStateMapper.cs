@@ -70,7 +70,7 @@ public sealed class PresenterWorkshopStateMapper(
                     session.Formation.IsFormed
                         ? new PresenterFormedView(Groups(session, groupViews))
                         : new PresenterFormingView(
-                            formationProgressPort.ProgressOf(session.Identity)
+                            formationProgressPort.ProgressOf(session.Identity).Value
                         )
                 ),
             [Phase.GroupWork] = (session, revision) =>

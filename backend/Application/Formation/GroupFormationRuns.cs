@@ -3,8 +3,6 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Formation;
 
-public sealed record GroupFormationWindow(TimeSpan Value);
-
 public sealed class GroupFormationRuns(
     IGroupSolver groupSolverPort,
     IGroupNames groupNamesPort,
@@ -50,11 +48,13 @@ public sealed class GroupFormationRuns(
         _ = Task.Run(() => SolveFor(session.Identity, token, request));
     }
 
-    public double ProgressOf(SessionIdentity sessionIdentity)
+    public FormationProgress ProgressOf(SessionIdentity sessionIdentity)
     {
         lock (gate)
         {
-            return runs.TryGetValue(sessionIdentity, out var run) ? ElapsedFractionOf(run) : 0;
+            return new FormationProgress(
+                runs.TryGetValue(sessionIdentity, out var run) ? ElapsedFractionOf(run) : 0
+            );
         }
     }
 

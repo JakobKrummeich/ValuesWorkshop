@@ -5,8 +5,8 @@ namespace ValuesWorkshop.TestSupport;
 
 public sealed class TestFormationProgress(double progress) : IGroupFormationProgress
 {
-    public double ProgressOf(SessionIdentity sessionIdentity)
+    public FormationProgress ProgressOf(SessionIdentity sessionIdentity)
     {
-        return progress;
+        return new FormationProgress(progress);
     }
 }

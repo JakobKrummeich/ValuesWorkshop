@@ -4,5 +4,5 @@ namespace ValuesWorkshop.Application.Formation;
 
 public interface IGroupFormationProgress
 {
-    double ProgressOf(SessionIdentity sessionIdentity);
+    FormationProgress ProgressOf(SessionIdentity sessionIdentity);
 }

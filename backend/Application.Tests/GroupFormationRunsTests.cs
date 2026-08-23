@@ -19,7 +19,7 @@ public class GroupFormationRunsTests
         runs.EnsureRunningFor(session);
 
         runs.RunningSessions().ShouldBe([session.Identity]);
-        runs.ProgressOf(session.Identity).ShouldBe(0);
+        runs.ProgressOf(session.Identity).Value.ShouldBe(0);
     }
 
     [Fact]
@@ -45,6 +45,12 @@ public class GroupFormationRunsTests
     }
 
     [Fact]
+    public void A_window_that_lasts_no_time_is_refused()
+    {
+        Should.Throw<InvalidOperationException>(() => new GroupFormationWindow(TimeSpan.Zero));
+    }
+
+    [Fact]
     public void Progress_advances_with_the_clock()
     {
         var session = FormingSession();
@@ -53,7 +59,7 @@ public class GroupFormationRunsTests
 
         clock.Advance(TimeSpan.FromSeconds(1.5));
 
-        runs.ProgressOf(session.Identity).ShouldBe(0.5);
+        runs.ProgressOf(session.Identity).Value.ShouldBe(0.5);
     }
 
     [Fact]
@@ -65,7 +71,7 @@ public class GroupFormationRunsTests
 
         clock.Advance(TimeSpan.FromSeconds(4));
 
-        runs.ProgressOf(session.Identity).ShouldBe(1);
+        runs.ProgressOf(session.Identity).Value.ShouldBe(1);
         runs.IsWindowOverFor(session.Identity).ShouldBeTrue();
     }
 
@@ -91,7 +97,7 @@ public class GroupFormationRunsTests
 
         runs.EnsureRunningFor(session);
 
-        runs.ProgressOf(session.Identity).ShouldBe(0.5);
+        runs.ProgressOf(session.Identity).Value.ShouldBe(0.5);
     }
 
     [Fact]
@@ -99,7 +105,7 @@ public class GroupFormationRunsTests
     {
         var runs = RunsOver(new TestGroupSolver());
 
-        runs.ProgressOf(FormingSession().Identity).ShouldBe(0);
+        runs.ProgressOf(FormingSession().Identity).Value.ShouldBe(0);
         runs.IsWindowOverFor(FormingSession().Identity).ShouldBeFalse();
     }
 
@@ -113,7 +119,7 @@ public class GroupFormationRunsTests
         runs.Drop(session.Identity);
 
         runs.RunningSessions().ShouldBeEmpty();
-        runs.ProgressOf(session.Identity).ShouldBe(0);
+        runs.ProgressOf(session.Identity).Value.ShouldBe(0);
     }
 
     [Fact]
