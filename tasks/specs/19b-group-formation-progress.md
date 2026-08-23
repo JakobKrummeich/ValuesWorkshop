@@ -76,15 +76,6 @@ what it must not show, so the data is not sent.
 - **D6 — scope.** The approved presenter wall redesign ships on this same
   branch.
 
-## Known behavior
-
-A client that drops its connection before the 4 → 5 advance and reconnects
-after it stays mounted, so it watches the phase change and plays the full
-3 s bar — minutes late, saying "Forming groups…" for groups that already
-exist. Accepted: the bar is a fixed beat for the room, and the extra
-machinery to tell a late reconnect from a live advance costs more than the
-rare stale bar. A reload or a late join in phase 5 still skips the bar (D2).
-
 ## Presenter wall redesign (folded in, review 2026-08-22)
 
 Verification screenshots of a real 24-participant workshop showed the phase-5
@@ -106,12 +97,23 @@ fix lands in this task as its own commit:
 
 ## Slices
 
-1. `FormationProgressBar` component + hook (3 s timer, cleanup on unmount).
-2. Presenter phase-5 screen shows the bar on observed entry, then the cards.
-3. Participant phase-5 screen shows the bar on observed entry, then the own
-   group card.
-4. E2e: advancing into phase 5 shows the bar on both screens and the cards
-   after it; a client that reloads during phase 5 sees the cards immediately.
+Backend:
+
+1. `AdvancePhase` out of phase 5 is refused until the groups stand.
+2. Phase 5 carries a `forming` / `formed` sub-state on the wire.
+3. A ticking service runs the window, emits the progress, and applies the
+   assignment (solver, or the random fallback) when the window is up.
+
+Frontend:
+
+4. The state adapter applies a repeated revision whose state has moved on —
+   without it every progress tick after the first is dropped.
+5. Zod models the sub-state union; the bar renders the emitted progress and
+   all three screens branch on the sub-state.
+6. The round-1 client-side timer and `isPhaseEntryObserved` go away.
+7. E2e: the bar runs on every screen, it advances while the server ticks, a
+   client that reloads mid-window rejoins the running bar, and the
+   facilitator cannot advance until the groups stand.
 
 ## Out of scope
 
