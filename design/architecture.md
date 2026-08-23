@@ -88,6 +88,14 @@ unformed and the formation runs on a clock (`design/state-machine.md` § 2.5),
 which is orchestration over time — an application concern,
 `GroupFormationRunner` below.
 
+How long that clock runs and what it means is domain, though. Two value
+objects carry it:
+
+| Value object | File | Rules |
+|---|---|---|
+| `GroupFormationWindow` | `Domain/GroupFormationWindow.cs` | a window lasts longer than no time at all; `Default` is the three-second window a deployment gets unless it says otherwise (`GROUP_FORMATION_WINDOW_MS`); `ProgressAfter(elapsed)` turns time spent into a `FormationProgress`, clamped at both ends |
+| `FormationProgress` | `Domain/FormationProgress.cs` | a fraction of the window from 0 to 1, `NaN` and anything outside refused; `NotStarted` is the fraction a session with no run stands at; `IsWindowOver` is a full bar |
+
 Application-layer ports (not Domain because they orchestrate cross-cutting
 concerns):
 
@@ -98,18 +106,19 @@ concerns):
 | `IQuizCatalog` | `Application/Ports/Driven/IQuizCatalog.cs` | `QuizCatalogFile` (Host) |
 | `IValuesCatalog` | `Application/Ports/Driven/IValuesCatalog.cs` | `ValuesCatalogFile` (Host) |
 | `IAnimalsCatalog` | `Application/Ports/Driven/IAnimalsCatalog.cs` | `AnimalsCatalogFile` (Host) |
-| `IGroupFormationProgress` | `Application/Formation/IGroupFormationProgress.cs` | `GroupFormationRunner` (Application) — driven by the three state mappers, which need the elapsed fraction (a `FormationProgress`, guarded to `[0,1]`) and nothing else |
+| `IGroupFormationProgress` | `Application/Formation/IGroupFormationProgress.cs` | `GroupFormationRunner` (Application) — driven by the three state mappers, which need the elapsed fraction (a `FormationProgress`, a Domain value object) and nothing else |
 
 Application services:
 
 | Service | File | Ports (ctor) | Lifetime | Called by |
 |---|---|---|---|---|
-| `GroupFormationRunner` | `Application/Formation/GroupFormationRunner.cs` | `IGroupSolver`, `IGroupNames`, `IRandomness`, `TimeProvider`, `GroupFormationWindow` (the tunable, `GROUP_FORMATION_WINDOW_MS`) | singleton | `GroupFormationService` (Adapters.Web hosted service, sibling of `StateResendService`) alone, on two beats: every 50 ms it pushes the progress of each session that has a run and applies the assignment once the window is over, and every 250 ms it scans for a connected session with no run that it finds unformed in phase 5. Only the slower scan reads the repository, so a room where nothing is forming costs no per-tick load. `WorkshopStateCache` is a cache and starts nothing |
+| `GroupFormationRunner` | `Application/Formation/GroupFormationRunner.cs` | `IGroupSolver`, `IGroupNames`, `IRandomness`, `TimeProvider`, `GroupFormationWindow` (the Domain value object, tunable through `GROUP_FORMATION_WINDOW_MS`) | singleton | `GroupFormationService` (Adapters.Web hosted service, sibling of `StateResendService`) alone, on two beats: every 50 ms it pushes the progress of each session that has a run and applies the assignment once the window is over, and every 250 ms it scans for a connected session with no run that it finds unformed in phase 5. Only the slower scan reads the repository, so a room where nothing is forming costs no per-tick load. `WorkshopStateCache` is a cache and starts nothing |
 
 `GroupFormationRunner` holds the one thing the domain must not hold: work in
 flight. The solver call runs off-thread under a cancellation token the run
-cancels when it is dropped, the elapsed fraction comes from `TimeProvider`,
-and the window ends with the solver's assignment or, when it did not finish,
+cancels when it is dropped, the elapsed time comes from `TimeProvider` and
+goes straight to `GroupFormationWindow` to be read as progress, and the
+window ends with the solver's assignment or, when it did not finish,
 `RandomGroupAssignment` — pure domain either way
 (`Domain/RandomGroupAssignment.cs`). A solve that returns after its run is
 gone is discarded: each run carries a token its solve must still match.
