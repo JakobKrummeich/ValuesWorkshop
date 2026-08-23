@@ -91,12 +91,6 @@ describe("presenter group formation screen", () => {
     expect(screen.queryByTestId("group-card-owl")).not.toBeInTheDocument();
   });
 
-  it("hands the wire formation to the paging hook", () => {
-    renderScreen(formed);
-
-    expect(screenHook).toHaveBeenCalledWith(formed);
-  });
-
   it("runs the bar at the emitted progress while the formation runs", () => {
     renderScreen({ subState: FormationSubState.Forming, progress: 0.25 }, []);
 

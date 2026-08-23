@@ -30,7 +30,7 @@ public sealed class GroupFormationWindowTests : IClassFixture<WorkshopTestFactor
     [Fact]
     public async Task A_presenter_watches_the_formation_window_run_before_the_groups_arrive()
     {
-        using var backend = BackendWithFormationWindow(milliseconds: 1000);
+        using var backend = BackendWithFormationWindow(milliseconds: 5000);
         var sessionIdentity = await AnUnformedSessionAsync(backend);
         await using var connection = PresenterConnection(backend, sessionIdentity);
         var inbox = new StateInbox<PresenterWorkshopState>(connection);
