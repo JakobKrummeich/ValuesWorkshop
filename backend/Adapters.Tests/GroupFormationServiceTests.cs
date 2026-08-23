@@ -124,6 +124,22 @@ public class GroupFormationServiceTests
     }
 
     [Fact]
+    public async Task A_window_that_is_over_saves_nothing_once_the_groups_already_stand()
+    {
+        var session = await AConnectedFormingSessionAsync();
+        var service = ServiceUnderTest();
+        await service.TickOnceAsync();
+        clock.Advance(TimeSpan.FromSeconds(3));
+        formationRuns.FormGroupsIn(session);
+
+        await service.TickOnceAsync();
+
+        repository.Saved.ShouldBeEmpty();
+        session.Revision.ShouldBe(0);
+        formationRuns.RunningSessions().ShouldBeEmpty();
+    }
+
+    [Fact]
     public async Task The_state_that_reveals_the_groups_reaches_every_role()
     {
         await AConnectedFormingSessionAsync();

@@ -59,8 +59,17 @@ public sealed class GroupFormationService(
     private async Task AdvanceFormationOfAsync(SessionIdentity sessionIdentity)
     {
         using var scope = scopeFactory.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<ISessionRepository>();
-        var session = await repository.LoadAsync(sessionIdentity);
+
+        if (formationRuns.IsWindowOverFor(sessionIdentity))
+        {
+            await CloseWindowOfAsync(scope, sessionIdentity);
+
+            return;
+        }
+
+        var session = await scope
+            .ServiceProvider.GetRequiredService<ISessionRepository>()
+            .LoadAsync(sessionIdentity);
 
         if (session is null || !session.IsFormingGroups)
         {
@@ -71,19 +80,22 @@ public sealed class GroupFormationService(
 
         formationRuns.EnsureRunningFor(session);
 
-        if (!formationRuns.IsWindowOverFor(sessionIdentity))
-        {
-            await dispatcher.SendAsync(sessionIdentity, cache.StatesOf(session));
+        await dispatcher.SendAsync(sessionIdentity, cache.StatesOf(session));
+    }
 
-            return;
-        }
-
+    private async Task CloseWindowOfAsync(IServiceScope scope, SessionIdentity sessionIdentity)
+    {
         await scope
             .ServiceProvider.GetRequiredService<SessionCommandHandler>()
             .HandleAsync(
                 sessionIdentity,
                 formingSession =>
                 {
+                    if (!formingSession.IsFormingGroups)
+                    {
+                        return false;
+                    }
+
                     formationRuns.FormGroupsIn(formingSession);
 
                     return true;
