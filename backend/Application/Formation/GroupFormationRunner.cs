@@ -55,9 +55,9 @@ public sealed class GroupFormationRunner(
     {
         lock (gate)
         {
-            return new FormationProgress(
-                runs.TryGetValue(sessionIdentity, out var run) ? ElapsedFractionOf(run) : 0
-            );
+            return runs.TryGetValue(sessionIdentity, out var run)
+                ? ProgressOf(run)
+                : FormationProgress.NotStarted;
         }
     }
 
@@ -65,7 +65,7 @@ public sealed class GroupFormationRunner(
     {
         lock (gate)
         {
-            return runs.TryGetValue(sessionIdentity, out var run) && ElapsedFractionOf(run) >= 1;
+            return runs.TryGetValue(sessionIdentity, out var run) && ProgressOf(run).IsWindowOver;
         }
     }
 
@@ -158,8 +158,8 @@ public sealed class GroupFormationRunner(
         }
     }
 
-    private double ElapsedFractionOf(GroupFormationRun run)
+    private FormationProgress ProgressOf(GroupFormationRun run)
     {
-        return Math.Clamp(timeProviderPort.GetElapsedTime(run.StartedAt) / window.Value, 0, 1);
+        return window.ProgressAfter(timeProviderPort.GetElapsedTime(run.StartedAt));
     }
 }

@@ -4,6 +4,11 @@ public sealed record GroupFormationWindow(TimeSpan Value)
 {
     public TimeSpan Value { get; } = Guarded(Value);
 
+    public FormationProgress ProgressAfter(TimeSpan elapsed)
+    {
+        return new FormationProgress(Math.Clamp(elapsed / Value, 0, 1));
+    }
+
     private static TimeSpan Guarded(TimeSpan value)
     {
         if (value <= TimeSpan.Zero)

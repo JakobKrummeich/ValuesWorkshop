@@ -2,7 +2,11 @@ namespace ValuesWorkshop.Domain;
 
 public sealed record FormationProgress(double Value)
 {
+    public static FormationProgress NotStarted { get; } = new(0);
+
     public double Value { get; } = Guarded(Value);
+
+    public bool IsWindowOver => Value >= 1;
 
     private static double Guarded(double value)
     {

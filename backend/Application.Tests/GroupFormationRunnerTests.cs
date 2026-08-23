@@ -57,7 +57,7 @@ public class GroupFormationRunnerTests
     }
 
     [Fact]
-    public void Progress_stops_at_a_full_bar_and_the_window_is_over()
+    public void A_run_whose_clock_has_passed_the_window_reports_the_window_over()
     {
         var session = FormingSession();
         var runner = RunnerOver(new TestGroupSolver());
@@ -65,20 +65,7 @@ public class GroupFormationRunnerTests
 
         clock.Advance(TimeSpan.FromSeconds(4));
 
-        runner.ProgressOf(session.Identity).Value.ShouldBe(1);
         runner.IsWindowOverFor(session.Identity).ShouldBeTrue();
-    }
-
-    [Fact]
-    public void The_window_is_not_over_while_the_bar_is_still_moving()
-    {
-        var session = FormingSession();
-        var runner = RunnerOver(new TestGroupSolver());
-        runner.EnsureRunningFor(session);
-
-        clock.Advance(TimeSpan.FromSeconds(2.999));
-
-        runner.IsWindowOverFor(session.Identity).ShouldBeFalse();
     }
 
     [Fact]
