@@ -280,22 +280,13 @@ export type PresenterGroupFormationState = InPhase<
   Phase.GroupFormation
 >;
 
-type InSubState<TFormation, TSubState extends FormationSubState> = Extract<
-  TFormation,
-  { subState: TSubState }
->;
-
 export type ParticipantFormationView =
   ParticipantGroupFormationState["formation"];
 export type FacilitatorFormationView =
   FacilitatorGroupFormationState["formation"];
 export type PresenterFormationView = PresenterGroupFormationState["formation"];
 
-export type FacilitatorGroups = InSubState<
-  FacilitatorFormationView,
-  FormationSubState.Formed
->["groups"];
-export type PresenterGroups = InSubState<
+export type PresenterGroups = Extract<
   PresenterFormationView,
-  FormationSubState.Formed
+  { subState: FormationSubState.Formed }
 >["groups"];
