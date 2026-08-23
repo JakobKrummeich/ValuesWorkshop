@@ -34,6 +34,14 @@ internal sealed class RecordingClient : IFacilitatorClient, IParticipantClient, 
         return ReceivedStates.OfType<TState>().ShouldHaveSingleItem();
     }
 
+    internal TState Latest<TState>()
+    {
+        var received = ReceivedStates.OfType<TState>().ToList();
+        received.ShouldNotBeEmpty();
+
+        return received[^1];
+    }
+
     private Task Record(object state)
     {
         ReceivedStates.Add(state);

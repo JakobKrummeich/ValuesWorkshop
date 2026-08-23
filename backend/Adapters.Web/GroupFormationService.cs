@@ -11,6 +11,7 @@ namespace ValuesWorkshop.Adapters.Web;
 public sealed record GroupFormationTickInterval(TimeSpan Value);
 
 public sealed class GroupFormationService(
+    SessionConnectionRegistry registry,
     GroupFormationRuns formationRuns,
     IServiceScopeFactory scopeFactory,
     WorkshopStateCache cache,
@@ -21,7 +22,11 @@ public sealed class GroupFormationService(
 {
     public async Task TickOnceAsync()
     {
-        foreach (var sessionIdentity in formationRuns.RunningSessions())
+        var connectedSessions = registry.ConnectedSessions();
+
+        formationRuns.RetainOnly(connectedSessions);
+
+        foreach (var sessionIdentity in connectedSessions)
         {
             try
             {
@@ -63,6 +68,8 @@ public sealed class GroupFormationService(
 
             return;
         }
+
+        formationRuns.EnsureRunningFor(session);
 
         if (!formationRuns.IsWindowOverFor(sessionIdentity))
         {

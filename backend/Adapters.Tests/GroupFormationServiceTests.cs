@@ -17,6 +17,7 @@ public class GroupFormationServiceTests
 
     private readonly ManualTimeProvider clock = new();
     private readonly InMemorySessionRepository repository = new();
+    private readonly SessionConnectionRegistry registry = new();
     private readonly RecordingHubClients<IFacilitatorClient> facilitatorClients = new();
     private readonly RecordingHubClients<IParticipantClient> participantClients = new();
     private readonly RecordingHubClients<IPresenterClient> presenterClients = new();
@@ -30,12 +31,54 @@ public class GroupFormationServiceTests
     }
 
     [Fact]
-    public async Task A_session_inside_its_window_is_pushed_the_progress_of_its_run()
+    public async Task A_connected_session_that_is_forming_its_groups_starts_a_run()
     {
-        var session = await AKnownFormingSessionAsync();
-        clock.Advance(TimeSpan.FromSeconds(1.5));
+        await AConnectedFormingSessionAsync();
 
         await ServiceUnderTest().TickOnceAsync();
+
+        formationRuns.RunningSessions().ShouldBe([KnownSession]);
+        PresenterState()
+            .ShouldBeOfType<PresenterGroupFormationState>()
+            .Formation.ShouldBeOfType<PresenterFormingView>()
+            .Progress.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task A_connected_session_outside_group_formation_starts_no_run()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.SelectionResults);
+        await repository.CreateAsync(session);
+        registry.Add(KnownSession, "connection-1");
+
+        await ServiceUnderTest().TickOnceAsync();
+
+        formationRuns.RunningSessions().ShouldBeEmpty();
+        presenterClients.AddressedGroups.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_run_of_a_session_nobody_is_connected_to_is_forgotten()
+    {
+        var session = AFormingSession();
+        await repository.CreateAsync(session);
+        formationRuns.EnsureRunningFor(session);
+
+        await ServiceUnderTest().TickOnceAsync();
+
+        formationRuns.RunningSessions().ShouldBeEmpty();
+        presenterClients.AddressedGroups.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_session_inside_its_window_is_pushed_the_progress_of_its_run()
+    {
+        var session = await AConnectedFormingSessionAsync();
+        var service = ServiceUnderTest();
+        await service.TickOnceAsync();
+        clock.Advance(TimeSpan.FromSeconds(1.5));
+
+        await service.TickOnceAsync();
 
         PresenterState()
             .ShouldBeOfType<PresenterGroupFormationState>()
@@ -54,10 +97,12 @@ public class GroupFormationServiceTests
     [Fact]
     public async Task The_facilitator_may_not_advance_while_the_bar_is_still_running()
     {
-        await AKnownFormingSessionAsync();
+        await AConnectedFormingSessionAsync();
+        var service = ServiceUnderTest();
+        await service.TickOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(1.5));
 
-        await ServiceUnderTest().TickOnceAsync();
+        await service.TickOnceAsync();
 
         FacilitatorState().EnabledIntents.ShouldBeEmpty();
     }
@@ -65,10 +110,12 @@ public class GroupFormationServiceTests
     [Fact]
     public async Task A_session_whose_window_is_over_gets_its_groups_and_forgets_its_run()
     {
-        await AKnownFormingSessionAsync();
+        await AConnectedFormingSessionAsync();
+        var service = ServiceUnderTest();
+        await service.TickOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
 
-        await ServiceUnderTest().TickOnceAsync();
+        await service.TickOnceAsync();
 
         var saved = repository.Saved.ShouldHaveSingleItem();
         saved.Formation.IsFormed.ShouldBeTrue();
@@ -79,10 +126,12 @@ public class GroupFormationServiceTests
     [Fact]
     public async Task The_state_that_reveals_the_groups_reaches_every_role()
     {
-        await AKnownFormingSessionAsync();
+        await AConnectedFormingSessionAsync();
+        var service = ServiceUnderTest();
+        await service.TickOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
 
-        await ServiceUnderTest().TickOnceAsync();
+        await service.TickOnceAsync();
 
         PresenterState()
             .ShouldBeOfType<PresenterGroupFormationState>()
@@ -94,19 +143,23 @@ public class GroupFormationServiceTests
     [Fact]
     public async Task A_session_whose_groups_already_stand_forgets_its_run_without_pushing()
     {
-        var session = await AKnownFormingSessionAsync();
+        var session = await AConnectedFormingSessionAsync();
+        var service = ServiceUnderTest();
+        await service.TickOnceAsync();
+        var statesBeforeTheGroupsStood = PresenterStates().Count;
         formationRuns.FormGroupsIn(session);
 
-        await ServiceUnderTest().TickOnceAsync();
+        await service.TickOnceAsync();
 
         formationRuns.RunningSessions().ShouldBeEmpty();
-        presenterClients.AddressedGroups.ShouldBeEmpty();
+        PresenterStates().Count.ShouldBe(statesBeforeTheGroupsStood);
     }
 
     [Fact]
     public async Task A_session_the_repository_no_longer_knows_forgets_its_run()
     {
         formationRuns.EnsureRunningFor(AFormingSession());
+        registry.Add(KnownSession, "connection-1");
 
         await ServiceUnderTest().TickOnceAsync();
 
@@ -117,13 +170,14 @@ public class GroupFormationServiceTests
     [Fact]
     public async Task A_tick_that_fails_keeps_the_run_so_the_next_tick_retries_it()
     {
-        await AKnownFormingSessionAsync();
+        await AConnectedFormingSessionAsync();
+        await ServiceUnderTest().TickOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
 
         await ServiceUnderTest(new UnreachableSessionRepository()).TickOnceAsync();
 
         formationRuns.RunningSessions().ShouldBe([KnownSession]);
-        presenterClients.AddressedGroups.ShouldBeEmpty();
+        repository.Saved.ShouldBeEmpty();
 
         await ServiceUnderTest().TickOnceAsync();
 
@@ -154,11 +208,11 @@ public class GroupFormationServiceTests
         return session;
     }
 
-    private async Task<Session> AKnownFormingSessionAsync()
+    private async Task<Session> AConnectedFormingSessionAsync()
     {
         var session = AFormingSession();
         await repository.CreateAsync(session);
-        formationRuns.EnsureRunningFor(session);
+        registry.Add(KnownSession, "connection-1");
 
         return session;
     }
@@ -167,21 +221,26 @@ public class GroupFormationServiceTests
     {
         return facilitatorClients
             .GroupClient(SessionGroups.Facilitator(KnownSession))
-            .Single<FacilitatorWorkshopState>();
+            .Latest<FacilitatorWorkshopState>();
     }
 
     private PresenterWorkshopState PresenterState()
     {
         return presenterClients
             .GroupClient(SessionGroups.Presenter(KnownSession))
-            .Single<PresenterWorkshopState>();
+            .Latest<PresenterWorkshopState>();
     }
 
     private ParticipantWorkshopState ParticipantState(ParticipantId participantId)
     {
         return participantClients
             .GroupClient(SessionGroups.Participant(KnownSession, participantId))
-            .Single<ParticipantWorkshopState>();
+            .Latest<ParticipantWorkshopState>();
+    }
+
+    private IReadOnlyList<object> PresenterStates()
+    {
+        return presenterClients.GroupClient(SessionGroups.Presenter(KnownSession)).ReceivedStates;
     }
 
     private GroupFormationService ServiceUnderTest(ISessionRepository? sessionRepository = null)
@@ -198,6 +257,7 @@ public class GroupFormationServiceTests
         services.AddScoped<SessionCommandHandler>();
 
         return new GroupFormationService(
+            registry,
             formationRuns,
             services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>(),
             cache,

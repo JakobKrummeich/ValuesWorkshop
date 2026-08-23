@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using ValuesWorkshop.Application.Formation;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
@@ -8,8 +7,7 @@ namespace ValuesWorkshop.Adapters.Web;
 public sealed class WorkshopStateCache(
     FacilitatorWorkshopStateMapper facilitatorStateMapper,
     PresenterWorkshopStateMapper presenterStateMapper,
-    ParticipantWorkshopStateMapper participantStateMapper,
-    GroupFormationRuns formationRuns
+    ParticipantWorkshopStateMapper participantStateMapper
 )
 {
     private readonly ConcurrentDictionary<SessionIdentity, SessionRoleStates> statesBySession =
@@ -17,8 +15,6 @@ public sealed class WorkshopStateCache(
 
     public SessionRoleStates StatesOf(Session session)
     {
-        formationRuns.EnsureRunningFor(session);
-
         return session.IsFormingGroups ? MapWithoutCaching(session) : MapAndCache(session);
     }
 

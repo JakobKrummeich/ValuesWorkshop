@@ -14,7 +14,7 @@ internal static class TestWorkshopStateCache
         return Create(FormationRuns(new TestGroupSolver(), TimeProvider.System));
     }
 
-    internal static WorkshopStateCache Create(GroupFormationRuns formationRuns)
+    internal static WorkshopStateCache Create(IGroupFormationProgress formationProgressPort)
     {
         var catalog = new TestQuizCatalog(5);
         var valuesCatalog = new TestValuesCatalog(50);
@@ -25,16 +25,20 @@ internal static class TestWorkshopStateCache
                 catalog,
                 valuesCatalog,
                 animalsCatalog,
-                formationRuns
+                formationProgressPort
             ),
-            new PresenterWorkshopStateMapper(catalog, valuesCatalog, animalsCatalog, formationRuns),
+            new PresenterWorkshopStateMapper(
+                catalog,
+                valuesCatalog,
+                animalsCatalog,
+                formationProgressPort
+            ),
             new ParticipantWorkshopStateMapper(
                 catalog,
                 valuesCatalog,
                 animalsCatalog,
-                formationRuns
-            ),
-            formationRuns
+                formationProgressPort
+            )
         );
     }
 

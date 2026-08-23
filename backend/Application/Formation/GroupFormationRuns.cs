@@ -81,6 +81,17 @@ public sealed class GroupFormationRuns(
         }
     }
 
+    public void RetainOnly(IReadOnlyCollection<SessionIdentity> sessionIdentities)
+    {
+        foreach (var sessionIdentity in RunningSessions())
+        {
+            if (!sessionIdentities.Contains(sessionIdentity))
+            {
+                Drop(sessionIdentity);
+            }
+        }
+    }
+
     private GroupFormationResult AssignmentFor(Session session)
     {
         lock (gate)

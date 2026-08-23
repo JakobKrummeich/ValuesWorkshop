@@ -1,5 +1,4 @@
 using ValuesWorkshop.Adapters.Web;
-using ValuesWorkshop.Application.Formation;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Adapters.Tests;
@@ -10,25 +9,7 @@ public class WorkshopStateCacheTests
         Guid.Parse("00000000-0000-0000-0000-00000000f00d")
     );
 
-    private readonly GroupFormationRuns formationRuns = TestWorkshopStateCache.FormationRuns(
-        new TestGroupSolver(),
-        new ManualTimeProvider()
-    );
-
-    private readonly WorkshopStateCache cache;
-
-    public WorkshopStateCacheTests()
-    {
-        cache = TestWorkshopStateCache.Create(formationRuns);
-    }
-
-    [Fact]
-    public void Observing_a_session_that_is_forming_its_groups_starts_its_run()
-    {
-        cache.StatesOf(FormingSession());
-
-        formationRuns.RunningSessions().ShouldBe([KnownSession]);
-    }
+    private readonly WorkshopStateCache cache = TestWorkshopStateCache.Create();
 
     [Fact]
     public void A_forming_session_is_mapped_afresh_and_never_retained()
