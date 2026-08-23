@@ -62,7 +62,7 @@ public sealed record ParticipantSelectionResultsState(
 public sealed record ParticipantGroupFormationState(
     long Revision,
     int ParticipantCount,
-    OwnGroupView? OwnGroup
+    ParticipantFormationView Formation
 ) : ParticipantWorkshopState(Revision, ParticipantCount)
 {
     [JsonIgnore]

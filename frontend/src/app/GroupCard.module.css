@@ -1,6 +1,7 @@
 .card {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: var(--space-gap);
   height: 100%;
   min-height: 0;
@@ -10,6 +11,13 @@
   border-radius: var(--radius-md);
   background: var(--color-surface);
   box-shadow: var(--shadow-sm);
+  text-align: start;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
 }
 
 .name {
@@ -19,58 +27,36 @@
   line-height: var(--leading-tight);
 }
 
-.members {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--space-tight);
-  align-self: flex-start;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.member {
-  color: var(--color-text);
-  font-size: var(--text-body);
-  line-height: var(--leading-normal);
-}
-
+.members,
 .values {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-tight);
-  align-self: flex-end;
-  justify-content: flex-end;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.values {
+  justify-content: flex-end;
+}
+
+.member,
 .value {
   padding: var(--space-tight) var(--space-gap);
   border-radius: var(--radius-full);
-  font-size: var(--text-small);
   font-weight: var(--weight-bold);
   line-height: var(--leading-tight);
 }
 
-.accent1 {
-  background: var(--color-value-accent-1-soft);
-  color: var(--color-value-accent-1);
+.member {
+  background: var(--color-member-chip-soft);
+  color: var(--color-member-chip);
+  font-size: var(--text-body);
 }
 
-.accent2 {
-  background: var(--color-value-accent-2-soft);
-  color: var(--color-value-accent-2);
-}
-
-.accent3 {
-  background: var(--color-value-accent-3-soft);
-  color: var(--color-value-accent-3);
-}
-
-.accent4 {
-  background: var(--color-value-accent-4-soft);
-  color: var(--color-value-accent-4);
+.value {
+  background: var(--color-value-chip-soft);
+  color: var(--color-value-chip);
+  font-size: var(--text-small);
 }

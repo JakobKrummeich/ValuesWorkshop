@@ -44,6 +44,9 @@ public sealed class Session
         return new Session(identity, facilitator, new SessionName(trimmedName));
     }
 
+    public bool IsFormingGroups =>
+        PhaseProgress.CurrentPhase == Phase.GroupFormation && !Formation.IsFormed;
+
     public bool IsFacilitatedBy(CallerSubject caller)
     {
         return string.Equals(Facilitator.Value, caller.Value, StringComparison.Ordinal);
@@ -83,7 +86,11 @@ public sealed class Session
         }
     }
 
-    public void FormGroups(GroupFormationResult formationResult, IReadOnlyList<string> groupNames)
+    public void FormGroups(
+        GroupFormationResult formationResult,
+        IReadOnlyList<string> groupNames,
+        IRandomness randomness
+    )
     {
         if (Formation.IsFormed)
         {
@@ -91,6 +98,14 @@ public sealed class Session
         }
 
         Formation.Form(formationResult, groupNames);
+
+        foreach (var participant in Roster.Participants)
+        {
+            if (!Formation.IsGrouped(participant.Id))
+            {
+                Formation.PlaceIntoSmallestGroup(participant.Id, randomness);
+            }
+        }
     }
 
     public void RevealAnswer()

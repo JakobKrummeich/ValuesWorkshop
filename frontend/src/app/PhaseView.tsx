@@ -29,5 +29,5 @@ export function PhaseView<TState extends PhasedWorkshopState>({
     state: TState;
   }>;
 
-  return <CurrentPhase state={state} />;
+  return <CurrentPhase key={state.phase} state={state} />;
 }

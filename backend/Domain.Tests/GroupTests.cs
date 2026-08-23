@@ -29,7 +29,7 @@ public class GroupTests
     {
         var group = new Group("Otter", [Anna, Ben, Chris], [Trust]);
 
-        group.AppointScribe(Randomness.Fixed(2));
+        group.AppointScribe(new FixedRandomness(2));
 
         group.Scribe.ShouldBe(Chris);
     }
@@ -38,9 +38,9 @@ public class GroupTests
     public void Appointing_again_keeps_the_first_scribe()
     {
         var group = new Group("Otter", [Anna, Ben, Chris], [Trust]);
-        group.AppointScribe(Randomness.Fixed(0));
+        group.AppointScribe(new FixedRandomness(0));
 
-        group.AppointScribe(Randomness.Fixed(1));
+        group.AppointScribe(new FixedRandomness(1));
 
         group.Scribe.ShouldBe(Anna);
     }
@@ -413,7 +413,7 @@ public class GroupTests
     private static Group GroupWithScribe()
     {
         var group = new Group("Otter", [Anna, Ben, Chris], [Trust, Courage]);
-        group.AppointScribe(Randomness.Fixed(0));
+        group.AppointScribe(new FixedRandomness(0));
 
         return group;
     }

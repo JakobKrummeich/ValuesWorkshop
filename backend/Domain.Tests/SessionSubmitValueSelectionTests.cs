@@ -115,7 +115,7 @@ public class SessionSubmitValueSelectionTests
     public void Submissions_exist_only_during_the_value_selection_phase()
     {
         var session = TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Join);
-        session.Join(TestParticipants.Named(Anna, "Anna"), Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Anna, "Anna"), new FixedRandomness(0));
         session.AdvancePhase();
 
         Should.Throw<WrongPhaseException>(() =>
@@ -131,7 +131,7 @@ public class SessionSubmitValueSelectionTests
 
         foreach (var participant in participants)
         {
-            session.Join(TestParticipants.Named(participant, "Anna"), Randomness.Fixed(0));
+            session.Join(TestParticipants.Named(participant, "Anna"), new FixedRandomness(0));
         }
 
         session.AdvancePhase();

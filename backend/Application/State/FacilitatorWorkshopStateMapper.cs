@@ -1,3 +1,4 @@
+using ValuesWorkshop.Application.Formation;
 using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Domain;
 
@@ -6,7 +7,8 @@ namespace ValuesWorkshop.Application.State;
 public sealed class FacilitatorWorkshopStateMapper(
     IQuizCatalog quizCatalog,
     IValuesCatalog valuesCatalog,
-    IAnimalsCatalog animalsCatalogPort
+    IAnimalsCatalog animalsCatalogPort,
+    IGroupFormationProgress formationProgressPort
 )
 {
     private delegate FacilitatorWorkshopState StateFactory(
@@ -18,7 +20,8 @@ public sealed class FacilitatorWorkshopStateMapper(
     private readonly IReadOnlyDictionary<Phase, StateFactory> stateOfPhase = BuildStateMap(
         quizCatalog,
         SelectionViews.CatalogOf(valuesCatalog),
-        new GroupViews(animalsCatalogPort, valuesCatalog)
+        new GroupViews(animalsCatalogPort, valuesCatalog),
+        formationProgressPort
     );
 
     public FacilitatorWorkshopState Map(Session session, long revision)
@@ -31,7 +34,8 @@ public sealed class FacilitatorWorkshopStateMapper(
     private static IReadOnlyDictionary<Phase, StateFactory> BuildStateMap(
         IQuizCatalog quizCatalog,
         IReadOnlyList<WorkshopValueView> catalogView,
-        GroupViews groupViews
+        GroupViews groupViews,
+        IGroupFormationProgress formationProgressPort
     )
     {
         return new Dictionary<Phase, StateFactory>
@@ -65,7 +69,11 @@ public sealed class FacilitatorWorkshopStateMapper(
                     SessionViews.Roster(session),
                     enabledIntents,
                     SelectionViews.Progress(session, catalogView),
-                    Groups(session, groupViews)
+                    session.Formation.IsFormed
+                        ? new FacilitatorFormedView(Groups(session, groupViews))
+                        : new FacilitatorFormingView(
+                            formationProgressPort.ProgressOf(session.Identity).Value
+                        )
                 ),
             [Phase.GroupWork] = (session, revision, enabledIntents) =>
                 new FacilitatorGroupWorkState(

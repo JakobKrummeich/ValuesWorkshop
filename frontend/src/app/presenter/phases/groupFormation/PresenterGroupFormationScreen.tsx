@@ -1,16 +1,28 @@
 "use client";
 
-import type { PresenterGroupFormationState } from "../../../../domain/workshopState";
+import {
+  FormationSubState,
+  type PresenterGroupFormationState,
+} from "../../../../domain/workshopState";
+import { FormationProgressBar } from "../../../FormationProgressBar";
 import { GroupCard } from "../../../GroupCard";
 import styles from "./PresenterGroupFormationScreen.module.css";
 import { usePresenterGroupFormationScreen } from "./usePresenterGroupFormationScreen";
 
 export function PresenterGroupFormationScreen({
-  state,
+  state: { formation },
 }: {
   state: PresenterGroupFormationState;
 }) {
-  const { currentPageGroups } = usePresenterGroupFormationScreen(state.groups);
+  const { currentPageGroups } = usePresenterGroupFormationScreen(formation);
+
+  if (formation.subState === FormationSubState.Forming) {
+    return (
+      <section className={styles.screen}>
+        <FormationProgressBar progress={formation.progress} />
+      </section>
+    );
+  }
 
   return (
     <section className={styles.screen}>

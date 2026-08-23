@@ -17,6 +17,14 @@ interface RevisionedState {
   revision: number;
 }
 
+function supersedes(incoming: RevisionedState, applied: RevisionedState) {
+  return (
+    incoming.revision > applied.revision ||
+    (incoming.revision === applied.revision &&
+      JSON.stringify(incoming) !== JSON.stringify(applied))
+  );
+}
+
 export function createSessionStatePort<TState extends RevisionedState>(
   connection: WebsocketConnection,
   schema: ZodType<TState>,
@@ -32,9 +40,7 @@ export function createSessionStatePort<TState extends RevisionedState>(
     }),
     scan<TState, TState | null>(
       (applied, incoming) =>
-        applied !== null && incoming.revision <= applied.revision
-          ? applied
-          : incoming,
+        applied === null || supersedes(incoming, applied) ? incoming : applied,
       null,
     ),
     distinctUntilChanged(),

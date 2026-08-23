@@ -29,6 +29,27 @@ public class SessionExitGuardTests
     }
 
     [Fact]
+    public void Group_formation_may_not_be_left_while_the_groups_are_still_forming()
+    {
+        var session = SessionInPhase(Phase.GroupFormation);
+
+        ShouldRefuseToAdvance(session, Phase.GroupFormation);
+    }
+
+    [Fact]
+    public void Group_formation_may_be_left_once_the_groups_stand()
+    {
+        var session = SessionInPhase(
+            Phase.GroupFormation,
+            formation: FormationOf(submittedStates: [false, false])
+        );
+
+        session.AdvancePhase();
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupWork);
+    }
+
+    [Fact]
     public void Group_work_may_not_be_left_while_a_group_is_still_editing()
     {
         var session = SessionInPhase(

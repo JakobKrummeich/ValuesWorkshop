@@ -190,7 +190,15 @@ test.describe.serial("session lifecycle and reconnect", () => {
 async function restartBackend(): Promise<void> {
   await runCommand(
     "docker",
-    ["compose", "-f", "docker-compose.dev.yml", "restart", "backend"],
+    [
+      "compose",
+      "-f",
+      "docker-compose.dev.yml",
+      "-f",
+      "docker-compose.e2e.yml",
+      "restart",
+      "backend",
+    ],
     { cwd: repositoryRoot },
   );
 }

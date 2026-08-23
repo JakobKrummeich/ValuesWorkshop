@@ -1,17 +1,13 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { localizedText } from "../../../../domain/i18n/localizedText";
 import type { PresenterQuizState } from "../../../../domain/workshopState";
+import { cssCustomProperty } from "../../../../shared/cssCustomProperty";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { QuizLearningText } from "../../../QuizLearningText";
 import { QuizQuestion } from "../../../QuizQuestion";
 import styles from "./PresenterQuizScreen.module.css";
 import { usePresenterQuizScreen } from "./usePresenterQuizScreen";
-
-function voteFraction(widthFraction: number): CSSProperties {
-  return { "--vote-fraction": widthFraction } as CSSProperties;
-}
 
 function barClass(isRevealed: boolean, isCorrect: boolean): string {
   if (!isRevealed) {
@@ -56,7 +52,7 @@ export function PresenterQuizScreen({ state }: { state: PresenterQuizState }) {
               <div
                 className={barClass(isRevealed, bar.isCorrect)}
                 data-testid={`answer-bar-${answerIndex}`}
-                style={voteFraction(bar.widthFraction)}
+                style={cssCustomProperty("--vote-fraction", bar.widthFraction)}
               />
             </div>
             <span

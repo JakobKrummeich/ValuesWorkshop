@@ -12,6 +12,30 @@ public class WorkshopStateCacheTests
     private readonly WorkshopStateCache cache = TestWorkshopStateCache.Create();
 
     [Fact]
+    public void A_forming_session_is_mapped_afresh_and_never_retained()
+    {
+        var session = FormingSession();
+
+        var first = cache.StatesOf(session);
+        var second = cache.StatesOf(session);
+
+        second.ShouldNotBeSameAs(first);
+        cache.LatestOf(KnownSession).ShouldBeNull();
+    }
+
+    [Fact]
+    public void A_session_that_starts_forming_drops_the_state_cached_before_it()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.SelectionResults);
+        cache.StatesOf(session);
+
+        session.AdvancePhase();
+        cache.StatesOf(session);
+
+        cache.LatestOf(KnownSession).ShouldBeNull();
+    }
+
+    [Fact]
     public void An_unchanged_session_is_mapped_only_once()
     {
         var session = TestSessions.Open(KnownSession);
@@ -79,5 +103,13 @@ public class WorkshopStateCacheTests
         cache.RetainOnly([KnownSession]);
 
         cache.LatestOf(KnownSession).ShouldNotBeNull();
+    }
+
+    private static Session FormingSession()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.SelectionResults);
+        session.AdvancePhase();
+
+        return session;
     }
 }

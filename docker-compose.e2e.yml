@@ -1,0 +1,10 @@
+services:
+  backend:
+    environment:
+      # The e2e suite opens a session per spec file; rapid re-runs would trip
+      # the production default of 5 attempts per minute.
+      SESSION_CREATION_ATTEMPTS_PER_WINDOW: "30"
+      # The suite asserts against the running bar — reloading a client and
+      # watching it advance inside the production window of 3 s would race the
+      # window instead of testing it.
+      GROUP_FORMATION_WINDOW_MS: "10000"

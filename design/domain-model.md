@@ -83,6 +83,8 @@ workshop's native language), English term used in model and code.
 | Gruppenname | **Group name** | Friendly animal name identifying a group (e.g. "Otter"). |
 | Gruppeneinteilung | **Group formation** | The one-time act of partitioning all present participants into groups and dealing the top values out across the groups — every top value to exactly one group. Formation aims to give each participant as many of their own ten selected values as possible; sizing follows the group sizing rule. Someone joining after formation is placed into a group with the fewest members — they have no value selection to optimise against, and no value is re-dealt. |
 | Gruppengrößenregel | **Group sizing rule** | Number of groups = at least one, otherwise participants divided by four rounded down. Participants and values are dealt round-robin: sizes differ by at most one, earlier groups get the extra ones. |
+| Einteilungsfenster | **Formation window** | The span the room waits between entering group formation and the groups appearing — three seconds unless a deployment sets another length. It lasts longer than no time at all, and group formation happens when it is over whether or not the solver has finished. |
+| Einteilungsfortschritt | **Formation progress** | How far the formation window has run, as a fraction of it: 0 while nothing is forming, 1 once the window is over, never outside those two. |
 | Verhaltensweise | **Action** | A work-related, everyday, pragmatic action a group formulates for one of its assigned values. Between one and five per assigned value. |
 | Gruppenergebnis | **Group work result** | A group's actions for all its assigned values. |
 | Abgabe / Abgabe zurückziehen | **Submit / reopen** | The scribe declaring the group's work finished, or taking it back for further editing. Only submitted work is presented. |
@@ -220,7 +222,7 @@ when a phase begins or a condition is met — no person issues them.
 | **ShowLearningText** | Facilitator | Show the current question's learning text. → LearningTextShown |
 | **SubmitValueSelection** | Participant | Hand in exactly ten distinct values; fewer, more, or duplicates are refused; resubmission is refused. → ValuesSelected |
 | **DetermineTopValues** | System (entering Selection results) | Fix the top values from the selection tally, widening on a tenth-place tie. → TopValuesDetermined |
-| **FormGroups** | System (entering Group formation) | Partition participants and deal out top values per the sizing rule and the formation aim. → GroupsFormed |
+| **FormGroups** | System (formation window over) | Partition participants and deal out top values per the sizing rule and the formation aim; a random assignment stands in when the solver has produced none by the deadline. → GroupsFormed |
 | **AddParticipantToGroup** | System (a participant joins while groups exist) | Place the joiner into a group with the fewest members; ties are broken at random. No top value is re-dealt. → ParticipantAddedToGroup |
 | **AppointScribes** | System (entering Group work) | Pick one member per group at random. → ScribeAppointed (per group) |
 | **ReassignScribe** | Facilitator | Hand a group's scribe role to another of its members. → ScribeReassigned |

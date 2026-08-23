@@ -21,9 +21,9 @@ public class WorkshopStateAnonymityTests
         ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState))
             .ShouldBe(
                 [
-                    "ParticipantGroupFormationState.OwnGroup.Actions[].ActionId",
-                    "ParticipantGroupFormationState.OwnGroup.MemberDisplayNames[]",
-                    "ParticipantGroupFormationState.OwnGroup.ScribeName",
+                    "ParticipantGroupFormationState.Formation.OwnGroup.Actions[].ActionId",
+                    "ParticipantGroupFormationState.Formation.OwnGroup.MemberDisplayNames[]",
+                    "ParticipantGroupFormationState.Formation.OwnGroup.ScribeName",
                     "ParticipantGroupWorkState.OwnGroup.Actions[].ActionId",
                     "ParticipantGroupWorkState.OwnGroup.MemberDisplayNames[]",
                     "ParticipantGroupWorkState.OwnGroup.ScribeName",
@@ -42,7 +42,7 @@ public class WorkshopStateAnonymityTests
         ParticipantIdentifyingPathsOf(typeof(PresenterWorkshopState))
             .ShouldBe(
                 [
-                    "PresenterGroupFormationState.Groups[].MemberDisplayNames[]",
+                    "PresenterGroupFormationState.Formation.Groups[].MemberDisplayNames[]",
                     "PresenterGroupWorkState.Groups[].MemberDisplayNames[]",
                     "PresenterJoinState.ParticipantDisplayNames[]",
                     "PresenterValuePresentationState.Groups[].MemberDisplayNames[]",
@@ -61,9 +61,9 @@ public class WorkshopStateAnonymityTests
                     "FacilitatorFinalPresentationState.Roster.Participants[].ParticipantId",
                     "FacilitatorFinalVotingState.Roster.Participants[].DisplayName",
                     "FacilitatorFinalVotingState.Roster.Participants[].ParticipantId",
-                    "FacilitatorGroupFormationState.Groups[].Members[].DisplayName",
-                    "FacilitatorGroupFormationState.Groups[].Members[].ParticipantId",
-                    "FacilitatorGroupFormationState.Groups[].ScribeParticipantId",
+                    "FacilitatorGroupFormationState.Formation.Groups[].Members[].DisplayName",
+                    "FacilitatorGroupFormationState.Formation.Groups[].Members[].ParticipantId",
+                    "FacilitatorGroupFormationState.Formation.Groups[].ScribeParticipantId",
                     "FacilitatorGroupFormationState.Roster.Participants[].DisplayName",
                     "FacilitatorGroupFormationState.Roster.Participants[].ParticipantId",
                     "FacilitatorGroupWorkState.Groups[].Members[].DisplayName",
@@ -91,10 +91,7 @@ public class WorkshopStateAnonymityTests
 
     private static IReadOnlyList<string> ParticipantIdentifyingPathsOf(Type stateType)
     {
-        var variants = stateType
-            .GetCustomAttributes<JsonDerivedTypeAttribute>()
-            .Select(attribute => attribute.DerivedType)
-            .ToList();
+        var variants = VariantsOf(stateType);
 
         variants.ShouldNotBeEmpty();
 
@@ -107,8 +104,20 @@ public class WorkshopStateAnonymityTests
         return paths.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToList();
     }
 
+    private static IReadOnlyList<Type> VariantsOf(Type type)
+    {
+        return type.GetCustomAttributes<JsonDerivedTypeAttribute>()
+            .Select(attribute => attribute.DerivedType)
+            .ToList();
+    }
+
     private static void CollectIdentifyingPaths(Type type, string prefix, List<string> paths)
     {
+        foreach (var variant in VariantsOf(type))
+        {
+            CollectIdentifyingPaths(variant, prefix, paths);
+        }
+
         foreach (var property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
         {
             var (propertyType, suffix) = Unwrap(property.PropertyType);

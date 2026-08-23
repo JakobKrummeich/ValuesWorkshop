@@ -60,7 +60,7 @@ public sealed record PresenterGroupFormationState(
     long Revision,
     int ParticipantCount,
     SelectionProgressView Selection,
-    IReadOnlyList<PresenterGroupView> Groups
+    PresenterFormationView Formation
 ) : PresenterWorkshopState(Revision, ParticipantCount)
 {
     [JsonIgnore]

@@ -6,7 +6,6 @@ public class SessionAdvancePhaseTests
     [InlineData(Phase.Join, Phase.Quiz)]
     [InlineData(Phase.ValueSelection, Phase.SelectionResults)]
     [InlineData(Phase.SelectionResults, Phase.GroupFormation)]
-    [InlineData(Phase.GroupFormation, Phase.GroupWork)]
     public void Advancing_moves_to_the_next_phase(Phase current, Phase expected)
     {
         var session = SessionInPhase(current);

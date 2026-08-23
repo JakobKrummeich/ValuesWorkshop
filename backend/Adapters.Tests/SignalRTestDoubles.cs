@@ -34,6 +34,14 @@ internal sealed class RecordingClient : IFacilitatorClient, IParticipantClient, 
         return ReceivedStates.OfType<TState>().ShouldHaveSingleItem();
     }
 
+    internal TState Latest<TState>()
+    {
+        var received = ReceivedStates.OfType<TState>().ToList();
+        received.ShouldNotBeEmpty();
+
+        return received[^1];
+    }
+
     private Task Record(object state)
     {
         ReceivedStates.Add(state);
@@ -212,6 +220,8 @@ internal sealed class InMemorySessionRepository : ISessionRepository
 
     internal List<Session> Saved { get; } = [];
 
+    internal List<SessionIdentity> Loaded { get; } = [];
+
     internal void Add(Session session)
     {
         sessions[session.Identity] = session;
@@ -220,6 +230,8 @@ internal sealed class InMemorySessionRepository : ISessionRepository
 
     public Task<Session?> LoadAsync(SessionIdentity sessionIdentity)
     {
+        Loaded.Add(sessionIdentity);
+
         return Task.FromResult(sessions.GetValueOrDefault(sessionIdentity));
     }
 
@@ -275,13 +287,5 @@ internal sealed class RecordingBroadcaster : ValuesWorkshop.Application.IBroadca
     {
         Broadcasts.Add(session);
         return Task.CompletedTask;
-    }
-}
-
-internal sealed class FixedRandomness(int index) : IRandomness
-{
-    public int NextIndex(int exclusiveUpperBound)
-    {
-        return index % exclusiveUpperBound;
     }
 }

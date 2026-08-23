@@ -102,7 +102,7 @@ public class SessionDetermineTopValuesTests
 
         foreach (var participant in participants)
         {
-            session.Join(TestParticipants.Named(participant, "Anna"), Randomness.Fixed(0));
+            session.Join(TestParticipants.Named(participant, "Anna"), new FixedRandomness(0));
         }
 
         session.AdvancePhase();

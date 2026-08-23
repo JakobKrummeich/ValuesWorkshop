@@ -71,7 +71,7 @@ public sealed record FacilitatorGroupFormationState(
     RosterView Roster,
     IReadOnlyList<FacilitatorIntent> EnabledIntents,
     SelectionProgressView Selection,
-    IReadOnlyList<FacilitatorGroupView> Groups
+    FacilitatorFormationView Formation
 ) : FacilitatorWorkshopState(Revision, Roster, EnabledIntents)
 {
     [JsonIgnore]

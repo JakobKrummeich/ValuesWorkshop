@@ -1,11 +1,17 @@
 import { render, screen, within } from "@testing-library/react";
 import { Language } from "../../../../../domain/i18n/language";
 import { Phase } from "../../../../../domain/phases";
-import type { FacilitatorGroupFormationState } from "../../../../../domain/workshopState";
+import {
+  FormationSubState,
+  type FacilitatorFormationView,
+  type FacilitatorGroupFormationState,
+} from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { FacilitatorGroupFormationScreen } from "../FacilitatorGroupFormationScreen";
 
-function state(): FacilitatorGroupFormationState {
+function state(
+  formation: FacilitatorFormationView = formed(),
+): FacilitatorGroupFormationState {
   return {
     phase: Phase.GroupFormation,
     revision: 30,
@@ -26,6 +32,13 @@ function state(): FacilitatorGroupFormationState {
       ],
       submittedCount: 4,
     },
+    formation,
+  };
+}
+
+function formed(): FacilitatorFormationView {
+  return {
+    subState: FormationSubState.Formed,
     groups: [
       {
         name: { animalId: "fox", text: { de: "Fuchs", en: "Fox" } },
@@ -90,5 +103,20 @@ describe("facilitator group formation screen", () => {
     expect(within(fox).getByTestId("group-value-trust")).toHaveTextContent(
       "Vertrauen",
     );
+  });
+
+  it("runs the bar at the emitted progress while the formation runs", () => {
+    render(
+      <FacilitatorGroupFormationScreen
+        state={state({ subState: FormationSubState.Forming, progress: 0.8 })}
+      />,
+      { wrapper: languageWrapper() },
+    );
+
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "80",
+    );
+    expect(screen.queryByTestId("group-card-fox")).not.toBeInTheDocument();
   });
 });

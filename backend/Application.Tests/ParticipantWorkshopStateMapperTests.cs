@@ -258,6 +258,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var ownGroup = Map(session, caller: SessionFixtures.Anna)
             .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormedView>()
             .OwnGroup.ShouldNotBeNull();
 
         ownGroup.Name.ShouldBe(
@@ -279,6 +280,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var ownGroup = Map(session, caller: SessionFixtures.Chris)
             .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormedView>()
             .OwnGroup.ShouldNotBeNull();
 
         ownGroup.Name.AnimalId.ShouldBe("tier-2");
@@ -295,6 +297,7 @@ public class ParticipantWorkshopStateMapperTests
 
         var ownGroup = Map(session, caller: SessionFixtures.Anna)
             .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormedView>()
             .OwnGroup.ShouldNotBeNull();
 
         ownGroup.IsCallerScribe.ShouldBeNull();
@@ -365,16 +368,27 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
-    public void A_caller_who_is_in_no_group_gets_no_own_group()
+    public void No_group_travels_while_the_formation_is_still_running()
+    {
+        Map(SessionFixtures.InPhase(Phase.GroupFormation))
+            .ShouldBeOfType<ParticipantGroupFormationState>()
+            .Formation.ShouldBeOfType<ParticipantFormingView>()
+            .Progress.ShouldBe(0.25);
+    }
+
+    [Fact]
+    public void A_caller_who_is_in_no_group_of_a_formed_session_fails_loudly()
     {
         var session = SessionFixtures.InPhase(
             Phase.GroupFormation,
             formation: SessionFixtures.TwoGroups()
         );
 
-        Map(session, caller: new ParticipantId(Guid.NewGuid()))
-            .ShouldBeOfType<ParticipantGroupFormationState>()
-            .OwnGroup.ShouldBeNull();
+        Should
+            .Throw<InvalidOperationException>(() =>
+                Map(session, caller: new ParticipantId(Guid.NewGuid()))
+            )
+            .Message.ShouldBe("Once the groups stand, every participant belongs to one of them.");
     }
 
     [Fact]
@@ -476,10 +490,8 @@ public class ParticipantWorkshopStateMapperTests
         long revision = 1
     )
     {
-        return new ParticipantWorkshopStateMapper(
-            new TestQuizCatalog(5),
-            new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8)
-        ).MapFor(session, caller ?? SessionFixtures.Anna, revision);
+        return TestMappers
+            .Participant(formationProgress: 0.25)
+            .MapFor(session, caller ?? SessionFixtures.Anna, revision);
     }
 }

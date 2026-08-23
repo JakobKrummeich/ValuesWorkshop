@@ -66,13 +66,18 @@ describe("group card", () => {
     );
   });
 
-  it("cycles through the four value accents by position", () => {
+  it("gives every member chip one class and every value chip another", () => {
     renderCard();
 
-    expect(screen.getByTestId("group-value-trust")).toHaveClass("accent1");
-    expect(screen.getByTestId("group-value-courage")).toHaveClass("accent2");
-    expect(screen.getByTestId("group-value-respect")).toHaveClass("accent3");
-    expect(screen.getByTestId("group-value-honesty")).toHaveClass("accent4");
-    expect(screen.getByTestId("group-value-openness")).toHaveClass("accent1");
+    const memberClasses = screen
+      .getAllByTestId("group-member")
+      .map((member) => member.className);
+    const valueClasses = screen
+      .getAllByTestId(/^group-value-/)
+      .map((value) => value.className);
+
+    expect(new Set(memberClasses).size).toBe(1);
+    expect(new Set(valueClasses).size).toBe(1);
+    expect(memberClasses[0]).not.toBe(valueClasses[0]);
   });
 });

@@ -67,8 +67,7 @@ export enum MessageKey {
   SelectionResultsHeading = "selectionResults.heading",
   SelectionResultsHiddenValues = "selectionResults.hiddenValues",
   SelectionResultsNoSubmissions = "selectionResults.noSubmissions",
-  GroupFormationWaitingForGroup = "groupFormation.waitingForGroup",
+  GroupFormationFormingGroups = "groupFormation.formingGroups",
   FacilitatorHeading = "facilitator.heading",
   ParticipantHeading = "participant.heading",
-  PresenterHeading = "presenter.heading",
 }

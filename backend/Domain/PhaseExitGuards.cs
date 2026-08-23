@@ -8,6 +8,7 @@ public static class PhaseExitGuards
         new IPhaseExitGuard[]
         {
             new QuizExitGuard(),
+            new GroupFormationExitGuard(),
             new GroupWorkExitGuard(),
             new FinalVotingExitGuard(),
         }.ToImmutableDictionary(guard => guard.Phase);

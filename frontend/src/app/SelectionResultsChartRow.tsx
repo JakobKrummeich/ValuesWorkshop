@@ -1,14 +1,10 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import { localizedText } from "../domain/i18n/localizedText";
 import type { SelectionResultRow } from "../domain/selectionResults";
+import { cssCustomProperty } from "../shared/cssCustomProperty";
 import { useTranslation } from "./i18n/useTranslation";
 import styles from "./SelectionResultsChartRow.module.css";
-
-function barFraction(fraction: number): CSSProperties {
-  return { "--bar-fraction": fraction } as CSSProperties;
-}
 
 export function SelectionResultsChartRow({ row }: { row: SelectionResultRow }) {
   const { language } = useTranslation();
@@ -26,7 +22,7 @@ export function SelectionResultsChartRow({ row }: { row: SelectionResultRow }) {
         <div
           className={styles.bar}
           data-testid={`result-bar-${row.valueId}`}
-          style={barFraction(row.barFraction)}
+          style={cssCustomProperty("--bar-fraction", row.barFraction)}
         />
       </div>
       <span

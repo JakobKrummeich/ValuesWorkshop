@@ -26,6 +26,25 @@ describe("phase view state", () => {
     expect(result.current).toEqual({ revision: 2, phase: Phase.Quiz });
   });
 
+  it("delivers a later state of the phase it is already in", () => {
+    const workshopState = new Subject<PhasedWorkshopState>();
+    const { result } = renderHook(() =>
+      usePhaseView({ workshopState, connectionState: NEVER }),
+    );
+
+    act(() =>
+      workshopState.next({ revision: 30, phase: Phase.GroupFormation }),
+    );
+    act(() =>
+      workshopState.next({ revision: 31, phase: Phase.GroupFormation }),
+    );
+
+    expect(result.current).toEqual({
+      revision: 31,
+      phase: Phase.GroupFormation,
+    });
+  });
+
   it("stops listening once the caller is gone", () => {
     const workshopState = new Subject<PhasedWorkshopState>();
     const { unmount } = renderHook(() =>

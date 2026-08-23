@@ -145,12 +145,6 @@ public class FacilitatorEnabledIntentsTests
 
     private static FacilitatorWorkshopState Map(Session session)
     {
-        var catalog = new TestQuizCatalog(QuestionCount);
-
-        return new FacilitatorWorkshopStateMapper(
-            catalog,
-            new TestValuesCatalog(50),
-            new TestAnimalsCatalog(8)
-        ).Map(session, 1);
+        return TestMappers.Facilitator().Map(session, 1);
     }
 }

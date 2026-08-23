@@ -154,6 +154,12 @@ test.describe.serial("value selection through group formation", () => {
     return page.getByTestId("selection-submitted-confirmation");
   }
 
+  async function formationPercent(page: Page): Promise<number> {
+    return Number(
+      await page.getByRole("progressbar").getAttribute("aria-valuenow"),
+    );
+  }
+
   async function submitThroughConfirmationDialog(page: Page): Promise<void> {
     await page.getByTestId("submit-selection-button").click();
     await page.getByTestId("confirm-submit-button").click();
@@ -361,13 +367,50 @@ test.describe.serial("value selection through group formation", () => {
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
   });
 
-  test("the advance into phase 5 deals every participant into the otter group", async () => {
+  test("the advance into phase 5 runs the progress bar on every screen", async () => {
     await advancePhaseButton(facilitatorPage).click();
 
+    await Promise.all(
+      everyRolePage().map((page) =>
+        expect(page.getByTestId("formation-progress")).toBeVisible(),
+      ),
+    );
+    await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
     for (const page of everyRolePage()) {
       await expect(page.getByTestId("phase")).toHaveText("Phase 5");
+      await expect(page.getByTestId(/^group-card-/)).toHaveCount(0);
     }
+  });
+
+  test("the bar follows the progress the server keeps sending", async () => {
+    for (const page of [presenterPage, alicePage]) {
+      const shownFirst = await formationPercent(page);
+
+      await expect
+        .poll(() => formationPercent(page))
+        .toBeGreaterThan(shownFirst);
+    }
+  });
+
+  test("a client that reloads during the window rejoins the running bar", async () => {
+    await Promise.all([presenterPage.reload(), alicePage.reload()]);
+
+    for (const page of [presenterPage, alicePage]) {
+      await expect(page.getByTestId("phase")).toHaveText("Phase 5", {
+        timeout: 15_000,
+      });
+      await expect(page.getByTestId("formation-progress")).toBeVisible();
+      await expect(page.getByTestId(/^group-card-/)).toHaveCount(0);
+      expect(await formationPercent(page)).toBeGreaterThan(0);
+    }
+    await expect(alicePage.getByTestId("own-group-card")).toHaveCount(0);
+  });
+
+  test("the finished progress bar deals every participant into the otter group", async () => {
     for (const page of participantPages()) {
+      await expect(page.getByTestId("formation-progress")).toHaveCount(0, {
+        timeout: 20_000,
+      });
       const ownGroupCard = page.getByTestId("own-group-card");
       await expect(ownGroupCard.getByTestId("group-name")).toHaveText("Otter");
       await expect(ownGroupCard.getByTestId("group-member")).toHaveText([
@@ -387,12 +430,14 @@ test.describe.serial("value selection through group formation", () => {
       await expect(
         ownGroupCard.getByTestId("group-value-kompetenz"),
       ).toHaveText("Competence");
-      await expect(page.getByTestId("own-group-waiting")).toHaveCount(0);
     }
   });
 
   test("the facilitator and the presenter show the single group card", async () => {
     for (const page of [facilitatorPage, presenterPage]) {
+      await expect(page.getByTestId("formation-progress")).toHaveCount(0, {
+        timeout: 20_000,
+      });
       await expect(page.getByTestId(/^group-card-/)).toHaveCount(1);
       const groupCard = page.getByTestId("group-card-otter");
       await expect(groupCard.getByTestId("group-name")).toHaveText("Otter");
@@ -411,5 +456,23 @@ test.describe.serial("value selection through group formation", () => {
     }
 
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
+  });
+
+  test("a reload after the window shows the groups without the progress bar", async () => {
+    for (const page of [alicePage, presenterPage]) {
+      await page.reload();
+      await expect(page.getByTestId("phase")).toHaveText("Phase 5", {
+        timeout: 15_000,
+      });
+      await expect(page.getByTestId("formation-progress")).toHaveCount(0, {
+        timeout: 1_000,
+      });
+    }
+    await expect(alicePage.getByTestId("own-group-card")).toBeVisible({
+      timeout: 1_000,
+    });
+    await expect(presenterPage.getByTestId("group-card-otter")).toBeVisible({
+      timeout: 1_000,
+    });
   });
 });

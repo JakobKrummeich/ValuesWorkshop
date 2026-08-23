@@ -6,6 +6,11 @@ export enum QuizSubState {
   LearningTextShown = 3,
 }
 
+export enum FormationSubState {
+  Forming = "forming",
+  Formed = "formed",
+}
+
 const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
@@ -100,6 +105,8 @@ export const ownGroupViewSchema = z.object({
   assignedValues: workshopValuesSchema,
 });
 
+export type OwnGroupView = z.infer<typeof ownGroupViewSchema>;
+
 export const facilitatorGroupsSchema = z.array(
   z.object({
     name: groupNameSchema,
@@ -115,6 +122,35 @@ export const presenterGroupsSchema = z.array(
     assignedValues: workshopValuesSchema,
   }),
 );
+
+const formationProgressSchema = z.object({
+  subState: z.literal(FormationSubState.Forming),
+  progress: z.number().min(0).max(1),
+});
+
+export const participantFormationViewSchema = z.discriminatedUnion("subState", [
+  formationProgressSchema,
+  z.object({
+    subState: z.literal(FormationSubState.Formed),
+    ownGroup: ownGroupViewSchema,
+  }),
+]);
+
+export const facilitatorFormationViewSchema = z.discriminatedUnion("subState", [
+  formationProgressSchema,
+  z.object({
+    subState: z.literal(FormationSubState.Formed),
+    groups: facilitatorGroupsSchema,
+  }),
+]);
+
+export const presenterFormationViewSchema = z.discriminatedUnion("subState", [
+  formationProgressSchema,
+  z.object({
+    subState: z.literal(FormationSubState.Formed),
+    groups: presenterGroupsSchema,
+  }),
+]);
 
 export const presentationViewSchema = z.object({
   presentingGroupName: z.string().nullable(),

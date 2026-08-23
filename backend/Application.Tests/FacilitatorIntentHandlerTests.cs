@@ -108,7 +108,7 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
-    public async Task Entering_group_formation_forms_the_groups()
+    public async Task Entering_group_formation_leaves_the_groups_unformed()
     {
         var repository = FakeSessionRepository.Holding(SessionFixtures.InSelectionResults());
 
@@ -118,15 +118,23 @@ public class FacilitatorIntentHandlerTests
         result.ShouldBe(IntentResult.Accepted());
         var saved = repository.Saved.ShouldHaveSingleItem();
         saved.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
-        saved.Formation.IsFormed.ShouldBeTrue();
-        var group = saved.Formation.Groups.ShouldHaveSingleItem();
-        group.Name.ShouldBe("tier-1");
-        group.Members.ShouldBe(
-            [SessionFixtures.Anna, SessionFixtures.Ben, SessionFixtures.Chris],
-            ignoreOrder: true
+        saved.Formation.IsFormed.ShouldBeFalse();
+        saved.Formation.Groups.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Leaving_group_formation_is_refused_until_the_groups_stand()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupFormation)
         );
-        group.AssignedValues.ShouldBe(saved.Selection.TopValues, ignoreOrder: true);
-        broadcaster.Broadcasts.ShouldHaveSingleItem().Formation.IsFormed.ShouldBeTrue();
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller));
+
+        result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
     [Fact]
@@ -145,22 +153,6 @@ public class FacilitatorIntentHandlerTests
 
         result.ShouldBe(IntentResult.Accepted());
         recorder.SeenPhases.ShouldHaveSingleItem().ShouldBe(Phase.Quiz);
-    }
-
-    [Fact]
-    public async Task A_failing_solver_propagates_loudly()
-    {
-        var repository = FakeSessionRepository.Holding(SessionFixtures.InSelectionResults());
-        var handler = HandlerOver(repository, new ThrowingGroupSolver());
-
-        await Should.ThrowAsync<InvalidOperationException>(() =>
-            handler.HandleAsync(
-                new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller)
-            )
-        );
-
-        repository.Saved.ShouldBeEmpty();
-        broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
     [Fact]
@@ -509,14 +501,11 @@ public class FacilitatorIntentHandlerTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
-    private FacilitatorIntentHandler HandlerOver(
-        FakeSessionRepository repository,
-        IGroupSolver? groupSolverPort = null
-    )
+    private FacilitatorIntentHandler HandlerOver(FakeSessionRepository repository)
     {
         return new FacilitatorIntentHandler(
             new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
-            [new GroupFormation(groupSolverPort ?? new TestGroupSolver(), new TestGroupNames(8))]
+            []
         );
     }
 

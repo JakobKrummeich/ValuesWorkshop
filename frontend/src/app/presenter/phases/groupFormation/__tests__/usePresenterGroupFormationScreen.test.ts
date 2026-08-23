@@ -1,11 +1,13 @@
 import { act, renderHook } from "@testing-library/react";
-import type { PresenterGroupFormationState } from "../../../../../domain/workshopState";
+import {
+  FormationSubState,
+  type PresenterFormationView,
+  type PresenterGroups,
+} from "../../../../../domain/workshopState";
 import {
   groupPageCycleMilliseconds,
   usePresenterGroupFormationScreen,
 } from "../usePresenterGroupFormationScreen";
-
-type PresenterGroups = PresenterGroupFormationState["groups"];
 
 function groups(count: number): PresenterGroups {
   return Array.from({ length: count }, (unused, index) => ({
@@ -30,29 +32,31 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
+function renderScreenHook(formation: PresenterFormationView) {
+  return renderHook(() => usePresenterGroupFormationScreen(formation));
+}
+
+function formed(groupCount: number): PresenterFormationView {
+  return { subState: FormationSubState.Formed, groups: groups(groupCount) };
+}
+
 describe("presenter group formation screen hook", () => {
   it("shows every group without cycling when they fit one page", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(6)),
-    );
+    const { result } = renderScreenHook(formed(6));
 
     expect(result.current.currentPageGroups).toHaveLength(6);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("shows no groups when none exist", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(0)),
-    );
+    const { result } = renderScreenHook(formed(0));
 
     expect(result.current.currentPageGroups).toEqual([]);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("advances to the next page after the cycle interval", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(7)),
-    );
+    const { result } = renderScreenHook(formed(7));
 
     expect(animalIds(result.current.currentPageGroups)).toEqual([
       "animal-1",
@@ -69,9 +73,7 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("wraps around to the first page after the last one", () => {
-    const { result } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(7)),
-    );
+    const { result } = renderScreenHook(formed(7));
 
     act(() => jest.advanceTimersByTime(2 * groupPageCycleMilliseconds));
 
@@ -86,14 +88,38 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("clears the cycle timer on unmount", () => {
-    const { unmount } = renderHook(() =>
-      usePresenterGroupFormationScreen(groups(7)),
-    );
+    const { unmount } = renderScreenHook(formed(7));
 
     expect(jest.getTimerCount()).toBe(1);
 
     unmount();
 
     expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it("holds every page back while the formation still runs", () => {
+    const { result } = renderScreenHook({
+      subState: FormationSubState.Forming,
+      progress: 0.5,
+    });
+
+    expect(result.current.currentPageGroups).toEqual([]);
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it("starts cycling once the groups are formed", () => {
+    const { rerender, result } = renderHook(
+      (formation: PresenterFormationView) =>
+        usePresenterGroupFormationScreen(formation),
+      { initialProps: { subState: FormationSubState.Forming, progress: 0.9 } },
+    );
+
+    expect(jest.getTimerCount()).toBe(0);
+
+    rerender(formed(7));
+
+    act(() => jest.advanceTimersByTime(groupPageCycleMilliseconds));
+
+    expect(animalIds(result.current.currentPageGroups)).toEqual(["animal-7"]);
   });
 });

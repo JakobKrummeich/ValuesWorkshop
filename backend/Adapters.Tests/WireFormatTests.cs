@@ -17,17 +17,20 @@ public class WireFormatTests
     private static readonly FacilitatorWorkshopStateMapper FacilitatorStateMapper = new(
         Catalog,
         ValuesCatalog,
-        AnimalsCatalog
+        AnimalsCatalog,
+        new TestFormationProgress(0)
     );
     private static readonly ParticipantWorkshopStateMapper ParticipantStateMapper = new(
         Catalog,
         ValuesCatalog,
-        AnimalsCatalog
+        AnimalsCatalog,
+        new TestFormationProgress(0)
     );
     private static readonly PresenterWorkshopStateMapper PresenterStateMapper = new(
         Catalog,
         ValuesCatalog,
-        AnimalsCatalog
+        AnimalsCatalog,
+        new TestFormationProgress(0)
     );
 
     [Fact]

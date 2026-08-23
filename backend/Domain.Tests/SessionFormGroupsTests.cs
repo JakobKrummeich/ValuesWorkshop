@@ -3,11 +3,11 @@ namespace ValuesWorkshop.Domain.Tests;
 public class SessionFormGroupsTests
 {
     [Fact]
-    public void Advancing_into_group_formation_forms_named_groups_sized_by_the_sizing_rule()
+    public void The_formed_groups_are_named_and_sized_by_the_sizing_rule()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
         session.Formation.IsFormed.ShouldBeTrue();
@@ -21,7 +21,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session
             .Formation.Groups.SelectMany(group => group.Members)
@@ -32,11 +32,35 @@ public class SessionFormGroupsTests
     }
 
     [Fact]
+    public void A_participant_who_joined_while_the_groups_were_forming_still_lands_in_a_group()
+    {
+        var session = SessionAwaitingFormation(participantCount: 8, topValueCount: 4);
+        session.AdvancePhase();
+        var members = Enumerable.Range(1, 8).Select(ParticipantAt).ToList();
+        var topValues = TestValueIds.Numbered(1, 4);
+        var assignmentWithoutTheLatecomer = new GroupFormationResult([
+            new FormedGroup(members.Take(4).ToList(), topValues.Take(2).ToList()),
+            new FormedGroup(members.Skip(4).ToList(), topValues.Skip(2).ToList()),
+        ]);
+        var latecomer = TestParticipants.Named(ParticipantAt(99), "Late Lena");
+        session.Join(latecomer, new FixedRandomness(0));
+
+        session.FormGroups(
+            assignmentWithoutTheLatecomer,
+            new TestGroupNames(8).Names,
+            new FixedRandomness(0)
+        );
+
+        session.Formation.Groups.SelectMany(group => group.Members).ShouldContain(latecomer.Id);
+        session.Formation.Groups.Select(group => group.Members.Count).ShouldBe([5, 4]);
+    }
+
+    [Fact]
     public void Every_top_value_is_dealt_to_exactly_one_group()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session
             .Formation.Groups.SelectMany(group => group.AssignedValues)
@@ -49,7 +73,7 @@ public class SessionFormGroupsTests
         var session = SessionAwaitingFormation(participantCount: 2, topValueCount: 3);
         var solver = new RecordingGroupSolver();
 
-        AdvanceIntoGroupFormation(session, solver);
+        AdvanceAndFormGroups(session, solver);
 
         var request = solver.LastRequest.ShouldNotBeNull();
         request
@@ -74,7 +98,7 @@ public class SessionFormGroupsTests
             formation: alreadyFormed
         );
 
-        AdvanceIntoGroupFormation(session, new ThrowingGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
         var group = session.Formation.Groups.ShouldHaveSingleItem();
@@ -87,53 +111,15 @@ public class SessionFormGroupsTests
     public void Forming_an_already_formed_session_again_changes_nothing()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.FormGroups(
             new GroupFormationResult([new FormedGroup([ParticipantAt(1)], [])]),
-            ["usurper"]
+            ["usurper"],
+            new FixedRandomness(0)
         );
 
         session.Formation.Groups.Select(group => group.Name).ShouldBe(["tier-1", "tier-2"]);
-    }
-
-    [Fact]
-    public void Formation_waits_until_the_group_formation_phase_is_reached()
-    {
-        var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
-
-        FormationWith(new ThrowingGroupSolver()).ExecuteFor(session);
-
-        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
-        session.Formation.IsFormed.ShouldBeFalse();
-    }
-
-    [Fact]
-    public void Advancing_out_of_group_formation_re_forms_nothing()
-    {
-        var session = TestSessions.InPhase(
-            new SessionIdentity(Guid.NewGuid()),
-            Phase.GroupFormation,
-            formation: FormationRecord.Restore(
-                true,
-                [
-                    Group.Restore(
-                        "otter",
-                        [ParticipantAt(1)],
-                        [new ValueId("wert-1")],
-                        null,
-                        false,
-                        []
-                    ),
-                ]
-            )
-        );
-
-        session.AdvancePhase();
-        FormationWith(new ThrowingGroupSolver()).ExecuteFor(session);
-
-        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupWork);
-        session.Formation.Groups.ShouldHaveSingleItem().Name.ShouldBe("otter");
     }
 
     [Fact]
@@ -141,7 +127,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 0, topValueCount: 0);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.Formation.IsFormed.ShouldBeTrue();
         var group = session.Formation.Groups.ShouldHaveSingleItem();
@@ -155,7 +141,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 0);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.Formation.Groups.Count.ShouldBe(2);
         session.Formation.Groups.ShouldAllBe(group => group.AssignedValues.Count == 0);
@@ -169,7 +155,7 @@ public class SessionFormGroupsTests
 
         Should
             .Throw<InvariantViolationException>(() =>
-                new GroupFormation(new TestGroupSolver(), new TestGroupNames(1)).ExecuteFor(session)
+                FormGroupsWith(session, new TestGroupSolver(), nameCount: 1)
             )
             .Message.ShouldContain("group names");
 
@@ -182,7 +168,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 30, topValueCount: 10);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.Formation.Groups.Count.ShouldBe(7);
         session
@@ -190,15 +176,19 @@ public class SessionFormGroupsTests
             .ShouldBe(["tier-1", "tier-2", "tier-3", "tier-4", "tier-5", "tier-6", "tier-7"]);
     }
 
-    private static void AdvanceIntoGroupFormation(Session session, IGroupSolver groupSolverPort)
+    private static void AdvanceAndFormGroups(Session session, IGroupSolver groupSolverPort)
     {
         session.AdvancePhase();
-        FormationWith(groupSolverPort).ExecuteFor(session);
+        FormGroupsWith(session, groupSolverPort, nameCount: 8);
     }
 
-    private static GroupFormation FormationWith(IGroupSolver groupSolverPort)
+    private static void FormGroupsWith(Session session, IGroupSolver groupSolverPort, int nameCount)
     {
-        return new GroupFormation(groupSolverPort, new TestGroupNames(8));
+        session.FormGroups(
+            groupSolverPort.Solve(GroupFormationRequest.For(session), CancellationToken.None),
+            new TestGroupNames(nameCount).Names,
+            new FixedRandomness(0)
+        );
     }
 
     private static ParticipantId ParticipantAt(int number)
@@ -242,10 +232,13 @@ public class SessionFormGroupsTests
     {
         public GroupFormationRequest? LastRequest { get; private set; }
 
-        public GroupFormationResult Solve(GroupFormationRequest request)
+        public GroupFormationResult Solve(
+            GroupFormationRequest request,
+            CancellationToken cancellationToken
+        )
         {
             LastRequest = request;
-            return new TestGroupSolver().Solve(request);
+            return new TestGroupSolver().Solve(request, cancellationToken);
         }
     }
 }

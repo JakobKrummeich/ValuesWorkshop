@@ -374,7 +374,8 @@ public class ParticipantHubTests
             new ParticipantWorkshopStateMapper(
                 new TestQuizCatalog(5),
                 new TestValuesCatalog(50),
-                new TestAnimalsCatalog(8)
+                new TestAnimalsCatalog(8),
+                new TestFormationProgress(0)
             ),
             TestWorkshopStateCache.Create(),
             new FixedRandomness(0),

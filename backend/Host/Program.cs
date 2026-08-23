@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using ValuesWorkshop.Adapters.Persistence;
 using ValuesWorkshop.Adapters.Web;
 using ValuesWorkshop.Application;
+using ValuesWorkshop.Application.Formation;
 using ValuesWorkshop.Application.Intents;
 using ValuesWorkshop.Application.Ports.Driven;
 using ValuesWorkshop.Application.State;
@@ -40,9 +41,22 @@ builder.Services.AddSingleton<IValuesCatalog>(valuesCatalog);
 builder.Services.AddSingleton<IAnimalsCatalog>(animalsCatalog);
 builder.Services.AddSingleton<IGroupNames>(animalsCatalog);
 builder.Services.AddSingleton<IGroupSolver, CpSatGroupSolver>();
-builder.Services.AddSingleton<IPhaseEntryAction, GroupFormation>();
 builder.Services.AddSingleton<IPhaseEntryAction, ScribeAppointment>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton(
+    builder.Configuration["GROUP_FORMATION_WINDOW_MS"] is { } formationWindowMilliseconds
+        ? new GroupFormationWindow(
+            TimeSpan.FromMilliseconds(
+                double.Parse(formationWindowMilliseconds, CultureInfo.InvariantCulture)
+            )
+        )
+        : GroupFormationWindow.Default
+);
+builder.Services.AddSingleton<GroupFormationRunner>();
+builder.Services.AddSingleton<IGroupFormationProgress>(services =>
+    services.GetRequiredService<GroupFormationRunner>()
+);
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
     new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))
 );
@@ -62,7 +76,28 @@ builder.Services.AddSingleton(
         )
     )
 );
+builder.Services.AddSingleton(
+    new GroupFormationTickInterval(
+        TimeSpan.FromMilliseconds(
+            double.Parse(
+                builder.Configuration["GROUP_FORMATION_TICK_INTERVAL_MS"] ?? "50",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
+builder.Services.AddSingleton(
+    new GroupFormationDiscoveryInterval(
+        TimeSpan.FromMilliseconds(
+            double.Parse(
+                builder.Configuration["GROUP_FORMATION_DISCOVERY_INTERVAL_MS"] ?? "250",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
 builder.Services.AddHostedService<StateResendService>();
+builder.Services.AddHostedService<GroupFormationService>();
 builder.Services.AddSignalR();
 builder.Services.AddSessionCreationRateLimit(
     new SessionCreationRateLimit(
