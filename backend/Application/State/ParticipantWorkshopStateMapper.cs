@@ -67,7 +67,7 @@ public sealed class ParticipantWorkshopStateMapper(
                     revision,
                     ParticipantCount(session),
                     session.Formation.IsFormed
-                        ? new ParticipantFormedView(GroupOf(session, caller, groupViews))
+                        ? new ParticipantFormedView(OwnGroupOnceFormed(session, caller, groupViews))
                         : new ParticipantFormingView(
                             formationProgressPort.ProgressOf(session.Identity).Value
                         )
@@ -105,7 +105,7 @@ public sealed class ParticipantWorkshopStateMapper(
         return session.Roster.Participants.Count;
     }
 
-    private static OwnGroupView GroupOf(
+    private static OwnGroupView OwnGroupOnceFormed(
         Session session,
         ParticipantId caller,
         GroupViews groupViews

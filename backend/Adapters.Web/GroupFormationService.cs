@@ -82,14 +82,14 @@ public sealed class GroupFormationService(
 
     private async Task AdvanceFormationOfAsync(SessionIdentity sessionIdentity)
     {
-        using var scope = scopeFactory.CreateScope();
-
         if (formationRunner.IsWindowOverFor(sessionIdentity))
         {
-            await CloseWindowOfAsync(scope, sessionIdentity);
+            await CloseWindowOfAsync(sessionIdentity);
 
             return;
         }
+
+        using var scope = scopeFactory.CreateScope();
 
         var session = await scope
             .ServiceProvider.GetRequiredService<ISessionRepository>()
@@ -107,8 +107,10 @@ public sealed class GroupFormationService(
         await dispatcher.SendAsync(sessionIdentity, cache.StatesOf(session));
     }
 
-    private async Task CloseWindowOfAsync(IServiceScope scope, SessionIdentity sessionIdentity)
+    private async Task CloseWindowOfAsync(SessionIdentity sessionIdentity)
     {
+        using var scope = scopeFactory.CreateScope();
+
         await scope
             .ServiceProvider.GetRequiredService<SessionCommandHandler>()
             .HandleAsync(

@@ -29,24 +29,18 @@ public sealed class GroupFormationRunner(
             return;
         }
 
-        var token = Guid.NewGuid();
-        var cancellation = new CancellationTokenSource();
+        var run = new GroupFormationRun(
+            Guid.NewGuid(),
+            timeProviderPort.GetTimestamp(),
+            new CancellationTokenSource(),
+            null
+        );
 
         lock (gate)
         {
-            if (
-                !runs.TryAdd(
-                    session.Identity,
-                    new GroupFormationRun(
-                        token,
-                        timeProviderPort.GetTimestamp(),
-                        cancellation,
-                        null
-                    )
-                )
-            )
+            if (!runs.TryAdd(session.Identity, run))
             {
-                cancellation.Dispose();
+                run.Cancellation.Dispose();
 
                 return;
             }
@@ -54,7 +48,7 @@ public sealed class GroupFormationRunner(
 
         var request = GroupFormationRequest.For(session);
 
-        _ = Task.Run(() => SolveFor(session.Identity, token, request, cancellation.Token));
+        _ = Task.Run(() => SolveFor(session.Identity, run.Token, request, run.Cancellation.Token));
     }
 
     public FormationProgress ProgressOf(SessionIdentity sessionIdentity)
