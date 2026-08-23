@@ -115,14 +115,19 @@ public class GroupFormationServiceTests
     }
 
     [Fact]
-    public async Task A_tick_that_fails_forgets_the_run_instead_of_retrying_it_forever()
+    public async Task A_tick_that_fails_keeps_the_run_so_the_next_tick_retries_it()
     {
         await AKnownFormingSessionAsync();
+        clock.Advance(TimeSpan.FromSeconds(3));
 
         await ServiceUnderTest(new UnreachableSessionRepository()).TickOnceAsync();
 
-        formationRuns.RunningSessions().ShouldBeEmpty();
+        formationRuns.RunningSessions().ShouldBe([KnownSession]);
         presenterClients.AddressedGroups.ShouldBeEmpty();
+
+        await ServiceUnderTest().TickOnceAsync();
+
+        repository.Saved.ShouldHaveSingleItem().Formation.IsFormed.ShouldBeTrue();
     }
 
     private static Session AFormingSession()

@@ -29,7 +29,6 @@ public sealed class GroupFormationService(
             }
             catch (Exception exception)
             {
-                formationRuns.Drop(sessionIdentity);
                 logger.LogError(exception, "Advancing a group formation failed.");
             }
         }
@@ -41,7 +40,14 @@ public sealed class GroupFormationService(
 
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
-            await TickOnceAsync();
+            try
+            {
+                await TickOnceAsync();
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Running the group formation windows failed.");
+            }
         }
     }
 
