@@ -36,14 +36,20 @@ Playwright drives real browsers against the compose stack. The config has no
 which brings the stack up, runs the suite and tears the stack down again. CI
 runs that same script in its own `e2e` job.
 
+The suite runs the stack with `docker-compose.e2e.yml` layered on top of the
+dev file: it widens the session-creation rate limit and stretches the group
+formation window, both of which the suite asserts against. The dev stack alone
+runs the production values.
+
 The suite asserts on visible text, so `playwright.config.ts` pins the browser
 locale to English; the app otherwise follows the browser's `Accept-Language`.
 
 ```sh
-docker compose -f docker-compose.dev.yml up -d --build   # wait for backend healthy
-npx playwright test                                      # whole suite
-npx playwright test sessionLifecycle                     # one spec
-docker compose -f docker-compose.dev.yml down            # add -v to drop the database volume
+compose="-f docker-compose.dev.yml -f docker-compose.e2e.yml"
+docker compose $compose up -d --build   # wait for backend healthy
+npx playwright test                     # whole suite
+npx playwright test sessionLifecycle    # one spec
+docker compose $compose down            # add -v to drop the database volume
 ```
 
 `e2e/sessionLifecycle.spec.ts` restarts the backend container mid-suite, so
@@ -64,9 +70,9 @@ migrations run at startup and evolve an existing volume in place.
 | `OIDC_AUTHORITY` / `OIDC_METADATA_URL` | no | `http://localhost:9000` |
 | `CORS_ORIGINS` | no | `http://localhost:3000` |
 | `STATE_RESEND_INTERVAL_MS` | no (`500`) | `500` |
-| `GROUP_FORMATION_WINDOW_MS` | no (`3000`) | `3000` |
+| `GROUP_FORMATION_WINDOW_MS` | no (`3000`) | `3000` (`10000` under `docker-compose.e2e.yml`) |
 | `GROUP_FORMATION_TICK_INTERVAL_MS` | no (`50`) | `50` |
-| `SESSION_CREATION_ATTEMPTS_PER_WINDOW` | no (`5`) | `30` |
+| `SESSION_CREATION_ATTEMPTS_PER_WINDOW` | no (`5`) | `5` (`30` under `docker-compose.e2e.yml`) |
 | `SESSION_CREATION_ATTEMPT_WINDOW_SECONDS` | no (`60`) | `60` |
 
 The dev passphrase is a local development value only; a real deployment sets
