@@ -5,6 +5,12 @@ public class GroupFormationWindowTests
     private static readonly GroupFormationWindow Window = new(TimeSpan.FromSeconds(3));
 
     [Fact]
+    public void A_formation_window_lasts_three_seconds_unless_a_deployment_says_otherwise()
+    {
+        GroupFormationWindow.Default.Value.ShouldBe(TimeSpan.FromSeconds(3));
+    }
+
+    [Fact]
     public void A_window_that_lasts_no_time_is_refused()
     {
         Should.Throw<InvalidOperationException>(() => new GroupFormationWindow(TimeSpan.Zero));

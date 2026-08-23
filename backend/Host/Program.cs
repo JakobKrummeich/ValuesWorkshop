@@ -45,14 +45,13 @@ builder.Services.AddSingleton<IPhaseEntryAction, ScribeAppointment>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton(
-    new GroupFormationWindow(
-        TimeSpan.FromMilliseconds(
-            double.Parse(
-                builder.Configuration["GROUP_FORMATION_WINDOW_MS"] ?? "3000",
-                CultureInfo.InvariantCulture
+    builder.Configuration["GROUP_FORMATION_WINDOW_MS"] is { } formationWindowMilliseconds
+        ? new GroupFormationWindow(
+            TimeSpan.FromMilliseconds(
+                double.Parse(formationWindowMilliseconds, CultureInfo.InvariantCulture)
             )
         )
-    )
+        : GroupFormationWindow.Default
 );
 builder.Services.AddSingleton<GroupFormationRunner>();
 builder.Services.AddSingleton<IGroupFormationProgress>(services =>

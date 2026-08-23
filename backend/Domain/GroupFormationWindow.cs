@@ -2,6 +2,8 @@ namespace ValuesWorkshop.Domain;
 
 public sealed record GroupFormationWindow(TimeSpan Value)
 {
+    public static GroupFormationWindow Default { get; } = new(TimeSpan.FromSeconds(3));
+
     public TimeSpan Value { get; } = Guarded(Value);
 
     public FormationProgress ProgressAfter(TimeSpan elapsed)

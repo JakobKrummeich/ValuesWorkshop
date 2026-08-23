@@ -28,6 +28,26 @@ public sealed class GroupFormationWindowTests : IClassFixture<WorkshopTestFactor
     }
 
     [Fact]
+    public void A_backend_that_is_told_nothing_runs_the_window_the_domain_asks_for()
+    {
+        using var backend = factory.WithWebHostBuilder(_ => { });
+
+        backend
+            .Services.GetRequiredService<GroupFormationWindow>()
+            .ShouldBe(GroupFormationWindow.Default);
+    }
+
+    [Fact]
+    public void A_backend_told_how_long_the_window_lasts_runs_it_for_that_long()
+    {
+        using var backend = BackendWithFormationWindow(milliseconds: 7500);
+
+        backend
+            .Services.GetRequiredService<GroupFormationWindow>()
+            .Value.ShouldBe(TimeSpan.FromMilliseconds(7500));
+    }
+
+    [Fact]
     public async Task A_presenter_watches_the_formation_window_run_before_the_groups_arrive()
     {
         using var backend = BackendWithFormationWindow(milliseconds: 5000);

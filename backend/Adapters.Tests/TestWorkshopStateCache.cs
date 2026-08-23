@@ -52,7 +52,7 @@ internal static class TestWorkshopStateCache
             new TestGroupNames(8),
             new FixedRandomness(0),
             timeProvider,
-            new GroupFormationWindow(TimeSpan.FromSeconds(3)),
+            GroupFormationWindow.Default,
             NullLogger<GroupFormationRunner>.Instance
         );
     }
