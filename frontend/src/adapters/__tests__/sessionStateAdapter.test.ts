@@ -8,12 +8,15 @@ import {
 import { createSessionStatePort } from "../sessionStateAdapter";
 import type { WebsocketConnection } from "../websocketConnection";
 
-function participantStatePayload(revision: number): unknown {
+function participantStatePayload(
+  revision: number,
+  ownDisplayName = "Anna Schmidt",
+): unknown {
   return {
     revision,
     phase: 1,
     participantCount: 2,
-    ownDisplayName: "Anna Schmidt",
+    ownDisplayName,
   };
 }
 
@@ -72,6 +75,26 @@ describe("session state port", () => {
       expectObservable(port.workshopState).toBe("-a-b-----|", {
         a: expect.objectContaining({ revision: 1 }),
         b: expect.objectContaining({ revision: 3 }),
+      });
+    });
+  });
+
+  it("applies a state that repeats the applied revision with different content", () => {
+    testScheduler().run(({ cold, expectObservable }) => {
+      const payloads = cold("-a-b-c-|", {
+        a: participantStatePayload(4, "Anna Schmidt"),
+        b: participantStatePayload(4, "Anna Schmidt-Meyer"),
+        c: participantStatePayload(4, "Anna Meyer"),
+      });
+      const port = createSessionStatePort(
+        connectionEmitting(payloads),
+        participantWorkshopStateSchema,
+      );
+
+      expectObservable(port.workshopState).toBe("-a-b-c-|", {
+        a: expect.objectContaining({ ownDisplayName: "Anna Schmidt" }),
+        b: expect.objectContaining({ ownDisplayName: "Anna Schmidt-Meyer" }),
+        c: expect.objectContaining({ ownDisplayName: "Anna Meyer" }),
       });
     });
   });
