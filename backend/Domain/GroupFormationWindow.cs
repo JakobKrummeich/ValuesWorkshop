@@ -1,4 +1,4 @@
-namespace ValuesWorkshop.Application.Formation;
+namespace ValuesWorkshop.Domain;
 
 public sealed record GroupFormationWindow(TimeSpan Value)
 {

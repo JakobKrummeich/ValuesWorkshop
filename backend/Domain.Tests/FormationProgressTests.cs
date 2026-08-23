@@ -1,6 +1,4 @@
-using ValuesWorkshop.Application.Formation;
-
-namespace ValuesWorkshop.Application.Tests;
+namespace ValuesWorkshop.Domain.Tests;
 
 public class FormationProgressTests
 {
