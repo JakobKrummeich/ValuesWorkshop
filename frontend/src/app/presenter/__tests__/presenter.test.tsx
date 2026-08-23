@@ -68,4 +68,18 @@ describe("presenter screen group", () => {
       "Ada Lovelace",
     );
   });
+
+  it("carries no heading and no language switcher on the wall", async () => {
+    await act(async () => {
+      render(
+        <PresenterLayout>
+          <PresenterHome />
+        </PresenterLayout>,
+        { wrapper: languageWrapper() },
+      );
+    });
+
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
+    expect(screen.queryByRole("group")).not.toBeInTheDocument();
+  });
 });

@@ -10,6 +10,10 @@
 
   --progress-track-height: 64px;
 
+  --text-group-card-name: var(--base-text-32);
+  --text-group-card-chip: var(--base-text-20);
+  --space-group-card-padding: var(--base-space-24);
+
   --space-tight: var(--base-space-16);
   --space-gap: var(--base-space-24);
   --space-gutter: var(--base-space-48);

@@ -71,5 +71,4 @@ export enum MessageKey {
   GroupFormationWaitingForGroup = "groupFormation.waitingForGroup",
   FacilitatorHeading = "facilitator.heading",
   ParticipantHeading = "participant.heading",
-  PresenterHeading = "presenter.heading",
 }

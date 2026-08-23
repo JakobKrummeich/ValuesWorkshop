@@ -41,6 +41,25 @@ exist. Accepted: the bar is a fixed beat for the room, and the extra
 machinery to tell a late reconnect from a live advance costs more than the
 rare stale bar. A reload or a late join in phase 5 still skips the bar (D2).
 
+## Presenter wall redesign (folded in, review 2026-08-22)
+
+Verification screenshots of a real 24-participant workshop showed the phase-5
+wall clipping every member name. The repo owner reviewed them and decided the
+fix lands in this task as its own commit:
+
+- **Six cards per page stay** (3×2) — no fewer cards, no extra pages.
+- **Member names become chips**, grouped top-left under the group name,
+  flex-wrapping.
+- **Values stay chips**, grouped bottom-right, flex-wrapping.
+- **One color for all names, one color for all values, the two differ** — no
+  per-value color variety.
+- **The presenter header goes away**: no `Presenter` heading, and no language
+  switcher anywhere on the presenter — the wall is non-interactive. The space
+  goes to the cards.
+- **Font sizes are tuned so everything fits**: with 24 participants in 6 groups
+  of 4, every member name and every value chip is fully visible on a 1920×1080
+  wall.
+
 ## Slices
 
 1. `FormationProgressBar` component + hook (3 s timer, cleanup on unmount).

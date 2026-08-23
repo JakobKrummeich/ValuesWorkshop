@@ -166,8 +166,4 @@ export const generalMessages = {
     [Language.German]: "Teilnahme",
     [Language.English]: "Participant",
   },
-  [MessageKey.PresenterHeading]: {
-    [Language.German]: "Präsentation",
-    [Language.English]: "Presenter",
-  },
 } as const satisfies Partial<Readonly<Record<MessageKey, Message>>>;
