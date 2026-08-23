@@ -8,7 +8,7 @@ using ValuesWorkshop.Domain.Ports;
 
 namespace ValuesWorkshop.Host.Tests;
 
-public sealed class GroupFormationWindowTests : IClassFixture<WorkshopTestFactory>
+public sealed class DeployedFormationWindowTests : IClassFixture<WorkshopTestFactory>
 {
     private const int ParticipantCount = 4;
 
@@ -22,7 +22,7 @@ public sealed class GroupFormationWindowTests : IClassFixture<WorkshopTestFactor
 
     private readonly WorkshopTestFactory factory;
 
-    public GroupFormationWindowTests(WorkshopTestFactory factory)
+    public DeployedFormationWindowTests(WorkshopTestFactory factory)
     {
         this.factory = factory;
     }
