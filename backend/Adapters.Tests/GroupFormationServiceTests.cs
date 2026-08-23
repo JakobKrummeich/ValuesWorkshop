@@ -31,11 +31,11 @@ public class GroupFormationServiceTests
     }
 
     [Fact]
-    public async Task A_connected_session_that_is_forming_its_groups_starts_a_run()
+    public async Task A_connected_session_that_is_forming_its_groups_is_discovered()
     {
         await AConnectedFormingSessionAsync();
 
-        await ServiceUnderTest().TickOnceAsync();
+        await ServiceUnderTest().DiscoverOnceAsync();
 
         formationRunner.RunningSessions().ShouldBe([KnownSession]);
         PresenterState()
@@ -51,10 +51,34 @@ public class GroupFormationServiceTests
         await repository.CreateAsync(session);
         registry.Add(KnownSession, "connection-1");
 
-        await ServiceUnderTest().TickOnceAsync();
+        await ServiceUnderTest().DiscoverOnceAsync();
 
         formationRunner.RunningSessions().ShouldBeEmpty();
         presenterClients.AddressedGroups.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_tick_reads_no_session_as_long_as_no_formation_runs()
+    {
+        await AConnectedFormingSessionAsync();
+
+        await ServiceUnderTest().TickOnceAsync();
+
+        repository.Loaded.ShouldBeEmpty();
+        formationRunner.RunningSessions().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task A_discovered_session_is_left_to_the_ticks_from_then_on()
+    {
+        await AConnectedFormingSessionAsync();
+        var service = ServiceUnderTest();
+        await service.DiscoverOnceAsync();
+        repository.Loaded.Clear();
+
+        await service.DiscoverOnceAsync();
+
+        repository.Loaded.ShouldBeEmpty();
     }
 
     [Fact]
@@ -75,7 +99,7 @@ public class GroupFormationServiceTests
     {
         var session = await AConnectedFormingSessionAsync();
         var service = ServiceUnderTest();
-        await service.TickOnceAsync();
+        await service.DiscoverOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(1.5));
 
         await service.TickOnceAsync();
@@ -99,7 +123,7 @@ public class GroupFormationServiceTests
     {
         await AConnectedFormingSessionAsync();
         var service = ServiceUnderTest();
-        await service.TickOnceAsync();
+        await service.DiscoverOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(1.5));
 
         await service.TickOnceAsync();
@@ -112,7 +136,7 @@ public class GroupFormationServiceTests
     {
         await AConnectedFormingSessionAsync();
         var service = ServiceUnderTest();
-        await service.TickOnceAsync();
+        await service.DiscoverOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
 
         await service.TickOnceAsync();
@@ -128,7 +152,7 @@ public class GroupFormationServiceTests
     {
         var session = await AConnectedFormingSessionAsync();
         var service = ServiceUnderTest();
-        await service.TickOnceAsync();
+        await service.DiscoverOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
         formationRunner.FormGroupsIn(session);
 
@@ -144,7 +168,7 @@ public class GroupFormationServiceTests
     {
         await AConnectedFormingSessionAsync();
         var service = ServiceUnderTest();
-        await service.TickOnceAsync();
+        await service.DiscoverOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
 
         await service.TickOnceAsync();
@@ -161,7 +185,7 @@ public class GroupFormationServiceTests
     {
         var session = await AConnectedFormingSessionAsync();
         var service = ServiceUnderTest();
-        await service.TickOnceAsync();
+        await service.DiscoverOnceAsync();
         var statesBeforeTheGroupsStood = PresenterStates().Count;
         formationRunner.FormGroupsIn(session);
 
@@ -187,7 +211,7 @@ public class GroupFormationServiceTests
     public async Task A_tick_that_fails_keeps_the_run_so_the_next_tick_retries_it()
     {
         await AConnectedFormingSessionAsync();
-        await ServiceUnderTest().TickOnceAsync();
+        await ServiceUnderTest().DiscoverOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
 
         await ServiceUnderTest(new UnreachableSessionRepository()).TickOnceAsync();
@@ -279,6 +303,7 @@ public class GroupFormationServiceTests
             cache,
             dispatcher,
             new GroupFormationTickInterval(TimeSpan.FromMilliseconds(50)),
+            new GroupFormationDiscoveryInterval(TimeSpan.FromMilliseconds(250)),
             NullLogger<GroupFormationService>.Instance
         );
     }

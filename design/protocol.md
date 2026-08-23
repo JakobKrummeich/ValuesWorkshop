@@ -224,14 +224,18 @@ changes; no repository read, no domain work, no SQLite traffic.
 
 A session whose group formation is running (phase 5, `Forming` — § 5.1) is
 the one exception: its state changes while `revision` stands still, so it is
-never cached. A second hosted service, the formation ticker, runs every
-`GROUP_FORMATION_TICK_INTERVAL_MS` (default **50**). It loads every session
-with a connected client — the one place that reads the repository on a timer
-— starts a formation run for each one it finds unformed in phase 5, re-maps
-that session fresh and pushes it, so the progress bar moves smoothly instead
-of stepping every 500 ms. When `GROUP_FORMATION_WINDOW_MS` (default **3000**)
-is up the same tick applies the assignment (T11) and the session goes back to
-the ordinary cached resend.
+never cached. A second hosted service, the formation ticker, keeps two beats.
+Every `GROUP_FORMATION_TICK_INTERVAL_MS` (default **50**) it re-maps each
+session that has a formation run and pushes it, so the progress bar moves
+smoothly instead of stepping every 500 ms; when `GROUP_FORMATION_WINDOW_MS`
+(default **3000**) is up the same tick applies the assignment (T11) and the
+session goes back to the ordinary cached resend. Every
+`GROUP_FORMATION_DISCOVERY_INTERVAL_MS` (default **250**) it looks for a
+session that still needs a run: only that slower beat loads sessions from the
+repository — the one place that reads it on a timer — and only sessions with
+a connected client and no run yet. A room where nothing is forming therefore
+costs four reads a second, not twenty, and a session found unformed in phase 5
+starts its window within a quarter second of entering it.
 
 ```mermaid
 sequenceDiagram

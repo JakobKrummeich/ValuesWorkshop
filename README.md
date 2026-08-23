@@ -72,6 +72,7 @@ migrations run at startup and evolve an existing volume in place.
 | `STATE_RESEND_INTERVAL_MS` | no (`500`) | `500` |
 | `GROUP_FORMATION_WINDOW_MS` | no (`3000`) | `3000` (`10000` under `docker-compose.e2e.yml`) |
 | `GROUP_FORMATION_TICK_INTERVAL_MS` | no (`50`) | `50` |
+| `GROUP_FORMATION_DISCOVERY_INTERVAL_MS` | no (`250`) | `250` |
 | `SESSION_CREATION_ATTEMPTS_PER_WINDOW` | no (`5`) | `5` (`30` under `docker-compose.e2e.yml`) |
 | `SESSION_CREATION_ATTEMPT_WINDOW_SECONDS` | no (`60`) | `60` |
 

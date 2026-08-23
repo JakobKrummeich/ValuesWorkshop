@@ -10,23 +10,64 @@ namespace ValuesWorkshop.Adapters.Web;
 
 public sealed record GroupFormationTickInterval(TimeSpan Value);
 
+public sealed record GroupFormationDiscoveryInterval(TimeSpan Value);
+
 public sealed class GroupFormationService(
     SessionConnectionRegistry registry,
     GroupFormationRunner formationRunner,
     IServiceScopeFactory scopeFactory,
     WorkshopStateCache cache,
     RoleStateDispatcher dispatcher,
-    GroupFormationTickInterval interval,
+    GroupFormationTickInterval tickInterval,
+    GroupFormationDiscoveryInterval discoveryInterval,
     ILogger<GroupFormationService> logger
 ) : BackgroundService
 {
     public async Task TickOnceAsync()
     {
-        var connectedSessions = registry.ConnectedSessions();
+        formationRunner.RetainOnly(registry.ConnectedSessions());
 
-        formationRunner.RetainOnly(connectedSessions);
+        await AdvanceEachAsync(formationRunner.RunningSessions());
+    }
 
-        foreach (var sessionIdentity in connectedSessions)
+    public async Task DiscoverOnceAsync()
+    {
+        await AdvanceEachAsync(SessionsWithoutARun());
+    }
+
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        return Task.WhenAll(
+            RepeatAsync(tickInterval.Value, TickOnceAsync, stoppingToken),
+            RepeatAsync(discoveryInterval.Value, DiscoverOnceAsync, stoppingToken)
+        );
+    }
+
+    private IReadOnlyList<SessionIdentity> SessionsWithoutARun()
+    {
+        return registry.ConnectedSessions().Except(formationRunner.RunningSessions()).ToList();
+    }
+
+    private async Task RepeatAsync(TimeSpan every, Func<Task> work, CancellationToken stoppingToken)
+    {
+        using var timer = new PeriodicTimer(every);
+
+        while (await timer.WaitForNextTickAsync(stoppingToken))
+        {
+            try
+            {
+                await work();
+            }
+            catch (Exception exception)
+            {
+                logger.LogError(exception, "Running the group formation windows failed.");
+            }
+        }
+    }
+
+    private async Task AdvanceEachAsync(IReadOnlyList<SessionIdentity> sessionIdentities)
+    {
+        foreach (var sessionIdentity in sessionIdentities)
         {
             try
             {
@@ -35,23 +76,6 @@ public sealed class GroupFormationService(
             catch (Exception exception)
             {
                 logger.LogError(exception, "Advancing a group formation failed.");
-            }
-        }
-    }
-
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        using var timer = new PeriodicTimer(interval.Value);
-
-        while (await timer.WaitForNextTickAsync(stoppingToken))
-        {
-            try
-            {
-                await TickOnceAsync();
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Running the group formation windows failed.");
             }
         }
     }

@@ -104,7 +104,7 @@ Application services:
 
 | Service | File | Ports (ctor) | Lifetime | Called by |
 |---|---|---|---|---|
-| `GroupFormationRunner` | `Application/Formation/GroupFormationRunner.cs` | `IGroupSolver`, `IGroupNames`, `IRandomness`, `TimeProvider`, `GroupFormationWindow` (the tunable, `GROUP_FORMATION_WINDOW_MS`) | singleton | `GroupFormationService` (Adapters.Web hosted service, sibling of `StateResendService`) alone: every 50 ms it loads each connected session, starts a run for one that is unformed in phase 5, pushes the progress, and applies the assignment once the window is over. `WorkshopStateCache` is a cache and starts nothing |
+| `GroupFormationRunner` | `Application/Formation/GroupFormationRunner.cs` | `IGroupSolver`, `IGroupNames`, `IRandomness`, `TimeProvider`, `GroupFormationWindow` (the tunable, `GROUP_FORMATION_WINDOW_MS`) | singleton | `GroupFormationService` (Adapters.Web hosted service, sibling of `StateResendService`) alone, on two beats: every 50 ms it pushes the progress of each session that has a run and applies the assignment once the window is over, and every 250 ms it scans for a connected session with no run that it finds unformed in phase 5. Only the slower scan reads the repository, so a room where nothing is forming costs no per-tick load. `WorkshopStateCache` is a cache and starts nothing |
 
 `GroupFormationRunner` holds the one thing the domain must not hold: work in
 flight. The solver call runs off-thread under a cancellation token the run

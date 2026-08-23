@@ -220,6 +220,8 @@ internal sealed class InMemorySessionRepository : ISessionRepository
 
     internal List<Session> Saved { get; } = [];
 
+    internal List<SessionIdentity> Loaded { get; } = [];
+
     internal void Add(Session session)
     {
         sessions[session.Identity] = session;
@@ -228,6 +230,8 @@ internal sealed class InMemorySessionRepository : ISessionRepository
 
     public Task<Session?> LoadAsync(SessionIdentity sessionIdentity)
     {
+        Loaded.Add(sessionIdentity);
+
         return Task.FromResult(sessions.GetValueOrDefault(sessionIdentity));
     }
 

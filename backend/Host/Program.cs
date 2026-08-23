@@ -87,6 +87,16 @@ builder.Services.AddSingleton(
         )
     )
 );
+builder.Services.AddSingleton(
+    new GroupFormationDiscoveryInterval(
+        TimeSpan.FromMilliseconds(
+            double.Parse(
+                builder.Configuration["GROUP_FORMATION_DISCOVERY_INTERVAL_MS"] ?? "250",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
 builder.Services.AddHostedService<StateResendService>();
 builder.Services.AddHostedService<GroupFormationService>();
 builder.Services.AddSignalR();
