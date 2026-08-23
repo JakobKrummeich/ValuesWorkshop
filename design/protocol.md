@@ -225,11 +225,13 @@ changes; no repository read, no domain work, no SQLite traffic.
 A session whose group formation is running (phase 5, `Forming` — § 5.1) is
 the one exception: its state changes while `revision` stands still, so it is
 never cached. A second hosted service, the formation ticker, runs every
-`GROUP_FORMATION_TICK_INTERVAL_MS` (default **50**), re-maps that session
-fresh and pushes it, so the progress bar moves smoothly instead of stepping
-every 500 ms. When `GROUP_FORMATION_WINDOW_MS` (default **3000**) is up the
-same tick applies the assignment (T11) and the session goes back to the
-ordinary cached resend.
+`GROUP_FORMATION_TICK_INTERVAL_MS` (default **50**). It loads every session
+with a connected client — the one place that reads the repository on a timer
+— starts a formation run for each one it finds unformed in phase 5, re-maps
+that session fresh and pushes it, so the progress bar moves smoothly instead
+of stepping every 500 ms. When `GROUP_FORMATION_WINDOW_MS` (default **3000**)
+is up the same tick applies the assignment (T11) and the session goes back to
+the ordinary cached resend.
 
 ```mermaid
 sequenceDiagram
@@ -255,9 +257,11 @@ the state differs from the applied one**; otherwise drop it.
 
 The equal-revision clause exists for state that moves without a persisted
 mutation: formation progress (§ 3.3) advances every 50 ms while `revision`
-stands still. It is safe because messages of one revision arrive in order on
-a connection, and the only thing that can differ between them is that
-progress.
+stands still. The only thing that can differ between two messages of one
+revision is that progress, and both senders — the ticker and the ordinary
+broadcast — can be in flight at the same revision, so a bar may jitter back
+by one tick. That is the worst case: a fraction of a percent, invisible, and
+the next tick moves it forward again.
 
 Consequences: identical resends cause no re-render and no flicker, and a late
 or duplicated message can never move a screen backwards — it is either older
@@ -378,8 +382,10 @@ quiz block already uses for its walk:
 - `forming` — `progress`, a double in `[0,1]` saying how far the formation
   window has run (§ 3.3). **No group data at all**: while the groups do not
   exist, nothing about them is sent.
-- `formed` — the role's group data: `ownGroup` for the participant (`null`
-  when the caller has no group yet), `groups` for facilitator and presenter.
+- `formed` — the role's group data: `ownGroup` for the participant, `groups`
+  for facilitator and presenter. Forming places every participant on the
+  roster, and a participant who joins a formed session is placed on the spot,
+  so a formed phase 5 always names the caller's group.
 
 So `progress` exists only while `forming` and group data only once `formed`;
 neither is ever a null placeholder for the other. `AdvancePhase` is absent
@@ -395,7 +401,7 @@ variant carries it.
 | quiz | `questionIndex`, `questionCount`, `subState` (`answering` \| `revealed` \| `learningTextShown`), `question: {de, en}`, `answers: [{de, en}]`, `ownAnswerIndex` (`null` until the participant casts) — never `correctAnswerIndex` or `learningText`: the participant device shows only the participant's own answer after casting (Task 19a), and data a screen must not show is data not sent |
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | ownGroup | `name: {animalId, text: {de, en}}` (the animal label rides the wire — values-catalog precedent, the client never reads `config/`), `memberDisplayNames` (formation order), `assignedValues: [{valueId, text: {de, en}}]` (deal order; texts embedded because the participant variant carries no values catalog in phase 5), `isCallerScribe?`, `scribeName?`, `workStatus?` (`editing` \| `submitted`), `actions?: [{ actionId, valueId, text, sortOrder }]` (all four present during phase 6 only — group-work data leaves the wire when the phase ends; T19) |
-| formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `ownGroup` (the block above, `null` when the caller has not been placed) |
+| formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `ownGroup` (the block above, always present — every participant of a formed session is in a group) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |

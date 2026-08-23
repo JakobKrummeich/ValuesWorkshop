@@ -1,5 +1,3 @@
-"use client";
-
 import {
   FormationSubState,
   type ParticipantGroupFormationState,

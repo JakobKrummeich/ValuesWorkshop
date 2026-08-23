@@ -164,9 +164,13 @@ Guards in words:
 While `Forming` no group data exists, so none is shown or sent
 (`design/protocol.md` § 5.1); the elapsed fraction of the window is emitted
 instead, and the presenter and participant screens render their progress bar
-from it. The run is memory-only: a server restarting mid-window finds an
-unformed phase-5 session and starts a fresh window, while a session that was
-already formed simply keeps its groups.
+from it. The run is memory-only, and the formation ticker is what looks for
+one: every 50 ms it loads each session a client is connected to, and a
+session it finds unformed in phase 5 gets a run. A server restarting
+mid-window therefore starts a fresh window within a tick of the first client
+reconnecting, while a session that was already formed simply keeps its
+groups. A run whose room has emptied is dropped, and the next connection
+starts it over.
 
 Once formed, `JoinSession` carries a second effect:
 `AddParticipantToGroup [System] / ParticipantAddedToGroup` puts the joiner
