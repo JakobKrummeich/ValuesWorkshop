@@ -7,8 +7,4 @@ export const groupFormationMessages = {
     [Language.German]: "Gruppen werden gebildet\u2026",
     [Language.English]: "Forming groups\u2026",
   },
-  [MessageKey.GroupFormationWaitingForGroup]: {
-    [Language.German]: "Deine Gruppe wird gerade gebildet\u2026",
-    [Language.English]: "Your group is being formed\u2026",
-  },
 } as const satisfies Partial<Readonly<Record<MessageKey, Message>>>;

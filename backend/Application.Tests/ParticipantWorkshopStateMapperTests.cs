@@ -377,17 +377,18 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
-    public void A_caller_who_is_in_no_group_gets_no_own_group()
+    public void A_caller_who_is_in_no_group_of_a_formed_session_fails_loudly()
     {
         var session = SessionFixtures.InPhase(
             Phase.GroupFormation,
             formation: SessionFixtures.TwoGroups()
         );
 
-        Map(session, caller: new ParticipantId(Guid.NewGuid()))
-            .ShouldBeOfType<ParticipantGroupFormationState>()
-            .Formation.ShouldBeOfType<ParticipantFormedView>()
-            .OwnGroup.ShouldBeNull();
+        Should
+            .Throw<InvalidOperationException>(() =>
+                Map(session, caller: new ParticipantId(Guid.NewGuid()))
+            )
+            .Message.ShouldBe("Once the groups stand, every participant belongs to one of them.");
     }
 
     [Fact]

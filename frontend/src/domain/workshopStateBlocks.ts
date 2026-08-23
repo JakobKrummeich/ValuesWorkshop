@@ -105,6 +105,8 @@ export const ownGroupViewSchema = z.object({
   assignedValues: workshopValuesSchema,
 });
 
+export type OwnGroupView = z.infer<typeof ownGroupViewSchema>;
+
 export const facilitatorGroupsSchema = z.array(
   z.object({
     name: groupNameSchema,
@@ -130,7 +132,7 @@ export const participantFormationViewSchema = z.discriminatedUnion("subState", [
   formationProgressSchema,
   z.object({
     subState: z.literal(FormationSubState.Formed),
-    ownGroup: ownGroupViewSchema.nullable(),
+    ownGroup: ownGroupViewSchema,
   }),
 ]);
 

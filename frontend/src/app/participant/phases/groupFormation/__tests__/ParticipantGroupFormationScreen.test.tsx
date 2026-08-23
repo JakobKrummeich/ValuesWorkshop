@@ -3,13 +3,14 @@ import { Language } from "../../../../../domain/i18n/language";
 import { Phase } from "../../../../../domain/phases";
 import {
   FormationSubState,
+  type OwnGroupView,
   type ParticipantFormationView,
   type ParticipantGroupFormationState,
 } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { ParticipantGroupFormationScreen } from "../ParticipantGroupFormationScreen";
 
-const ownGroup = {
+const ownGroup: OwnGroupView = {
   name: { animalId: "fox", text: { de: "Fuchs", en: "Fox" } },
   memberDisplayNames: ["Ada", "Grace", "Lin"],
   assignedValues: [
@@ -18,10 +19,8 @@ const ownGroup = {
   ],
 };
 
-function formed(
-  group: typeof ownGroup | null = ownGroup,
-): ParticipantFormationView {
-  return { subState: FormationSubState.Formed, ownGroup: group };
+function formed(): ParticipantFormationView {
+  return { subState: FormationSubState.Formed, ownGroup };
 }
 
 function renderScreen(
@@ -64,23 +63,6 @@ describe("participant group formation screen", () => {
     );
   });
 
-  it("notes that the group is being formed while no group is assigned", () => {
-    renderScreen(formed(null));
-
-    expect(screen.queryByTestId("own-group-card")).not.toBeInTheDocument();
-    expect(screen.getByTestId("own-group-waiting")).toHaveTextContent(
-      "Your group is being formed\u2026",
-    );
-  });
-
-  it("notes the forming group in German when German is chosen", () => {
-    renderScreen(formed(null), Language.German);
-
-    expect(screen.getByTestId("own-group-waiting")).toHaveTextContent(
-      "Deine Gruppe wird gerade gebildet\u2026",
-    );
-  });
-
   it("runs the bar at the emitted progress while the formation runs", () => {
     renderScreen({ subState: FormationSubState.Forming, progress: 0.6 });
 
@@ -89,6 +71,5 @@ describe("participant group formation screen", () => {
       "60",
     );
     expect(screen.queryByTestId("own-group-card")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("own-group-waiting")).not.toBeInTheDocument();
   });
 });

@@ -430,7 +430,6 @@ test.describe.serial("value selection through group formation", () => {
       await expect(
         ownGroupCard.getByTestId("group-value-kompetenz"),
       ).toHaveText("Competence");
-      await expect(page.getByTestId("own-group-waiting")).toHaveCount(0);
     }
   });
 

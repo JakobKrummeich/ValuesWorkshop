@@ -150,15 +150,15 @@ describe("participant workshop state schema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("accepts a group formation state for a caller who is in no group", () => {
-    const state = participantWorkshopStateSchema.parse({
+  it("rejects formed groups that carry no own group", () => {
+    const result = participantWorkshopStateSchema.safeParse({
       revision: 12,
       phase: 5,
       participantCount: 8,
       formation: { subState: "formed", ownGroup: null },
     });
 
-    expect(state.phase).toBe(Phase.GroupFormation);
+    expect(result.success).toBe(false);
   });
 
   it("accepts a running formation that carries its progress", () => {

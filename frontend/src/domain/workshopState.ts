@@ -23,7 +23,11 @@ import {
 import { FormationSubState } from "./workshopStateBlocks";
 
 export { FormationSubState, QuizSubState } from "./workshopStateBlocks";
-export type { GroupName, WorkshopValue } from "./workshopStateBlocks";
+export type {
+  GroupName,
+  OwnGroupView,
+  WorkshopValue,
+} from "./workshopStateBlocks";
 
 export enum FacilitatorIntent {
   AdvancePhase = "AdvancePhase",

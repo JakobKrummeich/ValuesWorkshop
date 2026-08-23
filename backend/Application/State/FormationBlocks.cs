@@ -15,7 +15,7 @@ public abstract record ParticipantFormationView;
 
 public sealed record ParticipantFormingView(double Progress) : ParticipantFormationView;
 
-public sealed record ParticipantFormedView(OwnGroupView? OwnGroup) : ParticipantFormationView;
+public sealed record ParticipantFormedView(OwnGroupView OwnGroup) : ParticipantFormationView;
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "subState")]
 [JsonDerivedType(typeof(FacilitatorFormingView), FormationSubState.Forming)]
