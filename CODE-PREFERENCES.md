@@ -61,7 +61,7 @@ provides — `randomness`, not `randomnessPort`.
 Code performing a general operation — advancing a phase, dispatching an
 intent — reads identically no matter which case passes through: it mentions
 no specific phase, and its signature carries no dependency that only one case
-needs. A case-specific effect (forming groups on entering GroupFormation)
+needs. A case-specific effect (appointing scribes on entering GroupWork)
 implements a case-owned hook (`IPhaseEntryAction`) that decides *itself*
 whether it applies; the general path just runs every hook.
 
