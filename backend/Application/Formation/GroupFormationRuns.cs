@@ -14,7 +14,11 @@ public sealed class GroupFormationRuns(
     ILogger<GroupFormationRuns> logger
 ) : IGroupFormationProgress
 {
-    private sealed record GroupFormationRun(long StartedAt, GroupFormationResult? Assignment);
+    private sealed record GroupFormationRun(
+        Guid Token,
+        long StartedAt,
+        GroupFormationResult? Assignment
+    );
 
     private readonly Lock gate = new();
     private readonly Dictionary<SessionIdentity, GroupFormationRun> runs = [];
@@ -26,14 +30,14 @@ public sealed class GroupFormationRuns(
             return;
         }
 
-        var request = GroupFormationRequest.For(session);
+        var token = Guid.NewGuid();
 
         lock (gate)
         {
             if (
                 !runs.TryAdd(
                     session.Identity,
-                    new GroupFormationRun(timeProvider.GetTimestamp(), null)
+                    new GroupFormationRun(token, timeProvider.GetTimestamp(), null)
                 )
             )
             {
@@ -41,7 +45,9 @@ public sealed class GroupFormationRuns(
             }
         }
 
-        _ = Task.Run(() => SolveFor(session.Identity, request));
+        var request = GroupFormationRequest.For(session);
+
+        _ = Task.Run(() => SolveFor(session.Identity, token, request));
     }
 
     public double ProgressOf(SessionIdentity sessionIdentity)
@@ -109,7 +115,11 @@ public sealed class GroupFormationRuns(
         return RandomGroupAssignment.For(GroupFormationRequest.For(session), randomness);
     }
 
-    private void SolveFor(SessionIdentity sessionIdentity, GroupFormationRequest request)
+    private void SolveFor(
+        SessionIdentity sessionIdentity,
+        Guid token,
+        GroupFormationRequest request
+    )
     {
         GroupFormationResult? assignment = null;
 
@@ -124,7 +134,11 @@ public sealed class GroupFormationRuns(
 
         lock (gate)
         {
-            if (assignment is not null && runs.TryGetValue(sessionIdentity, out var run))
+            if (
+                assignment is not null
+                && runs.TryGetValue(sessionIdentity, out var run)
+                && run.Token == token
+            )
             {
                 runs[sessionIdentity] = run with { Assignment = assignment };
             }

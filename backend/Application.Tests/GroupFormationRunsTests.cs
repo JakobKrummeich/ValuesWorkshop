@@ -164,6 +164,40 @@ public class GroupFormationRunsTests
     }
 
     [Fact]
+    public void An_assignment_from_a_dropped_run_never_lands_in_the_run_that_replaced_it()
+    {
+        var solver = new HeldGroupSolver();
+        var session = FormingSession();
+
+        try
+        {
+            var runs = RunsOver(solver);
+            runs.EnsureRunningFor(session);
+            runs.Drop(session.Identity);
+            runs.EnsureRunningFor(session);
+
+            solver.ReleaseFirstSolve();
+
+            SpinWait
+                .SpinUntil(
+                    () =>
+                    {
+                        var candidate = FormingSession();
+                        runs.FormGroupsIn(candidate);
+
+                        return candidate.Formation.Groups.Count == 2;
+                    },
+                    TimeSpan.FromMilliseconds(500)
+                )
+                .ShouldBeFalse();
+        }
+        finally
+        {
+            solver.ReleaseLaterSolves();
+        }
+    }
+
+    [Fact]
     public void The_solver_is_asked_about_the_whole_room_and_the_top_values()
     {
         var solver = new RecordingGroupSolver();
@@ -230,6 +264,36 @@ public class GroupFormationRunsTests
                 new FormedGroup(members.Take(1).ToList(), request.TopValues.Take(1).ToList()),
                 new FormedGroup(members.Skip(1).ToList(), request.TopValues.Skip(1).ToList()),
             ]);
+        }
+    }
+
+    private sealed class HeldGroupSolver : IGroupSolver
+    {
+        private readonly ManualResetEventSlim firstSolveReleased = new();
+        private readonly ManualResetEventSlim laterSolvesReleased = new();
+        private int solves;
+
+        public GroupFormationResult Solve(GroupFormationRequest request)
+        {
+            var isFirstSolve = Interlocked.Increment(ref solves) == 1;
+
+            (isFirstSolve ? firstSolveReleased : laterSolvesReleased).Wait(
+                TimeSpan.FromSeconds(10)
+            );
+
+            return isFirstSolve
+                ? new SplitInTwoGroupSolver().Solve(request)
+                : new TestGroupSolver().Solve(request);
+        }
+
+        public void ReleaseFirstSolve()
+        {
+            firstSolveReleased.Set();
+        }
+
+        public void ReleaseLaterSolves()
+        {
+            laterSolvesReleased.Set();
         }
     }
 
