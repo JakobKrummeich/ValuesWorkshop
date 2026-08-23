@@ -8,6 +8,11 @@ public sealed class FormationRecord
     public IReadOnlyList<Group> Groups => _groups;
     public bool IsEveryGroupSubmitted => _groups.TrueForAll(group => group.IsSubmitted);
 
+    public bool IsGrouped(ParticipantId participantId)
+    {
+        return _groups.Exists(group => group.Members.Contains(participantId));
+    }
+
     internal void Form(GroupFormationResult formationResult, IReadOnlyList<string> groupNames)
     {
         if (formationResult.Groups.Count > groupNames.Count)

@@ -15,7 +15,7 @@ public class ScribeAppointmentTests
             Group.Restore("owl", [Chris, Dana], [new ValueId("wert-2")], null, false, [])
         );
 
-        new ScribeAppointment(Randomness.Fixed(1)).ExecuteFor(session);
+        new ScribeAppointment(new FixedRandomness(1)).ExecuteFor(session);
 
         session.Formation.Groups[0].Scribe.ShouldBe(Ben);
         session.Formation.Groups[1].Scribe.ShouldBe(Dana);
@@ -33,7 +33,7 @@ public class ScribeAppointmentTests
             )
         );
 
-        new ScribeAppointment(Randomness.Fixed(0)).ExecuteFor(session);
+        new ScribeAppointment(new FixedRandomness(0)).ExecuteFor(session);
 
         session.Formation.Groups[0].Scribe.ShouldBeNull();
     }
@@ -45,7 +45,7 @@ public class ScribeAppointmentTests
             Group.Restore("fox", [Anna, Ben], [new ValueId("wert-1")], Anna, false, [])
         );
 
-        new ScribeAppointment(Randomness.Fixed(1)).ExecuteFor(session);
+        new ScribeAppointment(new FixedRandomness(1)).ExecuteFor(session);
 
         session.Formation.Groups[0].Scribe.ShouldBe(Anna);
     }
@@ -57,8 +57,8 @@ public class ScribeAppointmentTests
             Group.Restore("fox", [Anna, Ben], [new ValueId("wert-1")], null, false, [])
         );
 
-        new ScribeAppointment(Randomness.Fixed(0)).ExecuteFor(session);
-        new ScribeAppointment(Randomness.Fixed(1)).ExecuteFor(session);
+        new ScribeAppointment(new FixedRandomness(0)).ExecuteFor(session);
+        new ScribeAppointment(new FixedRandomness(1)).ExecuteFor(session);
 
         session.Formation.Groups[0].Scribe.ShouldBe(Anna);
     }
@@ -71,7 +71,7 @@ public class ScribeAppointmentTests
             Group.Restore("owl", [Chris, Dana], [new ValueId("wert-2")], null, false, [])
         );
 
-        new ScribeAppointment(Randomness.Fixed(0)).ExecuteFor(session);
+        new ScribeAppointment(new FixedRandomness(0)).ExecuteFor(session);
 
         session.Formation.Groups[0].Scribe.ShouldBeNull();
         session.Formation.Groups[1].Scribe.ShouldBe(Chris);
@@ -85,7 +85,7 @@ public class ScribeAppointmentTests
             Group.Restore("owl", [Chris, Dana], [new ValueId("wert-2")], null, false, [])
         );
 
-        new ScribeAppointment(Randomness.Fixed(0)).ExecuteFor(session);
+        new ScribeAppointment(new FixedRandomness(0)).ExecuteFor(session);
 
         session.Formation.Groups[0].Scribe.ShouldBe(Ben);
         session.Formation.Groups[1].Scribe.ShouldBe(Chris);

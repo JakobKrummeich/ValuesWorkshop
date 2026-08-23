@@ -13,6 +13,23 @@ public static class GroupSizing
     public static IReadOnlyList<int> ValueCountsPerGroup(int valueCount, int groupCount) =>
         DealOut(valueCount, groupCount);
 
+    public static IReadOnlyList<IReadOnlyList<TItem>> Deal<TItem>(
+        IReadOnlyList<TItem> items,
+        IReadOnlyList<int> countsPerGroup
+    )
+    {
+        var dealt = new List<IReadOnlyList<TItem>>();
+        var nextItem = 0;
+
+        foreach (var count in countsPerGroup)
+        {
+            dealt.Add(items.Skip(nextItem).Take(count).ToList());
+            nextItem += count;
+        }
+
+        return dealt;
+    }
+
     private static IReadOnlyList<int> DealOut(int itemCount, int groupCount)
     {
         var baseCount = itemCount / groupCount;

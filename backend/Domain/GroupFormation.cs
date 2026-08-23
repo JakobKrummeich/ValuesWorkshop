@@ -1,7 +1,10 @@
 namespace ValuesWorkshop.Domain;
 
-public sealed class GroupFormation(IGroupSolver groupSolverPort, IGroupNames groupNamesPort)
-    : IPhaseEntryAction
+public sealed class GroupFormation(
+    IGroupSolver groupSolverPort,
+    IGroupNames groupNamesPort,
+    IRandomness randomness
+) : IPhaseEntryAction
 {
     public void ExecuteFor(Session session)
     {
@@ -24,6 +27,6 @@ public sealed class GroupFormation(IGroupSolver groupSolverPort, IGroupNames gro
             new GroupFormationRequest(participants, session.Selection.TopValues)
         );
 
-        session.FormGroups(formationResult, groupNamesPort.Names);
+        session.FormGroups(formationResult, groupNamesPort.Names, randomness);
     }
 }

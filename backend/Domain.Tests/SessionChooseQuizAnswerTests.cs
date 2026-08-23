@@ -112,7 +112,7 @@ public class SessionChooseQuizAnswerTests
     public void Answers_exist_only_during_the_quiz_phase()
     {
         var session = TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Join);
-        session.Join(TestParticipants.Named(Anna, "Anna"), Randomness.Fixed(0));
+        session.Join(TestParticipants.Named(Anna, "Anna"), new FixedRandomness(0));
 
         Should.Throw<WrongPhaseException>(() =>
             session.ChooseQuizAnswer(Anna, questionIndex: 0, answerIndex: 0)
@@ -125,7 +125,7 @@ public class SessionChooseQuizAnswerTests
 
         foreach (var participant in participants)
         {
-            session.Join(TestParticipants.Named(participant, "Anna"), Randomness.Fixed(0));
+            session.Join(TestParticipants.Named(participant, "Anna"), new FixedRandomness(0));
         }
 
         session.AdvancePhase();

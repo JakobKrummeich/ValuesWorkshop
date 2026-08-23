@@ -277,11 +277,3 @@ internal sealed class RecordingBroadcaster : ValuesWorkshop.Application.IBroadca
         return Task.CompletedTask;
     }
 }
-
-internal sealed class FixedRandomness(int index) : IRandomness
-{
-    public int NextIndex(int exclusiveUpperBound)
-    {
-        return index % exclusiveUpperBound;
-    }
-}

@@ -32,6 +32,30 @@ public class SessionFormGroupsTests
     }
 
     [Fact]
+    public void A_participant_who_joined_while_the_groups_were_forming_still_lands_in_a_group()
+    {
+        var session = SessionAwaitingFormation(participantCount: 8, topValueCount: 4);
+        session.AdvancePhase();
+        var members = Enumerable.Range(1, 8).Select(ParticipantAt).ToList();
+        var topValues = TestValueIds.Numbered(1, 4);
+        var assignmentWithoutTheLatecomer = new GroupFormationResult([
+            new FormedGroup(members.Take(4).ToList(), topValues.Take(2).ToList()),
+            new FormedGroup(members.Skip(4).ToList(), topValues.Skip(2).ToList()),
+        ]);
+        var latecomer = TestParticipants.Named(ParticipantAt(99), "Late Lena");
+        session.Join(latecomer, new FixedRandomness(0));
+
+        session.FormGroups(
+            assignmentWithoutTheLatecomer,
+            new TestGroupNames(8).Names,
+            new FixedRandomness(0)
+        );
+
+        session.Formation.Groups.SelectMany(group => group.Members).ShouldContain(latecomer.Id);
+        session.Formation.Groups.Select(group => group.Members.Count).ShouldBe([5, 4]);
+    }
+
+    [Fact]
     public void Every_top_value_is_dealt_to_exactly_one_group()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
@@ -91,7 +115,8 @@ public class SessionFormGroupsTests
 
         session.FormGroups(
             new GroupFormationResult([new FormedGroup([ParticipantAt(1)], [])]),
-            ["usurper"]
+            ["usurper"],
+            new FixedRandomness(0)
         );
 
         session.Formation.Groups.Select(group => group.Name).ShouldBe(["tier-1", "tier-2"]);
@@ -169,7 +194,11 @@ public class SessionFormGroupsTests
 
         Should
             .Throw<InvariantViolationException>(() =>
-                new GroupFormation(new TestGroupSolver(), new TestGroupNames(1)).ExecuteFor(session)
+                new GroupFormation(
+                    new TestGroupSolver(),
+                    new TestGroupNames(1),
+                    new FixedRandomness(0)
+                ).ExecuteFor(session)
             )
             .Message.ShouldContain("group names");
 
@@ -198,7 +227,7 @@ public class SessionFormGroupsTests
 
     private static GroupFormation FormationWith(IGroupSolver groupSolverPort)
     {
-        return new GroupFormation(groupSolverPort, new TestGroupNames(8));
+        return new GroupFormation(groupSolverPort, new TestGroupNames(8), new FixedRandomness(0));
     }
 
     private static ParticipantId ParticipantAt(int number)
