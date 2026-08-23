@@ -1,6 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { Phase } from "../../../../../domain/phases";
-import type { PresenterGroupFormationState } from "../../../../../domain/workshopState";
+import {
+  FormationSubState,
+  type PresenterFormationView,
+  type PresenterGroupFormationState,
+  type PresenterGroups,
+} from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { PresenterGroupFormationScreen } from "../PresenterGroupFormationScreen";
 import { usePresenterGroupFormationScreen } from "../usePresenterGroupFormationScreen";
@@ -14,7 +19,7 @@ const screenHook = usePresenterGroupFormationScreen as jest.MockedFunction<
   typeof usePresenterGroupFormationScreen
 >;
 
-const groups: PresenterGroupFormationState["groups"] = [
+const groups: PresenterGroups = [
   {
     name: { animalId: "fox", text: { de: "Fuchs", en: "Fox" } },
     memberDisplayNames: ["Ada", "Grace"],
@@ -31,35 +36,40 @@ const groups: PresenterGroupFormationState["groups"] = [
   },
 ];
 
-const state: PresenterGroupFormationState = {
-  phase: Phase.GroupFormation,
-  revision: 30,
-  participantCount: 4,
-  selection: {
-    values: [{ valueId: "trust", text: { de: "Vertrauen", en: "Trust" } }],
-    submittedCount: 4,
-  },
+function state(
+  formation: PresenterFormationView,
+): PresenterGroupFormationState {
+  return {
+    phase: Phase.GroupFormation,
+    revision: 30,
+    participantCount: 4,
+    selection: {
+      values: [{ valueId: "trust", text: { de: "Vertrauen", en: "Trust" } }],
+      submittedCount: 4,
+    },
+    formation,
+  };
+}
+
+function renderScreen(
+  formation: PresenterFormationView,
+  currentPageGroups: PresenterGroups = groups,
+) {
+  screenHook.mockReturnValue({ currentPageGroups });
+
+  return render(<PresenterGroupFormationScreen state={state(formation)} />, {
+    wrapper: languageWrapper(),
+  });
+}
+
+const formed: PresenterFormationView = {
+  subState: FormationSubState.Formed,
   groups,
 };
 
-function renderScreen(
-  currentPageGroups: PresenterGroupFormationState["groups"],
-  { isFormationProgressRunning = false, isPhaseEntryObserved = false } = {},
-) {
-  screenHook.mockReturnValue({ isFormationProgressRunning, currentPageGroups });
-
-  return render(
-    <PresenterGroupFormationScreen
-      state={state}
-      isPhaseEntryObserved={isPhaseEntryObserved}
-    />,
-    { wrapper: languageWrapper() },
-  );
-}
-
 describe("presenter group formation screen", () => {
   it("renders a card for every group on the current page", () => {
-    renderScreen(groups);
+    renderScreen(formed);
 
     const fox = screen.getByTestId("group-card-fox");
     expect(within(fox).getByTestId("group-name")).toHaveTextContent("Fox");
@@ -75,25 +85,25 @@ describe("presenter group formation screen", () => {
   });
 
   it("leaves groups beyond the current page off the wall", () => {
-    renderScreen([groups[0]]);
+    renderScreen(formed, [groups[0]]);
 
     expect(screen.getByTestId("group-card-fox")).toBeInTheDocument();
     expect(screen.queryByTestId("group-card-owl")).not.toBeInTheDocument();
   });
 
-  it("hands the wire groups and the observed entry to the paging hook", () => {
-    renderScreen(groups, { isPhaseEntryObserved: true });
+  it("hands the wire formation to the paging hook", () => {
+    renderScreen(formed);
 
-    expect(screenHook).toHaveBeenCalledWith(groups, true);
+    expect(screenHook).toHaveBeenCalledWith(formed);
   });
 
-  it("holds the cards back while the progress bar runs", () => {
-    renderScreen(groups, {
-      isFormationProgressRunning: true,
-      isPhaseEntryObserved: true,
-    });
+  it("runs the bar at the emitted progress while the formation runs", () => {
+    renderScreen({ subState: FormationSubState.Forming, progress: 0.25 }, []);
 
-    expect(screen.getByTestId("formation-progress")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "25",
+    );
     expect(screen.queryByTestId("group-card-fox")).not.toBeInTheDocument();
   });
 });

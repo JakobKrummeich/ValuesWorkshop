@@ -1,33 +1,31 @@
 "use client";
 
 import { MessageKey } from "../../../../domain/i18n/messages";
-import type { ParticipantGroupFormationState } from "../../../../domain/workshopState";
+import {
+  FormationSubState,
+  type ParticipantGroupFormationState,
+} from "../../../../domain/workshopState";
 import { FormationProgressBar } from "../../../FormationProgressBar";
 import { GroupCard } from "../../../GroupCard";
 import { useTranslation } from "../../../i18n/useTranslation";
-import { useFormationProgressGate } from "../../../useFormationProgressGate";
 import styles from "./ParticipantGroupFormationScreen.module.css";
 
 export function ParticipantGroupFormationScreen({
-  state,
-  isPhaseEntryObserved,
+  state: { formation },
 }: {
   state: ParticipantGroupFormationState;
-  isPhaseEntryObserved: boolean;
 }) {
   const { translate } = useTranslation();
-  const { isFormationProgressRunning } =
-    useFormationProgressGate(isPhaseEntryObserved);
 
-  if (isFormationProgressRunning) {
+  if (formation.subState === FormationSubState.Forming) {
     return (
       <section className={styles.screen}>
-        <FormationProgressBar />
+        <FormationProgressBar progress={formation.progress} />
       </section>
     );
   }
 
-  if (state.ownGroup === null) {
+  if (formation.ownGroup === null) {
     return (
       <section className={styles.screen}>
         <p className={styles.waitingNote} data-testid="own-group-waiting">
@@ -40,9 +38,9 @@ export function ParticipantGroupFormationScreen({
   return (
     <section className={styles.screen} data-testid="own-group-card">
       <GroupCard
-        name={state.ownGroup.name}
-        memberDisplayNames={state.ownGroup.memberDisplayNames}
-        assignedValues={state.ownGroup.assignedValues}
+        name={formation.ownGroup.name}
+        memberDisplayNames={formation.ownGroup.memberDisplayNames}
+        assignedValues={formation.ownGroup.assignedValues}
       />
     </section>
   );

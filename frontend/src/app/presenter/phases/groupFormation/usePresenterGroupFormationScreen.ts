@@ -2,30 +2,29 @@
 
 import { useEffect, useState } from "react";
 import { splitIntoGroupPages } from "../../../../domain/groupFormation";
-import type { PresenterGroupFormationState } from "../../../../domain/workshopState";
-import { useFormationProgressGate } from "../../../useFormationProgressGate";
+import {
+  FormationSubState,
+  type PresenterFormationView,
+  type PresenterGroups,
+} from "../../../../domain/workshopState";
 
 export const groupPageCycleMilliseconds = 7000;
 
-type PresenterGroups = PresenterGroupFormationState["groups"];
-
 export interface PresenterGroupFormationScreenModel {
-  isFormationProgressRunning: boolean;
   currentPageGroups: PresenterGroups;
 }
 
 export function usePresenterGroupFormationScreen(
-  groups: PresenterGroups,
-  isPhaseEntryObserved: boolean,
+  formation: PresenterFormationView,
 ): PresenterGroupFormationScreenModel {
-  const { isFormationProgressRunning } =
-    useFormationProgressGate(isPhaseEntryObserved);
   const [pageIndex, setPageIndex] = useState(0);
-  const pages = splitIntoGroupPages(groups);
+  const pages = splitIntoGroupPages(
+    formation.subState === FormationSubState.Formed ? formation.groups : [],
+  );
   const pageCount = pages.length;
 
   useEffect(() => {
-    if (isFormationProgressRunning || pageCount <= 1) {
+    if (pageCount <= 1) {
       return undefined;
     }
     const pageTimer = setInterval(
@@ -33,10 +32,9 @@ export function usePresenterGroupFormationScreen(
       groupPageCycleMilliseconds,
     );
     return () => clearInterval(pageTimer);
-  }, [isFormationProgressRunning, pageCount]);
+  }, [pageCount]);
 
   return {
-    isFormationProgressRunning,
     currentPageGroups: pageCount === 0 ? [] : pages[pageIndex % pageCount],
   };
 }

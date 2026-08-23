@@ -1,11 +1,15 @@
 import { render, screen } from "@testing-library/react";
 import { Language } from "../../../../../domain/i18n/language";
 import { Phase } from "../../../../../domain/phases";
-import type { ParticipantGroupFormationState } from "../../../../../domain/workshopState";
+import {
+  FormationSubState,
+  type ParticipantFormationView,
+  type ParticipantGroupFormationState,
+} from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { ParticipantGroupFormationScreen } from "../ParticipantGroupFormationScreen";
 
-const ownGroup: NonNullable<ParticipantGroupFormationState["ownGroup"]> = {
+const ownGroup = {
   name: { animalId: "fox", text: { de: "Fuchs", en: "Fox" } },
   memberDisplayNames: ["Ada", "Grace", "Lin"],
   assignedValues: [
@@ -14,29 +18,31 @@ const ownGroup: NonNullable<ParticipantGroupFormationState["ownGroup"]> = {
   ],
 };
 
+function formed(
+  group: typeof ownGroup | null = ownGroup,
+): ParticipantFormationView {
+  return { subState: FormationSubState.Formed, ownGroup: group };
+}
+
 function renderScreen(
-  group: ParticipantGroupFormationState["ownGroup"],
-  { language = Language.English, isPhaseEntryObserved = false } = {},
+  formation: ParticipantFormationView,
+  language = Language.English,
 ) {
   const state: ParticipantGroupFormationState = {
     phase: Phase.GroupFormation,
     revision: 30,
     participantCount: 3,
-    ownGroup: group,
+    formation,
   };
 
-  return render(
-    <ParticipantGroupFormationScreen
-      state={state}
-      isPhaseEntryObserved={isPhaseEntryObserved}
-    />,
-    { wrapper: languageWrapper(language) },
-  );
+  return render(<ParticipantGroupFormationScreen state={state} />, {
+    wrapper: languageWrapper(language),
+  });
 }
 
 describe("participant group formation screen", () => {
   it("shows the own group card with name, members, and values", () => {
-    renderScreen(ownGroup);
+    renderScreen(formed());
 
     expect(screen.getByTestId("own-group-card")).toBeInTheDocument();
     expect(screen.getByTestId("group-name")).toHaveTextContent("Fox");
@@ -50,7 +56,7 @@ describe("participant group formation screen", () => {
   });
 
   it("speaks German when German is chosen", () => {
-    renderScreen(ownGroup, { language: Language.German });
+    renderScreen(formed(), Language.German);
 
     expect(screen.getByTestId("group-name")).toHaveTextContent("Fuchs");
     expect(screen.getByTestId("group-value-trust")).toHaveTextContent(
@@ -59,7 +65,7 @@ describe("participant group formation screen", () => {
   });
 
   it("notes that the group is being formed while no group is assigned", () => {
-    renderScreen(null);
+    renderScreen(formed(null));
 
     expect(screen.queryByTestId("own-group-card")).not.toBeInTheDocument();
     expect(screen.getByTestId("own-group-waiting")).toHaveTextContent(
@@ -68,17 +74,21 @@ describe("participant group formation screen", () => {
   });
 
   it("notes the forming group in German when German is chosen", () => {
-    renderScreen(null, { language: Language.German });
+    renderScreen(formed(null), Language.German);
 
     expect(screen.getByTestId("own-group-waiting")).toHaveTextContent(
       "Deine Gruppe wird gerade gebildet\u2026",
     );
   });
 
-  it("holds the group card back while the progress bar runs", () => {
-    renderScreen(ownGroup, { isPhaseEntryObserved: true });
+  it("runs the bar at the emitted progress while the formation runs", () => {
+    renderScreen({ subState: FormationSubState.Forming, progress: 0.6 });
 
-    expect(screen.getByTestId("formation-progress")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "60",
+    );
     expect(screen.queryByTestId("own-group-card")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("own-group-waiting")).not.toBeInTheDocument();
   });
 });

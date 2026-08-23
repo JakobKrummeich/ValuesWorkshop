@@ -1,12 +1,13 @@
 import { act, renderHook } from "@testing-library/react";
-import type { PresenterGroupFormationState } from "../../../../../domain/workshopState";
-import { formationProgressMilliseconds } from "../../../../useFormationProgressGate";
+import {
+  FormationSubState,
+  type PresenterFormationView,
+  type PresenterGroups,
+} from "../../../../../domain/workshopState";
 import {
   groupPageCycleMilliseconds,
   usePresenterGroupFormationScreen,
 } from "../usePresenterGroupFormationScreen";
-
-type PresenterGroups = PresenterGroupFormationState["groups"];
 
 function groups(count: number): PresenterGroups {
   return Array.from({ length: count }, (unused, index) => ({
@@ -31,29 +32,31 @@ afterEach(() => {
   jest.useRealTimers();
 });
 
-function renderScreenHook(groupCount: number, isPhaseEntryObserved = false) {
-  return renderHook(() =>
-    usePresenterGroupFormationScreen(groups(groupCount), isPhaseEntryObserved),
-  );
+function renderScreenHook(formation: PresenterFormationView) {
+  return renderHook(() => usePresenterGroupFormationScreen(formation));
+}
+
+function formed(groupCount: number): PresenterFormationView {
+  return { subState: FormationSubState.Formed, groups: groups(groupCount) };
 }
 
 describe("presenter group formation screen hook", () => {
   it("shows every group without cycling when they fit one page", () => {
-    const { result } = renderScreenHook(6);
+    const { result } = renderScreenHook(formed(6));
 
     expect(result.current.currentPageGroups).toHaveLength(6);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("shows no groups when none exist", () => {
-    const { result } = renderScreenHook(0);
+    const { result } = renderScreenHook(formed(0));
 
     expect(result.current.currentPageGroups).toEqual([]);
     expect(jest.getTimerCount()).toBe(0);
   });
 
   it("advances to the next page after the cycle interval", () => {
-    const { result } = renderScreenHook(7);
+    const { result } = renderScreenHook(formed(7));
 
     expect(animalIds(result.current.currentPageGroups)).toEqual([
       "animal-1",
@@ -70,7 +73,7 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("wraps around to the first page after the last one", () => {
-    const { result } = renderScreenHook(7);
+    const { result } = renderScreenHook(formed(7));
 
     act(() => jest.advanceTimersByTime(2 * groupPageCycleMilliseconds));
 
@@ -85,7 +88,7 @@ describe("presenter group formation screen hook", () => {
   });
 
   it("clears the cycle timer on unmount", () => {
-    const { unmount } = renderScreenHook(7);
+    const { unmount } = renderScreenHook(formed(7));
 
     expect(jest.getTimerCount()).toBe(1);
 
@@ -94,25 +97,26 @@ describe("presenter group formation screen hook", () => {
     expect(jest.getTimerCount()).toBe(0);
   });
 
-  it("shows the groups right away when it did not watch the phase begin", () => {
-    const { result } = renderScreenHook(7);
+  it("holds every page back while the formation still runs", () => {
+    const { result } = renderScreenHook({
+      subState: FormationSubState.Forming,
+      progress: 0.5,
+    });
 
-    expect(result.current.isFormationProgressRunning).toBe(false);
+    expect(result.current.currentPageGroups).toEqual([]);
+    expect(jest.getTimerCount()).toBe(0);
   });
 
-  it("holds the page cycle back while the progress bar runs", () => {
-    const { result } = renderScreenHook(7, true);
+  it("starts cycling once the groups are formed", () => {
+    const { rerender, result } = renderHook(
+      (formation: PresenterFormationView) =>
+        usePresenterGroupFormationScreen(formation),
+      { initialProps: { subState: FormationSubState.Forming, progress: 0.9 } },
+    );
 
-    expect(result.current.isFormationProgressRunning).toBe(true);
-    expect(jest.getTimerCount()).toBe(1);
-  });
+    expect(jest.getTimerCount()).toBe(0);
 
-  it("cycles the pages once the progress bar is done", () => {
-    const { result } = renderScreenHook(7, true);
-
-    act(() => jest.advanceTimersByTime(formationProgressMilliseconds));
-
-    expect(result.current.isFormationProgressRunning).toBe(false);
+    rerender(formed(7));
 
     act(() => jest.advanceTimersByTime(groupPageCycleMilliseconds));
 

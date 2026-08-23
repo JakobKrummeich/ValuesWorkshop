@@ -2,12 +2,15 @@ import { z } from "zod";
 import { Phase } from "./phases";
 import {
   conclusionViewSchema,
+  facilitatorFormationViewSchema,
   facilitatorGroupsSchema,
   facilitatorQuizViewSchema,
   ownGroupViewSchema,
+  participantFormationViewSchema,
   ownSelectionViewSchema,
   participantQuizViewSchema,
   presentationViewSchema,
+  presenterFormationViewSchema,
   presenterGroupsSchema,
   presenterPresentationViewSchema,
   presenterQuizViewSchema,
@@ -17,7 +20,9 @@ import {
   votingViewSchema,
 } from "./workshopStateBlocks";
 
-export { QuizSubState } from "./workshopStateBlocks";
+import { FormationSubState } from "./workshopStateBlocks";
+
+export { FormationSubState, QuizSubState } from "./workshopStateBlocks";
 export type { GroupName, WorkshopValue } from "./workshopStateBlocks";
 
 export enum FacilitatorIntent {
@@ -72,7 +77,7 @@ export const participantWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.GroupFormation),
     ...participantEnvelope,
-    ownGroup: ownGroupViewSchema.nullable(),
+    formation: participantFormationViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.GroupWork),
@@ -118,7 +123,7 @@ export const facilitatorWorkshopStateSchema = z.discriminatedUnion("phase", [
     phase: z.literal(Phase.GroupFormation),
     ...facilitatorEnvelope,
     selection: selectionProgressViewSchema,
-    groups: facilitatorGroupsSchema,
+    formation: facilitatorFormationViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.GroupWork),
@@ -168,7 +173,7 @@ export const presenterWorkshopStateSchema = z.discriminatedUnion("phase", [
     phase: z.literal(Phase.GroupFormation),
     ...presenterEnvelope,
     selection: selectionProgressViewSchema,
-    groups: presenterGroupsSchema,
+    formation: presenterFormationViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.GroupWork),
@@ -274,3 +279,23 @@ export type PresenterGroupFormationState = InPhase<
   PresenterWorkshopState,
   Phase.GroupFormation
 >;
+
+type InSubState<TFormation, TSubState extends FormationSubState> = Extract<
+  TFormation,
+  { subState: TSubState }
+>;
+
+export type ParticipantFormationView =
+  ParticipantGroupFormationState["formation"];
+export type FacilitatorFormationView =
+  FacilitatorGroupFormationState["formation"];
+export type PresenterFormationView = PresenterGroupFormationState["formation"];
+
+export type FacilitatorGroups = InSubState<
+  FacilitatorFormationView,
+  FormationSubState.Formed
+>["groups"];
+export type PresenterGroups = InSubState<
+  PresenterFormationView,
+  FormationSubState.Formed
+>["groups"];
