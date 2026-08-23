@@ -35,14 +35,6 @@ public class WorkshopStateCacheTests
         cache.LatestOf(KnownSession).ShouldBeNull();
     }
 
-    private static Session FormingSession()
-    {
-        var session = TestSessions.InPhase(KnownSession, Phase.SelectionResults);
-        session.AdvancePhase();
-
-        return session;
-    }
-
     [Fact]
     public void An_unchanged_session_is_mapped_only_once()
     {
@@ -111,5 +103,13 @@ public class WorkshopStateCacheTests
         cache.RetainOnly([KnownSession]);
 
         cache.LatestOf(KnownSession).ShouldNotBeNull();
+    }
+
+    private static Session FormingSession()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.SelectionResults);
+        session.AdvancePhase();
+
+        return session;
     }
 }

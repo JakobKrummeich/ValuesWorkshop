@@ -3,11 +3,11 @@ namespace ValuesWorkshop.Domain.Tests;
 public class SessionFormGroupsTests
 {
     [Fact]
-    public void Advancing_into_group_formation_forms_named_groups_sized_by_the_sizing_rule()
+    public void The_formed_groups_are_named_and_sized_by_the_sizing_rule()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
         session.Formation.IsFormed.ShouldBeTrue();
@@ -21,7 +21,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session
             .Formation.Groups.SelectMany(group => group.Members)
@@ -60,7 +60,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session
             .Formation.Groups.SelectMany(group => group.AssignedValues)
@@ -73,7 +73,7 @@ public class SessionFormGroupsTests
         var session = SessionAwaitingFormation(participantCount: 2, topValueCount: 3);
         var solver = new RecordingGroupSolver();
 
-        AdvanceIntoGroupFormation(session, solver);
+        AdvanceAndFormGroups(session, solver);
 
         var request = solver.LastRequest.ShouldNotBeNull();
         request
@@ -98,7 +98,7 @@ public class SessionFormGroupsTests
             formation: alreadyFormed
         );
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
         var group = session.Formation.Groups.ShouldHaveSingleItem();
@@ -111,7 +111,7 @@ public class SessionFormGroupsTests
     public void Forming_an_already_formed_session_again_changes_nothing()
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.FormGroups(
             new GroupFormationResult([new FormedGroup([ParticipantAt(1)], [])]),
@@ -127,7 +127,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 0, topValueCount: 0);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.Formation.IsFormed.ShouldBeTrue();
         var group = session.Formation.Groups.ShouldHaveSingleItem();
@@ -141,7 +141,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 0);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.Formation.Groups.Count.ShouldBe(2);
         session.Formation.Groups.ShouldAllBe(group => group.AssignedValues.Count == 0);
@@ -168,7 +168,7 @@ public class SessionFormGroupsTests
     {
         var session = SessionAwaitingFormation(participantCount: 30, topValueCount: 10);
 
-        AdvanceIntoGroupFormation(session, new TestGroupSolver());
+        AdvanceAndFormGroups(session, new TestGroupSolver());
 
         session.Formation.Groups.Count.ShouldBe(7);
         session
@@ -176,7 +176,7 @@ public class SessionFormGroupsTests
             .ShouldBe(["tier-1", "tier-2", "tier-3", "tier-4", "tier-5", "tier-6", "tier-7"]);
     }
 
-    private static void AdvanceIntoGroupFormation(Session session, IGroupSolver groupSolverPort)
+    private static void AdvanceAndFormGroups(Session session, IGroupSolver groupSolverPort)
     {
         session.AdvancePhase();
         FormGroupsWith(session, groupSolverPort, nameCount: 8);
