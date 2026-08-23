@@ -92,6 +92,7 @@ public sealed class GroupFormationRunner(
         }
 
         dropped?.Cancellation.Cancel();
+        dropped?.Cancellation.Dispose();
     }
 
     public void RetainOnly(IReadOnlyCollection<SessionIdentity> sessionIdentities)
