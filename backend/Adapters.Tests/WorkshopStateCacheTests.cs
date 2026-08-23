@@ -1,4 +1,5 @@
 using ValuesWorkshop.Adapters.Web;
+using ValuesWorkshop.Application.Formation;
 using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Adapters.Tests;
@@ -9,7 +10,57 @@ public class WorkshopStateCacheTests
         Guid.Parse("00000000-0000-0000-0000-00000000f00d")
     );
 
-    private readonly WorkshopStateCache cache = TestWorkshopStateCache.Create();
+    private readonly GroupFormationRuns formationRuns = TestWorkshopStateCache.FormationRuns(
+        new TestGroupSolver(),
+        new ManualTimeProvider()
+    );
+
+    private readonly WorkshopStateCache cache;
+
+    public WorkshopStateCacheTests()
+    {
+        cache = TestWorkshopStateCache.Create(formationRuns);
+    }
+
+    [Fact]
+    public void Observing_a_session_that_is_forming_its_groups_starts_its_run()
+    {
+        cache.StatesOf(FormingSession());
+
+        formationRuns.RunningSessions().ShouldBe([KnownSession]);
+    }
+
+    [Fact]
+    public void A_forming_session_is_mapped_afresh_and_never_retained()
+    {
+        var session = FormingSession();
+
+        var first = cache.StatesOf(session);
+        var second = cache.StatesOf(session);
+
+        second.ShouldNotBeSameAs(first);
+        cache.LatestOf(KnownSession).ShouldBeNull();
+    }
+
+    [Fact]
+    public void A_session_that_starts_forming_drops_the_state_cached_before_it()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.SelectionResults);
+        cache.StatesOf(session);
+
+        session.AdvancePhase();
+        cache.StatesOf(session);
+
+        cache.LatestOf(KnownSession).ShouldBeNull();
+    }
+
+    private static Session FormingSession()
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.SelectionResults);
+        session.AdvancePhase();
+
+        return session;
+    }
 
     [Fact]
     public void An_unchanged_session_is_mapped_only_once()

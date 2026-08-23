@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using ValuesWorkshop.Application.Formation;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
 
@@ -7,7 +8,8 @@ namespace ValuesWorkshop.Adapters.Web;
 public sealed class WorkshopStateCache(
     FacilitatorWorkshopStateMapper facilitatorStateMapper,
     PresenterWorkshopStateMapper presenterStateMapper,
-    ParticipantWorkshopStateMapper participantStateMapper
+    ParticipantWorkshopStateMapper participantStateMapper,
+    GroupFormationRuns formationRuns
 )
 {
     private readonly ConcurrentDictionary<SessionIdentity, SessionRoleStates> statesBySession =
@@ -15,20 +17,9 @@ public sealed class WorkshopStateCache(
 
     public SessionRoleStates StatesOf(Session session)
     {
-        var cached = LatestOf(session.Identity);
+        formationRuns.EnsureRunningFor(session);
 
-        if (cached?.Revision == session.Revision)
-        {
-            return cached;
-        }
-
-        var mapped = MapAllRoles(session);
-
-        return statesBySession.AddOrUpdate(
-            session.Identity,
-            _ => mapped,
-            (_, existing) => existing.Revision >= mapped.Revision ? existing : mapped
-        );
+        return session.IsFormingGroups ? MapWithoutCaching(session) : MapAndCache(session);
     }
 
     public SessionRoleStates? LatestOf(SessionIdentity sessionIdentity)
@@ -45,6 +36,31 @@ public sealed class WorkshopStateCache(
                 statesBySession.TryRemove(sessionIdentity, out _);
             }
         }
+    }
+
+    private SessionRoleStates MapWithoutCaching(Session session)
+    {
+        statesBySession.TryRemove(session.Identity, out _);
+
+        return MapAllRoles(session);
+    }
+
+    private SessionRoleStates MapAndCache(Session session)
+    {
+        var cached = LatestOf(session.Identity);
+
+        if (cached?.Revision == session.Revision)
+        {
+            return cached;
+        }
+
+        var mapped = MapAllRoles(session);
+
+        return statesBySession.AddOrUpdate(
+            session.Identity,
+            _ => mapped,
+            (_, existing) => existing.Revision >= mapped.Revision ? existing : mapped
+        );
     }
 
     private SessionRoleStates MapAllRoles(Session session)

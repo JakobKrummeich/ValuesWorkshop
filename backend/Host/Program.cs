@@ -41,7 +41,6 @@ builder.Services.AddSingleton<IValuesCatalog>(valuesCatalog);
 builder.Services.AddSingleton<IAnimalsCatalog>(animalsCatalog);
 builder.Services.AddSingleton<IGroupNames>(animalsCatalog);
 builder.Services.AddSingleton<IGroupSolver, CpSatGroupSolver>();
-builder.Services.AddSingleton<IPhaseEntryAction, GroupFormation>();
 builder.Services.AddSingleton<IPhaseEntryAction, ScribeAppointment>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -78,7 +77,18 @@ builder.Services.AddSingleton(
         )
     )
 );
+builder.Services.AddSingleton(
+    new GroupFormationTickInterval(
+        TimeSpan.FromMilliseconds(
+            double.Parse(
+                builder.Configuration["GROUP_FORMATION_TICK_INTERVAL_MS"] ?? "50",
+                CultureInfo.InvariantCulture
+            )
+        )
+    )
+);
 builder.Services.AddHostedService<StateResendService>();
+builder.Services.AddHostedService<GroupFormationService>();
 builder.Services.AddSignalR();
 builder.Services.AddSessionCreationRateLimit(
     new SessionCreationRateLimit(

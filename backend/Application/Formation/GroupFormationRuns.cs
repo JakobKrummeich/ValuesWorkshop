@@ -26,7 +26,7 @@ public sealed class GroupFormationRuns(
             return;
         }
 
-        var request = RequestFrom(session);
+        var request = GroupFormationRequest.For(session);
 
         lock (gate)
         {
@@ -95,7 +95,7 @@ public sealed class GroupFormationRuns(
             "The group solver had no assignment ready in time; a random assignment is used instead."
         );
 
-        return RandomGroupAssignment.For(RequestFrom(session), randomness);
+        return RandomGroupAssignment.For(GroupFormationRequest.For(session), randomness);
     }
 
     private void SolveFor(SessionIdentity sessionIdentity, GroupFormationRequest request)
@@ -123,17 +123,5 @@ public sealed class GroupFormationRuns(
     private double ElapsedFractionOf(GroupFormationRun run)
     {
         return Math.Clamp(timeProvider.GetElapsedTime(run.StartedAt) / window.Value, 0, 1);
-    }
-
-    private static GroupFormationRequest RequestFrom(Session session)
-    {
-        var participants = session
-            .Roster.Participants.Select(participant => new ParticipantSelection(
-                participant.Id,
-                session.Selection.SelectedValuesOf(participant.Id)
-            ))
-            .ToList();
-
-        return new GroupFormationRequest(participants, session.Selection.TopValues);
     }
 }

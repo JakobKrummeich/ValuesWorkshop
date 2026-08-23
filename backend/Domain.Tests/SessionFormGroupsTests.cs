@@ -98,7 +98,7 @@ public class SessionFormGroupsTests
             formation: alreadyFormed
         );
 
-        AdvanceIntoGroupFormation(session, new ThrowingGroupSolver());
+        AdvanceIntoGroupFormation(session, new TestGroupSolver());
 
         session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupFormation);
         var group = session.Formation.Groups.ShouldHaveSingleItem();
@@ -120,45 +120,6 @@ public class SessionFormGroupsTests
         );
 
         session.Formation.Groups.Select(group => group.Name).ShouldBe(["tier-1", "tier-2"]);
-    }
-
-    [Fact]
-    public void Formation_waits_until_the_group_formation_phase_is_reached()
-    {
-        var session = SessionAwaitingFormation(participantCount: 9, topValueCount: 3);
-
-        FormationWith(new ThrowingGroupSolver()).ExecuteFor(session);
-
-        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.SelectionResults);
-        session.Formation.IsFormed.ShouldBeFalse();
-    }
-
-    [Fact]
-    public void Advancing_out_of_group_formation_re_forms_nothing()
-    {
-        var session = TestSessions.InPhase(
-            new SessionIdentity(Guid.NewGuid()),
-            Phase.GroupFormation,
-            formation: FormationRecord.Restore(
-                true,
-                [
-                    Group.Restore(
-                        "otter",
-                        [ParticipantAt(1)],
-                        [new ValueId("wert-1")],
-                        null,
-                        false,
-                        []
-                    ),
-                ]
-            )
-        );
-
-        session.AdvancePhase();
-        FormationWith(new ThrowingGroupSolver()).ExecuteFor(session);
-
-        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.GroupWork);
-        session.Formation.Groups.ShouldHaveSingleItem().Name.ShouldBe("otter");
     }
 
     [Fact]
@@ -194,11 +155,7 @@ public class SessionFormGroupsTests
 
         Should
             .Throw<InvariantViolationException>(() =>
-                new GroupFormation(
-                    new TestGroupSolver(),
-                    new TestGroupNames(1),
-                    new FixedRandomness(0)
-                ).ExecuteFor(session)
+                FormGroupsWith(session, new TestGroupSolver(), nameCount: 1)
             )
             .Message.ShouldContain("group names");
 
@@ -222,12 +179,16 @@ public class SessionFormGroupsTests
     private static void AdvanceIntoGroupFormation(Session session, IGroupSolver groupSolverPort)
     {
         session.AdvancePhase();
-        FormationWith(groupSolverPort).ExecuteFor(session);
+        FormGroupsWith(session, groupSolverPort, nameCount: 8);
     }
 
-    private static GroupFormation FormationWith(IGroupSolver groupSolverPort)
+    private static void FormGroupsWith(Session session, IGroupSolver groupSolverPort, int nameCount)
     {
-        return new GroupFormation(groupSolverPort, new TestGroupNames(8), new FixedRandomness(0));
+        session.FormGroups(
+            groupSolverPort.Solve(GroupFormationRequest.For(session)),
+            new TestGroupNames(nameCount).Names,
+            new FixedRandomness(0)
+        );
     }
 
     private static ParticipantId ParticipantAt(int number)
