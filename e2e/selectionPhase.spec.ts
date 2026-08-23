@@ -438,8 +438,6 @@ test.describe.serial("value selection through group formation", () => {
       await expect(page.getByTestId("formation-progress")).toHaveCount(0, {
         timeout: 20_000,
       });
-    }
-    for (const page of [facilitatorPage, presenterPage]) {
       await expect(page.getByTestId(/^group-card-/)).toHaveCount(1);
       const groupCard = page.getByTestId("group-card-otter");
       await expect(groupCard.getByTestId("group-name")).toHaveText("Otter");
