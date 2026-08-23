@@ -3,13 +3,13 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Formation;
 
-public sealed class GroupFormationRuns(
+public sealed class GroupFormationRunner(
     IGroupSolver groupSolverPort,
     IGroupNames groupNamesPort,
-    IRandomness randomness,
-    TimeProvider timeProvider,
+    IRandomness randomnessPort,
+    TimeProvider timeProviderPort,
     GroupFormationWindow window,
-    ILogger<GroupFormationRuns> logger
+    ILogger<GroupFormationRunner> logger
 ) : IGroupFormationProgress
 {
     private sealed record GroupFormationRun(
@@ -37,7 +37,12 @@ public sealed class GroupFormationRuns(
             if (
                 !runs.TryAdd(
                     session.Identity,
-                    new GroupFormationRun(token, timeProvider.GetTimestamp(), cancellation, null)
+                    new GroupFormationRun(
+                        token,
+                        timeProviderPort.GetTimestamp(),
+                        cancellation,
+                        null
+                    )
                 )
             )
             {
@@ -80,7 +85,7 @@ public sealed class GroupFormationRuns(
 
     public void FormGroupsIn(Session session)
     {
-        session.FormGroups(AssignmentFor(session), groupNamesPort.Names, randomness);
+        session.FormGroups(AssignmentFor(session), groupNamesPort.Names, randomnessPort);
     }
 
     public void Drop(SessionIdentity sessionIdentity)
@@ -120,7 +125,7 @@ public sealed class GroupFormationRuns(
             "The group solver had no assignment ready in time; a random assignment is used instead."
         );
 
-        return RandomGroupAssignment.For(GroupFormationRequest.For(session), randomness);
+        return RandomGroupAssignment.For(GroupFormationRequest.For(session), randomnessPort);
     }
 
     private void SolveFor(
@@ -160,6 +165,6 @@ public sealed class GroupFormationRuns(
 
     private double ElapsedFractionOf(GroupFormationRun run)
     {
-        return Math.Clamp(timeProvider.GetElapsedTime(run.StartedAt) / window.Value, 0, 1);
+        return Math.Clamp(timeProviderPort.GetElapsedTime(run.StartedAt) / window.Value, 0, 1);
     }
 }

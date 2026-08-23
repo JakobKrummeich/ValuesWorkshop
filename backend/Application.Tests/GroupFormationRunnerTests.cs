@@ -4,7 +4,7 @@ using ValuesWorkshop.Domain;
 
 namespace ValuesWorkshop.Application.Tests;
 
-public class GroupFormationRunsTests
+public class GroupFormationRunnerTests
 {
     private static readonly TimeSpan Window = TimeSpan.FromSeconds(3);
 
@@ -14,34 +14,34 @@ public class GroupFormationRunsTests
     public void A_session_forming_its_groups_starts_a_run_at_no_progress()
     {
         var session = FormingSession();
-        var runs = RunsOver(new TestGroupSolver());
+        var runner = RunnerOver(new TestGroupSolver());
 
-        runs.EnsureRunningFor(session);
+        runner.EnsureRunningFor(session);
 
-        runs.RunningSessions().ShouldBe([session.Identity]);
-        runs.ProgressOf(session.Identity).Value.ShouldBe(0);
+        runner.RunningSessions().ShouldBe([session.Identity]);
+        runner.ProgressOf(session.Identity).Value.ShouldBe(0);
     }
 
     [Fact]
     public void A_session_whose_groups_stand_starts_no_run()
     {
-        var runs = RunsOver(new TestGroupSolver());
+        var runner = RunnerOver(new TestGroupSolver());
 
-        runs.EnsureRunningFor(
+        runner.EnsureRunningFor(
             SessionFixtures.InPhase(Phase.GroupFormation, formation: SessionFixtures.TwoGroups())
         );
 
-        runs.RunningSessions().ShouldBeEmpty();
+        runner.RunningSessions().ShouldBeEmpty();
     }
 
     [Fact]
     public void A_session_in_another_phase_starts_no_run()
     {
-        var runs = RunsOver(new TestGroupSolver());
+        var runner = RunnerOver(new TestGroupSolver());
 
-        runs.EnsureRunningFor(SessionFixtures.InPhase(Phase.SelectionResults));
+        runner.EnsureRunningFor(SessionFixtures.InPhase(Phase.SelectionResults));
 
-        runs.RunningSessions().ShouldBeEmpty();
+        runner.RunningSessions().ShouldBeEmpty();
     }
 
     [Fact]
@@ -54,81 +54,81 @@ public class GroupFormationRunsTests
     public void Progress_advances_with_the_clock()
     {
         var session = FormingSession();
-        var runs = RunsOver(new TestGroupSolver());
-        runs.EnsureRunningFor(session);
+        var runner = RunnerOver(new TestGroupSolver());
+        runner.EnsureRunningFor(session);
 
         clock.Advance(TimeSpan.FromSeconds(1.5));
 
-        runs.ProgressOf(session.Identity).Value.ShouldBe(0.5);
+        runner.ProgressOf(session.Identity).Value.ShouldBe(0.5);
     }
 
     [Fact]
     public void Progress_stops_at_a_full_bar_and_the_window_is_over()
     {
         var session = FormingSession();
-        var runs = RunsOver(new TestGroupSolver());
-        runs.EnsureRunningFor(session);
+        var runner = RunnerOver(new TestGroupSolver());
+        runner.EnsureRunningFor(session);
 
         clock.Advance(TimeSpan.FromSeconds(4));
 
-        runs.ProgressOf(session.Identity).Value.ShouldBe(1);
-        runs.IsWindowOverFor(session.Identity).ShouldBeTrue();
+        runner.ProgressOf(session.Identity).Value.ShouldBe(1);
+        runner.IsWindowOverFor(session.Identity).ShouldBeTrue();
     }
 
     [Fact]
     public void The_window_is_not_over_while_the_bar_is_still_moving()
     {
         var session = FormingSession();
-        var runs = RunsOver(new TestGroupSolver());
-        runs.EnsureRunningFor(session);
+        var runner = RunnerOver(new TestGroupSolver());
+        runner.EnsureRunningFor(session);
 
         clock.Advance(TimeSpan.FromSeconds(2.999));
 
-        runs.IsWindowOverFor(session.Identity).ShouldBeFalse();
+        runner.IsWindowOverFor(session.Identity).ShouldBeFalse();
     }
 
     [Fact]
     public void Observing_the_same_session_again_leaves_the_running_clock_alone()
     {
         var session = FormingSession();
-        var runs = RunsOver(new TestGroupSolver());
-        runs.EnsureRunningFor(session);
+        var runner = RunnerOver(new TestGroupSolver());
+        runner.EnsureRunningFor(session);
         clock.Advance(TimeSpan.FromSeconds(1.5));
 
-        runs.EnsureRunningFor(session);
+        runner.EnsureRunningFor(session);
 
-        runs.ProgressOf(session.Identity).Value.ShouldBe(0.5);
+        runner.ProgressOf(session.Identity).Value.ShouldBe(0.5);
     }
 
     [Fact]
     public void A_session_without_a_run_reports_no_progress_and_no_finished_window()
     {
-        var runs = RunsOver(new TestGroupSolver());
+        var runner = RunnerOver(new TestGroupSolver());
 
-        runs.ProgressOf(FormingSession().Identity).Value.ShouldBe(0);
-        runs.IsWindowOverFor(FormingSession().Identity).ShouldBeFalse();
+        runner.ProgressOf(FormingSession().Identity).Value.ShouldBe(0);
+        runner.IsWindowOverFor(FormingSession().Identity).ShouldBeFalse();
     }
 
     [Fact]
     public void A_dropped_run_is_forgotten()
     {
         var session = FormingSession();
-        var runs = RunsOver(new TestGroupSolver());
-        runs.EnsureRunningFor(session);
+        var runner = RunnerOver(new TestGroupSolver());
+        runner.EnsureRunningFor(session);
 
-        runs.Drop(session.Identity);
+        runner.Drop(session.Identity);
 
-        runs.RunningSessions().ShouldBeEmpty();
-        runs.ProgressOf(session.Identity).Value.ShouldBe(0);
+        runner.RunningSessions().ShouldBeEmpty();
+        runner.ProgressOf(session.Identity).Value.ShouldBe(0);
     }
 
     [Fact]
     public void The_groups_are_formed_from_the_assignment_the_solver_found()
     {
-        var runs = RunsOver(new SplitInTwoGroupSolver());
-        runs.EnsureRunningFor(FormingSession());
+        var runner = RunnerOver(new SplitInTwoGroupSolver());
+        runner.EnsureRunningFor(FormingSession());
 
-        var session = FormedOnceTheSolverIsHeard(runs);
+        var session = FormedOnceTheSolverIsHeard(runner);
 
         session.Formation.Groups.Select(group => group.Members.Count).ShouldBe([1, 2]);
     }
@@ -141,10 +141,10 @@ public class GroupFormationRunsTests
 
         try
         {
-            var runs = RunsOver(solver);
-            runs.EnsureRunningFor(session);
+            var runner = RunnerOver(solver);
+            runner.EnsureRunningFor(session);
 
-            runs.FormGroupsIn(session);
+            runner.FormGroupsIn(session);
         }
         finally
         {
@@ -159,12 +159,12 @@ public class GroupFormationRunsTests
     public void The_groups_are_formed_at_random_when_the_solver_failed()
     {
         var solver = new FailingGroupSolver();
-        var runs = RunsOver(solver);
-        runs.EnsureRunningFor(FormingSession());
+        var runner = RunnerOver(solver);
+        runner.EnsureRunningFor(FormingSession());
         solver.WaitUntilAttempted();
 
         var session = FormingSession();
-        runs.FormGroupsIn(session);
+        runner.FormGroupsIn(session);
 
         session.Formation.Groups.SelectMany(group => group.Members).Count().ShouldBe(3);
     }
@@ -173,12 +173,12 @@ public class GroupFormationRunsTests
     public void Dropping_a_run_cancels_the_solve_it_started()
     {
         var solver = new CancellationWatchingGroupSolver();
-        var runs = RunsOver(solver);
+        var runner = RunnerOver(solver);
         var session = FormingSession();
-        runs.EnsureRunningFor(session);
+        runner.EnsureRunningFor(session);
         solver.WaitUntilAsked();
 
-        runs.Drop(session.Identity);
+        runner.Drop(session.Identity);
 
         solver.WaitUntilCancelled();
     }
@@ -191,10 +191,11 @@ public class GroupFormationRunsTests
 
         try
         {
-            var runs = RunsOver(solver);
-            runs.EnsureRunningFor(session);
-            runs.Drop(session.Identity);
-            runs.EnsureRunningFor(session);
+            var runner = RunnerOver(solver);
+            runner.EnsureRunningFor(session);
+            solver.WaitUntilAsked();
+            runner.Drop(session.Identity);
+            runner.EnsureRunningFor(session);
 
             solver.ReleaseFirstSolve();
 
@@ -203,7 +204,7 @@ public class GroupFormationRunsTests
                     () =>
                     {
                         var candidate = FormingSession();
-                        runs.FormGroupsIn(candidate);
+                        runner.FormGroupsIn(candidate);
 
                         return candidate.Formation.Groups.Count == 2;
                     },
@@ -223,7 +224,7 @@ public class GroupFormationRunsTests
         var solver = new RecordingGroupSolver();
         var session = FormingSession();
 
-        RunsOver(solver).EnsureRunningFor(session);
+        RunnerOver(solver).EnsureRunningFor(session);
 
         var request = solver.AwaitedRequest();
         request
@@ -240,7 +241,7 @@ public class GroupFormationRunsTests
         return session;
     }
 
-    private static Session FormedOnceTheSolverIsHeard(GroupFormationRuns runs)
+    private static Session FormedOnceTheSolverIsHeard(GroupFormationRunner runner)
     {
         Session formed = FormingSession();
 
@@ -249,7 +250,7 @@ public class GroupFormationRunsTests
                 () =>
                 {
                     formed = FormingSession();
-                    runs.FormGroupsIn(formed);
+                    runner.FormGroupsIn(formed);
 
                     return formed.Formation.Groups.Count == 2;
                 },
@@ -260,15 +261,15 @@ public class GroupFormationRunsTests
         return formed;
     }
 
-    private GroupFormationRuns RunsOver(IGroupSolver groupSolverPort)
+    private GroupFormationRunner RunnerOver(IGroupSolver groupSolverPort)
     {
-        return new GroupFormationRuns(
+        return new GroupFormationRunner(
             groupSolverPort,
             new TestGroupNames(8),
             new FixedRandomness(0),
             clock,
             new GroupFormationWindow(Window),
-            NullLogger<GroupFormationRuns>.Instance
+            NullLogger<GroupFormationRunner>.Instance
         );
     }
 
@@ -322,6 +323,7 @@ public class GroupFormationRunsTests
 
     private sealed class HeldGroupSolver : IGroupSolver
     {
+        private readonly ManualResetEventSlim asked = new();
         private readonly ManualResetEventSlim firstSolveReleased = new();
         private readonly ManualResetEventSlim laterSolvesReleased = new();
         private int solves;
@@ -333,6 +335,7 @@ public class GroupFormationRunsTests
         {
             var isFirstSolve = Interlocked.Increment(ref solves) == 1;
 
+            asked.Set();
             (isFirstSolve ? firstSolveReleased : laterSolvesReleased).Wait(
                 TimeSpan.FromSeconds(10)
             );
@@ -340,6 +343,11 @@ public class GroupFormationRunsTests
             return isFirstSolve
                 ? new SplitInTwoGroupSolver().Solve(request, cancellationToken)
                 : new TestGroupSolver().Solve(request, cancellationToken);
+        }
+
+        public void WaitUntilAsked()
+        {
+            asked.Wait(TimeSpan.FromSeconds(10)).ShouldBeTrue();
         }
 
         public void ReleaseFirstSolve()

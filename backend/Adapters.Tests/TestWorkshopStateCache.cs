@@ -11,7 +11,7 @@ internal static class TestWorkshopStateCache
 {
     internal static WorkshopStateCache Create()
     {
-        return Create(FormationRuns(new TestGroupSolver(), TimeProvider.System));
+        return Create(FormationRunner(new TestGroupSolver(), TimeProvider.System));
     }
 
     internal static WorkshopStateCache Create(IGroupFormationProgress formationProgressPort)
@@ -42,18 +42,18 @@ internal static class TestWorkshopStateCache
         );
     }
 
-    internal static GroupFormationRuns FormationRuns(
+    internal static GroupFormationRunner FormationRunner(
         IGroupSolver groupSolverPort,
         TimeProvider timeProvider
     )
     {
-        return new GroupFormationRuns(
+        return new GroupFormationRunner(
             groupSolverPort,
             new TestGroupNames(8),
             new FixedRandomness(0),
             timeProvider,
             new GroupFormationWindow(TimeSpan.FromSeconds(3)),
-            NullLogger<GroupFormationRuns>.Instance
+            NullLogger<GroupFormationRunner>.Instance
         );
     }
 }

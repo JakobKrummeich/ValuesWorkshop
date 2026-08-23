@@ -54,9 +54,9 @@ builder.Services.AddSingleton(
         )
     )
 );
-builder.Services.AddSingleton<GroupFormationRuns>();
+builder.Services.AddSingleton<GroupFormationRunner>();
 builder.Services.AddSingleton<IGroupFormationProgress>(services =>
-    services.GetRequiredService<GroupFormationRuns>()
+    services.GetRequiredService<GroupFormationRunner>()
 );
 builder.Services.AddSingleton<IFacilitatorPassphrase>(
     new FacilitatorPassphrase(Environment.GetEnvironmentVariable("FACILITATOR_PASSPHRASE"))

@@ -12,7 +12,7 @@ public sealed record GroupFormationTickInterval(TimeSpan Value);
 
 public sealed class GroupFormationService(
     SessionConnectionRegistry registry,
-    GroupFormationRuns formationRuns,
+    GroupFormationRunner formationRunner,
     IServiceScopeFactory scopeFactory,
     WorkshopStateCache cache,
     RoleStateDispatcher dispatcher,
@@ -24,7 +24,7 @@ public sealed class GroupFormationService(
     {
         var connectedSessions = registry.ConnectedSessions();
 
-        formationRuns.RetainOnly(connectedSessions);
+        formationRunner.RetainOnly(connectedSessions);
 
         foreach (var sessionIdentity in connectedSessions)
         {
@@ -60,7 +60,7 @@ public sealed class GroupFormationService(
     {
         using var scope = scopeFactory.CreateScope();
 
-        if (formationRuns.IsWindowOverFor(sessionIdentity))
+        if (formationRunner.IsWindowOverFor(sessionIdentity))
         {
             await CloseWindowOfAsync(scope, sessionIdentity);
 
@@ -73,12 +73,12 @@ public sealed class GroupFormationService(
 
         if (session is null || !session.IsFormingGroups)
         {
-            formationRuns.Drop(sessionIdentity);
+            formationRunner.Drop(sessionIdentity);
 
             return;
         }
 
-        formationRuns.EnsureRunningFor(session);
+        formationRunner.EnsureRunningFor(session);
 
         await dispatcher.SendAsync(sessionIdentity, cache.StatesOf(session));
     }
@@ -96,12 +96,12 @@ public sealed class GroupFormationService(
                         return false;
                     }
 
-                    formationRuns.FormGroupsIn(formingSession);
+                    formationRunner.FormGroupsIn(formingSession);
 
                     return true;
                 }
             );
 
-        formationRuns.Drop(sessionIdentity);
+        formationRunner.Drop(sessionIdentity);
     }
 }

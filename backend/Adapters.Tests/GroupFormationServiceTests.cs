@@ -21,13 +21,13 @@ public class GroupFormationServiceTests
     private readonly RecordingHubClients<IFacilitatorClient> facilitatorClients = new();
     private readonly RecordingHubClients<IParticipantClient> participantClients = new();
     private readonly RecordingHubClients<IPresenterClient> presenterClients = new();
-    private readonly GroupFormationRuns formationRuns;
+    private readonly GroupFormationRunner formationRunner;
     private readonly WorkshopStateCache cache;
 
     public GroupFormationServiceTests()
     {
-        formationRuns = TestWorkshopStateCache.FormationRuns(new TestGroupSolver(), clock);
-        cache = TestWorkshopStateCache.Create(formationRuns);
+        formationRunner = TestWorkshopStateCache.FormationRunner(new TestGroupSolver(), clock);
+        cache = TestWorkshopStateCache.Create(formationRunner);
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class GroupFormationServiceTests
 
         await ServiceUnderTest().TickOnceAsync();
 
-        formationRuns.RunningSessions().ShouldBe([KnownSession]);
+        formationRunner.RunningSessions().ShouldBe([KnownSession]);
         PresenterState()
             .ShouldBeOfType<PresenterGroupFormationState>()
             .Formation.ShouldBeOfType<PresenterFormingView>()
@@ -53,7 +53,7 @@ public class GroupFormationServiceTests
 
         await ServiceUnderTest().TickOnceAsync();
 
-        formationRuns.RunningSessions().ShouldBeEmpty();
+        formationRunner.RunningSessions().ShouldBeEmpty();
         presenterClients.AddressedGroups.ShouldBeEmpty();
     }
 
@@ -62,11 +62,11 @@ public class GroupFormationServiceTests
     {
         var session = AFormingSession();
         await repository.CreateAsync(session);
-        formationRuns.EnsureRunningFor(session);
+        formationRunner.EnsureRunningFor(session);
 
         await ServiceUnderTest().TickOnceAsync();
 
-        formationRuns.RunningSessions().ShouldBeEmpty();
+        formationRunner.RunningSessions().ShouldBeEmpty();
         presenterClients.AddressedGroups.ShouldBeEmpty();
     }
 
@@ -120,7 +120,7 @@ public class GroupFormationServiceTests
         var saved = repository.Saved.ShouldHaveSingleItem();
         saved.Formation.IsFormed.ShouldBeTrue();
         saved.Formation.Groups.SelectMany(group => group.Members).Count().ShouldBe(4);
-        formationRuns.RunningSessions().ShouldBeEmpty();
+        formationRunner.RunningSessions().ShouldBeEmpty();
     }
 
     [Fact]
@@ -130,13 +130,13 @@ public class GroupFormationServiceTests
         var service = ServiceUnderTest();
         await service.TickOnceAsync();
         clock.Advance(TimeSpan.FromSeconds(3));
-        formationRuns.FormGroupsIn(session);
+        formationRunner.FormGroupsIn(session);
 
         await service.TickOnceAsync();
 
         repository.Saved.ShouldBeEmpty();
         session.Revision.ShouldBe(0);
-        formationRuns.RunningSessions().ShouldBeEmpty();
+        formationRunner.RunningSessions().ShouldBeEmpty();
     }
 
     [Fact]
@@ -163,23 +163,23 @@ public class GroupFormationServiceTests
         var service = ServiceUnderTest();
         await service.TickOnceAsync();
         var statesBeforeTheGroupsStood = PresenterStates().Count;
-        formationRuns.FormGroupsIn(session);
+        formationRunner.FormGroupsIn(session);
 
         await service.TickOnceAsync();
 
-        formationRuns.RunningSessions().ShouldBeEmpty();
+        formationRunner.RunningSessions().ShouldBeEmpty();
         PresenterStates().Count.ShouldBe(statesBeforeTheGroupsStood);
     }
 
     [Fact]
     public async Task A_session_the_repository_no_longer_knows_forgets_its_run()
     {
-        formationRuns.EnsureRunningFor(AFormingSession());
+        formationRunner.EnsureRunningFor(AFormingSession());
         registry.Add(KnownSession, "connection-1");
 
         await ServiceUnderTest().TickOnceAsync();
 
-        formationRuns.RunningSessions().ShouldBeEmpty();
+        formationRunner.RunningSessions().ShouldBeEmpty();
         presenterClients.AddressedGroups.ShouldBeEmpty();
     }
 
@@ -192,7 +192,7 @@ public class GroupFormationServiceTests
 
         await ServiceUnderTest(new UnreachableSessionRepository()).TickOnceAsync();
 
-        formationRuns.RunningSessions().ShouldBe([KnownSession]);
+        formationRunner.RunningSessions().ShouldBe([KnownSession]);
         repository.Saved.ShouldBeEmpty();
 
         await ServiceUnderTest().TickOnceAsync();
@@ -274,7 +274,7 @@ public class GroupFormationServiceTests
 
         return new GroupFormationService(
             registry,
-            formationRuns,
+            formationRunner,
             services.BuildServiceProvider().GetRequiredService<IServiceScopeFactory>(),
             cache,
             dispatcher,
