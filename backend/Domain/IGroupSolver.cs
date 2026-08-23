@@ -2,5 +2,5 @@ namespace ValuesWorkshop.Domain;
 
 public interface IGroupSolver
 {
-    GroupFormationResult Solve(GroupFormationRequest request);
+    GroupFormationResult Solve(GroupFormationRequest request, CancellationToken cancellationToken);
 }

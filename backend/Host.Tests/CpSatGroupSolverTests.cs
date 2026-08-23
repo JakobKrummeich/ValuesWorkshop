@@ -12,7 +12,7 @@ public sealed class CpSatGroupSolverTests
     {
         var request = ThirtyParticipantRequest();
 
-        var result = solver.Solve(request);
+        var result = solver.Solve(request, CancellationToken.None);
 
         result.Groups.Select(group => group.Members.Count).ShouldBe([5, 5, 4, 4, 4, 4, 4]);
         result.Groups.Select(group => group.AssignedValues.Count).ShouldBe([2, 2, 2, 1, 1, 1, 1]);
@@ -33,7 +33,7 @@ public sealed class CpSatGroupSolverTests
         var request = ThirtyParticipantRequest();
 
         var stopwatch = Stopwatch.StartNew();
-        solver.Solve(request);
+        solver.Solve(request, CancellationToken.None);
         stopwatch.Stop();
 
         stopwatch.ElapsedMilliseconds.ShouldBeLessThan(3000);
@@ -44,7 +44,7 @@ public sealed class CpSatGroupSolverTests
     {
         var request = HandWorkedRequest();
 
-        var result = solver.Solve(request);
+        var result = solver.Solve(request, CancellationToken.None);
 
         AchievedOverlap(request, result).ShouldBe(22);
     }
@@ -52,7 +52,7 @@ public sealed class CpSatGroupSolverTests
     [Fact]
     public void The_hand_worked_eight_participant_instance_forms_the_unique_optimal_groups()
     {
-        var result = solver.Solve(HandWorkedRequest());
+        var result = solver.Solve(HandWorkedRequest(), CancellationToken.None);
 
         result.Groups.Count.ShouldBe(2);
         var groupAroundA = result.Groups.Single(group => group.Members.Contains(Named('a')));
@@ -68,7 +68,7 @@ public sealed class CpSatGroupSolverTests
     {
         var request = DisjointInterestsRequest();
 
-        var result = solver.Solve(request);
+        var result = solver.Solve(request, CancellationToken.None);
 
         AchievedOverlap(request, result).ShouldBe(18);
         ShouldBeDisjointInterestsOptimum(result);
@@ -79,7 +79,7 @@ public sealed class CpSatGroupSolverTests
     {
         var request = DisjointInterestsRequest(extraSelection: new ValueId("not-in-top"));
 
-        var result = solver.Solve(request);
+        var result = solver.Solve(request, CancellationToken.None);
 
         ShouldBeDisjointInterestsOptimum(result);
     }
@@ -89,7 +89,7 @@ public sealed class CpSatGroupSolverTests
     {
         var topValues = new[] { Value("v1"), Value("v2"), Value("v3") };
 
-        var result = solver.Solve(new GroupFormationRequest([], topValues));
+        var result = solver.Solve(new GroupFormationRequest([], topValues), CancellationToken.None);
 
         var onlyGroup = result.Groups.ShouldHaveSingleItem();
         onlyGroup.Members.ShouldBeEmpty();
@@ -101,7 +101,10 @@ public sealed class CpSatGroupSolverTests
     {
         var participants = FivePeopleSelecting(Value("dropped-with-the-top-set"));
 
-        var result = solver.Solve(new GroupFormationRequest(participants, []));
+        var result = solver.Solve(
+            new GroupFormationRequest(participants, []),
+            CancellationToken.None
+        );
 
         var onlyGroup = result.Groups.ShouldHaveSingleItem();
         onlyGroup.Members.ShouldBe(participants.Select(participant => participant.ParticipantId));
@@ -114,7 +117,10 @@ public sealed class CpSatGroupSolverTests
         var topValues = new[] { Value("v1"), Value("v2"), Value("v3"), Value("v4") };
         var participants = FivePeopleSelecting(Value("v1"), Value("v4"));
 
-        var result = solver.Solve(new GroupFormationRequest(participants, topValues));
+        var result = solver.Solve(
+            new GroupFormationRequest(participants, topValues),
+            CancellationToken.None
+        );
 
         var onlyGroup = result.Groups.ShouldHaveSingleItem();
         onlyGroup.Members.ShouldBe(participants.Select(participant => participant.ParticipantId));
@@ -126,8 +132,8 @@ public sealed class CpSatGroupSolverTests
     {
         var request = DenseThirtyParticipantRequest();
 
-        var firstResult = solver.Solve(request);
-        var secondResult = solver.Solve(request);
+        var firstResult = solver.Solve(request, CancellationToken.None);
+        var secondResult = solver.Solve(request, CancellationToken.None);
 
         firstResult.Groups.Count.ShouldBe(secondResult.Groups.Count);
         foreach (var (firstGroup, secondGroup) in firstResult.Groups.Zip(secondResult.Groups))

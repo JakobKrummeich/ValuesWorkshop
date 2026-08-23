@@ -170,6 +170,20 @@ public class GroupFormationRunsTests
     }
 
     [Fact]
+    public void Dropping_a_run_cancels_the_solve_it_started()
+    {
+        var solver = new CancellationWatchingGroupSolver();
+        var runs = RunsOver(solver);
+        var session = FormingSession();
+        runs.EnsureRunningFor(session);
+        solver.WaitUntilAsked();
+
+        runs.Drop(session.Identity);
+
+        solver.WaitUntilCancelled();
+    }
+
+    [Fact]
     public void An_assignment_from_a_dropped_run_never_lands_in_the_run_that_replaced_it()
     {
         var solver = new HeldGroupSolver();
@@ -260,7 +274,10 @@ public class GroupFormationRunsTests
 
     private sealed class SplitInTwoGroupSolver : IGroupSolver
     {
-        public GroupFormationResult Solve(GroupFormationRequest request)
+        public GroupFormationResult Solve(
+            GroupFormationRequest request,
+            CancellationToken cancellationToken
+        )
         {
             var members = request
                 .Participants.Select(participant => participant.ParticipantId)
@@ -273,13 +290,46 @@ public class GroupFormationRunsTests
         }
     }
 
+    private sealed class CancellationWatchingGroupSolver : IGroupSolver
+    {
+        private readonly ManualResetEventSlim asked = new();
+        private readonly ManualResetEventSlim cancelled = new();
+
+        public GroupFormationResult Solve(
+            GroupFormationRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            using var stopWhenCancelled = cancellationToken.Register(cancelled.Set);
+
+            asked.Set();
+            cancelled.Wait(TimeSpan.FromSeconds(10));
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return new TestGroupSolver().Solve(request, cancellationToken);
+        }
+
+        public void WaitUntilAsked()
+        {
+            asked.Wait(TimeSpan.FromSeconds(10)).ShouldBeTrue();
+        }
+
+        public void WaitUntilCancelled()
+        {
+            cancelled.Wait(TimeSpan.FromSeconds(10)).ShouldBeTrue();
+        }
+    }
+
     private sealed class HeldGroupSolver : IGroupSolver
     {
         private readonly ManualResetEventSlim firstSolveReleased = new();
         private readonly ManualResetEventSlim laterSolvesReleased = new();
         private int solves;
 
-        public GroupFormationResult Solve(GroupFormationRequest request)
+        public GroupFormationResult Solve(
+            GroupFormationRequest request,
+            CancellationToken cancellationToken
+        )
         {
             var isFirstSolve = Interlocked.Increment(ref solves) == 1;
 
@@ -288,8 +338,8 @@ public class GroupFormationRunsTests
             );
 
             return isFirstSolve
-                ? new SplitInTwoGroupSolver().Solve(request)
-                : new TestGroupSolver().Solve(request);
+                ? new SplitInTwoGroupSolver().Solve(request, cancellationToken)
+                : new TestGroupSolver().Solve(request, cancellationToken);
         }
 
         public void ReleaseFirstSolve()
@@ -307,11 +357,14 @@ public class GroupFormationRunsTests
     {
         private readonly ManualResetEventSlim released = new();
 
-        public GroupFormationResult Solve(GroupFormationRequest request)
+        public GroupFormationResult Solve(
+            GroupFormationRequest request,
+            CancellationToken cancellationToken
+        )
         {
             released.Wait();
 
-            return new TestGroupSolver().Solve(request);
+            return new TestGroupSolver().Solve(request, cancellationToken);
         }
 
         public void Release()
@@ -324,7 +377,10 @@ public class GroupFormationRunsTests
     {
         private readonly ManualResetEventSlim attempted = new();
 
-        public GroupFormationResult Solve(GroupFormationRequest request)
+        public GroupFormationResult Solve(
+            GroupFormationRequest request,
+            CancellationToken cancellationToken
+        )
         {
             attempted.Set();
 
@@ -341,11 +397,14 @@ public class GroupFormationRunsTests
     {
         private readonly TaskCompletionSource<GroupFormationRequest> requested = new();
 
-        public GroupFormationResult Solve(GroupFormationRequest request)
+        public GroupFormationResult Solve(
+            GroupFormationRequest request,
+            CancellationToken cancellationToken
+        )
         {
             requested.SetResult(request);
 
-            return new TestGroupSolver().Solve(request);
+            return new TestGroupSolver().Solve(request, cancellationToken);
         }
 
         public GroupFormationRequest AwaitedRequest()

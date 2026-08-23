@@ -15,6 +15,7 @@ public sealed class GroupFormationRuns(
     private sealed record GroupFormationRun(
         Guid Token,
         long StartedAt,
+        CancellationTokenSource Cancellation,
         GroupFormationResult? Assignment
     );
 
@@ -29,23 +30,26 @@ public sealed class GroupFormationRuns(
         }
 
         var token = Guid.NewGuid();
+        var cancellation = new CancellationTokenSource();
 
         lock (gate)
         {
             if (
                 !runs.TryAdd(
                     session.Identity,
-                    new GroupFormationRun(token, timeProvider.GetTimestamp(), null)
+                    new GroupFormationRun(token, timeProvider.GetTimestamp(), cancellation, null)
                 )
             )
             {
+                cancellation.Dispose();
+
                 return;
             }
         }
 
         var request = GroupFormationRequest.For(session);
 
-        _ = Task.Run(() => SolveFor(session.Identity, token, request));
+        _ = Task.Run(() => SolveFor(session.Identity, token, request, cancellation.Token));
     }
 
     public FormationProgress ProgressOf(SessionIdentity sessionIdentity)
@@ -81,10 +85,14 @@ public sealed class GroupFormationRuns(
 
     public void Drop(SessionIdentity sessionIdentity)
     {
+        GroupFormationRun? dropped;
+
         lock (gate)
         {
-            runs.Remove(sessionIdentity);
+            runs.Remove(sessionIdentity, out dropped);
         }
+
+        dropped?.Cancellation.Cancel();
     }
 
     public void RetainOnly(IReadOnlyCollection<SessionIdentity> sessionIdentities)
@@ -118,14 +126,19 @@ public sealed class GroupFormationRuns(
     private void SolveFor(
         SessionIdentity sessionIdentity,
         Guid token,
-        GroupFormationRequest request
+        GroupFormationRequest request,
+        CancellationToken cancellationToken
     )
     {
         GroupFormationResult? assignment = null;
 
         try
         {
-            assignment = groupSolverPort.Solve(request);
+            assignment = groupSolverPort.Solve(request, cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
         }
         catch (Exception exception)
         {
