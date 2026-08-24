@@ -34,9 +34,7 @@ function mockGroupWorkPort(
 
 function makeGroupWorkPort() {
   return {
-    addAction: jest.fn(
-      (_valueId: string, _text: string): Single<IntentResult> => of(accepted),
-    ),
+    addAction: jest.fn((): Single<IntentResult> => of(accepted)),
     editAction: jest.fn((): Single<IntentResult> => of(accepted)),
     removeAction: jest.fn((): Single<IntentResult> => of(accepted)),
     submitGroupWork: jest.fn((): Single<IntentResult> => of(accepted)),
