@@ -7,12 +7,7 @@ export function createFacilitatorGroupWorkControlPort(
   connection: WebsocketConnection,
 ): FacilitatorGroupWorkControlPort {
   return {
-    reassignScribe: (groupName, participantId) =>
-      invokeIntent(
-        connection,
-        FacilitatorIntent.ReassignScribe,
-        groupName,
-        participantId,
-      ),
+    reassignScribe: (participantId) =>
+      invokeIntent(connection, FacilitatorIntent.ReassignScribe, participantId),
   };
 }

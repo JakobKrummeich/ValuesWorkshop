@@ -34,7 +34,9 @@ function mockGroupWorkPort(
 
 function makeGroupWorkPort() {
   return {
-    addAction: jest.fn((): Single<IntentResult> => of(accepted)),
+    addAction: jest.fn(
+      (_valueId: string, _text: string): Single<IntentResult> => of(accepted),
+    ),
     editAction: jest.fn((): Single<IntentResult> => of(accepted)),
     removeAction: jest.fn((): Single<IntentResult> => of(accepted)),
     submitGroupWork: jest.fn((): Single<IntentResult> => of(accepted)),
@@ -59,13 +61,6 @@ function ownGroup(overrides: Partial<OwnGroupView> = {}): OwnGroupView {
 }
 
 describe("useGroupWorkCard", () => {
-  beforeEach(() => {
-    Object.defineProperty(globalThis, "crypto", {
-      value: { randomUUID: () => "test-uuid" },
-      configurable: true,
-    });
-  });
-
   it("selects the first value tab by default", () => {
     mockGroupWorkPort();
     const { result } = renderHook(() => useGroupWorkCard(ownGroup()));
@@ -103,7 +98,7 @@ describe("useGroupWorkCard", () => {
 
     act(() => result.current.addAction());
 
-    expect(port.addAction).toHaveBeenCalledWith("test-uuid", "trust", "");
+    expect(port.addAction).toHaveBeenCalledWith("trust", "");
   });
 
   it("sends editAction with throttled text snapshots", () => {

@@ -151,8 +151,7 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
 
   const addAction = useCallback(() => {
     if (!isCallerScribe || isSubmitted || selectedValueId === null) return;
-    const actionId = crypto.randomUUID();
-    sendIntent(groupWorkPort.addAction(actionId, selectedValueId, ""));
+    sendIntent(groupWorkPort.addAction(selectedValueId, ""));
   }, [isCallerScribe, isSubmitted, selectedValueId, sendIntent, groupWorkPort]);
 
   const removeAction = useCallback(

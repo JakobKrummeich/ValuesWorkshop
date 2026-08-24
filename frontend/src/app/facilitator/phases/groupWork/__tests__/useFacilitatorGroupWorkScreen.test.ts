@@ -104,8 +104,8 @@ describe("useFacilitatorGroupWorkScreen", () => {
       useFacilitatorGroupWorkScreen(state(groups)),
     );
 
-    act(() => result.current.reassignScribe("otter", "p2"));
+    act(() => result.current.reassignScribe("p2"));
 
-    expect(reassignScribe).toHaveBeenCalledWith("otter", "p2");
+    expect(reassignScribe).toHaveBeenCalledWith("p2");
   });
 });

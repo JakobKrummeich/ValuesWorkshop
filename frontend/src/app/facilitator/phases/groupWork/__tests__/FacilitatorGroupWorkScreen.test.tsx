@@ -126,6 +126,6 @@ describe("FacilitatorGroupWorkScreen", () => {
       target: { value: "p2" },
     });
 
-    expect(reassignScribe).toHaveBeenCalledWith("otter", "p2");
+    expect(reassignScribe).toHaveBeenCalledWith("p2");
   });
 });

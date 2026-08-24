@@ -12,7 +12,7 @@ import { useFacilitatorDependencies } from "../../dependencies";
 
 export interface FacilitatorGroupWorkScreenModel {
   groups: FacilitatorGroupWorkGroups;
-  reassignScribe: (groupName: string, participantId: string) => void;
+  reassignScribe: (participantId: string) => void;
   allSubmitted: boolean;
   isSending: boolean;
   rejectionMessage: MessageKey | null;
@@ -40,11 +40,11 @@ export function useFacilitatorGroupWorkScreen(
   );
 
   const reassignScribe = useCallback(
-    (groupName: string, participantId: string) => {
+    (participantId: string) => {
       setIsSending(true);
       intentSubscription.current?.unsubscribe();
       intentSubscription.current = groupWorkControlPort
-        .reassignScribe(groupName, participantId)
+        .reassignScribe(participantId)
         .subscribe({
           next(result) {
             setRejectionMessage(result.isAccepted ? null : null);

@@ -7,14 +7,8 @@ export function createParticipantGroupWorkPort(
   connection: WebsocketConnection,
 ): ParticipantGroupWorkPort {
   return {
-    addAction: (actionId, valueId, text) =>
-      invokeIntent(
-        connection,
-        ParticipantIntent.AddAction,
-        actionId,
-        valueId,
-        text,
-      ),
+    addAction: (valueId, text) =>
+      invokeIntent(connection, ParticipantIntent.AddAction, valueId, text),
     editAction: (actionId, text) =>
       invokeIntent(connection, ParticipantIntent.EditAction, actionId, text),
     removeAction: (actionId) =>

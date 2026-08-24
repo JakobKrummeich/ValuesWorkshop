@@ -62,9 +62,7 @@ export function FacilitatorGroupWorkScreen({
                     className={styles.scribeSelect}
                     data-testid={`scribe-select-${group.name.animalId}`}
                     value={group.scribeParticipantId ?? ""}
-                    onChange={(event) =>
-                      reassignScribe(group.name.animalId, event.target.value)
-                    }
+                    onChange={(event) => reassignScribe(event.target.value)}
                   >
                     {group.members.map((member) => (
                       <option
