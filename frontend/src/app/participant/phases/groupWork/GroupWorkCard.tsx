@@ -2,13 +2,13 @@
 
 import { localizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
-import {
-  GroupWorkStatus,
-  type OwnGroupView,
-} from "../../../../domain/workshopState";
+import type { OwnGroupView } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { ActionListItem } from "./ActionListItem";
 import styles from "./GroupWorkCard.module.css";
+import { GroupWorkControls } from "./GroupWorkControls";
 import { useGroupWorkCard } from "./useGroupWorkCard";
+import { WorkStatusBadge } from "./WorkStatusBadge";
 
 export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
   const { language, translate } = useTranslation();
@@ -31,6 +31,8 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
     canSubmit,
     isSending,
   } = useGroupWorkCard(ownGroup);
+
+  const isEditable = isCallerScribe && !isSubmitted;
 
   return (
     <article className={styles.card} data-testid="group-work-card">
@@ -73,44 +75,17 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
       </ul>
       <ul className={styles.actionList} data-testid="action-list">
         {actionsForSelectedValue.map((action) => (
-          <li
+          <ActionListItem
             key={action.actionId}
-            className={styles.actionItem}
-            data-testid={`action-${action.actionId}`}
-          >
-            {isCallerScribe && !isSubmitted ? (
-              <>
-                <input
-                  type="text"
-                  className={styles.actionInput}
-                  data-testid={`action-input-${action.actionId}`}
-                  value={localTexts[action.actionId] ?? action.text}
-                  placeholder={translate(MessageKey.GroupWorkActionPlaceholder)}
-                  onChange={(event) =>
-                    editActionText(action.actionId, event.target.value)
-                  }
-                />
-                <button
-                  type="button"
-                  className={styles.removeButton}
-                  data-testid={`remove-action-${action.actionId}`}
-                  onClick={() => removeAction(action.actionId)}
-                >
-                  {translate(MessageKey.GroupWorkRemoveAction)}
-                </button>
-              </>
-            ) : (
-              <span
-                className={styles.actionText}
-                data-testid={`action-text-${action.actionId}`}
-              >
-                {action.text}
-              </span>
-            )}
-          </li>
+            action={action}
+            isEditable={isEditable}
+            localText={localTexts[action.actionId]}
+            onEditText={editActionText}
+            onRemove={removeAction}
+          />
         ))}
       </ul>
-      {isCallerScribe && !isSubmitted && (
+      {isEditable && (
         <button
           type="button"
           className={styles.addButton}
@@ -122,53 +97,16 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
         </button>
       )}
       {isCallerScribe && (
-        <div className={styles.controls}>
-          {isSubmitted ? (
-            <button
-              type="button"
-              className={styles.reopenButton}
-              data-testid="reopen-button"
-              onClick={reopenGroupWork}
-              disabled={isSending}
-            >
-              {translate(MessageKey.GroupWorkReopen)}
-            </button>
-          ) : (
-            <>
-              <button
-                type="button"
-                className={styles.submitButton}
-                data-testid="submit-group-work-button"
-                disabled={!canSubmit || isSending}
-                onClick={submitGroupWork}
-              >
-                {translate(MessageKey.GroupWorkSubmit)}
-              </button>
-              {!canSubmit && (
-                <p
-                  className={styles.disabledHint}
-                  data-testid="submit-disabled-hint"
-                >
-                  {translate(MessageKey.GroupWorkSubmitDisabledHint)}
-                </p>
-              )}
-            </>
-          )}
-        </div>
+        <GroupWorkControls
+          isSubmitted={isSubmitted}
+          canSubmit={canSubmit}
+          isSending={isSending}
+          onSubmit={submitGroupWork}
+          onReopen={reopenGroupWork}
+        />
       )}
       {ownGroup.workStatus !== undefined && (
-        <span
-          className={`${styles.statusBadge} ${
-            ownGroup.workStatus === GroupWorkStatus.Submitted
-              ? styles.statusSubmitted
-              : styles.statusEditing
-          }`}
-          data-testid="group-work-status"
-        >
-          {ownGroup.workStatus === GroupWorkStatus.Submitted
-            ? translate(MessageKey.GroupWorkStatusSubmitted)
-            : translate(MessageKey.GroupWorkStatusEditing)}
-        </span>
+        <WorkStatusBadge workStatus={ownGroup.workStatus} />
       )}
     </article>
   );

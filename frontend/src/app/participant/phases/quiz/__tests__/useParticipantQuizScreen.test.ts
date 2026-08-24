@@ -30,6 +30,13 @@ function withChooseAnswer(
     sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
     quizPort: { chooseAnswer },
     selectionPort: { submitSelection: () => NEVER },
+    groupWorkPort: {
+      addAction: () => NEVER,
+      editAction: () => NEVER,
+      removeAction: () => NEVER,
+      submitGroupWork: () => NEVER,
+      reopenGroupWork: () => NEVER,
+    },
   });
 }
 

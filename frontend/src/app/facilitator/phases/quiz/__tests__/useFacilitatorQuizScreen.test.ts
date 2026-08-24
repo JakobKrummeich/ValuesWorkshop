@@ -34,6 +34,9 @@ function withQuizControl(overrides: Partial<FacilitatorQuizControlPort> = {}) {
     sessionStatePort: { workshopState: NEVER, connectionState: NEVER },
     lifecyclePort: { advancePhase: () => NEVER },
     quizControlPort: quizControl,
+    groupWorkControlPort: {
+      reassignScribe: () => NEVER,
+    },
   });
   return quizControl;
 }

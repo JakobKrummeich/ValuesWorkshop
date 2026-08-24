@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Subscription } from "rxjs";
 import type { MessageKey } from "../../../../domain/i18n/messages";
 import type { IntentResult } from "../../../../domain/intentResult";
-import type { ParticipantGroupWorkPort } from "../../../../domain/ports/participant/groupWorkPort";
 import {
   GroupWorkStatus,
   type GroupActionView,
@@ -35,6 +34,38 @@ export interface GroupWorkCardModel {
   canSubmit: boolean;
   isSending: boolean;
   rejectionMessage: MessageKey | null;
+}
+
+function actionsForValue(
+  actions: GroupActionView[],
+  valueId: string | null,
+): GroupActionView[] {
+  if (valueId === null) return [];
+  return actions
+    .filter((action) => action.valueId === valueId)
+    .sort((first, second) => first.sortOrder - second.sortOrder);
+}
+
+function resolveActionText(
+  action: GroupActionView,
+  localTexts: Record<string, string>,
+): string {
+  const local = localTexts[action.actionId];
+  return local !== undefined ? local : action.text;
+}
+
+function everyValueHasNonEmptyAction(
+  assignedValues: WorkshopValue[],
+  actions: GroupActionView[],
+  localTexts: Record<string, string>,
+): boolean {
+  return assignedValues.every((value) =>
+    actions
+      .filter((action) => action.valueId === value.valueId)
+      .some(
+        (action) => resolveActionText(action, localTexts).trim().length > 0,
+      ),
+  );
 }
 
 export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
@@ -68,28 +99,11 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
   const isCallerScribe = ownGroup.isCallerScribe === true;
   const isSubmitted = ownGroup.workStatus === GroupWorkStatus.Submitted;
   const actions = ownGroup.actions ?? [];
-
-  const actionsForSelectedValue =
-    selectedValueId !== null
-      ? actions
-          .filter((action) => action.valueId === selectedValueId)
-          .sort((first, second) => first.sortOrder - second.sortOrder)
-      : [];
-
   const canSubmit =
     isCallerScribe &&
     !isSubmitted &&
     !isSending &&
-    ownGroup.assignedValues.every((value) => {
-      const valueActions = actions.filter(
-        (action) => action.valueId === value.valueId,
-      );
-      return valueActions.some((action) => {
-        const local = localTexts[action.actionId];
-        const text = local !== undefined ? local : action.text;
-        return text.trim().length > 0;
-      });
-    });
+    everyValueHasNonEmptyAction(ownGroup.assignedValues, actions, localTexts);
 
   const sendIntent = useCallback((intent: Single<IntentResult>) => {
     setIsSending(true);
@@ -169,10 +183,6 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
     sendIntent(groupWorkPort.reopenGroupWork());
   }, [isCallerScribe, isSubmitted, sendIntent, groupWorkPort]);
 
-  const selectValue = useCallback((valueId: string) => {
-    setSelectedValueId(valueId);
-  }, []);
-
   return {
     groupName: ownGroup.name,
     memberDisplayNames: ownGroup.memberDisplayNames,
@@ -181,8 +191,8 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
     isSubmitted,
     assignedValues: ownGroup.assignedValues,
     selectedValueId,
-    selectValue,
-    actionsForSelectedValue,
+    selectValue: setSelectedValueId,
+    actionsForSelectedValue: actionsForValue(actions, selectedValueId),
     localTexts,
     addAction,
     editActionText,

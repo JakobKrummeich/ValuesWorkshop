@@ -50,6 +50,9 @@ beforeEach(() => {
       showLearningText: jest.fn(() => EMPTY),
       poseNextQuestion: jest.fn(() => EMPTY),
     },
+    groupWorkControlPort: {
+      reassignScribe: jest.fn(() => EMPTY),
+    },
     start: EMPTY,
     close: EMPTY,
   });

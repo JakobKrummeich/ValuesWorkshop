@@ -44,6 +44,13 @@ beforeEach(() => {
     },
     quizPort: { chooseAnswer: jest.fn(() => EMPTY) },
     selectionPort: { submitSelection: jest.fn(() => EMPTY) },
+    groupWorkPort: {
+      addAction: jest.fn(() => EMPTY),
+      editAction: jest.fn(() => EMPTY),
+      removeAction: jest.fn(() => EMPTY),
+      submitGroupWork: jest.fn(() => EMPTY),
+      reopenGroupWork: jest.fn(() => EMPTY),
+    },
     start: EMPTY,
     close: EMPTY,
   });

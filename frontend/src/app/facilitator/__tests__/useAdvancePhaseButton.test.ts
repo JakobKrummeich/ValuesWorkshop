@@ -41,6 +41,9 @@ function withAdvancePhase(
       showLearningText: () => NEVER,
       poseNextQuestion: () => NEVER,
     },
+    groupWorkControlPort: {
+      reassignScribe: () => NEVER,
+    },
   });
 }
 
