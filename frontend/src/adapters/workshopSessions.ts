@@ -1,5 +1,7 @@
+import type { FacilitatorGroupWorkControlPort } from "../domain/ports/facilitator/groupWorkControlPort";
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorQuizControlPort } from "../domain/ports/facilitator/quizControlPort";
+import type { ParticipantGroupWorkPort } from "../domain/ports/participant/groupWorkPort";
 import type { ParticipantQuizPort } from "../domain/ports/participant/quizPort";
 import type { ParticipantSelectionPort } from "../domain/ports/participant/selectionPort";
 import type { FacilitatorSessionStatePort } from "../domain/ports/facilitator/sessionStatePort";
@@ -14,8 +16,10 @@ import { WorkshopRole } from "../domain/workshopRole";
 import { hubBaseUrl } from "../config/environment";
 import type { Completable, Single } from "../shared/reactiveTypes";
 import { getAccessToken } from "./authAdapter";
+import { createFacilitatorGroupWorkControlPort } from "./facilitatorGroupWorkControlAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
 import { createFacilitatorQuizControlPort } from "./facilitatorQuizControlAdapter";
+import { createParticipantGroupWorkPort } from "./participantGroupWorkAdapter";
 import { createParticipantQuizPort } from "./participantQuizAdapter";
 import { createParticipantSelectionPort } from "./participantSelectionAdapter";
 import { withSerializedLifecycle } from "./serializedLifecycle";
@@ -32,12 +36,14 @@ export interface ParticipantSession extends WorkshopSession {
   readonly sessionStatePort: ParticipantSessionStatePort;
   readonly quizPort: ParticipantQuizPort;
   readonly selectionPort: ParticipantSelectionPort;
+  readonly groupWorkPort: ParticipantGroupWorkPort;
 }
 
 export interface FacilitatorSession extends WorkshopSession {
   readonly sessionStatePort: FacilitatorSessionStatePort;
   readonly lifecyclePort: FacilitatorLifecyclePort;
   readonly quizControlPort: FacilitatorQuizControlPort;
+  readonly groupWorkControlPort: FacilitatorGroupWorkControlPort;
 }
 
 export interface PresenterSession extends WorkshopSession {
@@ -59,6 +65,7 @@ export function createParticipantSession(
     ),
     quizPort: createParticipantQuizPort(connection),
     selectionPort: createParticipantSelectionPort(connection),
+    groupWorkPort: createParticipantGroupWorkPort(connection),
     ...lifetimeOf(connection),
   };
 }
@@ -78,6 +85,7 @@ export function createFacilitatorSession(
     ),
     lifecyclePort: createFacilitatorLifecyclePort(connection),
     quizControlPort: createFacilitatorQuizControlPort(connection),
+    groupWorkControlPort: createFacilitatorGroupWorkControlPort(connection),
     ...lifetimeOf(connection),
   };
 }

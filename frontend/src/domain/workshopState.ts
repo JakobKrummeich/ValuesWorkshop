@@ -22,8 +22,13 @@ import {
 
 import { FormationSubState } from "./workshopStateBlocks";
 
-export { FormationSubState, QuizSubState } from "./workshopStateBlocks";
+export {
+  FormationSubState,
+  GroupWorkStatus,
+  QuizSubState,
+} from "./workshopStateBlocks";
 export type {
+  GroupActionView,
   GroupName,
   OwnGroupView,
   WorkshopValue,
@@ -40,6 +45,11 @@ export enum FacilitatorIntent {
 export enum ParticipantIntent {
   ChooseQuizAnswer = "ChooseQuizAnswer",
   SubmitValueSelection = "SubmitValueSelection",
+  AddAction = "AddAction",
+  EditAction = "EditAction",
+  RemoveAction = "RemoveAction",
+  SubmitGroupWork = "SubmitGroupWork",
+  ReopenGroupWork = "ReopenGroupWork",
 }
 
 const revisionSchema = z.int().nonnegative();
@@ -294,3 +304,19 @@ export type PresenterGroups = Extract<
   PresenterFormationView,
   { subState: FormationSubState.Formed }
 >["groups"];
+
+export type ParticipantGroupWorkState = InPhase<
+  ParticipantWorkshopState,
+  Phase.GroupWork
+>;
+export type FacilitatorGroupWorkState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.GroupWork
+>;
+export type PresenterGroupWorkState = InPhase<
+  PresenterWorkshopState,
+  Phase.GroupWork
+>;
+
+export type FacilitatorGroupWorkGroups = FacilitatorGroupWorkState["groups"];
+export type PresenterGroupWorkGroups = PresenterGroupWorkState["groups"];
