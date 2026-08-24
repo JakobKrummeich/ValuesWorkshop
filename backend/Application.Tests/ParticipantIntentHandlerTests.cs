@@ -241,15 +241,15 @@ public class ParticipantIntentHandlerTests
     }
 
     [Fact]
-    public async Task A_blank_action_text_is_rejected_as_a_malformed_payload()
+    public async Task A_blank_action_text_is_accepted_during_editing()
     {
         var repository = FakeSessionRepository.Holding(GroupWorkSession());
 
         var result = await HandlerOver(repository)
             .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1", "   "));
 
-        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
-        repository.Saved.ShouldBeEmpty();
+        result.IsAccepted.ShouldBeTrue();
+        repository.Saved.ShouldNotBeEmpty();
     }
 
     [Fact]
