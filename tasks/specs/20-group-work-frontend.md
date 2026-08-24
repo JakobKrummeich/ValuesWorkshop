@@ -97,12 +97,10 @@ indicator badge. No actions or scribe details on the wall.
 - **D8 — Scribe intent commands reuse the hub.** The `useSessionGateway`
   hook already exposes `sendIntent`; each command is a thin intent message.
   No new transport.
-- **D9 — Empty action text during editing. (OPEN — needs decision.)**
-  Option A: relax `GroupActionText` to allow empty/whitespace during
-  editing; `SubmitGroupWork` still guards that every value has ≥ 1
-  non-empty action. Option B: create the action on first non-empty
-  character, avoiding any domain change but adding UX complexity
-  (the scribe sees no row until they start typing).
+- **D9 — Empty action text during editing.** Option A chosen: relax
+  `GroupActionText` to allow empty/whitespace during editing;
+  `SubmitGroupWork` still guards that every value has ≥ 1 non-empty
+  action.
 
 ## Slices
 

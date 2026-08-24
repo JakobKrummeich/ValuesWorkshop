@@ -322,7 +322,7 @@ can refuse a command violating it.
 | I8 | Groups are formed exactly once, per the sizing rule; each top value is assigned to exactly one group, and that assignment never changes. Membership changes afterwards only by a participant joining the session late: they are placed into a group with the fewest members, keeping sizes within one of each other. | Session |
 | I9 | A group has exactly one scribe at any time, and the scribe is a member of that group. | Group |
 | I10 | During Group work, only the scribe creates, edits, removes actions and submits or reopens; a reassigned-away scribe is refused immediately. During Value presentation, only the facilitator may correct an action's wording (typo fixes); nothing may be added or removed. | Group |
-| I11 | Every assigned value carries between one and five actions when group work is submitted; no edits while submitted. | Group |
+| I11 | Every assigned value carries between one and five actions with non-empty text when group work is submitted; empty text is allowed during editing. No edits while submitted. | Group |
 | I12 | Only submitted group results are presented. | Session |
 | I13 | A final-votes submission spends exactly the round's allotment (five in the main round; the number of tied values in a tiebreak), only on the round's eligible values; one submission per participant per round. | Session |
 | I14 | Final votes are anonymous and secret: the session remembers *that* a participant voted, never *what* — no connection between voter and votes exists anywhere in the model. As a consequence, votes can never be taken back. | Session |
