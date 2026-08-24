@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Subscription } from "rxjs";
-import type { MessageKey } from "../../../../domain/i18n/messages";
+import { intentRejectionMessage } from "../../../../domain/i18n/intentRejectionMessage";
+import { MessageKey } from "../../../../domain/i18n/messages";
 import type { IntentResult } from "../../../../domain/intentResult";
 import {
   GroupWorkStatus,
@@ -110,9 +111,12 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
     intentSubscription.current?.unsubscribe();
     intentSubscription.current = intent.subscribe({
       next(result) {
-        setRejectionMessage(result.isAccepted ? null : null);
+        setRejectionMessage(
+          result.isAccepted ? null : intentRejectionMessage(result.code),
+        );
       },
       error() {
+        setRejectionMessage(MessageKey.IntentFailed);
         setIsSending(false);
       },
       complete() {
@@ -126,7 +130,7 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
       const text = pendingTexts.current[actionId];
       if (text !== undefined) {
         delete pendingTexts.current[actionId];
-        groupWorkPort.editAction(actionId, text).subscribe();
+        groupWorkPort.editAction(actionId, text).subscribe({ error() {} });
       }
     },
     [groupWorkPort],
@@ -138,7 +142,7 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
       pendingTexts.current[actionId] = text;
 
       if (throttleTimers.current[actionId] === undefined) {
-        groupWorkPort.editAction(actionId, text).subscribe();
+        groupWorkPort.editAction(actionId, text).subscribe({ error() {} });
         delete pendingTexts.current[actionId];
         throttleTimers.current[actionId] = setTimeout(() => {
           delete throttleTimers.current[actionId];

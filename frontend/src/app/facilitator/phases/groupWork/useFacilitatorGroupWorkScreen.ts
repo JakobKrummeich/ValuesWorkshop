@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Subscription } from "rxjs";
-import type { MessageKey } from "../../../../domain/i18n/messages";
+import { intentRejectionMessage } from "../../../../domain/i18n/intentRejectionMessage";
+import { MessageKey } from "../../../../domain/i18n/messages";
 import {
   GroupWorkStatus,
   type FacilitatorGroupWorkState,
@@ -47,9 +48,12 @@ export function useFacilitatorGroupWorkScreen(
         .reassignScribe(participantId)
         .subscribe({
           next(result) {
-            setRejectionMessage(result.isAccepted ? null : null);
+            setRejectionMessage(
+              result.isAccepted ? null : intentRejectionMessage(result.code),
+            );
           },
           error() {
+            setRejectionMessage(MessageKey.IntentFailed);
             setIsSending(false);
           },
           complete() {
