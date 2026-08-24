@@ -1,0 +1,200 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  padding: var(--space-gutter);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
+}
+
+.groupName {
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.members {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member {
+  padding: var(--space-tight) var(--space-gap);
+  border-radius: var(--radius-full);
+  background: var(--color-member-chip-soft);
+  color: var(--color-member-chip);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.scribeLabel {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  line-height: var(--leading-normal);
+}
+
+.valueTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.valueTab {
+  padding: var(--space-tight) var(--space-gap);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  cursor: pointer;
+}
+
+.valueTab[aria-selected="true"] {
+  background: var(--color-value-chip-soft);
+  color: var(--color-value-chip);
+  border-color: var(--color-value-chip);
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-gap);
+}
+
+.actionInput {
+  flex: 1;
+  padding: var(--space-tight) var(--space-gap);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+.actionText {
+  flex: 1;
+  padding: var(--space-tight) var(--space-gap);
+  color: var(--color-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+.removeButton {
+  padding: var(--space-tight) var(--space-gap);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  cursor: pointer;
+}
+
+.addButton {
+  align-self: flex-start;
+  padding: var(--space-tight) var(--space-gap);
+  border: var(--border-hairline) dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-normal);
+  cursor: pointer;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
+  align-items: flex-start;
+}
+
+.submitButton {
+  padding: var(--space-gap) var(--space-gutter);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-normal);
+  cursor: pointer;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reopenButton {
+  padding: var(--space-gap) var(--space-gutter);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-normal);
+  cursor: pointer;
+}
+
+.disabledHint {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  line-height: var(--leading-normal);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: var(--space-tight) var(--space-gap);
+  border-radius: var(--radius-full);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.statusEditing {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.statusSubmitted {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}

@@ -1,0 +1,66 @@
+.screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-gutter);
+  padding: var(--space-gutter);
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.headerCell {
+  padding: var(--space-gap) var(--space-gutter);
+  border-bottom: var(--border-hairline) solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  text-align: start;
+}
+
+.cell {
+  padding: var(--space-gap) var(--space-gutter);
+  border-bottom: var(--border-hairline) solid var(--color-border);
+  color: var(--color-text);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+.scribeSelect {
+  padding: var(--space-tight) var(--space-gap);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: var(--space-tight) var(--space-gap);
+  border-radius: var(--radius-full);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.statusEditing {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.statusSubmitted {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.hint {
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  line-height: var(--leading-normal);
+}
