@@ -300,6 +300,18 @@ public class GroupTests
     }
 
     [Fact]
+    public void Submitting_is_refused_when_any_action_has_empty_text()
+    {
+        var group = GroupWithScribe();
+        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"));
+        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Courage, GroupActionText.Of(""));
+
+        Should.Throw<InvariantViolationException>(() => group.Submit(Anna));
+
+        group.IsSubmitted.ShouldBeFalse();
+    }
+
+    [Fact]
     public void The_scribe_submits_once_every_value_holds_an_action()
     {
         var group = GroupWithScribe();

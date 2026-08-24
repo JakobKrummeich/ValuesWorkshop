@@ -8,6 +8,8 @@ public sealed record GroupActionText
 
     public string Value { get; }
 
+    public bool IsEmpty => Value.Length == 0;
+
     private GroupActionText(string value)
     {
         Value = value;
@@ -19,7 +21,7 @@ public sealed record GroupActionText
 
         if (trimmed.Length == 0)
         {
-            throw new MalformedPayloadException("An action needs a text.");
+            return new GroupActionText(string.Empty);
         }
 
         return new GroupActionText(TruncatedToTextElements(trimmed));

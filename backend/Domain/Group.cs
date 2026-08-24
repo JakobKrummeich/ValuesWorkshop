@@ -120,6 +120,13 @@ public sealed class Group
             );
         }
 
+        if (_actions.Any(action => action.Text.IsEmpty))
+        {
+            throw new InvariantViolationException(
+                "Every action must have a non-empty text before submitting."
+            );
+        }
+
         IsSubmitted = true;
     }
 
