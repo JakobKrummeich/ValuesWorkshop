@@ -493,7 +493,7 @@ test.describe.serial("value selection through group formation", () => {
     ).toBeVisible();
     await expect(
       facilitatorPage.getByTestId("group-status-otter"),
-    ).toHaveTextContent("Editing");
+    ).toHaveText("Editing");
   });
 
   test("the scribe sees the group work card with editable actions", async () => {
@@ -544,11 +544,11 @@ test.describe.serial("value selection through group formation", () => {
     });
     await expect(
       scribePage.getByTestId("group-work-status"),
-    ).toHaveTextContent("Submitted");
+    ).toHaveText("Submitted");
 
     await expect(
       facilitatorPage.getByTestId("group-status-otter"),
-    ).toHaveTextContent("Submitted", { timeout: 5_000 });
+    ).toHaveText("Submitted", { timeout: 5_000 });
   });
 
   test("the facilitator can advance after all groups are submitted", async () => {
