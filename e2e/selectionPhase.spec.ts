@@ -475,4 +475,121 @@ test.describe.serial("value selection through group formation", () => {
       timeout: 1_000,
     });
   });
+
+  test("advancing to phase 6 shows the group work screen on every role", async () => {
+    await advancePhaseButton(facilitatorPage).click();
+
+    for (const page of everyRolePage()) {
+      await expect(page.getByTestId("phase")).toHaveText("Phase 6", {
+        timeout: 15_000,
+      });
+    }
+
+    await expect(
+      facilitatorPage.getByTestId("facilitator-group-work-screen"),
+    ).toBeVisible();
+    await expect(
+      facilitatorPage.getByTestId("group-work-table"),
+    ).toBeVisible();
+    await expect(
+      facilitatorPage.getByTestId("group-status-otter"),
+    ).toHaveTextContent("Editing");
+  });
+
+  test("the scribe sees the group work card with editable actions", async () => {
+    const scribePage = await findScribePage();
+
+    await expect(scribePage.getByTestId("group-work-card")).toBeVisible();
+    await expect(scribePage.getByTestId("group-work-name")).toHaveText("Otter");
+    await expect(scribePage.getByTestId("add-action-button")).toBeVisible();
+    await expect(
+      scribePage.getByTestId("submit-group-work-button"),
+    ).toBeDisabled();
+  });
+
+  test("the scribe adds actions for each value and the member sees them", async () => {
+    const scribePage = await findScribePage();
+    const memberPage = await findMemberPage();
+
+    const valueIds = await getAssignedValueIds(scribePage);
+    for (const valueId of valueIds) {
+      await scribePage.getByTestId(`value-tab-${valueId}`).click();
+      await scribePage.getByTestId("add-action-button").click();
+      await expect(scribePage.getByTestId(/^action-input-/)).toBeVisible({
+        timeout: 5_000,
+      });
+      const input = scribePage.getByTestId(/^action-input-/).first();
+      await input.fill(`Action for ${valueId}`);
+    }
+
+    await expect(
+      scribePage.getByTestId("submit-group-work-button"),
+    ).toBeEnabled({ timeout: 5_000 });
+
+    for (const valueId of valueIds) {
+      await memberPage.getByTestId(`value-tab-${valueId}`).click();
+      await expect(
+        memberPage.getByTestId(/^action-text-/).first(),
+      ).toBeVisible({ timeout: 5_000 });
+    }
+  });
+
+  test("the scribe submits the group work", async () => {
+    const scribePage = await findScribePage();
+
+    await scribePage.getByTestId("submit-group-work-button").click();
+
+    await expect(scribePage.getByTestId("reopen-button")).toBeVisible({
+      timeout: 5_000,
+    });
+    await expect(
+      scribePage.getByTestId("group-work-status"),
+    ).toHaveTextContent("Submitted");
+
+    await expect(
+      facilitatorPage.getByTestId("group-status-otter"),
+    ).toHaveTextContent("Submitted", { timeout: 5_000 });
+  });
+
+  test("the facilitator can advance after all groups are submitted", async () => {
+    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled({
+      timeout: 5_000,
+    });
+  });
+
+  async function findScribePage(): Promise<Page> {
+    for (const page of participantPages()) {
+      const addButton = page.getByTestId("add-action-button");
+      if ((await addButton.count()) > 0) {
+        return page;
+      }
+    }
+    throw new Error("No scribe page found among participants");
+  }
+
+  async function findMemberPage(): Promise<Page> {
+    for (const page of participantPages()) {
+      const addButton = page.getByTestId("add-action-button");
+      if ((await addButton.count()) === 0) {
+        const card = page.getByTestId("group-work-card");
+        if ((await card.count()) > 0) {
+          return page;
+        }
+      }
+    }
+    throw new Error("No member page found among participants");
+  }
+
+  async function getAssignedValueIds(page: Page): Promise<string[]> {
+    const tabs = page.locator('[data-testid^="value-tab-"]');
+    const count = await tabs.count();
+    const ids: string[] = [];
+    for (let index = 0; index < count; index++) {
+      const testId = await tabs.nth(index).getAttribute("data-testid");
+      if (testId !== null) {
+        ids.push(testId.replace("value-tab-", ""));
+      }
+    }
+    return ids;
+  }
 });
