@@ -13,6 +13,11 @@ import {
 } from "../../../../domain/workshopState";
 import type { Single } from "../../../../shared/reactiveTypes";
 import { useParticipantDependencies } from "../../dependencies";
+import {
+  actionsForValue,
+  everyValueHasNonEmptyAction,
+  valueSubmissions,
+} from "./actionDrafts";
 
 const throttleIntervalMilliseconds = 300;
 
@@ -35,38 +40,6 @@ export interface GroupWorkCardModel {
   canSubmit: boolean;
   isSending: boolean;
   rejectionMessage: MessageKey | null;
-}
-
-function actionsForValue(
-  actions: GroupActionView[],
-  valueId: string | null,
-): GroupActionView[] {
-  if (valueId === null) return [];
-  return actions
-    .filter((action) => action.valueId === valueId)
-    .sort((first, second) => first.sortOrder - second.sortOrder);
-}
-
-function resolveActionText(
-  action: GroupActionView,
-  localTexts: Record<string, string>,
-): string {
-  const local = localTexts[action.actionId];
-  return local !== undefined ? local : action.text;
-}
-
-function everyValueHasNonEmptyAction(
-  assignedValues: WorkshopValue[],
-  actions: GroupActionView[],
-  localTexts: Record<string, string>,
-): boolean {
-  return assignedValues.every((value) =>
-    actions
-      .filter((action) => action.valueId === value.valueId)
-      .some(
-        (action) => resolveActionText(action, localTexts).trim().length > 0,
-      ),
-  );
 }
 
 export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
@@ -182,14 +155,11 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
       clearTimeout(throttleTimers.current[actionId]);
       delete throttleTimers.current[actionId];
     }
-    const valueSubmissions = ownGroup.assignedValues.map((value) => ({
-      valueId: value.valueId,
-      actions: actionsForValue(actions, value.valueId).map((action) => ({
-        actionId: action.actionId,
-        text: resolveActionText(action, localTexts),
-      })),
-    }));
-    sendIntent(groupWorkPort.submitGroupWork(valueSubmissions));
+    sendIntent(
+      groupWorkPort.submitGroupWork(
+        valueSubmissions(ownGroup.assignedValues, actions, localTexts),
+      ),
+    );
   }, [
     canSubmit,
     sendIntent,
