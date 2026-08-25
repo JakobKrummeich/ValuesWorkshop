@@ -96,13 +96,13 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
             {
                 if (command.Actions is not null)
                 {
-                    foreach (var (actionId, text) in command.Actions)
+                    foreach (var action in command.Actions)
                     {
                         GroupWork.EditAction(
                             session,
                             command.ParticipantId,
-                            new ActionId(actionId),
-                            GroupActionText.Of(text)
+                            IntentPayloadValidator.RequiredActionId(action.ActionId),
+                            GroupActionText.Of(action.Text)
                         );
                     }
                 }

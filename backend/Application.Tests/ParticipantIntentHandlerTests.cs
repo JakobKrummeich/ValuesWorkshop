@@ -462,7 +462,7 @@ public class ParticipantIntentHandlerTests
                 new SubmitGroupWorkCommand(
                     KnownSession,
                     SessionFixtures.Anna,
-                    [(KnownAction.Value, "Final wording")]
+                    [new SubmitGroupWorkAction(KnownAction.Value.ToString(), "Final wording")]
                 )
             );
 

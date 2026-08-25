@@ -114,14 +114,12 @@ public sealed class ParticipantHub(
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
-        var parsed = actions
-            ?.Select(action =>
-                (IntentPayloadValidator.RequiredActionId(action.ActionId).Value, action.Text ?? "")
-            )
+        var mapped = actions
+            ?.Select(action => new SubmitGroupWorkAction(action.ActionId, action.Text))
             .ToList();
 
         return intentHandler.HandleAsync(
-            new SubmitGroupWorkCommand(sessionIdentity, participantId, parsed)
+            new SubmitGroupWorkCommand(sessionIdentity, participantId, mapped)
         );
     }
 
