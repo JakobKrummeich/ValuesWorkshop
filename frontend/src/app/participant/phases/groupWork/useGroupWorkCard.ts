@@ -161,6 +161,11 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
   const removeAction = useCallback(
     (actionId: string) => {
       if (!isCallerScribe || isSubmitted) return;
+      if (throttleTimers.current[actionId] !== undefined) {
+        clearTimeout(throttleTimers.current[actionId]);
+        delete throttleTimers.current[actionId];
+      }
+      delete pendingTexts.current[actionId];
       setLocalTexts((current) => {
         const next = { ...current };
         delete next[actionId];
