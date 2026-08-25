@@ -109,13 +109,21 @@ public sealed class ParticipantHub(
         );
     }
 
-    public Task<IntentResult> SubmitGroupWork(SubmitGroupWorkPayload[]? actions)
+    public Task<IntentResult> SubmitGroupWork(SubmitGroupWorkValuePayload[]? values)
     {
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
-        var mapped = actions
-            ?.Select(action => new SubmitGroupWorkAction(action.ActionId, action.Text))
+        var mapped = values
+            ?.Select(value => new SubmitGroupWorkValue(
+                value.ValueId,
+                value
+                    .Actions?.Select(action => new SubmitGroupWorkAction(
+                        action.ActionId,
+                        action.Text
+                    ))
+                    .ToList()
+            ))
             .ToList();
 
         return intentHandler.HandleAsync(

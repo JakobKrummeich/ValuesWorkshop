@@ -462,7 +462,17 @@ public class ParticipantIntentHandlerTests
                 new SubmitGroupWorkCommand(
                     KnownSession,
                     SessionFixtures.Anna,
-                    [new SubmitGroupWorkAction(KnownAction.Value.ToString(), "Final wording")]
+                    [
+                        new SubmitGroupWorkValue(
+                            "wert-1",
+                            [
+                                new SubmitGroupWorkAction(
+                                    KnownAction.Value.ToString(),
+                                    "Final wording"
+                                ),
+                            ]
+                        ),
+                    ]
                 )
             );
 
@@ -470,6 +480,46 @@ public class ParticipantIntentHandlerTests
         var group = repository.Saved.ShouldHaveSingleItem().Formation.Groups[0];
         group.IsSubmitted.ShouldBeTrue();
         group.Actions.ShouldHaveSingleItem().Text.Value.ShouldBe("Final wording");
+    }
+
+    [Fact]
+    public async Task Submitting_with_a_value_missing_its_identifier_is_rejected_as_a_malformed_payload()
+    {
+        var repository = FakeSessionRepository.Holding(
+            GroupWorkSession(TierOneAction(KnownAction, "Talk"))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new SubmitGroupWorkCommand(
+                    KnownSession,
+                    SessionFixtures.Anna,
+                    [new SubmitGroupWorkValue(null, [])]
+                )
+            );
+
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task Submitting_with_a_value_missing_its_actions_is_rejected_as_a_malformed_payload()
+    {
+        var repository = FakeSessionRepository.Holding(
+            GroupWorkSession(TierOneAction(KnownAction, "Talk"))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new SubmitGroupWorkCommand(
+                    KnownSession,
+                    SessionFixtures.Anna,
+                    [new SubmitGroupWorkValue("wert-1", null)]
+                )
+            );
+
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
     }
 
     [Fact]

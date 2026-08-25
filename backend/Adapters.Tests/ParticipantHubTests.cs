@@ -327,7 +327,10 @@ public class ParticipantHubTests
         var hub = HubBoundTo(KnownSession, Subject);
 
         var result = await hub.SubmitGroupWork([
-            new SubmitGroupWorkPayload(KnownAction.Value.ToString(), "Final wording"),
+            new SubmitGroupWorkValuePayload(
+                "wert-1",
+                [new SubmitGroupWorkActionPayload(KnownAction.Value.ToString(), "Final wording")]
+            ),
         ]);
 
         result.ShouldBe(IntentResult.Accepted());

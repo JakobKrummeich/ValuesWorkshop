@@ -94,16 +94,11 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
             command.SessionIdentity,
             session =>
             {
-                if (command.Actions is not null)
+                if (command.Values is not null)
                 {
-                    foreach (var action in command.Actions)
+                    foreach (var value in command.Values)
                     {
-                        GroupWork.EditAction(
-                            session,
-                            command.ParticipantId,
-                            IntentPayloadValidator.RequiredActionId(action.ActionId),
-                            GroupActionText.Of(action.Text)
-                        );
+                        ApplyFinalEdits(session, command.ParticipantId, value);
                     }
                 }
 
@@ -125,6 +120,25 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                 return wasSubmitted;
             }
         );
+    }
+
+    private static void ApplyFinalEdits(
+        Session session,
+        ParticipantId participantId,
+        SubmitGroupWorkValue value
+    )
+    {
+        IntentPayloadValidator.RequiredValueId(value.ValueId);
+
+        foreach (var action in IntentPayloadValidator.RequiredActions(value.Actions))
+        {
+            GroupWork.EditAction(
+                session,
+                participantId,
+                IntentPayloadValidator.RequiredActionId(action.ActionId),
+                GroupActionText.Of(action.Text)
+            );
+        }
     }
 
     private static bool IsCallerGroupSubmitted(Session session, ParticipantId participantId)
