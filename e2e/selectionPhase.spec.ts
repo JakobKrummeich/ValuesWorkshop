@@ -190,7 +190,9 @@ test.describe.serial("value selection through group formation", () => {
     await expect(alicePage.getByTestId("submit-selection-button")).toHaveText(
       "Submit selection",
     );
-    await expect(alicePage.getByTestId("submit-selection-button")).toBeDisabled();
+    await expect(
+      alicePage.getByTestId("submit-selection-button"),
+    ).toBeDisabled();
     await expect(presenterPage.getByText("Pick your 10 values")).toBeVisible();
     await expect(submittedCount(facilitatorPage)).toHaveText(
       "0 of 3 have submitted",
@@ -221,7 +223,9 @@ test.describe.serial("value selection through group formation", () => {
       "aria-pressed",
       "true",
     );
-    await expect(alicePage.getByTestId("submit-selection-button")).toBeEnabled();
+    await expect(
+      alicePage.getByTestId("submit-selection-button"),
+    ).toBeEnabled();
   });
 
   test("a full selection swaps a value by deselecting one first", async () => {
@@ -229,7 +233,9 @@ test.describe.serial("value selection through group formation", () => {
 
     await expect(selectedCount(alicePage)).toHaveText("Selected: 9/10");
     await expect(valueChip(alicePage, SWAP_IN_VALUE_ID)).toBeEnabled();
-    await expect(alicePage.getByTestId("submit-selection-button")).toBeDisabled();
+    await expect(
+      alicePage.getByTestId("submit-selection-button"),
+    ).toBeDisabled();
 
     await valueChip(alicePage, SWAP_IN_VALUE_ID).click();
 
@@ -424,9 +430,9 @@ test.describe.serial("value selection through group formation", () => {
       await expect(
         ownGroupCard.getByTestId("group-value-vertrauen"),
       ).toHaveText("Trust");
-      await expect(
-        ownGroupCard.getByTestId("group-value-freiheit"),
-      ).toHaveText("Freedom");
+      await expect(ownGroupCard.getByTestId("group-value-freiheit")).toHaveText(
+        "Freedom",
+      );
       await expect(
         ownGroupCard.getByTestId("group-value-kompetenz"),
       ).toHaveText("Competence");
@@ -488,12 +494,10 @@ test.describe.serial("value selection through group formation", () => {
     await expect(
       facilitatorPage.getByTestId("facilitator-group-work-screen"),
     ).toBeVisible();
-    await expect(
-      facilitatorPage.getByTestId("group-work-table"),
-    ).toBeVisible();
-    await expect(
-      facilitatorPage.getByTestId("group-status-otter"),
-    ).toHaveText("Editing");
+    await expect(facilitatorPage.getByTestId("group-work-table")).toBeVisible();
+    await expect(facilitatorPage.getByTestId("group-status-otter")).toHaveText(
+      "Editing",
+    );
   });
 
   test("the scribe sees the group work card with editable actions", async () => {
@@ -528,9 +532,9 @@ test.describe.serial("value selection through group formation", () => {
 
     for (const valueId of valueIds) {
       await memberPage.getByTestId(`value-tab-${valueId}`).click();
-      await expect(
-        memberPage.getByTestId(/^action-text-/).first(),
-      ).toBeVisible({ timeout: 5_000 });
+      await expect(memberPage.getByTestId(/^action-text-/).first()).toBeVisible(
+        { timeout: 5_000 },
+      );
     }
   });
 
@@ -542,13 +546,14 @@ test.describe.serial("value selection through group formation", () => {
     await expect(scribePage.getByTestId("reopen-button")).toBeVisible({
       timeout: 5_000,
     });
-    await expect(
-      scribePage.getByTestId("group-work-status"),
-    ).toHaveText("Submitted");
+    await expect(scribePage.getByTestId("group-work-status")).toHaveText(
+      "Submitted",
+    );
 
-    await expect(
-      facilitatorPage.getByTestId("group-status-otter"),
-    ).toHaveText("Submitted", { timeout: 5_000 });
+    await expect(facilitatorPage.getByTestId("group-status-otter")).toHaveText(
+      "Submitted",
+      { timeout: 5_000 },
+    );
   });
 
   test("the facilitator can advance after all groups are submitted", async () => {

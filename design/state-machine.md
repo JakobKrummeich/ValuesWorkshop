@@ -323,7 +323,7 @@ facilitator sub-controls are marked ◆.
 | T12 | →6 | Appoint scribes | System | on phase entry; one random member per group (I9) | ScribeAppointed |
 | T13 | 6 | Reassign scribe ◆ | Facilitator | target is a group member (I9) | ScribeReassigned |
 | T14 | 6 | Add / edit / remove action | Scribe | own group; Editing; ≤ five per value (I10, I11) | ActionAdded / ActionEdited / ActionRemoved |
-| T15 | 6 | Submit group work | Scribe | one to five actions per assigned value (I11) | GroupWorkSubmitted |
+| T15 | 6 | Submit group work | Scribe | one to five non-empty-text actions per assigned value (I11) | GroupWorkSubmitted |
 | T16 | 6 | Reopen group work | Scribe | currently Submitted | GroupWorkReopened |
 | T17 | 7 | Go to next value ◆ | Facilitator | values remain to show (I12) | NextValueShown |
 | T17a | 7 | Edit action (typo fix) | Facilitator | wording correction of a presented action only (I10) | ActionEdited |
