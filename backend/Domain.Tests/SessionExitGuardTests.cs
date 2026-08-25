@@ -95,12 +95,9 @@ public class SessionExitGuardTests
         foreach (var group in session.Formation.Groups)
         {
             var scribe = group.Scribe.ShouldNotBeNull();
-            group.AddAction(
-                scribe,
-                new ActionId(Guid.NewGuid()),
-                group.AssignedValues[0],
-                GroupActionText.Of("Talk openly about mistakes")
-            );
+            var actionId = new ActionId(Guid.NewGuid());
+            group.AddAction(scribe, actionId, group.AssignedValues[0]);
+            group.EditAction(scribe, actionId, GroupActionText.Of("Talk openly about mistakes"));
             group.Submit(scribe);
         }
         session.AdvancePhase();

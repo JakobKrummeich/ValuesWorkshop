@@ -52,12 +52,7 @@ public sealed class Group
         Scribe = newScribe;
     }
 
-    internal void AddAction(
-        ParticipantId caller,
-        ActionId actionId,
-        ValueId valueId,
-        GroupActionText text
-    )
+    internal void AddAction(ParticipantId caller, ActionId actionId, ValueId valueId)
     {
         RequireScribe(caller);
         RequireEditable();
@@ -83,7 +78,7 @@ public sealed class Group
             );
         }
 
-        _actions.Add(new GroupAction(actionId, valueId, text));
+        _actions.Add(new GroupAction(actionId, valueId, GroupActionText.Of(null)));
     }
 
     internal void EditAction(ParticipantId caller, ActionId actionId, GroupActionText text)

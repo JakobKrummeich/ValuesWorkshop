@@ -16,12 +16,10 @@ public class GroupWorkTests
         var session = SessionInPhase(Phase.GroupWork);
         var actionId = new ActionId(Guid.NewGuid());
 
-        GroupWork.AddAction(session, Anna, actionId, Trust, GroupActionText.Of("Talk openly"));
+        GroupWork.AddAction(session, Anna, actionId, Trust);
 
         GroupNamed(session, "fox")
-            .Actions.ShouldBe([
-                new GroupAction(actionId, Trust, GroupActionText.Of("Talk openly")),
-            ]);
+            .Actions.ShouldBe([new GroupAction(actionId, Trust, GroupActionText.Of(null))]);
         GroupNamed(session, "owl").Actions.ShouldBeEmpty();
     }
 
@@ -31,8 +29,8 @@ public class GroupWorkTests
         var session = SessionInPhase(Phase.GroupWork);
         var kept = new ActionId(Guid.NewGuid());
         var removed = new ActionId(Guid.NewGuid());
-        GroupWork.AddAction(session, Anna, kept, Trust, GroupActionText.Of("Talk"));
-        GroupWork.AddAction(session, Anna, removed, Trust, GroupActionText.Of("Drop me"));
+        GroupWork.AddAction(session, Anna, kept, Trust);
+        GroupWork.AddAction(session, Anna, removed, Trust);
 
         GroupWork.EditAction(session, Anna, kept, GroupActionText.Of("Talk openly"));
         GroupWork.RemoveAction(session, Anna, removed);
@@ -45,13 +43,9 @@ public class GroupWorkTests
     public void The_scribe_submits_and_reopens_through_the_session()
     {
         var session = SessionInPhase(Phase.GroupWork);
-        GroupWork.AddAction(
-            session,
-            Anna,
-            new ActionId(Guid.NewGuid()),
-            Trust,
-            GroupActionText.Of("Talk")
-        );
+        var actionId = new ActionId(Guid.NewGuid());
+        GroupWork.AddAction(session, Anna, actionId, Trust);
+        GroupWork.EditAction(session, Anna, actionId, GroupActionText.Of("Talk"));
 
         GroupWork.Submit(session, Anna);
         GroupNamed(session, "fox").IsSubmitted.ShouldBeTrue();
@@ -70,8 +64,7 @@ public class GroupWorkTests
                 session,
                 new ParticipantId(Guid.NewGuid()),
                 new ActionId(Guid.NewGuid()),
-                Trust,
-                GroupActionText.Of("Talk")
+                Trust
             )
         );
     }
@@ -90,13 +83,7 @@ public class GroupWorkTests
         var session = SessionInPhase(Phase.GroupFormation);
 
         Should.Throw<WrongPhaseException>(() =>
-            GroupWork.AddAction(
-                session,
-                Anna,
-                new ActionId(Guid.NewGuid()),
-                Trust,
-                GroupActionText.Of("Talk")
-            )
+            GroupWork.AddAction(session, Anna, new ActionId(Guid.NewGuid()), Trust)
         );
     }
 
@@ -128,16 +115,10 @@ public class GroupWorkTests
         GroupWork.ReassignScribe(session, Ben);
 
         Should.Throw<NotAuthorizedException>(() =>
-            GroupWork.AddAction(
-                session,
-                Anna,
-                new ActionId(Guid.NewGuid()),
-                Trust,
-                GroupActionText.Of("Talk")
-            )
+            GroupWork.AddAction(session, Anna, new ActionId(Guid.NewGuid()), Trust)
         );
         var actionId = new ActionId(Guid.NewGuid());
-        GroupWork.AddAction(session, Ben, actionId, Trust, GroupActionText.Of("Talk"));
+        GroupWork.AddAction(session, Ben, actionId, Trust);
         GroupNamed(session, "fox").Actions.Select(action => action.ActionId).ShouldBe([actionId]);
     }
 

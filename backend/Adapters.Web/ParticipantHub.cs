@@ -79,13 +79,13 @@ public sealed class ParticipantHub(
         );
     }
 
-    public Task<IntentResult> AddAction(string? valueId, string? text)
+    public Task<IntentResult> AddAction(string? valueId)
     {
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
         return intentHandler.HandleAsync(
-            new AddActionCommand(sessionIdentity, participantId, valueId, text)
+            new AddActionCommand(sessionIdentity, participantId, valueId)
         );
     }
 

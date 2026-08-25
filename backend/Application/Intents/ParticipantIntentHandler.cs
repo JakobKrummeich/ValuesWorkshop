@@ -47,8 +47,7 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
                     session,
                     command.ParticipantId,
                     new ActionId(Guid.NewGuid()),
-                    IntentPayloadValidator.RequiredValueId(command.ValueId),
-                    GroupActionText.Of(command.Text)
+                    IntentPayloadValidator.RequiredValueId(command.ValueId)
                 );
                 return true;
             }

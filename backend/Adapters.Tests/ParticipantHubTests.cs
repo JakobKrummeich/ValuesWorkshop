@@ -255,14 +255,14 @@ public class ParticipantHubTests
         SessionInGroupWork(isSubmitted: false);
         var hub = HubBoundTo(KnownSession, Subject);
 
-        var result = await hub.AddAction("wert-1", "Talk daily.");
+        var result = await hub.AddAction("wert-1");
 
         result.ShouldBe(IntentResult.Accepted());
         repository
             .Saved.ShouldHaveSingleItem()
             .Formation.Groups[0]
             .Actions.ShouldHaveSingleItem()
-            .Text.Value.ShouldBe("Talk daily.");
+            .Text.IsEmpty.ShouldBeTrue();
         broadcaster.Broadcasts.ShouldHaveSingleItem();
     }
 
@@ -272,7 +272,7 @@ public class ParticipantHubTests
         SessionInGroupWork(isSubmitted: false);
         var hub = HubBoundTo(KnownSession, Subject);
 
-        var result = await hub.AddAction(null, null);
+        var result = await hub.AddAction(null);
 
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);

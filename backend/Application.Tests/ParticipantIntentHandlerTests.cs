@@ -205,14 +205,12 @@ public class ParticipantIntentHandlerTests
     }
 
     [Fact]
-    public async Task The_scribe_adds_an_action_for_an_assigned_value()
+    public async Task The_scribe_adds_an_action_that_is_born_with_empty_text()
     {
         var repository = FakeSessionRepository.Holding(GroupWorkSession());
 
         var result = await HandlerOver(repository)
-            .HandleAsync(
-                new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1", " Talk daily. ")
-            );
+            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1"));
 
         result.ShouldBe(IntentResult.Accepted());
         var action = repository
@@ -220,7 +218,7 @@ public class ParticipantIntentHandlerTests
             .Formation.Groups[0]
             .Actions.ShouldHaveSingleItem();
         action.ValueId.ShouldBe(new ValueId("wert-1"));
-        action.Text.Value.ShouldBe("Talk daily.");
+        action.Text.IsEmpty.ShouldBeTrue();
         action.ActionId.Value.ShouldNotBe(Guid.Empty);
         broadcaster.Broadcasts.ShouldHaveSingleItem();
     }
@@ -231,7 +229,7 @@ public class ParticipantIntentHandlerTests
         var repository = FakeSessionRepository.Holding(GroupWorkSession());
 
         var result = await HandlerOver(repository)
-            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Ben, "wert-1", "Talk"));
+            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Ben, "wert-1"));
 
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
@@ -243,13 +241,26 @@ public class ParticipantIntentHandlerTests
     [Fact]
     public async Task A_blank_action_text_is_accepted_during_editing()
     {
-        var repository = FakeSessionRepository.Holding(GroupWorkSession());
+        var repository = FakeSessionRepository.Holding(
+            GroupWorkSession(TierOneAction(KnownAction, "Talk"))
+        );
 
         var result = await HandlerOver(repository)
-            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1", "   "));
+            .HandleAsync(
+                new EditActionCommand(
+                    KnownSession,
+                    SessionFixtures.Anna,
+                    KnownAction.Value.ToString(),
+                    "   "
+                )
+            );
 
         result.IsAccepted.ShouldBeTrue();
-        repository.Saved.ShouldNotBeEmpty();
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Formation.Groups[0]
+            .Actions.ShouldHaveSingleItem()
+            .Text.IsEmpty.ShouldBeTrue();
     }
 
     [Fact]
@@ -259,7 +270,7 @@ public class ParticipantIntentHandlerTests
         var handler = HandlerOver(repository);
 
         var addResult = await handler.HandleAsync(
-            new AddActionCommand(KnownSession, SessionFixtures.Anna, null, null)
+            new AddActionCommand(KnownSession, SessionFixtures.Anna, null)
         );
         var editResult = await handler.HandleAsync(
             new EditActionCommand(KnownSession, SessionFixtures.Anna, null, null)
@@ -280,7 +291,7 @@ public class ParticipantIntentHandlerTests
         var repository = FakeSessionRepository.Holding(GroupWorkSession());
 
         var result = await HandlerOver(repository)
-            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "  ", "Talk"));
+            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "  "));
 
         result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
         repository.Saved.ShouldBeEmpty();
@@ -292,9 +303,7 @@ public class ParticipantIntentHandlerTests
         var repository = FakeSessionRepository.Holding(GroupWorkSession());
 
         var result = await HandlerOver(repository)
-            .HandleAsync(
-                new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-2", "Talk")
-            );
+            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-2"));
 
         result.Code.ShouldBe(IntentRejectionCode.InvariantViolated);
         repository.Saved.ShouldBeEmpty();
@@ -312,9 +321,7 @@ public class ParticipantIntentHandlerTests
         var repository = FakeSessionRepository.Holding(GroupWorkSession(fiveActions));
 
         var result = await HandlerOver(repository)
-            .HandleAsync(
-                new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1", "One more")
-            );
+            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1"));
 
         result.Code.ShouldBe(IntentRejectionCode.InvariantViolated);
         repository.Saved.ShouldBeEmpty();
@@ -328,9 +335,7 @@ public class ParticipantIntentHandlerTests
         );
 
         var result = await HandlerOver(repository)
-            .HandleAsync(
-                new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1", "Talk")
-            );
+            .HandleAsync(new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1"));
 
         result.Code.ShouldBe(IntentRejectionCode.WrongPhase);
         repository.Saved.ShouldBeEmpty();
@@ -349,7 +354,7 @@ public class ParticipantIntentHandlerTests
                     KnownSession,
                     SessionFixtures.Anna,
                     KnownAction.Value.ToString(),
-                    "New wording"
+                    " New wording "
                 )
             );
 

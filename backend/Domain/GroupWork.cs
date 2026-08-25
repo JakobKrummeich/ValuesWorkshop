@@ -6,11 +6,10 @@ public static class GroupWork
         Session session,
         ParticipantId caller,
         ActionId actionId,
-        ValueId valueId,
-        GroupActionText text
+        ValueId valueId
     )
     {
-        WorkingGroupOf(session, caller).AddAction(caller, actionId, valueId, text);
+        WorkingGroupOf(session, caller).AddAction(caller, actionId, valueId);
     }
 
     public static void EditAction(
