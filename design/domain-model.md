@@ -229,7 +229,7 @@ when a phase begins or a condition is met — no person issues them.
 | **AddAction** | Scribe | Add an action under an assigned value of the own group; refused beyond five per value, refused while submitted, refused for non-scribes. → ActionAdded |
 | **EditAction** | Scribe; Facilitator during Value presentation | Change an action's wording; same refusals as AddAction. During Value presentation the facilitator may correct a presented action's wording (e.g. typos) — wording only, never adding or removing actions. → ActionEdited |
 | **RemoveAction** | Scribe | Remove an action; same refusals as AddAction. → ActionRemoved |
-| **SubmitGroupWork** | Scribe | Declare the group result finished; requires 1–5 actions for every assigned value. → GroupWorkSubmitted |
+| **SubmitGroupWork** | Scribe | Declare the group result finished; requires 1–5 non-empty-text actions for every assigned value (I11). → GroupWorkSubmitted |
 | **ReopenGroupWork** | Scribe | Take the submission back. → GroupWorkReopened |
 | **GoToNextValue** | Facilitator | Step presentation to the next value, iterating through each group's submitted values, group by group. → NextValueShown |
 | **SubmitFinalVotes** | Participant | Spend the full allotment across eligible values, multi-votes allowed; wrong totals, votes outside the eligible values, or a second submission in the same round are refused. No un-voting afterwards. → FinalVotesSubmitted |

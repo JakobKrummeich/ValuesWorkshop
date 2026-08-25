@@ -194,7 +194,7 @@ stateDiagram-v2
 
     [*] --> Editing : phase entry / ScribeAppointed (one random member)
     Editing --> Editing : AddAction, EditAction, RemoveAction [Scribe] / ActionAdded, ActionEdited, ActionRemoved · guard - at most five per assigned value (I11)
-    Editing --> Submitted : SubmitGroupWork [Scribe] / GroupWorkSubmitted · guard - one to five actions for every assigned value (I11)
+    Editing --> Submitted : SubmitGroupWork [Scribe] / GroupWorkSubmitted · guard - one to five non-empty-text actions for every assigned value (I11)
     Submitted --> Editing : ReopenGroupWork [Scribe] / GroupWorkReopened
     Editing --> Editing : ReassignScribe [Facilitator] / ScribeReassigned
     Submitted --> Submitted : ReassignScribe [Facilitator] / ScribeReassigned
@@ -206,7 +206,7 @@ Guards in words:
   (I10); refused while Submitted (I11); AddAction refused beyond five
   actions on a value.
 - **SubmitGroupWork** — refused unless every assigned value carries one to
-  five actions (I11).
+  five actions with non-empty text (I11).
 - **ReassignScribe** — facilitator only, during group work only, target must
   be a member of that group (I9); the previous scribe's rights end
   immediately (I10).

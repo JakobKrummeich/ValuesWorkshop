@@ -304,7 +304,7 @@ the caller's authenticated principal, so no client can act as another.
 | T14 | `AddAction` | `{ valueId, text }` | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text may be empty (the scribe has not typed yet); non-empty text truncated server-side to 200 text elements (T19) | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
 | T14 | `EditAction` | `{ actionId, text }` | as `AddAction`; action belongs to the caller's group | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
 | T14 | `RemoveAction` | `{ actionId }` | as `EditAction` | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
-| T15 | `SubmitGroupWork` | — | phase Group work; caller is scribe; one to five non-empty-text actions on every assigned value (I11) | `WrongPhase`, `NotAuthorized`, `InvariantViolated` |
+| T15 | `SubmitGroupWork` | `{ actions?: [{ actionId, text }] }` | phase Group work; caller is scribe; one to five non-empty-text actions on every assigned value (I11). When `actions` is provided, each entry's text is applied (as `EditAction`) before the submit guard runs — this lets the client flush un-synced edits atomically with submit. | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
 | T16 | `ReopenGroupWork` | — | phase Group work; caller is scribe; group Submitted | `WrongPhase`, `NotAuthorized` |
 | T18 | `SubmitFinalVotes` | `{ votes: [{ valueId, voteCount }] }` | phase Final voting; round open; totals equal the round allotment; only eligible values; not yet voted this round (I13) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
 
