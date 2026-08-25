@@ -177,15 +177,22 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
       clearTimeout(throttleTimers.current[actionId]);
       delete throttleTimers.current[actionId];
     }
-    const allActions = actions.map((action) => ({
-      actionId: action.actionId,
-      text:
-        localTexts[action.actionId] !== undefined
-          ? localTexts[action.actionId]
-          : action.text,
+    const valueSubmissions = ownGroup.assignedValues.map((value) => ({
+      valueId: value.valueId,
+      actions: actionsForValue(actions, value.valueId).map((action) => ({
+        actionId: action.actionId,
+        text: resolveActionText(action, localTexts),
+      })),
     }));
-    sendIntent(groupWorkPort.submitGroupWork(allActions));
-  }, [canSubmit, sendIntent, groupWorkPort, actions, localTexts]);
+    sendIntent(groupWorkPort.submitGroupWork(valueSubmissions));
+  }, [
+    canSubmit,
+    sendIntent,
+    groupWorkPort,
+    ownGroup.assignedValues,
+    actions,
+    localTexts,
+  ]);
 
   const reopenGroupWork = useCallback(() => {
     if (!isCallerScribe || !isSubmitted) return;

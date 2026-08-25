@@ -151,7 +151,7 @@ describe("useGroupWorkCard", () => {
     expect(result.current.canSubmit).toBe(true);
   });
 
-  it("sends submitGroupWork intent with all action texts", () => {
+  it("sends submitGroupWork intent with action texts grouped per value", () => {
     const port = mockGroupWorkPort();
     const group = ownGroup({
       actions: [
@@ -164,8 +164,8 @@ describe("useGroupWorkCard", () => {
     act(() => result.current.submitGroupWork());
 
     expect(port.submitGroupWork).toHaveBeenCalledWith([
-      { actionId: "a1", text: "Talk" },
-      { actionId: "a2", text: "Dare" },
+      { valueId: "trust", actions: [{ actionId: "a1", text: "Talk" }] },
+      { valueId: "courage", actions: [{ actionId: "a2", text: "Dare" }] },
     ]);
   });
 
@@ -183,8 +183,11 @@ describe("useGroupWorkCard", () => {
     act(() => result.current.submitGroupWork());
 
     expect(port.submitGroupWork).toHaveBeenCalledWith([
-      { actionId: "a1", text: "Updated talk" },
-      { actionId: "a2", text: "Dare" },
+      {
+        valueId: "trust",
+        actions: [{ actionId: "a1", text: "Updated talk" }],
+      },
+      { valueId: "courage", actions: [{ actionId: "a2", text: "Dare" }] },
     ]);
   });
 

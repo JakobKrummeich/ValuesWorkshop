@@ -13,8 +13,8 @@ export function createParticipantGroupWorkPort(
       invokeIntent(connection, ParticipantIntent.EditAction, actionId, text),
     removeAction: (actionId) =>
       invokeIntent(connection, ParticipantIntent.RemoveAction, actionId),
-    submitGroupWork: (actions) =>
-      invokeIntent(connection, ParticipantIntent.SubmitGroupWork, actions),
+    submitGroupWork: (values) =>
+      invokeIntent(connection, ParticipantIntent.SubmitGroupWork, values),
     reopenGroupWork: () =>
       invokeIntent(connection, ParticipantIntent.ReopenGroupWork),
   };
