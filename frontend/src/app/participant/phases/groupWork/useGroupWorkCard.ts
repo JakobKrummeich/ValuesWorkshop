@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Subscription } from "rxjs";
 import { intentRejectionMessage } from "../../../../domain/i18n/intentRejectionMessage";
 import { MessageKey } from "../../../../domain/i18n/messages";
@@ -99,7 +99,7 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
 
   const isCallerScribe = ownGroup.isCallerScribe === true;
   const isSubmitted = ownGroup.workStatus === GroupWorkStatus.Submitted;
-  const actions = ownGroup.actions ?? [];
+  const actions = useMemo(() => ownGroup.actions ?? [], [ownGroup.actions]);
   const canSubmit =
     isCallerScribe &&
     !isSubmitted &&

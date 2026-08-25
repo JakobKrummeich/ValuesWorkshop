@@ -34,16 +34,10 @@ function mockGroupWorkPort(
 
 function makeGroupWorkPort() {
   return {
-    addAction: jest.fn((_valueId: string): Single<IntentResult> =>
-      of(accepted),
-    ),
+    addAction: jest.fn((): Single<IntentResult> => of(accepted)),
     editAction: jest.fn((): Single<IntentResult> => of(accepted)),
     removeAction: jest.fn((): Single<IntentResult> => of(accepted)),
-    submitGroupWork: jest.fn(
-      (
-        _actions: ReadonlyArray<{ actionId: string; text: string }>,
-      ): Single<IntentResult> => of(accepted),
-    ),
+    submitGroupWork: jest.fn((): Single<IntentResult> => of(accepted)),
     reopenGroupWork: jest.fn((): Single<IntentResult> => of(accepted)),
   };
 }
