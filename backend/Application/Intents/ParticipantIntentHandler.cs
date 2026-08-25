@@ -94,6 +94,19 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
             command.SessionIdentity,
             session =>
             {
+                if (command.Actions is not null)
+                {
+                    foreach (var (actionId, text) in command.Actions)
+                    {
+                        GroupWork.EditAction(
+                            session,
+                            command.ParticipantId,
+                            new ActionId(actionId),
+                            GroupActionText.Of(text)
+                        );
+                    }
+                }
+
                 var wasSubmitted = IsCallerGroupSubmitted(session, command.ParticipantId);
                 GroupWork.Submit(session, command.ParticipantId);
                 return !wasSubmitted;

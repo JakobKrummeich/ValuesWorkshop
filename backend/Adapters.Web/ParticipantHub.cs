@@ -109,13 +109,19 @@ public sealed class ParticipantHub(
         );
     }
 
-    public Task<IntentResult> SubmitGroupWork()
+    public Task<IntentResult> SubmitGroupWork(SubmitGroupWorkPayload[]? actions)
     {
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
+        var parsed = actions
+            ?.Select(action =>
+                (IntentPayloadValidator.RequiredActionId(action.ActionId).Value, action.Text ?? "")
+            )
+            .ToList();
+
         return intentHandler.HandleAsync(
-            new SubmitGroupWorkCommand(sessionIdentity, participantId)
+            new SubmitGroupWorkCommand(sessionIdentity, participantId, parsed)
         );
     }
 

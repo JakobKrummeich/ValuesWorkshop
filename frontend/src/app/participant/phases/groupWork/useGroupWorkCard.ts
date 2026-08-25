@@ -176,10 +176,16 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
     for (const actionId of Object.keys(throttleTimers.current)) {
       clearTimeout(throttleTimers.current[actionId]);
       delete throttleTimers.current[actionId];
-      flushThrottle(actionId);
     }
-    sendIntent(groupWorkPort.submitGroupWork());
-  }, [canSubmit, sendIntent, groupWorkPort, flushThrottle]);
+    const allActions = actions.map((action) => ({
+      actionId: action.actionId,
+      text:
+        localTexts[action.actionId] !== undefined
+          ? localTexts[action.actionId]
+          : action.text,
+    }));
+    sendIntent(groupWorkPort.submitGroupWork(allActions));
+  }, [canSubmit, sendIntent, groupWorkPort, actions, localTexts]);
 
   const reopenGroupWork = useCallback(() => {
     if (!isCallerScribe || !isSubmitted) return;

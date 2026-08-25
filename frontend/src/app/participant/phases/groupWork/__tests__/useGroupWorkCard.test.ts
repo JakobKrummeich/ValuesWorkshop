@@ -39,7 +39,11 @@ function makeGroupWorkPort() {
     ),
     editAction: jest.fn((): Single<IntentResult> => of(accepted)),
     removeAction: jest.fn((): Single<IntentResult> => of(accepted)),
-    submitGroupWork: jest.fn((): Single<IntentResult> => of(accepted)),
+    submitGroupWork: jest.fn(
+      (
+        _actions: ReadonlyArray<{ actionId: string; text: string }>,
+      ): Single<IntentResult> => of(accepted),
+    ),
     reopenGroupWork: jest.fn((): Single<IntentResult> => of(accepted)),
   };
 }
@@ -153,7 +157,7 @@ describe("useGroupWorkCard", () => {
     expect(result.current.canSubmit).toBe(true);
   });
 
-  it("sends submitGroupWork intent", () => {
+  it("sends submitGroupWork intent with all action texts", () => {
     const port = mockGroupWorkPort();
     const group = ownGroup({
       actions: [
@@ -165,7 +169,29 @@ describe("useGroupWorkCard", () => {
 
     act(() => result.current.submitGroupWork());
 
-    expect(port.submitGroupWork).toHaveBeenCalled();
+    expect(port.submitGroupWork).toHaveBeenCalledWith([
+      { actionId: "a1", text: "Talk" },
+      { actionId: "a2", text: "Dare" },
+    ]);
+  });
+
+  it("includes locally edited text in submit payload", () => {
+    const port = mockGroupWorkPort();
+    const group = ownGroup({
+      actions: [
+        { actionId: "a1", valueId: "trust", text: "Talk", sortOrder: 0 },
+        { actionId: "a2", valueId: "courage", text: "Dare", sortOrder: 0 },
+      ],
+    });
+    const { result } = renderHook(() => useGroupWorkCard(group));
+
+    act(() => result.current.editActionText("a1", "Updated talk"));
+    act(() => result.current.submitGroupWork());
+
+    expect(port.submitGroupWork).toHaveBeenCalledWith([
+      { actionId: "a1", text: "Updated talk" },
+      { actionId: "a2", text: "Dare" },
+    ]);
   });
 
   it("sends reopenGroupWork intent when submitted", () => {

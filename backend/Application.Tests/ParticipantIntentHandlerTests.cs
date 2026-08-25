@@ -451,6 +451,28 @@ public class ParticipantIntentHandlerTests
     }
 
     [Fact]
+    public async Task Submitting_with_actions_applies_edits_before_evaluating_guards()
+    {
+        var repository = FakeSessionRepository.Holding(
+            GroupWorkSession(TierOneAction(KnownAction, "Old wording"))
+        );
+
+        var result = await HandlerOver(repository)
+            .HandleAsync(
+                new SubmitGroupWorkCommand(
+                    KnownSession,
+                    SessionFixtures.Anna,
+                    [(KnownAction.Value, "Final wording")]
+                )
+            );
+
+        result.ShouldBe(IntentResult.Accepted());
+        var group = repository.Saved.ShouldHaveSingleItem().Formation.Groups[0];
+        group.IsSubmitted.ShouldBeTrue();
+        group.Actions.ShouldHaveSingleItem().Text.Value.ShouldBe("Final wording");
+    }
+
+    [Fact]
     public async Task Submitting_with_a_value_at_zero_actions_is_rejected_as_an_invariant_violation()
     {
         var repository = FakeSessionRepository.Holding(GroupWorkSession());

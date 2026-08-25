@@ -313,11 +313,27 @@ public class ParticipantHubTests
         SessionInGroupWork(isSubmitted: false, TierOneAction("Talk"));
         var hub = HubBoundTo(KnownSession, Subject);
 
-        var result = await hub.SubmitGroupWork();
+        var result = await hub.SubmitGroupWork(null);
 
         result.ShouldBe(IntentResult.Accepted());
         repository.Saved.ShouldHaveSingleItem().Formation.Groups[0].IsSubmitted.ShouldBeTrue();
         broadcaster.Broadcasts.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task Submitting_with_actions_applies_final_edits_before_submitting()
+    {
+        SessionInGroupWork(isSubmitted: false, TierOneAction("Old wording"));
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitGroupWork([
+            new SubmitGroupWorkPayload(KnownAction.Value.ToString(), "Final wording"),
+        ]);
+
+        result.ShouldBe(IntentResult.Accepted());
+        var group = repository.Saved.ShouldHaveSingleItem().Formation.Groups[0];
+        group.IsSubmitted.ShouldBeTrue();
+        group.Actions.ShouldHaveSingleItem().Text.Value.ShouldBe("Final wording");
     }
 
     [Fact]

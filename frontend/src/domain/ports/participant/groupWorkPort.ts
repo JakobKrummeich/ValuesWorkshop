@@ -5,6 +5,8 @@ export interface ParticipantGroupWorkPort {
   addAction(valueId: string): Single<IntentResult>;
   editAction(actionId: string, text: string): Single<IntentResult>;
   removeAction(actionId: string): Single<IntentResult>;
-  submitGroupWork(): Single<IntentResult>;
+  submitGroupWork(
+    actions: ReadonlyArray<{ actionId: string; text: string }>,
+  ): Single<IntentResult>;
   reopenGroupWork(): Single<IntentResult>;
 }

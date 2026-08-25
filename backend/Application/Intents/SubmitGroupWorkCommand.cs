@@ -4,5 +4,6 @@ namespace ValuesWorkshop.Application.Intents;
 
 public sealed record SubmitGroupWorkCommand(
     SessionIdentity SessionIdentity,
-    ParticipantId ParticipantId
+    ParticipantId ParticipantId,
+    IReadOnlyList<(Guid ActionId, string Text)>? Actions = null
 );
