@@ -8,7 +8,7 @@ export function createParticipantGroupWorkPort(
 ): ParticipantGroupWorkPort {
   return {
     addAction: (valueId) =>
-      invokeIntent(connection, ParticipantIntent.AddAction, valueId, ""),
+      invokeIntent(connection, ParticipantIntent.AddAction, valueId),
     editAction: (actionId, text) =>
       invokeIntent(connection, ParticipantIntent.EditAction, actionId, text),
     removeAction: (actionId) =>
