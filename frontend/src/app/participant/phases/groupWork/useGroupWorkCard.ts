@@ -155,7 +155,7 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
 
   const addAction = useCallback(() => {
     if (!isCallerScribe || isSubmitted || selectedValueId === null) return;
-    sendIntent(groupWorkPort.addAction(selectedValueId, ""));
+    sendIntent(groupWorkPort.addAction(selectedValueId));
   }, [isCallerScribe, isSubmitted, selectedValueId, sendIntent, groupWorkPort]);
 
   const removeAction = useCallback(

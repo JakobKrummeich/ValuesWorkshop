@@ -34,7 +34,9 @@ function mockGroupWorkPort(
 
 function makeGroupWorkPort() {
   return {
-    addAction: jest.fn((): Single<IntentResult> => of(accepted)),
+    addAction: jest.fn((_valueId: string): Single<IntentResult> =>
+      of(accepted),
+    ),
     editAction: jest.fn((): Single<IntentResult> => of(accepted)),
     removeAction: jest.fn((): Single<IntentResult> => of(accepted)),
     submitGroupWork: jest.fn((): Single<IntentResult> => of(accepted)),
@@ -96,7 +98,7 @@ describe("useGroupWorkCard", () => {
 
     act(() => result.current.addAction());
 
-    expect(port.addAction).toHaveBeenCalledWith("trust", "");
+    expect(port.addAction).toHaveBeenCalledWith("trust");
   });
 
   it("sends editAction with throttled text snapshots", () => {
