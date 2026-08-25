@@ -564,6 +564,11 @@ test.describe.serial("value selection through group formation", () => {
 
   async function findScribePage(): Promise<Page> {
     for (const page of participantPages()) {
+      await expect(page.getByTestId("group-work-card")).toBeVisible({
+        timeout: 10_000,
+      });
+    }
+    for (const page of participantPages()) {
       const addButton = page.getByTestId("add-action-button");
       if ((await addButton.count()) > 0) {
         return page;
@@ -574,12 +579,14 @@ test.describe.serial("value selection through group formation", () => {
 
   async function findMemberPage(): Promise<Page> {
     for (const page of participantPages()) {
+      await expect(page.getByTestId("group-work-card")).toBeVisible({
+        timeout: 10_000,
+      });
+    }
+    for (const page of participantPages()) {
       const addButton = page.getByTestId("add-action-button");
       if ((await addButton.count()) === 0) {
-        const card = page.getByTestId("group-work-card");
-        if ((await card.count()) > 0) {
-          return page;
-        }
+        return page;
       }
     }
     throw new Error("No member page found among participants");
