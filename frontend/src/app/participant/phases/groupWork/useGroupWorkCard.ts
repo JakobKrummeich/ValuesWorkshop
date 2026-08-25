@@ -1,25 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Subscription } from "rxjs";
-import { intentRejectionMessage } from "../../../../domain/i18n/intentRejectionMessage";
-import { MessageKey } from "../../../../domain/i18n/messages";
-import type { IntentResult } from "../../../../domain/intentResult";
+import { useCallback, useMemo, useState } from "react";
+import type { MessageKey } from "../../../../domain/i18n/messages";
 import {
   GroupWorkStatus,
   type GroupActionView,
   type OwnGroupView,
   type WorkshopValue,
 } from "../../../../domain/workshopState";
-import type { Single } from "../../../../shared/reactiveTypes";
+import { useIntentSender } from "../../../useIntentSender";
 import { useParticipantDependencies } from "../../dependencies";
 import {
   actionsForValue,
   everyValueHasNonEmptyAction,
   valueSubmissions,
 } from "./actionDrafts";
-
-const throttleIntervalMilliseconds = 300;
+import { useThrottledActionEdits } from "./useThrottledActionEdits";
 
 export interface GroupWorkCardModel {
   groupName: OwnGroupView["name"];
@@ -44,31 +40,19 @@ export interface GroupWorkCardModel {
 
 export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
   const { groupWorkPort } = useParticipantDependencies();
+  const { isSending, rejectionMessage, sendIntent } = useIntentSender();
   const [selectedValueId, setSelectedValueId] = useState<string | null>(
     ownGroup.assignedValues.length > 0
       ? ownGroup.assignedValues[0].valueId
       : null,
   );
   const [localTexts, setLocalTexts] = useState<Record<string, string>>({});
-  const [isSending, setIsSending] = useState(false);
-  const [rejectionMessage, setRejectionMessage] = useState<MessageKey | null>(
-    null,
+  const sendEdit = useCallback(
+    (actionId: string, text: string) =>
+      groupWorkPort.editAction(actionId, text),
+    [groupWorkPort],
   );
-  const intentSubscription = useRef<Subscription | null>(null);
-  const throttleTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>(
-    {},
-  );
-  const pendingTexts = useRef<Record<string, string>>({});
-
-  useEffect(
-    () => () => {
-      intentSubscription.current?.unsubscribe();
-      for (const timer of Object.values(throttleTimers.current)) {
-        clearTimeout(timer);
-      }
-    },
-    [],
-  );
+  const { queueEdit, cancelEditsFor } = useThrottledActionEdits(sendEdit);
 
   const isCallerScribe = ownGroup.isCallerScribe === true;
   const isSubmitted = ownGroup.workStatus === GroupWorkStatus.Submitted;
@@ -79,51 +63,12 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
     !isSending &&
     everyValueHasNonEmptyAction(ownGroup.assignedValues, actions, localTexts);
 
-  const sendIntent = useCallback((intent: Single<IntentResult>) => {
-    setIsSending(true);
-    intentSubscription.current?.unsubscribe();
-    intentSubscription.current = intent.subscribe({
-      next(result) {
-        setRejectionMessage(
-          result.isAccepted ? null : intentRejectionMessage(result.code),
-        );
-      },
-      error() {
-        setRejectionMessage(MessageKey.IntentFailed);
-        setIsSending(false);
-      },
-      complete() {
-        setIsSending(false);
-      },
-    });
-  }, []);
-
-  const flushThrottle = useCallback(
-    (actionId: string) => {
-      const text = pendingTexts.current[actionId];
-      if (text !== undefined) {
-        delete pendingTexts.current[actionId];
-        groupWorkPort.editAction(actionId, text).subscribe({ error() {} });
-      }
-    },
-    [groupWorkPort],
-  );
-
   const editActionText = useCallback(
     (actionId: string, text: string) => {
       setLocalTexts((current) => ({ ...current, [actionId]: text }));
-      pendingTexts.current[actionId] = text;
-
-      if (throttleTimers.current[actionId] === undefined) {
-        groupWorkPort.editAction(actionId, text).subscribe({ error() {} });
-        delete pendingTexts.current[actionId];
-        throttleTimers.current[actionId] = setTimeout(() => {
-          delete throttleTimers.current[actionId];
-          flushThrottle(actionId);
-        }, throttleIntervalMilliseconds);
-      }
+      queueEdit(actionId, text);
     },
-    [groupWorkPort, flushThrottle],
+    [queueEdit],
   );
 
   const addAction = useCallback(() => {
@@ -134,11 +79,7 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
   const removeAction = useCallback(
     (actionId: string) => {
       if (!isCallerScribe || isSubmitted) return;
-      if (throttleTimers.current[actionId] !== undefined) {
-        clearTimeout(throttleTimers.current[actionId]);
-        delete throttleTimers.current[actionId];
-      }
-      delete pendingTexts.current[actionId];
+      cancelEditsFor(actionId);
       setLocalTexts((current) => {
         const next = { ...current };
         delete next[actionId];
@@ -146,15 +87,11 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
       });
       sendIntent(groupWorkPort.removeAction(actionId));
     },
-    [isCallerScribe, isSubmitted, sendIntent, groupWorkPort],
+    [isCallerScribe, isSubmitted, cancelEditsFor, sendIntent, groupWorkPort],
   );
 
   const submitGroupWork = useCallback(() => {
     if (!canSubmit) return;
-    for (const actionId of Object.keys(throttleTimers.current)) {
-      clearTimeout(throttleTimers.current[actionId]);
-      delete throttleTimers.current[actionId];
-    }
     sendIntent(
       groupWorkPort.submitGroupWork(
         valueSubmissions(ownGroup.assignedValues, actions, localTexts),

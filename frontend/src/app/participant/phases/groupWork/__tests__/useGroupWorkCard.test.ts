@@ -1,6 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
 import { NEVER, of } from "rxjs";
-import type { IntentResult } from "../../../../../domain/intentResult";
+import { MessageKey } from "../../../../../domain/i18n/messages";
+import {
+  IntentRejectionCode,
+  type IntentResult,
+} from "../../../../../domain/intentResult";
 import {
   GroupWorkStatus,
   type OwnGroupView,
@@ -8,6 +12,7 @@ import {
 import type { Single } from "../../../../../shared/reactiveTypes";
 import { useParticipantDependencies } from "../../../dependencies";
 import { useGroupWorkCard } from "../useGroupWorkCard";
+import { editThrottleIntervalMilliseconds } from "../useThrottledActionEdits";
 
 jest.mock("../../../dependencies", () => ({
   useParticipantDependencies: jest.fn(),
@@ -112,6 +117,26 @@ describe("useGroupWorkCard", () => {
     expect(result.current.localTexts["a1"]).toBe("Tal");
   });
 
+  it("sends the latest text of an edit burst when the throttle window ends", () => {
+    jest.useFakeTimers();
+    const port = mockGroupWorkPort();
+    const group = ownGroup({
+      actions: [{ actionId: "a1", valueId: "trust", text: "", sortOrder: 0 }],
+    });
+    const { result } = renderHook(() => useGroupWorkCard(group));
+
+    act(() => {
+      result.current.editActionText("a1", "T");
+      result.current.editActionText("a1", "Ta");
+      result.current.editActionText("a1", "Tal");
+    });
+    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
+
+    expect(port.editAction).toHaveBeenCalledTimes(2);
+    expect(port.editAction).toHaveBeenLastCalledWith("a1", "Tal");
+    jest.useRealTimers();
+  });
+
   it("sends removeAction intent", () => {
     const port = mockGroupWorkPort();
     const group = ownGroup({
@@ -124,6 +149,28 @@ describe("useGroupWorkCard", () => {
     act(() => result.current.removeAction("a1"));
 
     expect(port.removeAction).toHaveBeenCalledWith("a1");
+  });
+
+  it("drops a pending edit and the local text of a removed action", () => {
+    jest.useFakeTimers();
+    const port = mockGroupWorkPort();
+    const group = ownGroup({
+      actions: [
+        { actionId: "a1", valueId: "trust", text: "Talk", sortOrder: 0 },
+      ],
+    });
+    const { result } = renderHook(() => useGroupWorkCard(group));
+
+    act(() => {
+      result.current.editActionText("a1", "T");
+      result.current.editActionText("a1", "Ta");
+      result.current.removeAction("a1");
+    });
+    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
+
+    expect(port.editAction).toHaveBeenCalledTimes(1);
+    expect(result.current.localTexts["a1"]).toBeUndefined();
+    jest.useRealTimers();
   });
 
   it("disables submit when a value has no actions", () => {
@@ -189,6 +236,23 @@ describe("useGroupWorkCard", () => {
       },
       { valueId: "courage", actions: [{ actionId: "a2", text: "Dare" }] },
     ]);
+  });
+
+  it("surfaces the rejection message of a rejected intent", () => {
+    mockGroupWorkPort({
+      addAction: jest.fn(() =>
+        of<IntentResult>({
+          isAccepted: false,
+          code: IntentRejectionCode.WrongPhase,
+          detail: null,
+        }),
+      ),
+    });
+    const { result } = renderHook(() => useGroupWorkCard(ownGroup()));
+
+    act(() => result.current.addAction());
+
+    expect(result.current.rejectionMessage).toBe(MessageKey.IntentWrongPhase);
   });
 
   it("sends reopenGroupWork intent when submitted", () => {
