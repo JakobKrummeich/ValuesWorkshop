@@ -152,4 +152,46 @@ describe("presenter workshop state schema", () => {
 
     expect(result.success).toBe(false);
   });
+
+  it("accepts a value-presentation state that names the presenting group and its actions", () => {
+    const state = presenterWorkshopStateSchema.parse({
+      revision: 9,
+      phase: 7,
+      participantCount: 3,
+      groups: [],
+      presentation: {
+        presentingGroupName: "otter",
+        presentedValueId: "wert-1",
+        presentedActions: [{ text: "We start meetings on time" }],
+      },
+    });
+
+    if (state.phase !== Phase.ValuePresentation) {
+      throw new Error("expected a value-presentation state");
+    }
+    expect(state.presentation.presentingGroupName).toBe("otter");
+    expect(state.presentation.presentedActions).toEqual([
+      { text: "We start meetings on time" },
+    ]);
+  });
+
+  it("accepts a group intro that presents no value and no actions", () => {
+    const state = presenterWorkshopStateSchema.parse({
+      revision: 9,
+      phase: 7,
+      participantCount: 3,
+      groups: [],
+      presentation: {
+        presentingGroupName: "otter",
+        presentedValueId: null,
+        presentedActions: [],
+      },
+    });
+
+    if (state.phase !== Phase.ValuePresentation) {
+      throw new Error("expected a value-presentation state");
+    }
+    expect(state.presentation.presentedValueId).toBeNull();
+    expect(state.presentation.presentedActions).toEqual([]);
+  });
 });

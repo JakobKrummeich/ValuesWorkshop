@@ -44,6 +44,10 @@ function withAdvancePhase(
     groupWorkControlPort: {
       reassignScribe: () => NEVER,
     },
+    walkControlPort: {
+      goToNextValue: () => NEVER,
+      correctActionWording: () => NEVER,
+    },
   });
 }
 

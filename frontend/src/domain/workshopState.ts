@@ -31,6 +31,9 @@ export type {
   GroupActionView,
   GroupName,
   OwnGroupView,
+  PresentationView,
+  PresentedAction,
+  PresenterPresentationView,
   WorkshopValue,
 } from "./workshopStateBlocks";
 
@@ -40,6 +43,8 @@ export enum FacilitatorIntent {
   ShowLearningText = "ShowLearningText",
   PoseNextQuestion = "PoseNextQuestion",
   ReassignScribe = "ReassignScribe",
+  GoToNextValue = "GoToNextValue",
+  CorrectActionWording = "CorrectActionWording",
 }
 
 export enum ParticipantIntent {
@@ -320,3 +325,16 @@ export type PresenterGroupWorkState = InPhase<
 
 export type FacilitatorGroupWorkGroups = FacilitatorGroupWorkState["groups"];
 export type PresenterGroupWorkGroups = PresenterGroupWorkState["groups"];
+
+export type ParticipantValuePresentationState = InPhase<
+  ParticipantWorkshopState,
+  Phase.ValuePresentation
+>;
+export type FacilitatorValuePresentationState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.ValuePresentation
+>;
+export type PresenterValuePresentationState = InPhase<
+  PresenterWorkshopState,
+  Phase.ValuePresentation
+>;

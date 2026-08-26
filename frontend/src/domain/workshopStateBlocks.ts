@@ -174,14 +174,30 @@ export const presenterFormationViewSchema = z.discriminatedUnion("subState", [
   }),
 ]);
 
+const presentedActionSchema = z.object({
+  actionId: z.string(),
+  text: z.string(),
+});
+
+export type PresentedAction = z.infer<typeof presentedActionSchema>;
+
 export const presentationViewSchema = z.object({
   presentingGroupName: z.string().nullable(),
   presentedValueId: z.string().nullable(),
+  presentedActions: z.array(presentedActionSchema),
 });
 
+export type PresentationView = z.infer<typeof presentationViewSchema>;
+
 export const presenterPresentationViewSchema = z.object({
+  presentingGroupName: z.string().nullable(),
   presentedValueId: z.string().nullable(),
+  presentedActions: z.array(z.object({ text: z.string() })),
 });
+
+export type PresenterPresentationView = z.infer<
+  typeof presenterPresentationViewSchema
+>;
 
 export const votingViewSchema = z.object({
   roundNumber: z.int(),

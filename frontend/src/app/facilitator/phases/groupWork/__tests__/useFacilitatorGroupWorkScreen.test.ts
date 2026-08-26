@@ -30,6 +30,10 @@ function mockDependencies(reassignScribe = jest.fn(() => of(accepted))) {
       poseNextQuestion: () => NEVER,
     },
     groupWorkControlPort: { reassignScribe },
+    walkControlPort: {
+      goToNextValue: () => NEVER,
+      correctActionWording: () => NEVER,
+    },
   });
   return reassignScribe;
 }
