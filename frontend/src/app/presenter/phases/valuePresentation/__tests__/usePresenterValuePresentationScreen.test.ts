@@ -1,10 +1,8 @@
 import { renderHook } from "@testing-library/react";
 import { Phase } from "../../../../../domain/phases";
 import type { PresenterValuePresentationState } from "../../../../../domain/workshopState";
-import {
-  PresentationPositionKind,
-  usePresenterValuePresentationScreen,
-} from "../usePresenterValuePresentationScreen";
+import { PresentationPositionKind } from "../../../../../domain/presentationPosition";
+import { usePresenterValuePresentationScreen } from "../usePresenterValuePresentationScreen";
 
 function state(
   presentation: PresenterValuePresentationState["presentation"],
@@ -64,7 +62,7 @@ describe("usePresenterValuePresentationScreen", () => {
       animalId: "otter",
       groupName: { de: "Otter", en: "Otter" },
       valueName: { de: "Vertrauen", en: "Trust" },
-      actionTexts: ["We start meetings on time"],
+      actions: [{ text: "We start meetings on time" }],
     });
   });
 

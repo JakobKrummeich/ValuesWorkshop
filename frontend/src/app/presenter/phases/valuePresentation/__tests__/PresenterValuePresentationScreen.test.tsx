@@ -3,8 +3,8 @@ import { Phase } from "../../../../../domain/phases";
 import type { PresenterValuePresentationState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { PresenterValuePresentationScreen } from "../PresenterValuePresentationScreen";
+import { PresentationPositionKind } from "../../../../../domain/presentationPosition";
 import {
-  PresentationPositionKind,
   usePresenterValuePresentationScreen,
   type PresenterPresentationPosition,
 } from "../usePresenterValuePresentationScreen";
@@ -57,7 +57,10 @@ describe("PresenterValuePresentationScreen", () => {
       animalId: "otter",
       groupName: { de: "Otter", en: "Otter" },
       valueName: { de: "Vertrauen", en: "Trust" },
-      actionTexts: ["We start meetings on time", "We ask before assuming"],
+      actions: [
+        { text: "We start meetings on time" },
+        { text: "We ask before assuming" },
+      ],
     });
 
     expect(screen.getByTestId("presenter-presenting-group")).toHaveTextContent(

@@ -5,10 +5,8 @@ import { MessageKey } from "../../../../domain/i18n/messages";
 import type { PresenterValuePresentationState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./PresenterValuePresentationScreen.module.css";
-import {
-  PresentationPositionKind,
-  usePresenterValuePresentationScreen,
-} from "./usePresenterValuePresentationScreen";
+import { PresentationPositionKind } from "../../../../domain/presentationPosition";
+import { usePresenterValuePresentationScreen } from "./usePresenterValuePresentationScreen";
 
 export function PresenterValuePresentationScreen({
   state,
@@ -53,13 +51,13 @@ export function PresenterValuePresentationScreen({
         {translate(MessageKey.ValuePresentationActions)}
       </p>
       <ol className={styles.actions}>
-        {position.actionTexts.map((text, index) => (
+        {position.actions.map((action, index) => (
           <li
             key={index}
             className={styles.action}
             data-testid="presented-action"
           >
-            {text}
+            {action.text}
           </li>
         ))}
       </ol>
