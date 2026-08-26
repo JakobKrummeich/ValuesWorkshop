@@ -10,4 +10,6 @@ public enum FacilitatorIntent
     ShowLearningText,
     PoseNextQuestion,
     ReassignScribe,
+    GoToNextValue,
+    CorrectActionWording,
 }

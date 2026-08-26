@@ -136,6 +136,50 @@ public class FacilitatorEnabledIntentsTests
     }
 
     [Fact]
+    public void A_group_intro_enables_exactly_the_next_value_step()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValuePresentation,
+            formation: SessionFixtures.TwoGroups(),
+            presentation: PresentationWalk.Restore("tier-1", null, 0)
+        );
+
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.GoToNextValue]);
+    }
+
+    [Fact]
+    public void A_presented_value_enables_the_wording_correction_alongside_the_next_step()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValuePresentation,
+            formation: SessionFixtures.TwoGroups(),
+            presentation: PresentationWalk.Restore("tier-1", new ValueId("wert-1"), 1)
+        );
+
+        Map(session)
+            .EnabledIntents.ShouldBe([
+                FacilitatorIntent.GoToNextValue,
+                FacilitatorIntent.CorrectActionWording,
+            ]);
+    }
+
+    [Fact]
+    public void The_last_presented_value_swaps_the_next_step_for_the_phase_advance()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValuePresentation,
+            formation: SessionFixtures.TwoGroups(),
+            presentation: PresentationWalk.Restore("tier-2", new ValueId("wert-2"), 2)
+        );
+
+        Map(session)
+            .EnabledIntents.ShouldBe([
+                FacilitatorIntent.CorrectActionWording,
+                FacilitatorIntent.AdvancePhase,
+            ]);
+    }
+
+    [Fact]
     public void The_final_phase_enables_no_phase_advance_because_no_phase_follows()
     {
         var session = SessionFixtures.InPhase(Phase.FinalPresentation);

@@ -82,6 +82,36 @@ public sealed class FacilitatorIntentHandler(
         );
     }
 
+    public Task<IntentResult> HandleAsync(GoToNextValueCommand command)
+    {
+        return ExecuteAsFacilitatorAsync(
+            command.SessionIdentity,
+            command.Caller,
+            session =>
+            {
+                ValuePresentation.GoToNextValue(session);
+                return true;
+            }
+        );
+    }
+
+    public Task<IntentResult> HandleAsync(CorrectActionWordingCommand command)
+    {
+        return ExecuteAsFacilitatorAsync(
+            command.SessionIdentity,
+            command.Caller,
+            session =>
+            {
+                ValuePresentation.CorrectActionWording(
+                    session,
+                    IntentPayloadValidator.RequiredActionId(command.ActionId),
+                    GroupActionText.Of(command.Text)
+                );
+                return true;
+            }
+        );
+    }
+
     private Task<IntentResult> ExecuteAsFacilitatorAsync(
         SessionIdentity sessionIdentity,
         CallerSubject caller,
