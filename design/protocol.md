@@ -288,8 +288,8 @@ the caller's authenticated principal, so no client can act as another.
 | T7 | `ShowLearningText` | — | phase Quiz; answer revealed (repeat show is a no-op) | `WrongPhase` |
 | T8 | `PoseNextQuestion` | — | phase Quiz; learning text shown; questions remain | `WrongPhase` |
 | T13 | `ReassignScribe` | `{ participantId }` | phase Group work only; target is a grouped participant — the group derives from membership (I9) | `WrongPhase`, `MalformedPayload`, `InvariantViolated`, `UnknownParticipant` |
-| T17 | `GoToNextValue` | — | phase Value presentation; values remain (I12) | `WrongPhase` |
-| T17a | `CorrectActionWording` | `{ actionId, text }` | phase Value presentation; action belongs to the presented value; text non-empty ≤ 500 chars (I10) | `WrongPhase`, `InvariantViolated`, `MalformedPayload` |
+| T17 | `GoToNextValue` | — | phase Value presentation; a next position remains — the walk runs in per-group blocks: group intro, then one step per assigned value (I12) | `WrongPhase`, `InvariantViolated` |
+| T17a | `CorrectActionWording` | `{ actionId, text }` | phase Value presentation; a value is presented (refused on a group intro); action belongs to the presented value; text non-empty, trimmed, truncated server-side to 200 text elements (I10) | `WrongPhase`, `InvariantViolated`, `MalformedPayload` |
 | T19 | `CloseVoting` | — | phase Final voting; round open | `WrongPhase` |
 | T21 | `StartTiebreakRound` | — | phase Final voting; last closed round left a fifth-place tie (I15) | `WrongPhase`, `InvariantViolated` |
 | T22 | `RevealNextValue` | — | phase Final presentation; winners remain | `WrongPhase` |
@@ -406,7 +406,7 @@ variant carries it.
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `ownSelectedValueIds`, `isSubmitted`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | ownGroup | `name: {animalId, text: {de, en}}` (the animal label rides the wire — values-catalog precedent, the client never reads `config/`), `memberDisplayNames` (formation order), `assignedValues: [{valueId, text: {de, en}}]` (deal order; texts embedded because the participant variant carries no values catalog in phase 5), `isCallerScribe?`, `scribeName?`, `workStatus?` (`editing` \| `submitted`), `actions?: [{ actionId, valueId, text, sortOrder }]` (all four present during phase 6 only — group-work data leaves the wire when the phase ends; T19) |
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `ownGroup` (the block above, always present — every participant of a formed session is in a group) |
-| presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` |
+| presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` — a group intro is `presentingGroupName` set with `presentedValueId` null (empty `presentedActions`); a value position has both set |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
 
@@ -424,7 +424,7 @@ join lobby shows back to the person who just signed in.
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | groups | `[{ name: {animalId, text: {de, en}}, members: [{participantId, displayName}] (formation order), assignedValues: [{valueId, text: {de, en}}], scribeParticipantId?, workStatus?, actionCountPerValue? }]` — `scribeParticipantId?`, `workStatus?` and `actionCountPerValue?` present during phase 6 only (T19) |
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
-| presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]`, `remainingValueCount` |
+| presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` — group-intro encoding as in the participant block; no position counter (`design/screens.md`) |
 | voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
 | conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
 
@@ -444,7 +444,7 @@ what they answered, selected, or voted for.
 | selection | `values: [{valueId, text: {de, en}}]` (full catalog, config order), `submittedCount`, `selectionTallies?` (absent in phase 3; from phase 4 onward valueId → count, submitted values only), `topValueIds?` (absent in phase 3; from phase 4 onward in deterministic order: count desc, then config order) |
 | groups | `[{ name: {animalId, text: {de, en}}, memberDisplayNames (formation order), assignedValues: [{valueId, text: {de, en}}], workStatus? }]` — `workStatus` present during phase 6 only (T19) |
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
-| presentation | `presentedValueId`, `presentedActions: [{ text }]` |
+| presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ text }]` — group-intro encoding as in the participant block; the group name headlines the presented value and fills the intro screen |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
 

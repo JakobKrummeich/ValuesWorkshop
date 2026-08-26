@@ -215,29 +215,42 @@ Guards in words:
 
 ### 2.7 Phase 7 — Value presentation
 
-The facilitator steps value by value through each group's submitted
-result; when a group's assigned values are exhausted, the walk moves to
-the next group's first value (I12).
+The walk runs in per-group blocks (formation order, I12): each group's
+block opens with a group intro position ("up next: Group Otter"),
+followed by one position per assigned value (stored sort order) — the
+value plus its submitted actions. The facilitator is the clock; the walk
+advances by command only.
 
 ```mermaid
 stateDiagram-v2
+    state "Group intro" as Intro
     state "Value shown" as Shown
 
-    [*] --> Shown : phase entry - first value of the first group · guard - submitted results only (I12)
-    Shown --> Shown : GoToNextValue [Facilitator] / NextValueShown · next value of the presenting group, or first value of the next group
-    Shown --> Shown : EditAction [Facilitator] / ActionEdited · guard - wording correction only (I10)
-    Shown --> [*] : all groups' values shown · awaits AdvancePhase
+    [*] --> Intro : phase entry - first group's intro · guard - submitted results only (I12)
+    Intro --> Shown : GoToNextValue [Facilitator] / NextValueShown · first assigned value of the presenting group
+    Shown --> Shown : GoToNextValue [Facilitator] / NextValueShown · next assigned value of the presenting group
+    Shown --> Intro : GoToNextValue [Facilitator] / NextValueShown · group exhausted - next group's intro
+    Shown --> Shown : CorrectActionWording [Facilitator] / ActionEdited · guard - wording correction of a presented action only (I10)
+    Shown --> [*] : last value of the last group shown · awaits AdvancePhase
 ```
 
 Guards in words:
 
-- **GoToNextValue** — refused when every group's every value has been
-  shown (nothing left to present).
-- **EditAction** — facilitator only in this phase; corrects the wording of
-  a presented action (e.g. typos); adding or removing actions is refused
-  (I10). (Actor extension decided in the Task 0.3 screen-flow review.)
-- **AdvancePhase** out of Value presentation — allowed once all values
-  have been shown.
+- **Phase entry** stands the walk on the first group's intro via a phase
+  entry action (like scribe appointment on phase 6).
+- **GoToNextValue** — refused on the last value of the last group
+  (nothing left to present).
+- **CorrectActionWording** — facilitator only in this phase; reuses the
+  domain edit path scoped to the currently presented value's actions;
+  the corrected text stays non-empty (a submitted group keeps one to
+  five non-empty actions); refused on a group intro; adding or removing
+  actions is refused (I10). (Actor extension decided in the Task 0.3
+  screen-flow review.)
+- **AdvancePhase** out of Value presentation — guarded by the
+  `ValuePresentationExitGuard` registered in `PhaseExitGuards`:
+  satisfied once the shown-value count equals the session's total
+  assigned values (sum over the groups — derived per session, no
+  hardcoded constant).
 
 ### 2.8 Phase 8 — Final voting
 
@@ -325,8 +338,8 @@ facilitator sub-controls are marked ◆.
 | T14 | 6 | Add / edit / remove action | Scribe | own group; Editing; ≤ five per value (I10, I11) | ActionAdded / ActionEdited / ActionRemoved |
 | T15 | 6 | Submit group work | Scribe | one to five non-empty-text actions per assigned value (I11) | GroupWorkSubmitted |
 | T16 | 6 | Reopen group work | Scribe | currently Submitted | GroupWorkReopened |
-| T17 | 7 | Go to next value ◆ | Facilitator | values remain to show (I12) | NextValueShown |
-| T17a | 7 | Edit action (typo fix) | Facilitator | wording correction of a presented action only (I10) | ActionEdited |
+| T17 | 7 | Go to next value ◆ | Facilitator | a next position remains — group intro or value (I12) | NextValueShown |
+| T17a | 7 | Correct action wording (typo fix) | Facilitator | wording correction of a presented action only; refused on a group intro (I10) | ActionEdited |
 | T18 | 8 | Submit final votes | Participant | full allotment; eligible values; once per round (I13, I14) | FinalVotesSubmitted |
 | T19 | 8 | Close voting ◆ | Facilitator | round open | VotingClosed |
 | T20 | 8 | Winners determined | System | round closed; no fifth-place tie (I15) | WinnersDetermined |
@@ -352,7 +365,8 @@ Each phase has at least one exit and every exit guard is satisfiable:
    (solver assignment or random fallback); exit guard satisfiable.
 6. **Group work** → every group can reach Submitted (scribe reassignment
    rescues a dead phone); exit guard satisfiable.
-7. **Value presentation** → finite values, walk terminates; advance.
+7. **Value presentation** → finite positions (group intros + values),
+   walk terminates; advance.
 8. **Final voting** → every closed round either yields winners or permits
    a tiebreak; tied set shrinks or resolves — no infinite mandatory loop
    blocks exit (facilitator repeats tiebreaks until five survive, I15).

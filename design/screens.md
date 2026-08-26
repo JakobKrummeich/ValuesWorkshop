@@ -30,7 +30,7 @@ they fire. "Mirror" = passive copy of the presenter content, phone-sized.
 | **4 Selection results** | Top-values bar chart (same as presenter). **AdvancePhase** · System: DetermineTopValues on entry | Bar chart of the 20 most-selected values in two columns (ranks 1–10 left, 11–20 right), label + count + bar ∝ selections (most-selected = full width); top set color-highlighted (tie at 10th → 11+ highlighted); "and x more" hint below the cutoff; zero submissions → empty-state note | Waiting screen: centered icon with a slow pulsating circle — attention goes to the presenter wall; no tallies, no chart |
 | **5 Group formation** | Progress bar while forming (T19b), then all groups: names, members, assigned values. **AdvancePhase** (disabled until the groups stand) · System: FormGroups when the 3 s window is over | Server-driven 3 s progress bar while forming (T19b), then paginated 3×2 group cards mirroring the participant card (name, member chips, value chips); cycles every 7 s, static single page when all groups fit | Server-driven 3 s progress bar while forming (T19b), then own group card: animal name, member chips grouped top-left, value chips grouped bottom-right — one color for all member chips, another for all value chips, no section labels, no icon |
 | **6 Group work** | Per-group table: scribe, action count, editing/submitted status. **ReassignScribe**, **AdvancePhase** (disabled until every group submitted) · System: AppointScribes on entry | Same paginated 3×2 cards + working/submitted indicator per group | **Scribe:** value tabs + actions editor. **AddAction**, **EditAction**, **RemoveAction**, **SubmitGroupWork**, **ReopenGroupWork** · **Member:** same value tabs, read-only, synced with the scribe's state every 0.5 s |
-| **7 Value presentation** | Presenting position (group, value) + presented actions with edit affordance. **GoToNextValue**, **EditAction** (wording/typo fixes only, T17a), **AdvancePhase** (disabled until all values presented) | Presented value + its actions; no position counter | Calm waiting screen (shared pulsating circle) — no mirror; attention to the wall |
+| **7 Value presentation** | Presenting position (group intro, or group + value with presented actions and edit affordance). **GoToNextValue**, **EditAction** (wording/typo fixes only, T17a; value positions only), **AdvancePhase** (disabled until all values presented) | Per-group blocks: group-intro fullscreen ("up next"), then per value the presenting group, the value + its actions numbered; no position counter | Calm waiting screen (shared pulsating circle) — no mirror; attention to the wall |
 | **8 Final voting** | Round + voted-count progress; tie indicator after close. **CloseVoting**, **StartTiebreakRound**, **AdvancePhase** (winners must stand) | "Voting ongoing…" screen — no tallies shown | One card per presented value (value + its actions + vote stepper), allotment counter. **SubmitFinalVotes** (enabled at full allotment; irrevocable). After the own submission and while voting is closed: "votes submitted successfully" confirmation. Tiebreak round reopens the voting UI: tied values only, allotment = number of tied values |
 | **9 Final presentation** | Reveal position. **RevealNextValue** | One full screen per winning value *with* its actions, least → most voted; final overview after the last reveal | During reveal: calm waiting screen (shared pulsating circle). After conclusion: prominent Download-PDF button (workshop record) |
 
@@ -407,6 +407,23 @@ stays facilitator-triggered.
 
 ### Phase 7 — Value presentation
 
+**Presenter · Group intro (fullscreen)**
+
+```
+┌────────────────────────────────┐
+│                                │
+│          Als Nächstes          │
+│                                │
+│          Gruppe Otter          │
+│                                │
+└────────────────────────────────┘
+```
+
+Each group's block opens with this intro — on phase entry the walk stands
+on the first group's intro; `GoToNextValue` steps intro → first value → …
+→ last value → next group's intro. The intro between groups looks the
+same as the intro on phase entry.
+
 **Presenter · Presented value (fullscreen)**
 
 ```
@@ -436,6 +453,10 @@ stays facilitator-triggered.
 │ [ Next value ▸ ]  → GoToNextValue       │
 └─────────────────────────────────────────┘
 ```
+
+On a group intro the position line reads "Up next: Otter" — no actions,
+nothing to edit; "Next value" moves onto the group's first value. On the
+last value of the last group "Next value" disables and Advance unlocks.
 
 Participant phase 7: the shared calm waiting screen (pulsating circle, zero
 interactivity) — the device never mirrors the presented value.
