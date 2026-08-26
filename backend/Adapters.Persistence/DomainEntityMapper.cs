@@ -47,6 +47,13 @@ internal static class DomainEntityMapper
                 RoundOpen = session.Voting.RoundOpen,
                 RoundNumber = session.Voting.RoundNumber,
             },
+            VotingRounds = VotingEntityMapper.RoundEntities(identityString, session.Voting),
+            VoteTallies = VotingEntityMapper.TallyEntities(identityString, session.Voting),
+            VotedParticipants = VotingEntityMapper.VotedParticipantEntities(
+                identityString,
+                session.Voting
+            ),
+            VotingRoundTies = VotingEntityMapper.TieEntities(identityString, session.Voting),
             Participants = session
                 .Roster.Participants.Select(
                     (participant, index) =>
@@ -77,17 +84,7 @@ internal static class DomainEntityMapper
             Groups = session
                 .Formation.Groups.Select(group => ToGroupEntity(identityString, group))
                 .ToList(),
-            WinningValues = session
-                .Voting.WinningValues.Select(
-                    (valueId, index) =>
-                        new WinningValueEntity
-                        {
-                            SessionIdentity = identityString,
-                            ValueId = valueId.Value,
-                            Rank = index + 1,
-                        }
-                )
-                .ToList(),
+            WinningValues = VotingEntityMapper.WinningValueEntities(identityString, session.Voting),
         };
     }
 
@@ -157,7 +154,7 @@ internal static class DomainEntityMapper
             entity.PresentationState.ShownValueCount
         );
 
-        var voting = RestoreVoting(entity);
+        var voting = VotingEntityMapper.RestoreVoting(entity);
 
         var identity = new SessionIdentity(Guid.Parse(entity.Identity));
 
@@ -174,40 +171,6 @@ internal static class DomainEntityMapper
             voting,
             entity.Revision
         );
-    }
-
-    private static VotingRounds RestoreVoting(SessionEntity entity)
-    {
-        var winners = entity
-            .WinningValues.OrderBy(winner => winner.Rank)
-            .Select(winner => new ValueId(winner.ValueId))
-            .ToList();
-
-        var closedRounds = new List<ClosedVotingRound>();
-        if (winners.Count > 0)
-        {
-            closedRounds.Add(
-                new ClosedVotingRound(
-                    entity.VotingState.RoundNumber,
-                    winners.Count,
-                    winners,
-                    winners.ToDictionary(value => value, _ => 0),
-                    new HashSet<ParticipantId>(),
-                    winners,
-                    []
-                )
-            );
-        }
-
-        var openRound = entity.VotingState.RoundOpen
-            ? new OpenVotingRound(
-                entity.VotingState.RoundNumber,
-                VotingRounds.RequiredWinningValueCount - winners.Count,
-                []
-            )
-            : null;
-
-        return VotingRounds.Restore(closedRounds, openRound);
     }
 
     private static Participant ToParticipant(ParticipantEntity entity)

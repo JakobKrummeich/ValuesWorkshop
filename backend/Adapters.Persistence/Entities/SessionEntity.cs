@@ -18,7 +18,9 @@ public sealed class SessionEntity
     public List<ValueSelectionEntity> ValueSelections { get; set; } = [];
     public List<TopValueEntity> TopValues { get; set; } = [];
     public List<GroupEntity> Groups { get; set; } = [];
+    public List<VotingRoundEntity> VotingRounds { get; set; } = [];
     public List<VoteTallyEntity> VoteTallies { get; set; } = [];
+    public List<VotingRoundTieEntity> VotingRoundTies { get; set; } = [];
     public List<VotedParticipantEntity> VotedParticipants { get; set; } = [];
     public List<WinningValueEntity> WinningValues { get; set; } = [];
 }
