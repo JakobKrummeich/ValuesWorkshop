@@ -114,7 +114,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     if (scribeName === null) {
       throw new Error(`The ${animalId} group shows no scribe`);
     }
-    return scribeName;
+    return scribeName.trim();
   }
 
   async function wallCardCounts(wallPage: Page) {
