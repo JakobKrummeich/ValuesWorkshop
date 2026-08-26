@@ -42,6 +42,7 @@ builder.Services.AddSingleton<IAnimalsCatalog>(animalsCatalog);
 builder.Services.AddSingleton<IGroupNames>(animalsCatalog);
 builder.Services.AddSingleton<IGroupSolver, CpSatGroupSolver>();
 builder.Services.AddSingleton<IPhaseEntryAction, ScribeAppointment>();
+builder.Services.AddSingleton<IPhaseEntryAction, PresentationOpening>();
 builder.Services.AddSingleton<IRandomness, SystemRandomness>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton(

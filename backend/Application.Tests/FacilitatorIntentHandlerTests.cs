@@ -156,6 +156,53 @@ public class FacilitatorIntentHandlerTests
     }
 
     [Fact]
+    public async Task Entering_value_presentation_opens_the_walk_on_the_first_groups_intro()
+    {
+        var repository = FakeSessionRepository.Holding(
+            SessionFixtures.InPhase(Phase.GroupWork, formation: SubmittedGroups())
+        );
+        var handler = new FacilitatorIntentHandler(
+            new IntentPipeline(new SessionCommandHandler(repository, broadcaster)),
+            [new PresentationOpening()]
+        );
+
+        var result = await handler.HandleAsync(
+            new AdvancePhaseCommand(KnownSession, TestSessions.FacilitatorCaller)
+        );
+
+        result.ShouldBe(IntentResult.Accepted());
+        var saved = repository.Saved.ShouldHaveSingleItem();
+        saved.PhaseProgress.CurrentPhase.ShouldBe(Phase.ValuePresentation);
+        saved.Presentation.PresentingGroup.ShouldBe("tier-1");
+        saved.Presentation.PresentedValue.ShouldBeNull();
+    }
+
+    private static FormationRecord SubmittedGroups()
+    {
+        return FormationRecord.Restore(
+            true,
+            [
+                Group.Restore(
+                    "tier-1",
+                    [SessionFixtures.Anna],
+                    [new ValueId("wert-1")],
+                    SessionFixtures.Anna,
+                    true,
+                    []
+                ),
+                Group.Restore(
+                    "tier-2",
+                    [SessionFixtures.Chris],
+                    [new ValueId("wert-2")],
+                    SessionFixtures.Chris,
+                    true,
+                    []
+                ),
+            ]
+        );
+    }
+
+    [Fact]
     public async Task An_advance_past_the_last_phase_stays_an_invariant_violation()
     {
         var repository = FakeSessionRepository.Holding(
