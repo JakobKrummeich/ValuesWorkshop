@@ -227,9 +227,9 @@ each workshop phase completes (regression protection from day one).
 - [ ] 20. Group work frontend: scribe editor, read-only member view with
       live updates, facilitator overview + scribe reassignment.
 
-### Checkpoint D
-- [ ] E2E: phases 5–6 with 8 participants → 2 groups; solver < 3 s;
-      scribe reassignment works.
+### Checkpoint D (own slice, spec 20b, branch `checkpoint-d-scale-e2e`)
+- [ ] Playwright: 30 participants → 7 groups, wall pages in phases 5+6,
+      scribe reassign swaps editors live, all groups submit, then advance
 
 ### Phase E: Presentation + Voting + PDF (Tasks 21–24)
 
@@ -273,7 +273,7 @@ each workshop phase completes (regression protection from day one).
 | SignalR + Next.js dev-server proxy/websocket quirks | Med | Prove in Task 7 smoke e2e before building phases on top |
 | `oidc-provider` config drift vs Azure AD assumptions | Med | Keep auth behind one BE validation config; e2e only against dev provider; document Azure AD delta |
 | Anonymity leak via logs/ordering | High | Task 20 unit test asserts no voter id in vote rows; review logging |
-| Playwright multi-context flakiness (30 clients) | Med | E2e uses 3–8 participants; scale is a solver unit-test concern, not e2e |
+| Playwright multi-context flakiness (30 clients) | Med | Batched sign-in (6 at a time), contexts closed after each step; Checkpoint D exercises 30 participants |
 | Restart recovery drift (state in memory not persisted) | High | Write-before-broadcast rule from Task 7 on; checkpoint B/F kill-tests |
 | CA1502/jscpd thresholds too strict/lax early | Low | Set pragmatic initial thresholds in Task 5; tightening is Ask-first per SPEC.md |
 | E2e in CI flaky → blocks all merges | Med | Small participant counts in CI e2e; retries=1; flake fixes are priority-0; e2e grows incrementally so flake sources surface early |
