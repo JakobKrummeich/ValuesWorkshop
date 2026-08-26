@@ -1,4 +1,5 @@
 import type { FacilitatorGroupWorkControlPort } from "../domain/ports/facilitator/groupWorkControlPort";
+import type { FacilitatorWalkControlPort } from "../domain/ports/facilitator/walkControlPort";
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorQuizControlPort } from "../domain/ports/facilitator/quizControlPort";
 import type { ParticipantGroupWorkPort } from "../domain/ports/participant/groupWorkPort";
@@ -17,6 +18,7 @@ import { hubBaseUrl } from "../config/environment";
 import type { Completable, Single } from "../shared/reactiveTypes";
 import { getAccessToken } from "./authAdapter";
 import { createFacilitatorGroupWorkControlPort } from "./facilitatorGroupWorkControlAdapter";
+import { createFacilitatorWalkControlPort } from "./facilitatorWalkControlAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
 import { createFacilitatorQuizControlPort } from "./facilitatorQuizControlAdapter";
 import { createParticipantGroupWorkPort } from "./participantGroupWorkAdapter";
@@ -44,6 +46,7 @@ export interface FacilitatorSession extends WorkshopSession {
   readonly lifecyclePort: FacilitatorLifecyclePort;
   readonly quizControlPort: FacilitatorQuizControlPort;
   readonly groupWorkControlPort: FacilitatorGroupWorkControlPort;
+  readonly walkControlPort: FacilitatorWalkControlPort;
 }
 
 export interface PresenterSession extends WorkshopSession {
@@ -86,6 +89,7 @@ export function createFacilitatorSession(
     lifecyclePort: createFacilitatorLifecyclePort(connection),
     quizControlPort: createFacilitatorQuizControlPort(connection),
     groupWorkControlPort: createFacilitatorGroupWorkControlPort(connection),
+    walkControlPort: createFacilitatorWalkControlPort(connection),
     ...lifetimeOf(connection),
   };
 }

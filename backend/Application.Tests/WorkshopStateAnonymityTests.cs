@@ -31,6 +31,7 @@ public class WorkshopStateAnonymityTests
                     "ParticipantValuePresentationState.OwnGroup.Actions[].ActionId",
                     "ParticipantValuePresentationState.OwnGroup.MemberDisplayNames[]",
                     "ParticipantValuePresentationState.OwnGroup.ScribeName",
+                    "ParticipantValuePresentationState.Presentation.PresentedActions[].ActionId",
                 ],
                 ignoreOrder: false
             );
@@ -80,6 +81,7 @@ public class WorkshopStateAnonymityTests
                     "FacilitatorValuePresentationState.Groups[].Members[].DisplayName",
                     "FacilitatorValuePresentationState.Groups[].Members[].ParticipantId",
                     "FacilitatorValuePresentationState.Groups[].ScribeParticipantId",
+                    "FacilitatorValuePresentationState.Presentation.PresentedActions[].ActionId",
                     "FacilitatorValuePresentationState.Roster.Participants[].DisplayName",
                     "FacilitatorValuePresentationState.Roster.Participants[].ParticipantId",
                     "FacilitatorValueSelectionState.Roster.Participants[].DisplayName",

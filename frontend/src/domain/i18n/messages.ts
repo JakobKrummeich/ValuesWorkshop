@@ -7,6 +7,7 @@ import { joinMessages } from "./phases/joinMessages";
 import { quizMessages } from "./phases/quizMessages";
 import { selectionMessages } from "./phases/selectionMessages";
 import { selectionResultsMessages } from "./phases/selectionResultsMessages";
+import { valuePresentationMessages } from "./phases/valuePresentationMessages";
 
 export { MessageKey } from "./messageKey";
 
@@ -18,4 +19,5 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
   ...selectionResultsMessages,
   ...groupFormationMessages,
   ...groupWorkMessages,
+  ...valuePresentationMessages,
 };

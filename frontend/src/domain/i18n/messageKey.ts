@@ -82,6 +82,11 @@ export enum MessageKey {
   GroupWorkActions = "groupWork.actions",
   GroupWorkStatus = "groupWork.status",
   GroupWorkAllGroupsMustSubmit = "groupWork.allGroupsMustSubmit",
+  ValuePresentationUpNext = "valuePresentation.upNext",
+  ValuePresentationUpNextGroup = "valuePresentation.upNextGroup",
+  ValuePresentationPresenting = "valuePresentation.presenting",
+  ValuePresentationActions = "valuePresentation.actions",
+  ValuePresentationNextValue = "valuePresentation.nextValue",
   FacilitatorHeading = "facilitator.heading",
   ParticipantHeading = "participant.heading",
 }

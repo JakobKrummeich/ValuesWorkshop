@@ -118,9 +118,21 @@ public sealed record PresenterGroupView(
         GroupWorkStatus? WorkStatus
 );
 
-public sealed record PresentationView(string? PresentingGroupName, string? PresentedValueId);
+public sealed record PresentedActionView(Guid ActionId, string Text);
 
-public sealed record PresenterPresentationView(string? PresentedValueId);
+public sealed record PresentationView(
+    string? PresentingGroupName,
+    string? PresentedValueId,
+    IReadOnlyList<PresentedActionView> PresentedActions
+);
+
+public sealed record PresenterPresentedActionView(string Text);
+
+public sealed record PresenterPresentationView(
+    string? PresentingGroupName,
+    string? PresentedValueId,
+    IReadOnlyList<PresenterPresentedActionView> PresentedActions
+);
 
 public sealed record VotingView(int RoundNumber, bool IsRoundOpen);
 

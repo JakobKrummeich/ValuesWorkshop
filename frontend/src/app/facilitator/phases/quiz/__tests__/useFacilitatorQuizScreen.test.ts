@@ -37,6 +37,10 @@ function withQuizControl(overrides: Partial<FacilitatorQuizControlPort> = {}) {
     groupWorkControlPort: {
       reassignScribe: () => NEVER,
     },
+    walkControlPort: {
+      goToNextValue: () => NEVER,
+      correctActionWording: () => NEVER,
+    },
   });
   return quizControl;
 }

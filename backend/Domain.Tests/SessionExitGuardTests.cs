@@ -132,11 +132,37 @@ public class SessionExitGuardTests
     }
 
     [Fact]
-    public void Value_presentation_is_left_freely_while_its_walk_is_not_built_yet()
+    public void Value_presentation_is_left_freely_when_no_values_were_assigned()
     {
         var session = SessionInPhase(
             Phase.ValuePresentation,
             presentation: PresentationWalk.Restore(null, null, 0)
+        );
+
+        session.AdvancePhase();
+
+        session.PhaseProgress.CurrentPhase.ShouldBe(Phase.FinalVoting);
+    }
+
+    [Fact]
+    public void Value_presentation_may_not_be_left_before_every_assigned_value_is_shown()
+    {
+        var session = SessionInPhase(
+            Phase.ValuePresentation,
+            formation: FormationOf(submittedStates: [true, true]),
+            presentation: PresentationWalk.Restore("group-0", new ValueId("value-0"), 1)
+        );
+
+        ShouldRefuseToAdvance(session, Phase.ValuePresentation);
+    }
+
+    [Fact]
+    public void Value_presentation_may_be_left_once_every_assigned_value_is_shown()
+    {
+        var session = SessionInPhase(
+            Phase.ValuePresentation,
+            formation: FormationOf(submittedStates: [true, true]),
+            presentation: PresentationWalk.Restore("group-1", new ValueId("value-1"), 2)
         );
 
         session.AdvancePhase();

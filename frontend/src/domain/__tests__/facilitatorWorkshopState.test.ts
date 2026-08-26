@@ -176,4 +176,46 @@ describe("facilitator workshop state schema", () => {
 
     expect(result.success).toBe(false);
   });
+
+  it("accepts a value-presentation state whose actions carry ids for wording fixes", () => {
+    const state = facilitatorWorkshopStateSchema.parse({
+      revision: 7,
+      phase: 7,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["GoToNextValue", "CorrectActionWording"],
+      groups: [],
+      presentation: {
+        presentingGroupName: "otter",
+        presentedValueId: "wert-1",
+        presentedActions: [
+          { actionId: "0f42e0a2-0000-4000-8000-000000000001", text: "We ask" },
+        ],
+      },
+    });
+
+    if (state.phase !== Phase.ValuePresentation) {
+      throw new Error("expected a value-presentation state");
+    }
+    expect(state.enabledIntents).toContain(FacilitatorIntent.GoToNextValue);
+    expect(state.presentation.presentedActions[0].actionId).toBe(
+      "0f42e0a2-0000-4000-8000-000000000001",
+    );
+  });
+
+  it("rejects a presented action without an id", () => {
+    const result = facilitatorWorkshopStateSchema.safeParse({
+      revision: 7,
+      phase: 7,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: [],
+      groups: [],
+      presentation: {
+        presentingGroupName: "otter",
+        presentedValueId: "wert-1",
+        presentedActions: [{ text: "We ask" }],
+      },
+    });
+
+    expect(result.success).toBe(false);
+  });
 });

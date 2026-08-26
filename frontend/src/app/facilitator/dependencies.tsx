@@ -2,6 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 import type { FacilitatorGroupWorkControlPort } from "../../domain/ports/facilitator/groupWorkControlPort";
+import type { FacilitatorWalkControlPort } from "../../domain/ports/facilitator/walkControlPort";
 import type { FacilitatorLifecyclePort } from "../../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorQuizControlPort } from "../../domain/ports/facilitator/quizControlPort";
 import type { FacilitatorSessionStatePort } from "../../domain/ports/facilitator/sessionStatePort";
@@ -11,6 +12,7 @@ export interface FacilitatorDependencies {
   lifecyclePort: FacilitatorLifecyclePort;
   quizControlPort: FacilitatorQuizControlPort;
   groupWorkControlPort: FacilitatorGroupWorkControlPort;
+  walkControlPort: FacilitatorWalkControlPort;
 }
 
 const FacilitatorDependencyContext =

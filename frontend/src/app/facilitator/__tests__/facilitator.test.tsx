@@ -53,6 +53,10 @@ beforeEach(() => {
     groupWorkControlPort: {
       reassignScribe: jest.fn(() => EMPTY),
     },
+    walkControlPort: {
+      goToNextValue: jest.fn(() => EMPTY),
+      correctActionWording: jest.fn(() => EMPTY),
+    },
     start: EMPTY,
     close: EMPTY,
   });

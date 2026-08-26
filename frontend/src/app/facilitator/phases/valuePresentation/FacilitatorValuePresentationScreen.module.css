@@ -1,0 +1,50 @@
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  width: 100%;
+  max-width: 40rem;
+  padding: var(--space-gutter) 0;
+}
+
+.position {
+  margin: 0;
+  font-size: var(--text-heading);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary-strong);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  margin: 0;
+  padding-left: var(--space-gutter);
+}
+
+.action {
+  font-size: var(--text-body);
+}
+
+.nextButton {
+  align-self: flex-start;
+  padding: var(--space-gap) var(--space-gutter);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.nextButton:disabled {
+  background: var(--color-border);
+  cursor: not-allowed;
+}
+
+.rejection {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--color-danger);
+}

@@ -95,4 +95,23 @@ public sealed class FacilitatorHub(
             )
         );
     }
+
+    public Task<IntentResult> GoToNextValue()
+    {
+        return intentHandler.HandleAsync(
+            new GoToNextValueCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
+        );
+    }
+
+    public Task<IntentResult> CorrectActionWording(string? actionId, string? text)
+    {
+        return intentHandler.HandleAsync(
+            new CorrectActionWordingCommand(
+                HubSessionBinding.SessionIdentityOf(Context),
+                Caller(),
+                actionId,
+                text
+            )
+        );
+    }
 }

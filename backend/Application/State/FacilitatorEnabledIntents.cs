@@ -18,12 +18,33 @@ internal static class FacilitatorEnabledIntents
             enabledIntents.Add(FacilitatorIntent.ReassignScribe);
         }
 
+        if (session.PhaseProgress.CurrentPhase == Phase.ValuePresentation)
+        {
+            AddPresentationWalkIntents(enabledIntents, session);
+        }
+
         if (session.PhaseProgress.HasNextPhase && PhaseExitGuards.PermitExitOf(session))
         {
             enabledIntents.Add(FacilitatorIntent.AdvancePhase);
         }
 
         return enabledIntents;
+    }
+
+    private static void AddPresentationWalkIntents(
+        List<FacilitatorIntent> enabledIntents,
+        Session session
+    )
+    {
+        if (session.Presentation.HasNextPosition(session.Formation.Groups))
+        {
+            enabledIntents.Add(FacilitatorIntent.GoToNextValue);
+        }
+
+        if (session.Presentation.PresentedValue is not null)
+        {
+            enabledIntents.Add(FacilitatorIntent.CorrectActionWording);
+        }
     }
 
     private static void AddQuizWalkIntent(List<FacilitatorIntent> enabledIntents, QuizProgress quiz)

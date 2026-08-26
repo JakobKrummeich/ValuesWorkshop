@@ -221,10 +221,11 @@ expressed as interfaces implemented by sealed records: `IPhaseExitGuard`
 carries the `Phase` discriminator plus the `Refusal` / `IsSatisfiedBy`
 contract, and `QuizExitGuard`, `GroupFormationExitGuard`, `GroupWorkExitGuard`,
 `ValuePresentationExitGuard` and `FinalVotingExitGuard` implement it directly.
-The guards are stateless domain policy: the Domain-internal static registry
-`PhaseExitGuards` holds the registered ones, `Session.AdvancePhase()` consults
-it directly, and the facilitator `enabledIntents` computation reads the same
-registry — a single source.
+The guards are domain policy: the Domain-internal static class
+`PhaseExitGuards` builds them per session (some guards, such as
+`ValuePresentationExitGuard`, derive parameters from the session),
+`Session.AdvancePhase()` consults it directly, and the facilitator
+`enabledIntents` computation reads the same path — a single source.
 
 **Rationale:** Sealed classes communicate "this is a leaf type — extend
 behavior through composition, not subclassing." This prevents fragile base

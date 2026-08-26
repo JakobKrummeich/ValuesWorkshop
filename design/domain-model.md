@@ -94,7 +94,7 @@ workshop's native language), English term used in model and code.
 | Deutsch | English | Meaning |
 |---|---|---|
 | Präsentierende Gruppe | **Presenting group** | The group whose submitted result is currently being walked through. |
-| Präsentierter Wert | **Presented value** | The single value (with its actions) currently shown. The facilitator steps value by value through the presenting group's assigned values; when they are exhausted, presentation moves to the next group's first value. |
+| Präsentierter Wert | **Presented value** | The single value (with its actions) currently shown. The walk runs in per-group blocks: a group intro (no value) followed by one position per assigned value. When a group's values are exhausted, the walk moves to the next group's intro. |
 | Finale Stimmen | **Final votes** | Each participant's five votes, freely distributed across all presented values — several votes may go to one value, up to all five. Cast secretly and stored without any connection to the voter; only *that* someone has voted is remembered. |
 | Stimmenstand | **Vote tally** | Anonymous count of final votes per value. |
 | Siegerwerte | **Winning values** | The five values with the most final votes, together with their actions. |
@@ -185,7 +185,7 @@ belongs to the session it happened in.
 
 | Event | Meaning |
 |---|---|
-| **NextValueShown** | The facilitator stepped presentation to the next value: the next of the presenting group's assigned values, or — once exhausted — the first value of the next group. Only submitted results are shown. |
+| **NextValueShown** | The facilitator stepped the presentation walk to the next position: group intro → first value → … → last value → next group's intro. Only submitted results are shown. |
 
 ### Phase 8 — Final voting
 
@@ -231,7 +231,7 @@ when a phase begins or a condition is met — no person issues them.
 | **RemoveAction** | Scribe | Remove an action; same refusals as AddAction. → ActionRemoved |
 | **SubmitGroupWork** | Scribe | Declare the group result finished; requires 1–5 non-empty-text actions for every assigned value (I11). → GroupWorkSubmitted |
 | **ReopenGroupWork** | Scribe | Take the submission back. → GroupWorkReopened |
-| **GoToNextValue** | Facilitator | Step presentation to the next value, iterating through each group's submitted values, group by group. → NextValueShown |
+| **GoToNextValue** | Facilitator | Step the presentation walk to the next position (group intro or value), per-group blocks in formation order. → NextValueShown |
 | **SubmitFinalVotes** | Participant | Spend the full allotment across eligible values, multi-votes allowed; wrong totals, votes outside the eligible values, or a second submission in the same round are refused. No un-voting afterwards. → FinalVotesSubmitted |
 | **CloseVoting** | Facilitator | End the current voting round. → VotingClosed, then either WinnersDetermined (no fifth-place tie) or a pending tie |
 | **StartTiebreakRound** | Facilitator | Begin a further round among the tied values only. → TiebreakStarted |
