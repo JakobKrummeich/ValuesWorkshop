@@ -43,7 +43,23 @@ internal static class SessionViews
     {
         return new PresentationView(
             session.Presentation.PresentingGroup,
-            PresentedValueId(session)
+            PresentedValueId(session),
+            ValuePresentation
+                .PresentedActionsOf(session)
+                .Select(action => new PresentedActionView(action.ActionId.Value, action.Text.Value))
+                .ToList()
+        );
+    }
+
+    internal static PresenterPresentationView PresenterPresentation(Session session)
+    {
+        return new PresenterPresentationView(
+            session.Presentation.PresentingGroup,
+            PresentedValueId(session),
+            ValuePresentation
+                .PresentedActionsOf(session)
+                .Select(action => new PresenterPresentedActionView(action.Text.Value))
+                .ToList()
         );
     }
 

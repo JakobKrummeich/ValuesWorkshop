@@ -229,16 +229,29 @@ public class PresenterWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Value_presentation_state_reports_the_presented_value_without_naming_the_group()
+    public void Value_presentation_state_shows_the_presenting_group_and_the_action_texts()
     {
         var session = SessionFixtures.InPhase(
             Phase.ValuePresentation,
-            presentation: PresentationWalk.Restore("fox", new ValueId("honesty"), 1)
+            formation: SessionFixtures.TwoGroups(
+                new GroupAction(
+                    new ActionId(Guid.NewGuid()),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("We start meetings on time")
+                )
+            ),
+            presentation: PresentationWalk.Restore("tier-1", new ValueId("wert-1"), 1)
         );
 
-        Map(session)
+        var presentation = Map(session)
             .ShouldBeOfType<PresenterValuePresentationState>()
-            .Presentation.PresentedValueId.ShouldBe("honesty");
+            .Presentation;
+
+        presentation.PresentingGroupName.ShouldBe("tier-1");
+        presentation.PresentedValueId.ShouldBe("wert-1");
+        presentation
+            .PresentedActions.ShouldHaveSingleItem()
+            .Text.ShouldBe("We start meetings on time");
     }
 
     [Fact]

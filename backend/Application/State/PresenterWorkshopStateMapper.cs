@@ -84,7 +84,7 @@ public sealed class PresenterWorkshopStateMapper(
                     revision,
                     ParticipantCount(session),
                     Groups(session, groupViews),
-                    new PresenterPresentationView(SessionViews.PresentedValueId(session))
+                    SessionViews.PresenterPresentation(session)
                 ),
             [Phase.FinalVoting] = (session, revision) =>
                 new PresenterFinalVotingState(

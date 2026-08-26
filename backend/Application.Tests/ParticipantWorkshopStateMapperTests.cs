@@ -446,15 +446,25 @@ public class ParticipantWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.ValuePresentation,
-            presentation: PresentationWalk.Restore("fox", new ValueId("honesty"), 1)
+            formation: SessionFixtures.TwoGroups(
+                new GroupAction(
+                    new ActionId(Guid.NewGuid()),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("We start meetings on time")
+                )
+            ),
+            presentation: PresentationWalk.Restore("tier-1", new ValueId("wert-1"), 1)
         );
 
         var presentation = Map(session)
             .ShouldBeOfType<ParticipantValuePresentationState>()
             .Presentation;
 
-        presentation.PresentingGroupName.ShouldBe("fox");
-        presentation.PresentedValueId.ShouldBe("honesty");
+        presentation.PresentingGroupName.ShouldBe("tier-1");
+        presentation.PresentedValueId.ShouldBe("wert-1");
+        presentation
+            .PresentedActions.ShouldHaveSingleItem()
+            .Text.ShouldBe("We start meetings on time");
     }
 
     [Fact]

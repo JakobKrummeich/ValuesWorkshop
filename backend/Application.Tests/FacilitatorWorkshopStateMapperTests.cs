@@ -268,19 +268,48 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Value_presentation_state_reports_the_presenting_group_and_value()
+    public void Value_presentation_state_reports_the_presenting_position_with_its_actions()
     {
+        var actionId = Guid.NewGuid();
         var session = SessionFixtures.InPhase(
             Phase.ValuePresentation,
-            presentation: PresentationWalk.Restore("owl", new ValueId("courage"), 1)
+            formation: SessionFixtures.TwoGroups(
+                new GroupAction(
+                    new ActionId(actionId),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("We start meetings on time")
+                )
+            ),
+            presentation: PresentationWalk.Restore("tier-1", new ValueId("wert-1"), 1)
         );
 
         var presentation = Map(session)
             .ShouldBeOfType<FacilitatorValuePresentationState>()
             .Presentation;
 
-        presentation.PresentingGroupName.ShouldBe("owl");
-        presentation.PresentedValueId.ShouldBe("courage");
+        presentation.PresentingGroupName.ShouldBe("tier-1");
+        presentation.PresentedValueId.ShouldBe("wert-1");
+        var presentedAction = presentation.PresentedActions.ShouldHaveSingleItem();
+        presentedAction.ActionId.ShouldBe(actionId);
+        presentedAction.Text.ShouldBe("We start meetings on time");
+    }
+
+    [Fact]
+    public void A_group_intro_presents_the_group_without_a_value_or_actions()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.ValuePresentation,
+            formation: SessionFixtures.TwoGroups(),
+            presentation: PresentationWalk.Restore("tier-1", null, 0)
+        );
+
+        var presentation = Map(session)
+            .ShouldBeOfType<FacilitatorValuePresentationState>()
+            .Presentation;
+
+        presentation.PresentingGroupName.ShouldBe("tier-1");
+        presentation.PresentedValueId.ShouldBeNull();
+        presentation.PresentedActions.ShouldBeEmpty();
     }
 
     [Fact]
