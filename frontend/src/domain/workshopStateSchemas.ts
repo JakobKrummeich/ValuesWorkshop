@@ -14,10 +14,11 @@ import {
   presenterGroupsSchema,
   presenterPresentationViewSchema,
   presenterQuizViewSchema,
+  facilitatorVotingViewSchema,
+  participantVotingViewSchema,
   presenterVotingViewSchema,
   rosterViewSchema,
   selectionProgressViewSchema,
-  votingViewSchema,
 } from "./workshopStateBlocks";
 
 export enum FacilitatorIntent {
@@ -28,6 +29,8 @@ export enum FacilitatorIntent {
   ReassignScribe = "ReassignScribe",
   GoToNextValue = "GoToNextValue",
   CorrectActionWording = "CorrectActionWording",
+  CloseVoting = "CloseVoting",
+  StartTiebreakRound = "StartTiebreakRound",
 }
 
 export enum ParticipantIntent {
@@ -95,7 +98,7 @@ export const participantWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.FinalVoting),
     ...participantEnvelope,
-    voting: votingViewSchema,
+    voting: participantVotingViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.FinalPresentation),
@@ -141,7 +144,7 @@ export const facilitatorWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.FinalVoting),
     ...facilitatorEnvelope,
-    voting: votingViewSchema,
+    voting: facilitatorVotingViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.FinalPresentation),

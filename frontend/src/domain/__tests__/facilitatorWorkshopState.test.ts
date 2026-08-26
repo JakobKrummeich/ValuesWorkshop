@@ -156,6 +156,55 @@ describe("facilitator workshop state schema", () => {
     expect(state.enabledIntents).toContain(FacilitatorIntent.ReassignScribe);
   });
 
+  it("accepts a final-voting state with voter counts and closed-round results", () => {
+    const state = facilitatorWorkshopStateSchema.parse({
+      revision: 21,
+      phase: 8,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["StartTiebreakRound"],
+      voting: {
+        roundNumber: 1,
+        allotment: 5,
+        eligibleValueIds: ["wert-1", "wert-2", "wert-3"],
+        isRoundOpen: false,
+        votedCount: 7,
+        closedRoundTallies: { "wert-1": 9, "wert-2": 3, "wert-3": 3 },
+        tiedValueIds: ["wert-2", "wert-3"],
+      },
+    });
+
+    if (state.phase !== Phase.FinalVoting) {
+      throw new Error("expected a final voting state");
+    }
+    expect(state.voting.votedCount).toBe(7);
+    expect(state.voting.tiedValueIds).toEqual(["wert-2", "wert-3"]);
+    expect(state.enabledIntents).toContain(
+      FacilitatorIntent.StartTiebreakRound,
+    );
+  });
+
+  it("accepts an open final-voting round without closed-round results", () => {
+    const state = facilitatorWorkshopStateSchema.parse({
+      revision: 22,
+      phase: 8,
+      roster: { participants: [], participantCount: 0 },
+      enabledIntents: ["CloseVoting"],
+      voting: {
+        roundNumber: 1,
+        allotment: 5,
+        eligibleValueIds: ["wert-1"],
+        isRoundOpen: true,
+        votedCount: 0,
+      },
+    });
+
+    if (state.phase !== Phase.FinalVoting) {
+      throw new Error("expected a final voting state");
+    }
+    expect(state.voting.closedRoundTallies).toBeUndefined();
+    expect(state.voting.tiedValueIds).toBeUndefined();
+  });
+
   it("rejects an intent name that is no facilitator hub method", () => {
     const result = facilitatorWorkshopStateSchema.safeParse({
       revision: 1,

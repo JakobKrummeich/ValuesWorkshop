@@ -313,17 +313,57 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Final_voting_state_reports_the_round_and_whether_it_is_open()
+    public void Final_voting_state_counts_voters_but_hides_the_open_rounds_tallies()
+    {
+        var voting = TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 10));
+        voting.RecordBallot(
+            SessionFixtures.Anna,
+            new Dictionary<ValueId, int> { [new ValueId("wert-1")] = 5 }
+        );
+        var session = SessionFixtures.InPhase(Phase.FinalVoting, voting: voting);
+
+        var view = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
+
+        view.RoundNumber.ShouldBe(1);
+        view.Allotment.ShouldBe(5);
+        view.EligibleValueIds.Count.ShouldBe(10);
+        view.IsRoundOpen.ShouldBeTrue();
+        view.VotedCount.ShouldBe(1);
+        view.ClosedRoundTallies.ShouldBeNull();
+        view.TiedValueIds.ShouldBeNull();
+    }
+
+    [Fact]
+    public void A_closed_round_shows_its_final_tallies_and_the_tie()
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
-            voting: TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 10))
+            voting: TestVoting.AfterLocking(TestValueIds.Numbered(1, 4))
         );
 
-        var voting = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
+        var view = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
 
-        voting.RoundNumber.ShouldBe(1);
-        voting.IsRoundOpen.ShouldBeTrue();
+        view.IsRoundOpen.ShouldBeFalse();
+        var closedRoundTallies = view.ClosedRoundTallies.ShouldNotBeNull();
+        closedRoundTallies["wert-1"].ShouldBe(5);
+        closedRoundTallies["tied-1"].ShouldBe(1);
+        view.TiedValueIds.ShouldBe(["tied-1", "tied-2"]);
+    }
+
+    [Fact]
+    public void A_running_tiebreak_still_shows_the_last_closed_rounds_tallies()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalVoting,
+            voting: TestVoting.TiebreakOpen(2, TestValueIds.Numbered(1, 3), allotment: 2)
+        );
+
+        var view = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
+
+        view.RoundNumber.ShouldBe(2);
+        view.IsRoundOpen.ShouldBeTrue();
+        view.ClosedRoundTallies.ShouldNotBeNull();
+        view.TiedValueIds.ShouldBe(["wert-1", "wert-2", "wert-3"]);
     }
 
     [Fact]
