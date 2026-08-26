@@ -12,7 +12,7 @@ import {
 import type { Single } from "../../../../../shared/reactiveTypes";
 import { useParticipantDependencies } from "../../../dependencies";
 import { useGroupWorkCard } from "../useGroupWorkCard";
-import { editThrottleIntervalMilliseconds } from "../useThrottledActionEdits";
+import { editThrottleIntervalMilliseconds } from "../throttledActionEdits";
 
 jest.mock("../../../dependencies", () => ({
   useParticipantDependencies: jest.fn(),

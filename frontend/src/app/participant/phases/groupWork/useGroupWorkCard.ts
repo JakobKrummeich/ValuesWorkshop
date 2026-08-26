@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { MessageKey } from "../../../../domain/i18n/messages";
 import {
   GroupWorkStatus,
@@ -15,7 +15,7 @@ import {
   everyValueHasNonEmptyAction,
   valueSubmissions,
 } from "./actionDrafts";
-import { useThrottledActionEdits } from "./useThrottledActionEdits";
+import { createThrottledActionEdits } from "./throttledActionEdits";
 
 export interface GroupWorkCardModel {
   groupName: OwnGroupView["name"];
@@ -47,12 +47,13 @@ export function useGroupWorkCard(ownGroup: OwnGroupView): GroupWorkCardModel {
       : null,
   );
   const [localTexts, setLocalTexts] = useState<Record<string, string>>({});
-  const sendEdit = useCallback(
-    (actionId: string, text: string) =>
+  const [throttledEdits] = useState(() =>
+    createThrottledActionEdits((actionId, text) =>
       groupWorkPort.editAction(actionId, text),
-    [groupWorkPort],
+    ),
   );
-  const { queueEdit, cancelEditsFor } = useThrottledActionEdits(sendEdit);
+  useEffect(() => () => throttledEdits.stop(), [throttledEdits]);
+  const { queueEdit, cancelEditsFor } = throttledEdits;
 
   const isCallerScribe = ownGroup.isCallerScribe === true;
   const isSubmitted = ownGroup.workStatus === GroupWorkStatus.Submitted;

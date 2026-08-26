@@ -1,18 +1,21 @@
-import { act, renderHook } from "@testing-library/react";
 import { of, Subject, throwError } from "rxjs";
 import type { IntentResult } from "../../../../../domain/intentResult";
 import type { Single } from "../../../../../shared/reactiveTypes";
 import {
+  createThrottledActionEdits,
   editThrottleIntervalMilliseconds,
-  useThrottledActionEdits,
-} from "../useThrottledActionEdits";
+  type ThrottledActionEdits,
+} from "../throttledActionEdits";
 
 const accepted: IntentResult = { isAccepted: true, code: null, detail: null };
 
 type SendEdit = (actionId: string, text: string) => Single<IntentResult>;
 
-function renderEdits(sendEdit: SendEdit) {
-  return renderHook(() => useThrottledActionEdits(sendEdit));
+let stream: ThrottledActionEdits | null = null;
+
+function createEdits(sendEdit: SendEdit): ThrottledActionEdits {
+  stream = createThrottledActionEdits(sendEdit);
+  return stream;
 }
 
 beforeEach(() => {
@@ -20,17 +23,19 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  stream?.stop();
+  stream = null;
   jest.useRealTimers();
 });
 
-describe("useThrottledActionEdits", () => {
+describe("createThrottledActionEdits", () => {
   it("sends the first edit of an action immediately", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => result.current.queueEdit("a1", "T"));
+    edits.queueEdit("a1", "T");
 
     expect(sendEdit).toHaveBeenCalledTimes(1);
     expect(sendEdit).toHaveBeenCalledWith("a1", "T");
@@ -40,16 +45,14 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => {
-      result.current.queueEdit("a1", "T");
-      result.current.queueEdit("a1", "Ta");
-      result.current.queueEdit("a1", "Tal");
-    });
+    edits.queueEdit("a1", "T");
+    edits.queueEdit("a1", "Ta");
+    edits.queueEdit("a1", "Tal");
     expect(sendEdit).toHaveBeenCalledTimes(1);
 
-    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
+    jest.advanceTimersByTime(editThrottleIntervalMilliseconds);
 
     expect(sendEdit).toHaveBeenCalledTimes(2);
     expect(sendEdit).toHaveBeenLastCalledWith("a1", "Tal");
@@ -59,10 +62,10 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => result.current.queueEdit("a1", "T"));
-    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
+    edits.queueEdit("a1", "T");
+    jest.advanceTimersByTime(editThrottleIntervalMilliseconds);
 
     expect(sendEdit).toHaveBeenCalledTimes(1);
   });
@@ -71,12 +74,10 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => {
-      result.current.queueEdit("a1", "T");
-      result.current.queueEdit("a2", "D");
-    });
+    edits.queueEdit("a1", "T");
+    edits.queueEdit("a2", "D");
 
     expect(sendEdit).toHaveBeenCalledTimes(2);
     expect(sendEdit).toHaveBeenCalledWith("a1", "T");
@@ -87,14 +88,12 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => {
-      result.current.queueEdit("a1", "T");
-      result.current.queueEdit("a1", "Ta");
-      result.current.cancelEditsFor("a1");
-    });
-    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
+    edits.queueEdit("a1", "T");
+    edits.queueEdit("a1", "Ta");
+    edits.cancelEditsFor("a1");
+    jest.advanceTimersByTime(editThrottleIntervalMilliseconds);
 
     expect(sendEdit).toHaveBeenCalledTimes(1);
   });
@@ -103,16 +102,14 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => {
-      result.current.queueEdit("a1", "T");
-      result.current.queueEdit("a1", "Ta");
-      result.current.queueEdit("a2", "D");
-      result.current.queueEdit("a2", "Da");
-      result.current.cancelEditsFor("a1");
-    });
-    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
+    edits.queueEdit("a1", "T");
+    edits.queueEdit("a1", "Ta");
+    edits.queueEdit("a2", "D");
+    edits.queueEdit("a2", "Da");
+    edits.cancelEditsFor("a1");
+    jest.advanceTimersByTime(editThrottleIntervalMilliseconds);
 
     expect(sendEdit).toHaveBeenCalledTimes(3);
     expect(sendEdit).toHaveBeenLastCalledWith("a2", "Da");
@@ -122,13 +119,11 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => {
-      result.current.queueEdit("a1", "T");
-      result.current.cancelEditsFor("a1");
-      result.current.queueEdit("a1", "Z");
-    });
+    edits.queueEdit("a1", "T");
+    edits.cancelEditsFor("a1");
+    edits.queueEdit("a1", "Z");
 
     expect(sendEdit).toHaveBeenCalledTimes(2);
     expect(sendEdit).toHaveBeenLastCalledWith("a1", "Z");
@@ -138,10 +133,10 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => result.current.cancelEditsFor("unknown"));
-    act(() => result.current.queueEdit("a1", "T"));
+    edits.cancelEditsFor("unknown");
+    edits.queueEdit("a1", "T");
 
     expect(sendEdit).toHaveBeenCalledTimes(1);
   });
@@ -150,14 +145,12 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest
       .fn<Single<IntentResult>, [string, string]>(() => of(accepted))
       .mockImplementationOnce(() => throwError(() => new Error("boom")));
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => result.current.queueEdit("a1", "T"));
-    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
-    act(() => {
-      result.current.queueEdit("a1", "Ta");
-      result.current.queueEdit("a2", "D");
-    });
+    edits.queueEdit("a1", "T");
+    jest.advanceTimersByTime(editThrottleIntervalMilliseconds);
+    edits.queueEdit("a1", "Ta");
+    edits.queueEdit("a2", "D");
 
     expect(sendEdit).toHaveBeenCalledTimes(3);
     expect(sendEdit).toHaveBeenCalledWith("a1", "Ta");
@@ -169,37 +162,30 @@ describe("useThrottledActionEdits", () => {
     const sendEdit = jest
       .fn<Single<IntentResult>, [string, string]>(() => of(accepted))
       .mockImplementationOnce(() => firstSend);
-    const { result } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => {
-      result.current.queueEdit("a1", "T");
-      result.current.queueEdit("a1", "Ta");
-    });
-    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
+    edits.queueEdit("a1", "T");
+    edits.queueEdit("a1", "Ta");
+    jest.advanceTimersByTime(editThrottleIntervalMilliseconds);
     expect(sendEdit).toHaveBeenCalledTimes(1);
 
-    act(() => {
-      firstSend.next(accepted);
-      firstSend.complete();
-    });
+    firstSend.next(accepted);
+    firstSend.complete();
 
     expect(sendEdit).toHaveBeenCalledTimes(2);
     expect(sendEdit).toHaveBeenLastCalledWith("a1", "Ta");
   });
 
-  it("stops sending after unmount", () => {
+  it("stops sending after stop", () => {
     const sendEdit = jest.fn<Single<IntentResult>, [string, string]>(() =>
       of(accepted),
     );
-    const { result, unmount } = renderEdits(sendEdit);
+    const edits = createEdits(sendEdit);
 
-    act(() => {
-      result.current.queueEdit("a1", "T");
-      result.current.queueEdit("a1", "Ta");
-    });
-    unmount();
-    act(() => jest.advanceTimersByTime(editThrottleIntervalMilliseconds));
-    act(() => result.current.queueEdit("a1", "Tal"));
+    edits.queueEdit("a1", "T");
+    edits.queueEdit("a1", "Ta");
+    edits.stop();
+    jest.advanceTimersByTime(editThrottleIntervalMilliseconds);
 
     expect(sendEdit).toHaveBeenCalledTimes(1);
   });
