@@ -12,4 +12,6 @@ public enum FacilitatorIntent
     ReassignScribe,
     GoToNextValue,
     CorrectActionWording,
+    CloseVoting,
+    StartTiebreakRound,
 }

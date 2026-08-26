@@ -112,6 +112,34 @@ public sealed class FacilitatorIntentHandler(
         );
     }
 
+    public Task<IntentResult> HandleAsync(CloseVotingCommand command)
+    {
+        return ExecuteAsFacilitatorAsync(
+            command.SessionIdentity,
+            command.Caller,
+            session =>
+            {
+                var wasOpen = session.Voting.RoundOpen;
+                FinalVoting.CloseVoting(session);
+                return wasOpen;
+            }
+        );
+    }
+
+    public Task<IntentResult> HandleAsync(StartTiebreakRoundCommand command)
+    {
+        return ExecuteAsFacilitatorAsync(
+            command.SessionIdentity,
+            command.Caller,
+            session =>
+            {
+                var wasPending = session.Voting.TiebreakPending;
+                FinalVoting.StartTiebreakRound(session);
+                return wasPending;
+            }
+        );
+    }
+
     private Task<IntentResult> ExecuteAsFacilitatorAsync(
         SessionIdentity sessionIdentity,
         CallerSubject caller,

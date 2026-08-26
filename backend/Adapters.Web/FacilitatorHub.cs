@@ -114,4 +114,18 @@ public sealed class FacilitatorHub(
             )
         );
     }
+
+    public Task<IntentResult> CloseVoting()
+    {
+        return intentHandler.HandleAsync(
+            new CloseVotingCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
+        );
+    }
+
+    public Task<IntentResult> StartTiebreakRound()
+    {
+        return intentHandler.HandleAsync(
+            new StartTiebreakRoundCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
+        );
+    }
 }

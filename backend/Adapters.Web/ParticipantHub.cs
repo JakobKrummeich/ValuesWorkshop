@@ -131,6 +131,20 @@ public sealed class ParticipantHub(
         );
     }
 
+    public Task<IntentResult> SubmitFinalVotes(SubmitFinalVotePayload[]? votes)
+    {
+        var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
+        var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
+
+        var mapped = votes
+            ?.Select(vote => new SubmitFinalVote(vote.ValueId, vote.VoteCount))
+            .ToList();
+
+        return intentHandler.HandleAsync(
+            new SubmitFinalVotesCommand(sessionIdentity, participantId, mapped)
+        );
+    }
+
     public Task<IntentResult> ReopenGroupWork()
     {
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
