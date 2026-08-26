@@ -413,4 +413,64 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
       await expect(page.getByTestId("phase")).toHaveText("Phase 7");
     }
   });
+
+  test("the facilitator walks every group block on the wall and fixes a typo live", async ({
+    browser,
+  }) => {
+    test.setTimeout(300_000);
+
+    const nextValueButton = facilitatorPage.getByTestId("next-value-button");
+    const presentedActions = presenterPage.getByTestId("presented-action");
+    const correctedActionText = "We start every meeting with a check-in";
+
+    await expect(
+      presenterPage.getByTestId(`group-intro-${FIRST_PAGE_ANIMAL_ID}`),
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(facilitatorPage.getByTestId("presenting-position")).toHaveText(
+      "Up next: Otter",
+    );
+    await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
+
+    await withParticipant(
+      browser,
+      workshopParticipants[0].accountName,
+      async (page) => {
+        await expect(page.getByTestId("waiting-screen")).toBeVisible({
+          timeout: 15_000,
+        });
+      },
+    );
+
+    await nextValueButton.click();
+    await expect(presenterPage.getByTestId("presented-value-screen")).toBeVisible(
+      { timeout: 10_000 },
+    );
+    await expect(
+      presenterPage.getByTestId("presenter-presenting-group"),
+    ).toHaveText("Otter");
+    await expect(presentedActions.first()).toHaveText(/^Action for /);
+
+    const presentedActionInput = facilitatorPage
+      .getByTestId(/^presented-action-input-/)
+      .first();
+    await presentedActionInput.fill(correctedActionText);
+    await presentedActionInput.press("Enter");
+    await expect(presentedActions.first()).toHaveText(correctedActionText, {
+      timeout: 5_000,
+    });
+
+    const positionCount = EXPECTED_GROUP_ANIMAL_IDS.length + TOP_VALUE_COUNT;
+    for (let position = 2; position < positionCount; position++) {
+      await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
+      await expect(nextValueButton).toBeEnabled({ timeout: 10_000 });
+      await nextValueButton.click();
+    }
+
+    await expect(nextValueButton).toBeDisabled({ timeout: 10_000 });
+    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
+    await advancePhaseButton(facilitatorPage).click();
+    for (const page of [facilitatorPage, presenterPage]) {
+      await expect(page.getByTestId("phase")).toHaveText("Phase 8");
+    }
+  });
 });
