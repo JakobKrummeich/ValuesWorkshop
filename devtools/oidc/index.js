@@ -1,17 +1,18 @@
+import { readFileSync } from "node:fs";
 import Provider from "oidc-provider";
 
 const port = Number(process.env.OIDC_PORT ?? 9000);
 const issuer = process.env.OIDC_ISSUER ?? `http://localhost:${port}`;
 const apiResource = process.env.OIDC_API_RESOURCE ?? "http://localhost:5000";
 
-const testAccounts = {
-  facilitator: { name: "Workshop Facilitator" },
-  participant1: { name: "Alice" },
-  participant2: { name: "Bob" },
-  participant3: { name: "Charlie" },
-  participant4: { name: "Diana" },
-  participant5: { name: "Eve" },
-};
+const accounts = JSON.parse(
+  readFileSync(new URL("./accounts.json", import.meta.url), "utf8"),
+);
+
+const testAccounts = { facilitator: { name: accounts.facilitatorName } };
+for (const [index, name] of accounts.participantNames.entries()) {
+  testAccounts[`participant${index + 1}`] = { name };
+}
 
 const provider = new Provider(issuer, {
   clients: [
