@@ -310,7 +310,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
       const optionValue = await option.getAttribute("value");
       if (optionValue !== null && optionValue !== previousScribeIdentity) {
         nextScribeIdentity = optionValue;
-        nextScribeName = (await option.textContent()) ?? "";
+        nextScribeName = ((await option.textContent()) ?? "").trim();
         break;
       }
     }
