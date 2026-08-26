@@ -7,6 +7,7 @@ public sealed class FormationRecord
     public bool IsFormed { get; private set; }
     public IReadOnlyList<Group> Groups => _groups;
     public bool IsEveryGroupSubmitted => _groups.TrueForAll(group => group.IsSubmitted);
+    public int AssignedValueCount => _groups.Sum(group => group.AssignedValues.Count);
 
     public bool IsGrouped(ParticipantId participantId)
     {

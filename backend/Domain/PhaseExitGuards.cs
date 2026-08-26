@@ -1,17 +1,18 @@
-using System.Collections.Immutable;
-
 namespace ValuesWorkshop.Domain;
 
 public static class PhaseExitGuards
 {
-    private static readonly ImmutableDictionary<Phase, IPhaseExitGuard> GuardsByPhase =
-        new IPhaseExitGuard[]
-        {
+    private static IReadOnlyList<IPhaseExitGuard> GuardsFor(Session session)
+    {
+        return
+        [
             new QuizExitGuard(),
             new GroupFormationExitGuard(),
             new GroupWorkExitGuard(),
+            new ValuePresentationExitGuard(session.Formation.AssignedValueCount),
             new FinalVotingExitGuard(),
-        }.ToImmutableDictionary(guard => guard.Phase);
+        ];
+    }
 
     public static bool PermitExitOf(Session session)
     {
@@ -28,10 +29,9 @@ public static class PhaseExitGuards
 
     private static IPhaseExitGuard? BlockingGuardFor(Session session)
     {
-        return
-            GuardsByPhase.TryGetValue(session.PhaseProgress.CurrentPhase, out var guard)
-            && !guard.IsSatisfiedBy(session)
-            ? guard
-            : null;
+        var guard = GuardsFor(session)
+            .FirstOrDefault(candidate => candidate.Phase == session.PhaseProgress.CurrentPhase);
+
+        return guard is not null && !guard.IsSatisfiedBy(session) ? guard : null;
     }
 }
