@@ -91,6 +91,29 @@ public sealed class Group
         _actions[index] = _actions[index] with { Text = text };
     }
 
+    internal void CorrectActionWording(
+        ActionId actionId,
+        ValueId presentedValue,
+        GroupActionText text
+    )
+    {
+        var index = IndexOf(actionId);
+
+        if (_actions[index].ValueId != presentedValue)
+        {
+            throw new InvariantViolationException(
+                "Only the presented value's actions can be reworded."
+            );
+        }
+
+        if (text.IsEmpty)
+        {
+            throw new InvariantViolationException("A presented action keeps a non-empty text.");
+        }
+
+        _actions[index] = _actions[index] with { Text = text };
+    }
+
     internal void RemoveAction(ParticipantId caller, ActionId actionId)
     {
         RequireScribe(caller);
