@@ -20,9 +20,24 @@ public class GroupActionTextTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void A_blank_text_is_refused(string? candidate)
+    public void A_blank_text_produces_an_empty_value(string? candidate)
     {
-        Should.Throw<MalformedPayloadException>(() => GroupActionText.Of(candidate));
+        GroupActionText.Of(candidate).Value.ShouldBe("");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void A_blank_text_is_recognized_as_empty(string? candidate)
+    {
+        GroupActionText.Of(candidate).IsEmpty.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void A_non_blank_text_is_not_empty()
+    {
+        GroupActionText.Of("Talk openly").IsEmpty.ShouldBeFalse();
     }
 
     [Fact]

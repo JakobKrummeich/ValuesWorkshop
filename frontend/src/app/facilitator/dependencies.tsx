@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
+import type { FacilitatorGroupWorkControlPort } from "../../domain/ports/facilitator/groupWorkControlPort";
 import type { FacilitatorLifecyclePort } from "../../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorQuizControlPort } from "../../domain/ports/facilitator/quizControlPort";
 import type { FacilitatorSessionStatePort } from "../../domain/ports/facilitator/sessionStatePort";
@@ -9,6 +10,7 @@ export interface FacilitatorDependencies {
   sessionStatePort: FacilitatorSessionStatePort;
   lifecyclePort: FacilitatorLifecyclePort;
   quizControlPort: FacilitatorQuizControlPort;
+  groupWorkControlPort: FacilitatorGroupWorkControlPort;
 }
 
 const FacilitatorDependencyContext =

@@ -474,13 +474,13 @@ public class FacilitatorIntentHandlerTests
         );
 
         var oldScribeAttempt = await participantHandler.HandleAsync(
-            new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1", "Talk")
+            new AddActionCommand(KnownSession, SessionFixtures.Anna, "wert-1")
         );
         oldScribeAttempt.IsAccepted.ShouldBeFalse();
         oldScribeAttempt.Code.ShouldBe(IntentRejectionCode.NotAuthorized);
 
         var newScribeAttempt = await participantHandler.HandleAsync(
-            new AddActionCommand(KnownSession, SessionFixtures.Ben, "wert-1", "Talk")
+            new AddActionCommand(KnownSession, SessionFixtures.Ben, "wert-1")
         );
         newScribeAttempt.ShouldBe(IntentResult.Accepted());
         reassignedRepository

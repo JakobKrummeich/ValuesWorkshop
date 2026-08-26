@@ -62,7 +62,7 @@ public sealed class SqliteGroupWorkRoundTripTests : IAsyncLifetime, IDisposable
         var reloaded = (await LoadSession(identity)).ShouldNotBeNull();
         var editingGroup = reloaded.Formation.Groups.Single(group => !group.IsSubmitted);
         var addedActionId = new ActionId(Guid.NewGuid());
-        editingGroup.AddAction(Anna, addedActionId, Courage, GroupActionText.Of("Dare more"));
+        editingGroup.AddAction(Anna, addedActionId, Courage);
         reloaded.BumpRevision();
         await SaveSession(reloaded, expectedRevision: 0);
 
@@ -108,25 +108,27 @@ public sealed class SqliteGroupWorkRoundTripTests : IAsyncLifetime, IDisposable
         new ScribeAppointment(new FixedRandomness(0)).ExecuteFor(session);
 
         var fox = session.Formation.Groups[0];
-        fox.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk openly"));
-        fox.AddAction(
-            Anna,
-            new ActionId(Guid.NewGuid()),
-            Courage,
-            GroupActionText.Of("Name hard truths")
-        );
-        fox.AddAction(
-            Anna,
-            new ActionId(Guid.NewGuid()),
-            Trust,
-            GroupActionText.Of("Keep promises")
-        );
+        AddActionWithText(fox, Anna, Trust, "Talk openly");
+        AddActionWithText(fox, Anna, Courage, "Name hard truths");
+        AddActionWithText(fox, Anna, Trust, "Keep promises");
 
         var owl = session.Formation.Groups[1];
-        owl.AddAction(Ben, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Listen first"));
+        AddActionWithText(owl, Ben, Trust, "Listen first");
         owl.Submit(Ben);
 
         return session;
+    }
+
+    private static void AddActionWithText(
+        Group group,
+        ParticipantId scribe,
+        ValueId valueId,
+        string text
+    )
+    {
+        var actionId = new ActionId(Guid.NewGuid());
+        group.AddAction(scribe, actionId, valueId);
+        group.EditAction(scribe, actionId, GroupActionText.Of(text));
     }
 
     private async Task CreateSession(Session session)

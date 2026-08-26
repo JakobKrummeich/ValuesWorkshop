@@ -79,13 +79,13 @@ public sealed class ParticipantHub(
         );
     }
 
-    public Task<IntentResult> AddAction(string? valueId, string? text)
+    public Task<IntentResult> AddAction(string? valueId)
     {
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
         return intentHandler.HandleAsync(
-            new AddActionCommand(sessionIdentity, participantId, valueId, text)
+            new AddActionCommand(sessionIdentity, participantId, valueId)
         );
     }
 
@@ -109,13 +109,25 @@ public sealed class ParticipantHub(
         );
     }
 
-    public Task<IntentResult> SubmitGroupWork()
+    public Task<IntentResult> SubmitGroupWork(SubmitGroupWorkValuePayload[]? values)
     {
         var sessionIdentity = HubSessionBinding.SessionIdentityOf(Context);
         var participantId = CallerParticipantIdentity.ParticipantIdOf(Context, sessionIdentity);
 
+        var mapped = values
+            ?.Select(value => new SubmitGroupWorkValue(
+                value.ValueId,
+                value
+                    .Actions?.Select(action => new SubmitGroupWorkAction(
+                        action.ActionId,
+                        action.Text
+                    ))
+                    .ToList()
+            ))
+            .ToList();
+
         return intentHandler.HandleAsync(
-            new SubmitGroupWorkCommand(sessionIdentity, participantId)
+            new SubmitGroupWorkCommand(sessionIdentity, participantId, mapped)
         );
     }
 

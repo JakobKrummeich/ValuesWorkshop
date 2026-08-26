@@ -255,14 +255,14 @@ public class ParticipantHubTests
         SessionInGroupWork(isSubmitted: false);
         var hub = HubBoundTo(KnownSession, Subject);
 
-        var result = await hub.AddAction("wert-1", "Talk daily.");
+        var result = await hub.AddAction("wert-1");
 
         result.ShouldBe(IntentResult.Accepted());
         repository
             .Saved.ShouldHaveSingleItem()
             .Formation.Groups[0]
             .Actions.ShouldHaveSingleItem()
-            .Text.Value.ShouldBe("Talk daily.");
+            .Text.IsEmpty.ShouldBeTrue();
         broadcaster.Broadcasts.ShouldHaveSingleItem();
     }
 
@@ -272,7 +272,7 @@ public class ParticipantHubTests
         SessionInGroupWork(isSubmitted: false);
         var hub = HubBoundTo(KnownSession, Subject);
 
-        var result = await hub.AddAction(null, null);
+        var result = await hub.AddAction(null);
 
         result.IsAccepted.ShouldBeFalse();
         result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
@@ -313,11 +313,30 @@ public class ParticipantHubTests
         SessionInGroupWork(isSubmitted: false, TierOneAction("Talk"));
         var hub = HubBoundTo(KnownSession, Subject);
 
-        var result = await hub.SubmitGroupWork();
+        var result = await hub.SubmitGroupWork(null);
 
         result.ShouldBe(IntentResult.Accepted());
         repository.Saved.ShouldHaveSingleItem().Formation.Groups[0].IsSubmitted.ShouldBeTrue();
         broadcaster.Broadcasts.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task Submitting_with_actions_applies_final_edits_before_submitting()
+    {
+        SessionInGroupWork(isSubmitted: false, TierOneAction("Old wording"));
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitGroupWork([
+            new SubmitGroupWorkValuePayload(
+                "wert-1",
+                [new SubmitGroupWorkActionPayload(KnownAction.Value.ToString(), "Final wording")]
+            ),
+        ]);
+
+        result.ShouldBe(IntentResult.Accepted());
+        var group = repository.Saved.ShouldHaveSingleItem().Formation.Groups[0];
+        group.IsSubmitted.ShouldBeTrue();
+        group.Actions.ShouldHaveSingleItem().Text.Value.ShouldBe("Final wording");
     }
 
     [Fact]

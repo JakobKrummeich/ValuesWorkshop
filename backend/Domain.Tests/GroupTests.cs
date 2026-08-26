@@ -88,16 +88,14 @@ public class GroupTests
     }
 
     [Fact]
-    public void The_scribe_adds_an_action_to_an_assigned_value()
+    public void The_scribe_adds_an_action_that_is_born_with_empty_text()
     {
         var group = GroupWithScribe();
         var actionId = new ActionId(Guid.NewGuid());
 
-        group.AddAction(Anna, actionId, Trust, GroupActionText.Of("Talk openly"));
+        group.AddAction(Anna, actionId, Trust);
 
-        group.Actions.ShouldBe([
-            new GroupAction(actionId, Trust, GroupActionText.Of("Talk openly")),
-        ]);
+        group.Actions.ShouldBe([new GroupAction(actionId, Trust, GroupActionText.Of(null))]);
     }
 
     [Fact]
@@ -106,7 +104,7 @@ public class GroupTests
         var group = GroupWithScribe();
 
         Should.Throw<NotAuthorizedException>(() =>
-            group.AddAction(Ben, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"))
+            group.AddAction(Ben, new ActionId(Guid.NewGuid()), Trust)
         );
 
         group.Actions.ShouldBeEmpty();
@@ -118,7 +116,7 @@ public class GroupTests
         var group = new Group("Otter", [Anna, Ben, Chris], [Trust]);
 
         Should.Throw<NotAuthorizedException>(() =>
-            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"))
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust)
         );
     }
 
@@ -128,12 +126,7 @@ public class GroupTests
         var group = GroupWithScribe();
 
         Should.Throw<InvariantViolationException>(() =>
-            group.AddAction(
-                Anna,
-                new ActionId(Guid.NewGuid()),
-                new ValueId("fremd"),
-                GroupActionText.Of("Talk")
-            )
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), new ValueId("fremd"))
         );
 
         group.Actions.ShouldBeEmpty();
@@ -144,11 +137,9 @@ public class GroupTests
     {
         var group = GroupWithScribe();
         var actionId = new ActionId(Guid.NewGuid());
-        group.AddAction(Anna, actionId, Trust, GroupActionText.Of("Talk openly"));
+        group.AddAction(Anna, actionId, Trust);
 
-        Should.Throw<InvariantViolationException>(() =>
-            group.AddAction(Anna, actionId, Trust, GroupActionText.Of("Listen first"))
-        );
+        Should.Throw<InvariantViolationException>(() => group.AddAction(Anna, actionId, Trust));
 
         group.Actions.Count.ShouldBe(1);
     }
@@ -159,16 +150,11 @@ public class GroupTests
         var group = GroupWithScribe();
         for (var count = 1; count <= 5; count++)
         {
-            group.AddAction(
-                Anna,
-                new ActionId(Guid.NewGuid()),
-                Trust,
-                GroupActionText.Of($"Action {count}")
-            );
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust);
         }
 
         Should.Throw<InvariantViolationException>(() =>
-            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Sixth"))
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust)
         );
 
         group.Actions.Count.ShouldBe(5);
@@ -188,7 +174,7 @@ public class GroupTests
         var group = Group.Restore("fox", [Anna, Ben], [Trust], Anna, false, overfullActions);
 
         Should.Throw<InvariantViolationException>(() =>
-            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("More"))
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust)
         );
 
         group.Actions.Count.ShouldBe(6);
@@ -200,15 +186,10 @@ public class GroupTests
         var group = GroupWithScribe();
         for (var count = 1; count <= 5; count++)
         {
-            group.AddAction(
-                Anna,
-                new ActionId(Guid.NewGuid()),
-                Trust,
-                GroupActionText.Of($"Action {count}")
-            );
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust);
         }
 
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Courage, GroupActionText.Of("Dare"));
+        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Courage);
 
         group.Actions.Count.ShouldBe(6);
     }
@@ -219,8 +200,9 @@ public class GroupTests
         var group = GroupWithScribe();
         var first = new ActionId(Guid.NewGuid());
         var second = new ActionId(Guid.NewGuid());
-        group.AddAction(Anna, first, Trust, GroupActionText.Of("Talk openly"));
-        group.AddAction(Anna, second, Trust, GroupActionText.Of("Listen first"));
+        group.AddAction(Anna, first, Trust);
+        group.AddAction(Anna, second, Trust);
+        group.EditAction(Anna, second, GroupActionText.Of("Listen first"));
 
         group.EditAction(Anna, first, GroupActionText.Of("Talk honestly"));
 
@@ -245,7 +227,8 @@ public class GroupTests
     {
         var group = GroupWithScribe();
         var actionId = new ActionId(Guid.NewGuid());
-        group.AddAction(Anna, actionId, Trust, GroupActionText.Of("Talk openly"));
+        group.AddAction(Anna, actionId, Trust);
+        group.EditAction(Anna, actionId, GroupActionText.Of("Talk openly"));
 
         Should.Throw<NotAuthorizedException>(() =>
             group.EditAction(Ben, actionId, GroupActionText.Of("Hijacked"))
@@ -259,7 +242,7 @@ public class GroupTests
     {
         var group = GroupWithScribe();
         var actionId = new ActionId(Guid.NewGuid());
-        group.AddAction(Anna, actionId, Trust, GroupActionText.Of("Talk openly"));
+        group.AddAction(Anna, actionId, Trust);
 
         group.RemoveAction(Anna, actionId);
 
@@ -281,7 +264,7 @@ public class GroupTests
     {
         var group = GroupWithScribe();
         var actionId = new ActionId(Guid.NewGuid());
-        group.AddAction(Anna, actionId, Trust, GroupActionText.Of("Talk openly"));
+        group.AddAction(Anna, actionId, Trust);
 
         Should.Throw<NotAuthorizedException>(() => group.RemoveAction(Ben, actionId));
 
@@ -292,7 +275,19 @@ public class GroupTests
     public void Submitting_needs_an_action_for_every_assigned_value()
     {
         var group = GroupWithScribe();
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"));
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Trust, "Talk");
+
+        Should.Throw<InvariantViolationException>(() => group.Submit(Anna));
+
+        group.IsSubmitted.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Submitting_is_refused_when_any_action_has_empty_text()
+    {
+        var group = GroupWithScribe();
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Trust, "Talk");
+        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Courage);
 
         Should.Throw<InvariantViolationException>(() => group.Submit(Anna));
 
@@ -303,8 +298,8 @@ public class GroupTests
     public void The_scribe_submits_once_every_value_holds_an_action()
     {
         var group = GroupWithScribe();
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"));
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Courage, GroupActionText.Of("Dare"));
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Trust, "Talk");
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Courage, "Dare");
 
         group.Submit(Anna);
 
@@ -325,8 +320,8 @@ public class GroupTests
     public void A_member_other_than_the_scribe_cannot_submit()
     {
         var group = GroupWithScribe();
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"));
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Courage, GroupActionText.Of("Dare"));
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Trust, "Talk");
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Courage, "Dare");
 
         Should.Throw<NotAuthorizedException>(() => group.Submit(Ben));
 
@@ -340,7 +335,7 @@ public class GroupTests
         var existing = group.Actions[0].ActionId;
 
         Should.Throw<InvariantViolationException>(() =>
-            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("More"))
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust)
         );
         Should.Throw<InvariantViolationException>(() =>
             group.EditAction(Anna, existing, GroupActionText.Of("Changed"))
@@ -388,9 +383,9 @@ public class GroupTests
         group.ReassignScribe(Ben);
 
         Should.Throw<NotAuthorizedException>(() =>
-            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"))
+            group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust)
         );
-        group.AddAction(Ben, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"));
+        group.AddAction(Ben, new ActionId(Guid.NewGuid()), Trust);
         group.Actions.Count.ShouldBe(1);
     }
 
@@ -421,10 +416,21 @@ public class GroupTests
     private static Group SubmittedGroup()
     {
         var group = GroupWithScribe();
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Trust, GroupActionText.Of("Talk"));
-        group.AddAction(Anna, new ActionId(Guid.NewGuid()), Courage, GroupActionText.Of("Dare"));
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Trust, "Talk");
+        AddActionWithText(group, new ActionId(Guid.NewGuid()), Courage, "Dare");
         group.Submit(Anna);
 
         return group;
+    }
+
+    private static void AddActionWithText(
+        Group group,
+        ActionId actionId,
+        ValueId valueId,
+        string text
+    )
+    {
+        group.AddAction(Anna, actionId, valueId);
+        group.EditAction(Anna, actionId, GroupActionText.Of(text));
     }
 }

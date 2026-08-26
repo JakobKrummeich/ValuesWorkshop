@@ -24,6 +24,18 @@ internal static class IntentPayloadValidator
         return valueIds.Select(valueId => new ValueId(valueId)).ToList();
     }
 
+    internal static IReadOnlyList<SubmitGroupWorkAction> RequiredActions(
+        IReadOnlyList<SubmitGroupWorkAction>? actions
+    )
+    {
+        if (actions is null)
+        {
+            throw new MalformedPayloadException("A group-work value needs its actions.");
+        }
+
+        return actions;
+    }
+
     internal static ActionId RequiredActionId(string? actionId)
     {
         return Guid.TryParse(actionId, out var value)

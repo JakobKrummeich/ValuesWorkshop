@@ -11,6 +11,11 @@ export enum FormationSubState {
   Formed = "formed",
 }
 
+export enum GroupWorkStatus {
+  Editing = "editing",
+  Submitted = "submitted",
+}
+
 const valueIdsSchema = z.array(z.string());
 const participantIdSchema = z.string();
 
@@ -99,10 +104,23 @@ const groupNameSchema = z.object({
 
 export type GroupName = z.infer<typeof groupNameSchema>;
 
+const groupActionViewSchema = z.object({
+  actionId: z.string(),
+  valueId: z.string(),
+  text: z.string(),
+  sortOrder: z.int().nonnegative(),
+});
+
+export type GroupActionView = z.infer<typeof groupActionViewSchema>;
+
 export const ownGroupViewSchema = z.object({
   name: groupNameSchema,
   memberDisplayNames: z.array(z.string()),
   assignedValues: workshopValuesSchema,
+  isCallerScribe: z.boolean().optional(),
+  scribeName: z.string().optional(),
+  workStatus: z.enum(GroupWorkStatus).optional(),
+  actions: z.array(groupActionViewSchema).optional(),
 });
 
 export type OwnGroupView = z.infer<typeof ownGroupViewSchema>;
@@ -112,6 +130,9 @@ export const facilitatorGroupsSchema = z.array(
     name: groupNameSchema,
     members: z.array(rosterParticipantSchema),
     assignedValues: workshopValuesSchema,
+    scribeParticipantId: z.string().optional(),
+    workStatus: z.enum(GroupWorkStatus).optional(),
+    actionCountPerValue: z.record(z.string(), z.int()).optional(),
   }),
 );
 
@@ -120,6 +141,7 @@ export const presenterGroupsSchema = z.array(
     name: groupNameSchema,
     memberDisplayNames: z.array(z.string()),
     assignedValues: workshopValuesSchema,
+    workStatus: z.enum(GroupWorkStatus).optional(),
   }),
 );
 

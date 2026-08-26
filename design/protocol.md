@@ -301,10 +301,10 @@ the caller's authenticated principal, so no client can act as another.
 | T4/T3 | *(implicit on connect)* | — | see § 3.1 | — |
 | T5 | `ChooseQuizAnswer` | `{ questionIndex, answerIndex }` | phase Quiz; `questionIndex` is the posed question and its answer unrevealed; `answerIndex` within 0..2; not yet answered (I5) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
 | T9 | `SubmitValueSelection` | `{ valueIds }` | phase Value selection; exactly ten distinct catalog values; not yet submitted (I6) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
-| T14 | `AddAction` | `{ valueId, text }` | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); text non-empty, truncated server-side to 200 text elements (T19) | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
-| T14 | `EditAction` | `{ actionId, text }` | as `AddAction`; action belongs to the caller's group | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
+| T14 | `AddAction` | `{ valueId }` | phase Group work; caller is scribe of their group (I10); group Editing; value assigned to that group; ≤ five actions on it (I11); the new action starts with empty text — text arrives via `EditAction` | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
+| T14 | `EditAction` | `{ actionId, text }` | as `AddAction`; action belongs to the caller's group; text may be empty (the scribe has not typed yet); non-empty text truncated server-side to 200 text elements (T19) | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
 | T14 | `RemoveAction` | `{ actionId }` | as `EditAction` | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
-| T15 | `SubmitGroupWork` | — | phase Group work; caller is scribe; one to five actions on every assigned value (I11) | `WrongPhase`, `NotAuthorized`, `InvariantViolated` |
+| T15 | `SubmitGroupWork` | `{ values?: [{ valueId, actions: [{ actionId, text }] }] }` | phase Group work; caller is scribe; one to five non-empty-text actions on every assigned value (I11). When `values` is provided, it lists the actions per assigned value and each action's text is applied (as `EditAction`) before the submit guard runs — this lets the client flush un-synced edits atomically with submit. | `WrongPhase`, `NotAuthorized`, `InvariantViolated`, `MalformedPayload` |
 | T16 | `ReopenGroupWork` | — | phase Group work; caller is scribe; group Submitted | `WrongPhase`, `NotAuthorized` |
 | T18 | `SubmitFinalVotes` | `{ votes: [{ valueId, voteCount }] }` | phase Final voting; round open; totals equal the round allotment; only eligible values; not yet voted this round (I13) | `WrongPhase`, `MalformedPayload`, `InvariantViolated` |
 
@@ -516,7 +516,8 @@ this document.
 
 Server-side, in the pipeline, before any domain call: required fields
 present, identifiers non-empty, collections within bounds, free text
-non-empty (length is not rejected — action text is truncated
+non-empty — except action text, which may be empty during editing
+(length is not rejected — action text is truncated
 server-side to 200 text elements, `ParticipantName` precedent), no
 unknown identifiers. Failure → `MalformedPayload`, nothing else
 happens. First concrete producer: T5

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
+import type { ParticipantGroupWorkPort } from "../../domain/ports/participant/groupWorkPort";
 import type { ParticipantQuizPort } from "../../domain/ports/participant/quizPort";
 import type { ParticipantSelectionPort } from "../../domain/ports/participant/selectionPort";
 import type { ParticipantSessionStatePort } from "../../domain/ports/participant/sessionStatePort";
@@ -9,6 +10,7 @@ export interface ParticipantDependencies {
   sessionStatePort: ParticipantSessionStatePort;
   quizPort: ParticipantQuizPort;
   selectionPort: ParticipantSelectionPort;
+  groupWorkPort: ParticipantGroupWorkPort;
 }
 
 const ParticipantDependencyContext =

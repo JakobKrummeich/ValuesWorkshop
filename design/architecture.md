@@ -137,6 +137,8 @@ Port interfaces live in `src/domain/ports/`, sliced per role and concern:
 | `FacilitatorQuizControlPort` | `src/domain/ports/facilitator/quizControlPort.ts` | Quiz sub-controls (`revealAnswer`, `showLearningText`, `poseNextQuestion`) |
 | `ParticipantQuizPort` | `src/domain/ports/participant/quizPort.ts` | Participant quiz answer (`chooseAnswer`) |
 | `ParticipantSelectionPort` | `src/domain/ports/participant/selectionPort.ts` | Participant value selection (`submitSelection`) |
+| `ParticipantGroupWorkPort` | `src/domain/ports/participant/groupWorkPort.ts` | Participant group work actions (`addAction`, `editAction`, `removeAction`, `submitGroupWork`, `reopenGroupWork`) |
+| `FacilitatorGroupWorkControlPort` | `src/domain/ports/facilitator/groupWorkControlPort.ts` | Facilitator group work controls (`reassignScribe`) |
 | `FacilitatorSessionCreationPort` | `src/domain/ports/facilitator/sessionCreationPort.ts` | Open a session over `POST /api/sessions` |
 | `ParticipantSessionStatePort` | `src/domain/ports/participant/sessionStatePort.ts` | Participant state stream |
 | `PresenterSessionStatePort` | `src/domain/ports/presenter/sessionStatePort.ts` | Presenter read-only state stream |
@@ -150,8 +152,8 @@ performs dependency injection of port implementations:
 
 | Screen group | Directory | Context file | Injects |
 |---|---|---|---|
-| Facilitator | `src/app/facilitator/` | `dependencies.tsx` | `FacilitatorSessionStatePort`, `FacilitatorLifecyclePort`, `FacilitatorQuizControlPort` |
-| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantSessionStatePort`, `ParticipantQuizPort`, `ParticipantSelectionPort` |
+| Facilitator | `src/app/facilitator/` | `dependencies.tsx` | `FacilitatorSessionStatePort`, `FacilitatorLifecyclePort`, `FacilitatorQuizControlPort`, `FacilitatorGroupWorkControlPort` |
+| Participant | `src/app/participant/` | `dependencies.tsx` | `ParticipantSessionStatePort`, `ParticipantQuizPort`, `ParticipantSelectionPort`, `ParticipantGroupWorkPort` |
 | Presenter | `src/app/presenter/` | `dependencies.tsx` | `PresenterSessionStatePort` |
 
 **Rules:**
