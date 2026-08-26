@@ -38,8 +38,9 @@ Configure:
   token expiry. Access token TTL ~10 min, refresh token TTL ~3 hr
   (covers full workshop with margin). `automaticSilentRenew` in the
   FE adapter handles this transparently
-- **Test accounts:** `findAccount` returns claims for hardcoded users:
-  `facilitator` (sub + name), `participant1`–`participant5` (sub + name)
+- **Test accounts:** `findAccount` returns claims for accounts listed in
+  `devtools/oidc/accounts.json`: `facilitator` plus `participant1`–`participant30`
+  (sub + name each), loaded at startup via a loop
 - **Dev interactions:** enable `features.devInteractions` for built-in
   login/consent UI (Playwright can drive it)
 - **Allow HTTP:** `features.allowOmittingSingleRegisteredRedirectUri`,

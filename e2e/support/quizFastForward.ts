@@ -27,6 +27,42 @@ export async function expectQuestionHeading(
   }
 }
 
+async function clickThroughQuestionControls(
+  facilitatorPage: Page,
+  hasNextQuestion: boolean,
+): Promise<void> {
+  await expect(quizControlButton(facilitatorPage)).toHaveText("Reveal answer");
+  await quizControlButton(facilitatorPage).click();
+  await expect(quizControlButton(facilitatorPage)).toHaveText(
+    "Show learning text",
+  );
+  await quizControlButton(facilitatorPage).click();
+
+  if (hasNextQuestion) {
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Next question",
+    );
+    await quizControlButton(facilitatorPage).click();
+  }
+}
+
+export async function fastForwardQuizAsFacilitatorAlone(
+  facilitatorPage: Page,
+): Promise<void> {
+  for (
+    let questionNumber = 1;
+    questionNumber <= QUIZ_QUESTION_COUNT;
+    questionNumber += 1
+  ) {
+    await clickThroughQuestionControls(
+      facilitatorPage,
+      questionNumber < QUIZ_QUESTION_COUNT,
+    );
+  }
+
+  await expect(quizControlButton(facilitatorPage)).toHaveCount(0);
+}
+
 export async function fastForwardQuizQuestions(
   facilitatorPage: Page,
   answeringParticipantPage: Page,
@@ -47,20 +83,11 @@ export async function fastForwardQuizQuestions(
     ).toHaveText("Votes: 1");
     await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
 
-    await expect(quizControlButton(facilitatorPage)).toHaveText(
-      "Reveal answer",
+    await clickThroughQuestionControls(
+      facilitatorPage,
+      questionNumber < QUIZ_QUESTION_COUNT,
     );
-    await quizControlButton(facilitatorPage).click();
-    await expect(quizControlButton(facilitatorPage)).toHaveText(
-      "Show learning text",
-    );
-    await quizControlButton(facilitatorPage).click();
-
     if (questionNumber < QUIZ_QUESTION_COUNT) {
-      await expect(quizControlButton(facilitatorPage)).toHaveText(
-        "Next question",
-      );
-      await quizControlButton(facilitatorPage).click();
       await expectQuestionHeading(everyRolePages, questionNumber + 1);
     }
   }

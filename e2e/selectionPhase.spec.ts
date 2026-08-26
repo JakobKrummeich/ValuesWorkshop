@@ -6,6 +6,7 @@ import {
   type Page,
 } from "@playwright/test";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
+import { assignedValueIdsOf } from "./support/groupWork";
 import { openSignedIn, signInThroughOidcProvider } from "./support/oidcLogin";
 import {
   advancePhaseButton,
@@ -515,7 +516,7 @@ test.describe.serial("value selection through group formation", () => {
     const scribePage = await findScribePage();
     const memberPage = await findMemberPage();
 
-    const valueIds = await getAssignedValueIds(scribePage);
+    const valueIds = await assignedValueIdsOf(scribePage);
     for (const valueId of valueIds) {
       await scribePage.getByTestId(`value-tab-${valueId}`).click();
       await scribePage.getByTestId("add-action-button").click();
@@ -592,16 +593,4 @@ test.describe.serial("value selection through group formation", () => {
     throw new Error("No member page found among participants");
   }
 
-  async function getAssignedValueIds(page: Page): Promise<string[]> {
-    const tabs = page.locator('[data-testid^="value-tab-"]');
-    const count = await tabs.count();
-    const ids: string[] = [];
-    for (let index = 0; index < count; index++) {
-      const testId = await tabs.nth(index).getAttribute("data-testid");
-      if (testId !== null) {
-        ids.push(testId.replace("value-tab-", ""));
-      }
-    }
-    return ids;
-  }
 });

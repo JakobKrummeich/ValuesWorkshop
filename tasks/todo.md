@@ -511,9 +511,12 @@ for phases 2, 3, 5, 7, 8, 9. Spec: `tasks/specs/19a-participant-attention-screen
 AND participant screens (regardless of solve time), then existing cycling
 group cards / own-group card. Facilitator still advances to phase 6 — no
 auto-advance. Decision recorded in spec 19a §D1.
+> Superseded in review 2026-08-22: the backend owns the clock (spec 19b) —
+> phase 5 carries a `forming`/`formed` sub-state, advance refused while
+> forming, presenter wall redesigned on the same branch. Done in PR #41.
 **Acceptance criteria:**
-- [ ] Both screens show 3 s progress bar on entry, then current phase-5 UI
-- [ ] No state-machine change; facilitator advance unchanged
+- [x] Both screens show the formation progress bar, then the phase-5 UI
+- [x] Facilitator advance refused while forming (backend guard)
 **Verification:** FE tests + e2e phase-5 timing check.
 **Dependencies:** 19a. **Size:** S
 
@@ -521,16 +524,21 @@ auto-advance. Decision recorded in spec 19a §D1.
 **Description:** Scribe editor (actions per value, submit/un-submit);
 read-only live view for other members; facilitator overview with per-group
 submit status + scribe reassignment control.
+> Extended in review 2026-08-25: live typing (300 ms throttled EditAction
+> snapshots), actions born empty (no AddAction text), submit carries final
+> texts per value. Done in PR #42.
 **Acceptance criteria:**
-- [ ] Member view updates live as scribe types/saves
-- [ ] Facilitator reassignment swaps editor/read-only roles without reload
-- [ ] Multi-client e2e extended through phase 6
+- [x] Member view updates live as scribe types (throttled snapshots)
+- [x] Facilitator reassignment swaps editor/read-only roles without reload
+- [x] Multi-client e2e extended through phase 6
 **Verification:** FE tests + Playwright two-participant scribe scenario.
 **Dependencies:** 19b. **Size:** M
 
-### Checkpoint D
-- [ ] Playwright: 8 participants → 2 groups, solver <3 s, scribe reassign,
-      actions submitted
+### Checkpoint D (own slice, spec 20b, branch `checkpoint-d-scale-e2e`)
+> Upgraded in review 2026-08-26: 30 participants instead of 8, so the
+> presenter wall paging (6 cards per page) is exercised too.
+- [ ] Playwright: 30 participants → 7 groups, wall pages in phases 5+6,
+      scribe reassign swaps editors live, all groups submit, then advance
 
 ---
 
