@@ -27,6 +27,34 @@ export async function expectQuestionHeading(
   }
 }
 
+export async function fastForwardQuizAsFacilitatorAlone(
+  facilitatorPage: Page,
+): Promise<void> {
+  for (
+    let questionNumber = 1;
+    questionNumber <= QUIZ_QUESTION_COUNT;
+    questionNumber += 1
+  ) {
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Reveal answer",
+    );
+    await quizControlButton(facilitatorPage).click();
+    await expect(quizControlButton(facilitatorPage)).toHaveText(
+      "Show learning text",
+    );
+    await quizControlButton(facilitatorPage).click();
+
+    if (questionNumber < QUIZ_QUESTION_COUNT) {
+      await expect(quizControlButton(facilitatorPage)).toHaveText(
+        "Next question",
+      );
+      await quizControlButton(facilitatorPage).click();
+    }
+  }
+
+  await expect(quizControlButton(facilitatorPage)).toHaveCount(0);
+}
+
 export async function fastForwardQuizQuestions(
   facilitatorPage: Page,
   answeringParticipantPage: Page,
