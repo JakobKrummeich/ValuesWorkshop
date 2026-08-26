@@ -81,7 +81,9 @@ handlers. Aggregates stay port-free and own state + invariants.
 
 | Service | File | Ports (ctor) | Called by |
 |---|---|---|---|
-| `ScribeAppointment` | `Domain/ScribeAppointment.cs` | `IRandomness` | The one registered `IPhaseEntryAction`: `FacilitatorIntentHandler` runs them after `Session.AdvancePhase()`; it appoints one random scribe per group on entry into group work and self-guards (no-op outside phase 6, skips groups that already have a scribe so restore/restart never re-appoints) |
+| `ScribeAppointment` | `Domain/ScribeAppointment.cs` | `IRandomness` | One of the registered `IPhaseEntryAction`s: `FacilitatorIntentHandler` runs them after `Session.AdvancePhase()`; it appoints one random scribe per group on entry into group work and self-guards (no-op outside phase 6, skips groups that already have a scribe so restore/restart never re-appoints) |
+| `PresentationOpening` | `Domain/PresentationOpening.cs` | — | `IPhaseEntryAction`: opens the presentation walk on the first group's intro when entering value presentation (phase 7); self-guards (no-op outside phase 7) |
+| `VotingOpening` | `Domain/VotingOpening.cs` | — | `IPhaseEntryAction`: opens voting round 1 on entry into final voting (phase 8) with allotment 5, eligible = union of groups' assigned values; self-guards (no-op outside phase 8) |
 
 Group formation is deliberately *not* one of them: phase 5 is entered
 unformed and the formation runs on a clock (`design/state-machine.md` § 2.5),
