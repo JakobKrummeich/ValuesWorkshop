@@ -16,7 +16,7 @@ export const participantPhaseView: PhaseComponents<ParticipantWorkshopState> = {
   [Phase.SelectionResults]: WaitingScreen,
   [Phase.GroupFormation]: ParticipantGroupFormationScreen,
   [Phase.GroupWork]: ParticipantGroupWorkScreen,
-  [Phase.ValuePresentation]: EmptyPhase,
+  [Phase.ValuePresentation]: WaitingScreen,
   [Phase.FinalVoting]: EmptyPhase,
   [Phase.FinalPresentation]: EmptyPhase,
 };
