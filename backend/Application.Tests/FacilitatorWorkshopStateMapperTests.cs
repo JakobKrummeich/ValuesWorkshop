@@ -317,7 +317,7 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
-            voting: VotingRounds.Restore(true, 1, [])
+            voting: TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 10))
         );
 
         var voting = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
@@ -331,7 +331,7 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalPresentation,
-            voting: VotingRounds.Restore(false, 1, [new ValueId("courage")])
+            voting: TestVoting.AfterLocking([new ValueId("courage")])
         );
 
         Map(session)

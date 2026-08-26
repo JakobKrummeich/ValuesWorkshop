@@ -257,7 +257,7 @@ public class FacilitatorHubTests
                 [Group.Restore("tier-1", [anna, ben], [new ValueId("wert-1")], anna, false, [])]
             ),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 1
         );
         repository.Add(session);

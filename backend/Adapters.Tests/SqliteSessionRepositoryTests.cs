@@ -104,7 +104,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 0
         );
 
@@ -162,7 +162,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             ),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 0
         );
 
@@ -200,7 +200,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             SelectionRound.Restore([], []),
             FormationRecord.Restore(true, [group]),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 0
         );
 
@@ -238,7 +238,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore("Eagle", new ValueId("courage"), 3),
-            VotingRounds.Restore(false, 2, [winnerOne, winnerTwo]),
+            TestVoting.AfterLocking([winnerOne, winnerTwo], roundNumber: 2),
             revision: 0
         );
 
@@ -273,7 +273,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
                 [Group.Restore("Otter", [member], [new ValueId("honesty")], member, true, [])]
             ),
             PresentationWalk.Restore("Otter", new ValueId("honesty"), 7),
-            VotingRounds.Restore(false, 1, Winners),
+            TestVoting.AfterLocking(Winners),
             revision: 3
         );
 
@@ -305,7 +305,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 0
         );
         await SaveSession(updatedSession);
@@ -433,7 +433,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
                 SelectionRound.Restore([], []),
                 FormationRecord.Restore(false, []),
                 PresentationWalk.Restore(null, null, 0),
-                VotingRounds.Restore(false, 0, []),
+                VotingRounds.Restore([], null),
                 revision: 0
             )
         );
@@ -548,7 +548,7 @@ public sealed class SqliteSessionRepositoryTests : IAsyncLifetime, IDisposable
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision
         );
     }

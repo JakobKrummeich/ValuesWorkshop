@@ -259,7 +259,7 @@ public class PresenterWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
-            voting: VotingRounds.Restore(true, 2, [])
+            voting: TestVoting.TiebreakOpen(2, TestValueIds.Numbered(1, 3), allotment: 2)
         );
 
         Map(session).ShouldBeOfType<PresenterFinalVotingState>().Voting.IsRoundOpen.ShouldBeTrue();
@@ -270,7 +270,7 @@ public class PresenterWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalPresentation,
-            voting: VotingRounds.Restore(false, 2, [new ValueId("honesty")])
+            voting: TestVoting.AfterLocking([new ValueId("honesty")])
         );
 
         Map(session)

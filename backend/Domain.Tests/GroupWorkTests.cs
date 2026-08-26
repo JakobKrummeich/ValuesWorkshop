@@ -199,7 +199,7 @@ public class GroupWorkTests
                 ]
             ),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             0
         );
     }

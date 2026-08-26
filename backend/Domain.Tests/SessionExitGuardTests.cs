@@ -175,7 +175,7 @@ public class SessionExitGuardTests
     {
         var session = SessionInPhase(
             Phase.FinalVoting,
-            voting: VotingRounds.Restore(false, 1, Winners(4))
+            voting: TestVoting.AfterLocking(Winners(4))
         );
 
         ShouldRefuseToAdvance(session, Phase.FinalVoting);
@@ -186,7 +186,7 @@ public class SessionExitGuardTests
     {
         var session = SessionInPhase(
             Phase.FinalVoting,
-            voting: VotingRounds.Restore(false, 1, Winners(5))
+            voting: TestVoting.AfterLocking(Winners(5))
         );
 
         session.AdvancePhase();
