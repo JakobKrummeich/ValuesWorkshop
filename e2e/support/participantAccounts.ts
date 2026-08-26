@@ -24,14 +24,22 @@ export const participantAccounts: readonly ParticipantAccount[] =
     displayName,
   }));
 
-export function accountNameOf(displayName: string): string {
-  const account = participantAccounts.find(
-    (candidate) => candidate.displayName === displayName,
-  );
+const accountNameByDisplayName = new Map<string, string>();
+for (const account of participantAccounts) {
+  if (accountNameByDisplayName.has(account.displayName)) {
+    throw new Error(
+      `Two test accounts share the display name "${account.displayName}"`,
+    );
+  }
+  accountNameByDisplayName.set(account.displayName, account.accountName);
+}
 
-  if (account === undefined) {
+export function accountNameOf(displayName: string): string {
+  const accountName = accountNameByDisplayName.get(displayName);
+
+  if (accountName === undefined) {
     throw new Error(`No test account has the display name "${displayName}"`);
   }
 
-  return account.accountName;
+  return accountName;
 }

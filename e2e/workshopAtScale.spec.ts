@@ -38,13 +38,24 @@ const EXPECTED_GROUP_ANIMAL_IDS = [
   "biber",
 ];
 const EXPECTED_GROUP_SIZES_LARGEST_FIRST = [5, 5, 4, 4, 4, 4, 4];
+const TOP_VALUE_COUNT = 10;
 const FULL_WALL_PAGE_SIZE = 6;
-const FIRST_PAGE_ANIMAL_ID = "otter";
-const SECOND_PAGE_ANIMAL_ID = "biber";
+const FIRST_PAGE_ANIMAL_ID = EXPECTED_GROUP_ANIMAL_IDS[0];
+const SECOND_PAGE_ANIMAL_ID = EXPECTED_GROUP_ANIMAL_IDS[FULL_WALL_PAGE_SIZE];
 const WALL_PAGE_CYCLE_TIMEOUT_MILLISECONDS = 15_000;
 const REASSIGNED_GROUP_ANIMAL_ID = "otter";
 
 const workshopParticipants = participantAccounts.slice(0, PARTICIPANT_COUNT);
+
+function inBatches(
+  accounts: readonly ParticipantAccount[],
+): ParticipantAccount[][] {
+  const batches: ParticipantAccount[][] = [];
+  for (let start = 0; start < accounts.length; start += SIGN_IN_BATCH_SIZE) {
+    batches.push(accounts.slice(start, start + SIGN_IN_BATCH_SIZE));
+  }
+  return batches;
+}
 
 test.describe.serial("a workshop at scale with thirty participants", () => {
   let facilitatorContext: BrowserContext;
@@ -74,20 +85,6 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     await facilitatorContext.close();
     await presenterContext.close();
   });
-
-  function inBatches(
-    accounts: readonly ParticipantAccount[],
-  ): ParticipantAccount[][] {
-    const batches: ParticipantAccount[][] = [];
-    for (
-      let start = 0;
-      start < accounts.length;
-      start += SIGN_IN_BATCH_SIZE
-    ) {
-      batches.push(accounts.slice(start, start + SIGN_IN_BATCH_SIZE));
-    }
-    return batches;
-  }
 
   async function withParticipant(
     browser: Browser,
@@ -120,41 +117,32 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     return scribeName;
   }
 
-  async function wallShowsOnlySecondPage(wallPage: Page): Promise<boolean> {
+  async function wallCardCounts(wallPage: Page) {
     const [firstPageCards, secondPageCards, totalCards] = await Promise.all([
       wallPage.getByTestId(`group-card-${FIRST_PAGE_ANIMAL_ID}`).count(),
       wallPage.getByTestId(`group-card-${SECOND_PAGE_ANIMAL_ID}`).count(),
       wallPage.getByTestId(/^group-card-/).count(),
     ]);
-    return firstPageCards === 0 && secondPageCards === 1 && totalCards === 1;
-  }
-
-  async function wallShowsFullFirstPage(wallPage: Page): Promise<boolean> {
-    const [firstPageCards, secondPageCards, totalCards] = await Promise.all([
-      wallPage.getByTestId(`group-card-${FIRST_PAGE_ANIMAL_ID}`).count(),
-      wallPage.getByTestId(`group-card-${SECOND_PAGE_ANIMAL_ID}`).count(),
-      wallPage.getByTestId(/^group-card-/).count(),
-    ]);
-    return (
-      firstPageCards === 1 &&
-      secondPageCards === 0 &&
-      totalCards === FULL_WALL_PAGE_SIZE
-    );
+    return { firstPageCards, secondPageCards, totalCards };
   }
 
   async function expectWallToCycleThroughBothPages(
     wallPage: Page,
   ): Promise<void> {
     await expect
-      .poll(() => wallShowsOnlySecondPage(wallPage), {
+      .poll(() => wallCardCounts(wallPage), {
         timeout: WALL_PAGE_CYCLE_TIMEOUT_MILLISECONDS,
       })
-      .toBe(true);
+      .toEqual({ firstPageCards: 0, secondPageCards: 1, totalCards: 1 });
     await expect
-      .poll(() => wallShowsFullFirstPage(wallPage), {
+      .poll(() => wallCardCounts(wallPage), {
         timeout: WALL_PAGE_CYCLE_TIMEOUT_MILLISECONDS,
       })
-      .toBe(true);
+      .toEqual({
+        firstPageCards: 1,
+        secondPageCards: 0,
+        totalCards: FULL_WALL_PAGE_SIZE,
+      });
   }
 
   test("thirty participants join and the roster keeps every one of them", async ({
@@ -414,7 +402,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     }
 
     expect(assignedValueCounts.reduce((sum, count) => sum + count, 0)).toBe(
-      10,
+      TOP_VALUE_COUNT,
     );
 
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled({
