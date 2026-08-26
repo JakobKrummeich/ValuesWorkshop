@@ -8,6 +8,7 @@ import { PresenterJoinScreen } from "./join/PresenterJoinScreen";
 import { PresenterQuizScreen } from "./quiz/PresenterQuizScreen";
 import { PresenterSelectionScreen } from "./selection/PresenterSelectionScreen";
 import { PresenterSelectionResultsScreen } from "./selectionResults/PresenterSelectionResultsScreen";
+import { PresenterValuePresentationScreen } from "./valuePresentation/PresenterValuePresentationScreen";
 
 export const presenterPhaseView: PhaseComponents<PresenterWorkshopState> = {
   [Phase.Join]: PresenterJoinScreen,
@@ -16,7 +17,7 @@ export const presenterPhaseView: PhaseComponents<PresenterWorkshopState> = {
   [Phase.SelectionResults]: PresenterSelectionResultsScreen,
   [Phase.GroupFormation]: PresenterGroupFormationScreen,
   [Phase.GroupWork]: PresenterGroupWorkScreen,
-  [Phase.ValuePresentation]: EmptyPhase,
+  [Phase.ValuePresentation]: PresenterValuePresentationScreen,
   [Phase.FinalVoting]: EmptyPhase,
   [Phase.FinalPresentation]: EmptyPhase,
 };
