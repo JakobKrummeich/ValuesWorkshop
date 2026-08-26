@@ -98,7 +98,7 @@ workshop's native language), English term used in model and code.
 | Finale Stimmen | **Final votes** | Each participant's five votes, freely distributed across all presented values — several votes may go to one value, up to all five. Cast secretly and stored without any connection to the voter; only *that* someone has voted is remembered. |
 | Stimmenstand | **Vote tally** | Anonymous count of final votes per value. |
 | Siegerwerte | **Winning values** | The five values with the most final votes, together with their actions. |
-| Stichwahl | **Tiebreak round** | Held when a tie at fifth place prevents exactly five winners: a further vote among the tied values only, each participant receiving as many votes as there are tied values (multi-votes allowed). Repeated until exactly five values survive. Started by the facilitator. |
+| Stichwahl | **Tiebreak round** | Held when a tie at fifth place prevents exactly five winners: a further vote among the tied values only, each participant receiving as many votes as winner places are still open (multi-votes allowed). Repeated until exactly five values survive. Started by the facilitator. |
 | Workshop-Protokoll | **Workshop record** | The take-home document each participant may obtain at the end: all anonymous tallies, all worked-out actions, and the winning values. Contains no participant names. |
 
 ### Explicitly excluded from the domain
@@ -191,7 +191,7 @@ belongs to the session it happened in.
 
 | Event | Meaning |
 |---|---|
-| **FinalVotesSubmitted** | A participant spent their full vote allotment (five in the main round; the number of tied values in a tiebreak) across the eligible values. The anonymous vote tally grew; only the fact *that* they voted was remembered. Irrevocable: because no one knows whose votes they are, votes cannot be taken back. |
+| **FinalVotesSubmitted** | A participant spent their full vote allotment (the number of winner places still open — five in the main round) across the eligible values. The anonymous vote tally grew; only the fact *that* they voted was remembered. Irrevocable: because no one knows whose votes they are, votes cannot be taken back. |
 | **VotingClosed** | The facilitator ended the current voting round; the tally is final for this round. |
 | **TiebreakStarted** | A tie at fifth place being unresolved, the facilitator started a further round among the tied values only. |
 | **WinnersDetermined** | Exactly five values emerged with the most votes; they are the winning values. |
@@ -324,7 +324,7 @@ can refuse a command violating it.
 | I10 | During Group work, only the scribe creates, edits, removes actions and submits or reopens; a reassigned-away scribe is refused immediately. During Value presentation, only the facilitator may correct an action's wording (typo fixes); nothing may be added or removed. | Group |
 | I11 | Every assigned value carries between one and five actions with non-empty text when group work is submitted; empty text is allowed during editing. No edits while submitted. | Group |
 | I12 | Only submitted group results are presented. | Session |
-| I13 | A final-votes submission spends exactly the round's allotment (five in the main round; the number of tied values in a tiebreak), only on the round's eligible values; one submission per participant per round. | Session |
+| I13 | A final-votes submission spends exactly the round's allotment (the number of winner places still open — five in the main round), only on the round's eligible values; one submission per participant per round. | Session |
 | I14 | Final votes are anonymous and secret: the session remembers *that* a participant voted, never *what* — no connection between voter and votes exists anywhere in the model. As a consequence, votes can never be taken back. | Session |
 | I15 | Exactly five winning values; while a fifth-place tie persists, tiebreak rounds over the tied values repeat until it is resolved. | Session |
 | I16 | A session never forgets: every fact above survives any interruption, and a return resumes the exact prior state. | Session |

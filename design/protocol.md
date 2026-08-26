@@ -557,7 +557,7 @@ sequenceDiagram
   PH->>PIPE: intent + caller principal
   PIPE->>D: guard check
   D--xPIPE: round already closed (T19)
-  PIPE-->>P: Rejected(WrongPhase, "voting round is closed")
+  PIPE-->>P: Rejected(InvariantViolated, "voting round is closed")
   Note over PIPE: no mutation · no persist · no broadcast · revision unchanged
   Note over P: phone shows "the round was closed" and keeps<br/>rendering the state it already has
 ```
@@ -624,7 +624,7 @@ sequenceDiagram
   else fifth-place tie
     S-->>F: state (tiedValueIds set, closedRoundTallies visible)
     F->>S: StartTiebreakRound (T21)
-    Note over S: new round — eligible = tied values,<br/>allotment = number of tied values
+    Note over S: new round — eligible = tied values,<br/>allotment = number of winner slots still open
     S-->>P: state (roundNumber+1, hasVotedThisRound = false)
   end
 ```

@@ -568,8 +568,9 @@ shows that group's values + actions; participants see passive view.
 **Description:** 5 votes per participant across all presented values;
 multi-votes up to 5 on one value; storage anonymous (tallies + has-voted
 flag only — no voter↔vote rows). Tie at 5th place → tiebreak round over
-tied values only, votes-per-participant = number of tied values, repeat
-until exactly 5 survive. Facilitator sub-control starts each tiebreak.
+tied values only, votes-per-participant = number of winner places still
+open, repeat until exactly 5 survive. Facilitator sub-control starts each
+tiebreak.
 **Acceptance criteria:**
 - [ ] >5 votes rejected; vote data contains no participant identifier
       (asserted by test against DB schema/rows)

@@ -87,8 +87,9 @@ verified by a multi-client Playwright e2e test.
 8. **Final voting** — each participant has 5 votes across all presented
    values+actions; multi-votes allowed (up to 5 on one value). Secret and
    anonymous. Tie at 5th place → tiebreaker round among tied values only,
-   with as many votes as tied values (multi-votes allowed); repeat until 5
-   values survive. Facilitator sub-control: start tiebreak round.
+   with as many votes as winner places still open (multi-votes allowed);
+   repeat until 5 values survive. Facilitator sub-control: start tiebreak
+   round.
 9. **Final presentation** — winning values+actions on presenter screen.
    Participant screen shows a download button: client-side PDF with all
    anonymous votes, all worked-out actions, and the winners.

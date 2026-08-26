@@ -255,8 +255,9 @@ Guards in words:
 ### 2.8 Phase 8 — Final voting
 
 A main round (allotment: five votes) and, while a fifth-place tie
-persists, tiebreak rounds (allotment: number of tied values, eligible:
-tied values only), repeated until exactly five winning values stand (I15).
+persists, tiebreak rounds (allotment: number of winner places still
+open, eligible: tied values only), repeated until exactly five winning
+values stand (I15).
 
 ```mermaid
 stateDiagram-v2
@@ -268,12 +269,15 @@ stateDiagram-v2
     Open --> Open : SubmitFinalVotes [Participant] / FinalVotesSubmitted · guard - full allotment, eligible values only, not yet voted this round (I13)
     Open --> Closed : CloseVoting [Facilitator] / VotingClosed
     Closed --> Winners : no tie at fifth place [System] / WinnersDetermined
-    Closed --> Open : StartTiebreakRound [Facilitator] / TiebreakStarted · guard - tie at fifth place · eligible - tied values only, allotment = number of tied values
+    Closed --> Open : StartTiebreakRound [Facilitator] / TiebreakStarted · guard - tie at fifth place · eligible - tied values only, allotment = number of winner places still open
     Winners --> [*] : awaits AdvancePhase
 ```
 
 Guards in words:
 
+- **Phase entry** opens the main round via a phase entry action
+  (`VotingOpening`, like scribe appointment on phase 6): allotment five,
+  eligible all values the groups presented.
 - **SubmitFinalVotes** — refused on wrong totals, votes outside the
   round's eligible values, or a second submission in the same round (I13).
   Votes are anonymous and secret; no un-voting exists (I14).

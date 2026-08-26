@@ -237,8 +237,9 @@ each workshop phase completes (regression protection from day one).
       shows selected group's values + actions.
 - [ ] 22. Final voting backend: 5 votes per participant, multi-votes on one
       value allowed, anonymous storage (no voter↔vote link), tie-at-5th
-      detection, tiebreak rounds (votes = number of tied values, repeat
-      until 5 survive), facilitator "start tiebreak" sub-control.
+      detection, tiebreak rounds (votes = number of winner places still
+      open, repeat until 5 survive), facilitator "start tiebreak"
+      sub-control.
 - [ ] 23. Final voting frontend: participant vote allocation UI, presenter
       live/hidden tallies per spec, facilitator controls.
 - [ ] 24. Phase 9 Final presentation + PDF: winners on presenter,
