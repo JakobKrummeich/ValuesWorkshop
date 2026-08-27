@@ -15,10 +15,10 @@ when a condition is met — no person issues them.
 ## 1. Top-level: the nine phases
 
 Forward-only (I1); only the facilitator advances (I2). Every
-`AdvancePhase` emits `PhaseAdvanced`. Entering phases 4 and 6 triggers a
-System command before anything else happens in that phase. Phase 5 is the
-exception: it is entered unformed and its System command fires later, on the
-server clock (§ 2.5).
+`AdvancePhase` emits `PhaseAdvanced`. Entering phases 4, 6, 7, and 8
+triggers a System command before anything else happens in that phase.
+Phase 5 is the exception: it is entered unformed and its System command
+fires later, on the server clock (§ 2.5).
 
 ```mermaid
 stateDiagram-v2
@@ -38,8 +38,8 @@ stateDiagram-v2
     P3 --> P4 : AdvancePhase [Facilitator] / PhaseAdvanced · entry - DetermineTopValues [System] / TopValuesDetermined
     P4 --> P5 : AdvancePhase [Facilitator] / PhaseAdvanced · entered unformed, see § 2.5
     P5 --> P6 : AdvancePhase [Facilitator] / PhaseAdvanced · guard - groups formed (I8) · entry - AppointScribes [System] / ScribeAppointed (per group)
-    P6 --> P7 : AdvancePhase [Facilitator] / PhaseAdvanced
-    P7 --> P8 : AdvancePhase [Facilitator] / PhaseAdvanced
+    P6 --> P7 : AdvancePhase [Facilitator] / PhaseAdvanced · entry - OpenPresentationWalk [System]
+    P7 --> P8 : AdvancePhase [Facilitator] / PhaseAdvanced · entry - OpenVotingRound [System]
     P8 --> P9 : AdvancePhase [Facilitator] / PhaseAdvanced · guard - winning values determined (I15)
     P9 --> [*] : WorkshopConcluded
 
@@ -338,6 +338,8 @@ facilitator sub-controls are marked ◆.
 | T10 | →4 | Determine top values | System | on phase entry; widen on tenth-place tie (I7) | TopValuesDetermined |
 | T11 | 5 | Form groups | System | formation window over; sizing rule + formation aim (I8); random assignment when the solver did not finish | GroupsFormed |
 | T12 | →6 | Appoint scribes | System | on phase entry; one random member per group (I9) | ScribeAppointed |
+| T12a | →7 | Open presentation walk | System | on phase entry; first group's intro (I12) | NextValueShown |
+| T12b | →8 | Open voting round | System | on phase entry; allotment five, eligible = all presented values | — |
 | T13 | 6 | Reassign scribe ◆ | Facilitator | target is a group member (I9) | ScribeReassigned |
 | T14 | 6 | Add / edit / remove action | Scribe | own group; Editing; ≤ five per value (I10, I11) | ActionAdded / ActionEdited / ActionRemoved |
 | T15 | 6 | Submit group work | Scribe | one to five non-empty-text actions per assigned value (I11) | GroupWorkSubmitted |
