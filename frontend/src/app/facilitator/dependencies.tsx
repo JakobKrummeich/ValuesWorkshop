@@ -6,6 +6,7 @@ import type { FacilitatorWalkControlPort } from "../../domain/ports/facilitator/
 import type { FacilitatorLifecyclePort } from "../../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorQuizControlPort } from "../../domain/ports/facilitator/quizControlPort";
 import type { FacilitatorSessionStatePort } from "../../domain/ports/facilitator/sessionStatePort";
+import type { FacilitatorVotingControlPort } from "../../domain/ports/facilitator/votingControlPort";
 
 export interface FacilitatorDependencies {
   sessionStatePort: FacilitatorSessionStatePort;
@@ -13,6 +14,7 @@ export interface FacilitatorDependencies {
   quizControlPort: FacilitatorQuizControlPort;
   groupWorkControlPort: FacilitatorGroupWorkControlPort;
   walkControlPort: FacilitatorWalkControlPort;
+  votingControlPort: FacilitatorVotingControlPort;
 }
 
 const FacilitatorDependencyContext =

@@ -2,6 +2,7 @@ import type { FacilitatorGroupWorkControlPort } from "../domain/ports/facilitato
 import type { FacilitatorWalkControlPort } from "../domain/ports/facilitator/walkControlPort";
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorQuizControlPort } from "../domain/ports/facilitator/quizControlPort";
+import type { FacilitatorVotingControlPort } from "../domain/ports/facilitator/votingControlPort";
 import type { ParticipantGroupWorkPort } from "../domain/ports/participant/groupWorkPort";
 import type { ParticipantQuizPort } from "../domain/ports/participant/quizPort";
 import type { ParticipantSelectionPort } from "../domain/ports/participant/selectionPort";
@@ -22,6 +23,7 @@ import { createFacilitatorGroupWorkControlPort } from "./facilitatorGroupWorkCon
 import { createFacilitatorWalkControlPort } from "./facilitatorWalkControlAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
 import { createFacilitatorQuizControlPort } from "./facilitatorQuizControlAdapter";
+import { createFacilitatorVotingControlPort } from "./facilitatorVotingControlAdapter";
 import { createParticipantGroupWorkPort } from "./participantGroupWorkAdapter";
 import { createParticipantQuizPort } from "./participantQuizAdapter";
 import { createParticipantSelectionPort } from "./participantSelectionAdapter";
@@ -50,6 +52,7 @@ export interface FacilitatorSession extends WorkshopSession {
   readonly quizControlPort: FacilitatorQuizControlPort;
   readonly groupWorkControlPort: FacilitatorGroupWorkControlPort;
   readonly walkControlPort: FacilitatorWalkControlPort;
+  readonly votingControlPort: FacilitatorVotingControlPort;
 }
 
 export interface PresenterSession extends WorkshopSession {
@@ -94,6 +97,7 @@ export function createFacilitatorSession(
     quizControlPort: createFacilitatorQuizControlPort(connection),
     groupWorkControlPort: createFacilitatorGroupWorkControlPort(connection),
     walkControlPort: createFacilitatorWalkControlPort(connection),
+    votingControlPort: createFacilitatorVotingControlPort(connection),
     ...lifetimeOf(connection),
   };
 }

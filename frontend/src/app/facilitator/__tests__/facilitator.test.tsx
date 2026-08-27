@@ -57,6 +57,10 @@ beforeEach(() => {
       goToNextValue: jest.fn(() => EMPTY),
       correctActionWording: jest.fn(() => EMPTY),
     },
+    votingControlPort: {
+      closeVoting: jest.fn(() => EMPTY),
+      startTiebreakRound: jest.fn(() => EMPTY),
+    },
     start: EMPTY,
     close: EMPTY,
   });
