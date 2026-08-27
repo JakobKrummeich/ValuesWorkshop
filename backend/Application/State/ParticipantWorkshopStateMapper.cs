@@ -89,7 +89,7 @@ public sealed class ParticipantWorkshopStateMapper(
                 new ParticipantFinalVotingState(
                     revision,
                     ParticipantCount(session),
-                    SessionViews.Voting(session, caller)
+                    VotingViews.ForParticipant(session, caller, groupViews)
                 ),
             [Phase.FinalPresentation] = (session, _, revision) =>
                 new ParticipantFinalPresentationState(

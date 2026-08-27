@@ -472,16 +472,50 @@ public class ParticipantWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
-            voting: TestVoting.TiebreakOpen(2, TestValueIds.Numbered(1, 3), allotment: 2)
+            formation: SessionFixtures.TwoGroups(),
+            voting: TestVoting.TiebreakOpen(2, TestValueIds.Numbered(1, 2), allotment: 2)
         );
 
         var voting = Map(session).ShouldBeOfType<ParticipantFinalVotingState>().Voting;
 
         voting.RoundNumber.ShouldBe(2);
         voting.Allotment.ShouldBe(2);
-        voting.EligibleValueIds.ShouldBe(["wert-1", "wert-2", "wert-3"]);
+        voting.EligibleValues.Select(value => value.ValueId).ShouldBe(["wert-1", "wert-2"]);
         voting.IsRoundOpen.ShouldBeTrue();
         voting.HasVotedThisRound.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Final_voting_state_embeds_the_value_texts_and_the_submitted_group_actions()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalVoting,
+            formation: SessionFixtures.TwoGroups(
+                new GroupAction(
+                    new ActionId(Guid.NewGuid()),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("We start meetings on time")
+                ),
+                new GroupAction(
+                    new ActionId(Guid.NewGuid()),
+                    new ValueId("wert-1"),
+                    GroupActionText.Of("We share mistakes openly")
+                )
+            ),
+            voting: TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 2))
+        );
+
+        var voting = Map(session).ShouldBeOfType<ParticipantFinalVotingState>().Voting;
+
+        voting.EligibleValues.Count.ShouldBe(2);
+        voting.EligibleValues[0].ValueId.ShouldBe("wert-1");
+        voting.EligibleValues[0].Text.ShouldBe(new LocalizedTextView("Wert 1", "Value 1"));
+        voting
+            .EligibleValues[0]
+            .Actions.ShouldBe(["We start meetings on time", "We share mistakes openly"]);
+        voting.EligibleValues[1].ValueId.ShouldBe("wert-2");
+        voting.EligibleValues[1].Text.ShouldBe(new LocalizedTextView("Wert 2", "Value 2"));
+        voting.EligibleValues[1].Actions.ShouldBeEmpty();
     }
 
     [Fact]
