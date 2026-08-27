@@ -112,3 +112,19 @@ export type PresenterValuePresentationState = InPhase<
   PresenterWorkshopState,
   Phase.ValuePresentation
 >;
+
+export type ParticipantFinalVotingState = InPhase<
+  ParticipantWorkshopState,
+  Phase.FinalVoting
+>;
+export type FacilitatorFinalVotingState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.FinalVoting
+>;
+export type PresenterFinalVotingState = InPhase<
+  PresenterWorkshopState,
+  Phase.FinalVoting
+>;
+
+export type ParticipantVotingView = ParticipantFinalVotingState["voting"];
+export type FacilitatorVotingView = FacilitatorFinalVotingState["voting"];

@@ -34,6 +34,7 @@ function withSubmitSelection(
       submitGroupWork: () => NEVER,
       reopenGroupWork: () => NEVER,
     },
+    votingPort: { submitFinalVotes: () => NEVER },
   });
 }
 

@@ -5,6 +5,7 @@ import type { FacilitatorQuizControlPort } from "../domain/ports/facilitator/qui
 import type { ParticipantGroupWorkPort } from "../domain/ports/participant/groupWorkPort";
 import type { ParticipantQuizPort } from "../domain/ports/participant/quizPort";
 import type { ParticipantSelectionPort } from "../domain/ports/participant/selectionPort";
+import type { ParticipantVotingPort } from "../domain/ports/participant/votingPort";
 import type { FacilitatorSessionStatePort } from "../domain/ports/facilitator/sessionStatePort";
 import type { ParticipantSessionStatePort } from "../domain/ports/participant/sessionStatePort";
 import type { PresenterSessionStatePort } from "../domain/ports/presenter/sessionStatePort";
@@ -24,6 +25,7 @@ import { createFacilitatorQuizControlPort } from "./facilitatorQuizControlAdapte
 import { createParticipantGroupWorkPort } from "./participantGroupWorkAdapter";
 import { createParticipantQuizPort } from "./participantQuizAdapter";
 import { createParticipantSelectionPort } from "./participantSelectionAdapter";
+import { createParticipantVotingPort } from "./participantVotingAdapter";
 import { withSerializedLifecycle } from "./serializedLifecycle";
 import { createSessionStatePort } from "./sessionStateAdapter";
 import { createSignalRConnection } from "./signalRConnection";
@@ -39,6 +41,7 @@ export interface ParticipantSession extends WorkshopSession {
   readonly quizPort: ParticipantQuizPort;
   readonly selectionPort: ParticipantSelectionPort;
   readonly groupWorkPort: ParticipantGroupWorkPort;
+  readonly votingPort: ParticipantVotingPort;
 }
 
 export interface FacilitatorSession extends WorkshopSession {
@@ -69,6 +72,7 @@ export function createParticipantSession(
     quizPort: createParticipantQuizPort(connection),
     selectionPort: createParticipantSelectionPort(connection),
     groupWorkPort: createParticipantGroupWorkPort(connection),
+    votingPort: createParticipantVotingPort(connection),
     ...lifetimeOf(connection),
   };
 }

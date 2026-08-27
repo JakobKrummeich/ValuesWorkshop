@@ -41,6 +41,7 @@ export enum ParticipantIntent {
   RemoveAction = "RemoveAction",
   SubmitGroupWork = "SubmitGroupWork",
   ReopenGroupWork = "ReopenGroupWork",
+  SubmitFinalVotes = "SubmitFinalVotes",
 }
 
 const revisionSchema = z.int().nonnegative();

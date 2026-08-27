@@ -5,12 +5,14 @@ import type { ParticipantGroupWorkPort } from "../../domain/ports/participant/gr
 import type { ParticipantQuizPort } from "../../domain/ports/participant/quizPort";
 import type { ParticipantSelectionPort } from "../../domain/ports/participant/selectionPort";
 import type { ParticipantSessionStatePort } from "../../domain/ports/participant/sessionStatePort";
+import type { ParticipantVotingPort } from "../../domain/ports/participant/votingPort";
 
 export interface ParticipantDependencies {
   sessionStatePort: ParticipantSessionStatePort;
   quizPort: ParticipantQuizPort;
   selectionPort: ParticipantSelectionPort;
   groupWorkPort: ParticipantGroupWorkPort;
+  votingPort: ParticipantVotingPort;
 }
 
 const ParticipantDependencyContext =
