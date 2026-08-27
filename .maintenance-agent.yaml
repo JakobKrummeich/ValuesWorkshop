@@ -1,0 +1,27 @@
+# maintenance-agent target config for ValuesWorkshop.
+# Runs nightly from an isolated clone with its own no-mistakes gate identity;
+# delivery goes through the no-mistakes pipeline (review, full ci-test incl.
+# e2e, lint, push, PR, CI), so agent-side gates stay the fast subset: e2e is
+# deliberately absent here because the delivery pipeline always runs it.
+version: 1
+base_branch: main
+delivery: no-mistakes
+diff_limit: 200
+churn_paths: [frontend/src, backend, scripts, e2e]
+# Task specs and design documents record human intent; the agent maintains
+# code, never the record of what was asked for.
+protected_paths: [design, tasks]
+setup: no-mistakes init && pnpm install --frozen-lockfile && dotnet restore backend/ValuesWorkshop.sln
+gates:
+  - name: fe-test
+    run: pnpm --dir frontend test
+  - name: be-test
+    # The .sln is not test-wired under `dotnet test` (exit 0, zero tests run);
+    # the Tests.slnf solution filter is what actually executes the 779 tests.
+    run: dotnet test backend/ValuesWorkshop.Tests.slnf
+  - name: lint
+    run: bash scripts/ci-lint.sh
+analyzers:
+  - name: duplication
+    run: pnpm -w jscpd
+    note: "workspace-wide jscpd using the repo's .jscpd.json; clones that must stay in sync are latent divergence bugs"
