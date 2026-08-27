@@ -11,7 +11,7 @@ churn_paths: [frontend/src, backend, scripts, e2e]
 # Task specs and design documents record human intent; the agent maintains
 # code, never the record of what was asked for.
 protected_paths: [design, tasks]
-setup: no-mistakes init && pnpm install --frozen-lockfile && dotnet restore backend/ValuesWorkshop.sln
+setup: no-mistakes init && pnpm install --frozen-lockfile && dotnet restore backend/ValuesWorkshop.All.sln
 gates:
   - name: fe-test
     run: pnpm --dir frontend test
