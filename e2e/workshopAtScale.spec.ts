@@ -392,9 +392,9 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
             .fill(`Action for ${valueId}`);
         }
 
-        await expect(page.getByTestId("submit-group-work-button")).toBeEnabled(
-          { timeout: 5_000 },
-        );
+        await expect(page.getByTestId("submit-group-work-button")).toBeEnabled({
+          timeout: 5_000,
+        });
         await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
 
         await page.getByTestId("submit-group-work-button").click();
@@ -448,9 +448,9 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     );
 
     await nextValueButton.click();
-    await expect(presenterPage.getByTestId("presented-value-screen")).toBeVisible(
-      { timeout: 10_000 },
-    );
+    await expect(
+      presenterPage.getByTestId("presented-value-screen"),
+    ).toBeVisible({ timeout: 10_000 });
     await expect(
       presenterPage.getByTestId("presenter-presenting-group"),
     ).toHaveText("Otter");
@@ -593,9 +593,9 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
             await expect(page.getByTestId(/^vote-card-/)).toHaveCount(2, {
               timeout: 15_000,
             });
-            await expect(
-              page.getByTestId("submit-votes-button"),
-            ).toHaveText("Submit 1 vote");
+            await expect(page.getByTestId("submit-votes-button")).toHaveText(
+              "Submit 1 vote",
+            );
             const participantIndex = workshopParticipants.indexOf(account);
             const chosenValueId =
               participantIndex < TIEBREAK_WINNER_VOTES
