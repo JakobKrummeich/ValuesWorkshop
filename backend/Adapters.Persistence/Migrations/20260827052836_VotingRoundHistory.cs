@@ -63,6 +63,7 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     session_identity = table.Column<string>(type: "TEXT", nullable: false),
                     round_number = table.Column<int>(type: "INTEGER", nullable: false),
                     allotment = table.Column<int>(type: "INTEGER", nullable: false),
+                    voted_count = table.Column<int>(type: "INTEGER", nullable: false),
                 },
                 constraints: table =>
                 {

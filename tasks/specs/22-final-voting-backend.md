@@ -52,6 +52,10 @@ phase 8 → 9.
   final PDF's anonymous vote statistics in Task 24. Winner vote counts
   (valueId + count from the round it won in) derive from this history for
   the phase-9 `conclusion` block.
+
+  > Amended in diff review 2026-08-26: closed rounds keep no has-voted
+  > membership — only the voter count; the set lives on the open round
+  > solely to stop double voting.
 - **D7 — wire blocks per protocol.** Participant `voting`: `roundNumber`,
   `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound`.
   Facilitator: those minus `hasVotedThisRound`, plus `votedCount`,

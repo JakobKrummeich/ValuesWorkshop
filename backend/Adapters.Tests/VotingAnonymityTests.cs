@@ -97,6 +97,30 @@ public sealed class VotingAnonymityTests : IAsyncLifetime, IDisposable
         RowsMentioning("voted_participants", anna.Value.ToString()).ShouldBe(1);
     }
 
+    [Fact]
+    public async Task Closed_rounds_keep_no_voter_rows()
+    {
+        var anna = new ParticipantId(Guid.NewGuid());
+        var ben = new ParticipantId(Guid.NewGuid());
+        var eligibleValues = TestValueIds.Numbered(1, 10);
+        var voting = TestVoting.MainRoundOpen(eligibleValues);
+        voting.RecordBallot(anna, new Dictionary<ValueId, int> { [eligibleValues[0]] = 5 });
+        voting.CloseRound();
+        voting.StartTiebreak();
+        voting.RecordBallot(ben, new Dictionary<ValueId, int> { [voting.EligibleValues[0]] = 4 });
+
+        var identity = new SessionIdentity(Guid.NewGuid());
+        using (var context = new WorkshopDbContext(options))
+        {
+            await new SqliteSessionRepository(context).CreateAsync(
+                TestSessions.InPhase(identity, Phase.FinalVoting, voting: voting)
+            );
+        }
+
+        RowsMentioning("voted_participants", anna.Value.ToString()).ShouldBe(0);
+        RowsMentioning("voted_participants", ben.Value.ToString()).ShouldBe(1);
+    }
+
     private int RowsMentioning(string table, string text)
     {
         using var command = connection.CreateCommand();

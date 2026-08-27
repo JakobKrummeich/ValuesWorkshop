@@ -10,7 +10,7 @@ using ValuesWorkshop.Adapters.Persistence;
 namespace ValuesWorkshop.Adapters.Persistence.Migrations
 {
     [DbContext(typeof(WorkshopDbContext))]
-    [Migration("20260826201056_VotingRoundHistory")]
+    [Migration("20260827052836_VotingRoundHistory")]
     partial class VotingRoundHistory
     {
         /// <inheritdoc />
@@ -353,6 +353,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.Property<int>("Allotment")
                         .HasColumnType("INTEGER")
                         .HasColumnName("allotment");
+
+                    b.Property<int>("VotedCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("voted_count");
 
                     b.HasKey("SessionIdentity", "RoundNumber");
 

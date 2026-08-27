@@ -11,12 +11,12 @@ internal static class VotingEntityMapper
     )
     {
         var rounds = voting
-            .ClosedRounds.Select(round => (round.RoundNumber, round.Allotment))
+            .ClosedRounds.Select(round => (round.RoundNumber, round.Allotment, round.VotedCount))
             .ToList();
 
         if (voting.RoundOpen)
         {
-            rounds.Add((voting.RoundNumber, voting.Allotment));
+            rounds.Add((voting.RoundNumber, voting.Allotment, voting.VotedCount));
         }
 
         return rounds
@@ -25,6 +25,7 @@ internal static class VotingEntityMapper
                 SessionIdentity = sessionIdentity,
                 RoundNumber = round.RoundNumber,
                 Allotment = round.Allotment,
+                VotedCount = round.VotedCount,
             })
             .ToList();
     }
@@ -64,24 +65,13 @@ internal static class VotingEntityMapper
         VotingRounds voting
     )
     {
-        var votersPerRound = voting
-            .ClosedRounds.Select(round => (round.RoundNumber, round.VotedParticipants))
-            .ToList();
-
-        if (voting.RoundOpen)
-        {
-            votersPerRound.Add((voting.RoundNumber, voting.OpenRoundVotedParticipants));
-        }
-
-        return votersPerRound
-            .SelectMany(round =>
-                round.VotedParticipants.Select(participantId => new VotedParticipantEntity
-                {
-                    SessionIdentity = sessionIdentity,
-                    RoundNumber = round.RoundNumber,
-                    ParticipantId = participantId.Value.ToString(),
-                })
-            )
+        return voting
+            .OpenRoundVotedParticipants.Select(participantId => new VotedParticipantEntity
+            {
+                SessionIdentity = sessionIdentity,
+                RoundNumber = voting.RoundNumber,
+                ParticipantId = participantId.Value.ToString(),
+            })
             .ToList();
     }
 
@@ -145,7 +135,7 @@ internal static class VotingEntityMapper
                 round.Allotment,
                 EligibleValuesOf(entity, round.RoundNumber),
                 TalliesOf(entity, round.RoundNumber),
-                VotedParticipantsOf(entity, round.RoundNumber),
+                round.VotedCount,
                 LockedValuesOf(entity, round.RoundNumber),
                 TiedValuesOf(entity, round.RoundNumber)
             ))

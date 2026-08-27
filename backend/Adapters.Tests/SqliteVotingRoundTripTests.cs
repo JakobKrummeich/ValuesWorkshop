@@ -83,12 +83,13 @@ public sealed class SqliteVotingRoundTripTests : IAsyncLifetime, IDisposable
         closedRound.Tallies[TenValues[5]].ShouldBe(2);
         closedRound.LockedValues.ShouldBe(TenValues.Take(3));
         closedRound.TiedValues.ShouldBe(TenValues.Skip(3).Take(3));
-        closedRound.VotedParticipants.ShouldNotBeEmpty();
+        closedRound.VotedCount.ShouldBe(6);
 
         loaded.Voting.RoundOpen.ShouldBeTrue();
         loaded.Voting.RoundNumber.ShouldBe(2);
         loaded.Voting.Allotment.ShouldBe(2);
         loaded.Voting.EligibleValues.ShouldBe(TenValues.Skip(3).Take(3));
+        loaded.Voting.VotedCount.ShouldBe(1);
         loaded.Voting.HasVoted(Ben).ShouldBeTrue();
         loaded.Voting.WinningValues.ShouldBe(TenValues.Take(3));
     }
@@ -119,6 +120,8 @@ public sealed class SqliteVotingRoundTripTests : IAsyncLifetime, IDisposable
         loaded.Voting.ClosedRounds.Count.ShouldBe(2);
         loaded.Voting.ClosedRounds[1].Allotment.ShouldBe(2);
         loaded.Voting.RoundOpen.ShouldBeFalse();
+        loaded.Voting.VotedCount.ShouldBe(1);
+        loaded.Voting.HasVoted(Anna).ShouldBeFalse();
         loaded.Voting.TiebreakPending.ShouldBeFalse();
         loaded.Voting.LastClosedRound.ShouldNotBeNull().RoundNumber.ShouldBe(2);
     }

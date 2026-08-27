@@ -351,6 +351,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("allotment");
 
+                    b.Property<int>("VotedCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("voted_count");
+
                     b.HasKey("SessionIdentity", "RoundNumber");
 
                     b.ToTable("voting_rounds", (string)null);

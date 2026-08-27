@@ -18,7 +18,7 @@ public sealed class VotingRounds
     public IReadOnlyList<ValueId> EligibleValues =>
         openRound?.EligibleValues ?? LastClosedRound?.EligibleValues ?? [];
 
-    public int VotedCount => LatestVotedParticipants.Count;
+    public int VotedCount => openRound?.VotedParticipants.Count ?? LastClosedRound?.VotedCount ?? 0;
     public IReadOnlyList<ClosedVotingRound> ClosedRounds => closedRounds;
     public ClosedVotingRound? LastClosedRound => closedRounds.Count == 0 ? null : closedRounds[^1];
 
@@ -32,12 +32,9 @@ public sealed class VotingRounds
     internal IReadOnlySet<ParticipantId> OpenRoundVotedParticipants =>
         openRound?.VotedParticipants ?? NoVoters;
 
-    private IReadOnlySet<ParticipantId> LatestVotedParticipants =>
-        openRound?.VotedParticipants ?? LastClosedRound?.VotedParticipants ?? NoVoters;
-
     public bool HasVoted(ParticipantId participant)
     {
-        return LatestVotedParticipants.Contains(participant);
+        return openRound?.VotedParticipants.Contains(participant) ?? false;
     }
 
     internal void OpenRound(int allotment, IReadOnlyList<ValueId> eligibleValues)
@@ -106,7 +103,7 @@ public sealed class VotingRounds
                 openRound.Allotment,
                 openRound.EligibleValues,
                 new Dictionary<ValueId, int>(openRound.Tallies),
-                openRound.VotedParticipants.ToHashSet(),
+                openRound.VotedParticipants.Count,
                 lockedValues,
                 tiedValues
             )

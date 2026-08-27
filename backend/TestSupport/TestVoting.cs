@@ -55,12 +55,15 @@ public static class TestVoting
                     : 1
         );
 
+        var allotment = VotingRounds.RequiredWinningValueCount;
+        var ballotCount = (tallies.Values.Sum() + allotment - 1) / allotment;
+
         return new ClosedVotingRound(
             roundNumber,
-            VotingRounds.RequiredWinningValueCount,
+            allotment,
             eligibleValues,
             tallies,
-            new HashSet<ParticipantId>(),
+            ballotCount,
             lockedValues,
             tiedValues
         );

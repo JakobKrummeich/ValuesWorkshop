@@ -5,7 +5,7 @@ public sealed record ClosedVotingRound(
     int Allotment,
     IReadOnlyList<ValueId> EligibleValues,
     IReadOnlyDictionary<ValueId, int> Tallies,
-    IReadOnlySet<ParticipantId> VotedParticipants,
+    int VotedCount,
     IReadOnlyList<ValueId> LockedValues,
     IReadOnlyList<ValueId> TiedValues
 );

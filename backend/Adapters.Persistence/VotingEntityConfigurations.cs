@@ -13,6 +13,7 @@ internal sealed class VotingRoundEntityConfiguration : IEntityTypeConfiguration<
         builder.Property(round => round.SessionIdentity).HasColumnName("session_identity");
         builder.Property(round => round.RoundNumber).HasColumnName("round_number");
         builder.Property(round => round.Allotment).HasColumnName("allotment");
+        builder.Property(round => round.VotedCount).HasColumnName("voted_count");
         builder
             .HasOne(round => round.Session)
             .WithMany(session => session.VotingRounds)

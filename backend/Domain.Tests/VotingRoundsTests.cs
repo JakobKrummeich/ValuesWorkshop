@@ -246,10 +246,21 @@ public class VotingRoundsTests
         voting.RoundNumber.ShouldBe(1);
         voting.Allotment.ShouldBe(5);
         voting.EligibleValues.ShouldBe(TenValues);
-        voting.VotedCount.ShouldBe(
-            voting.LastClosedRound.ShouldNotBeNull().VotedParticipants.Count
-        );
+        voting.VotedCount.ShouldBe(6);
+        voting.LastClosedRound.ShouldNotBeNull().VotedCount.ShouldBe(6);
         voting.LastClosedRound.ShouldNotBeNull().Tallies[TenValues[0]].ShouldBe(9);
+    }
+
+    [Fact]
+    public void Closing_a_round_forgets_who_voted()
+    {
+        var voting = OpenedMainRound();
+        voting.RecordBallot(Anna, Votes((1, 5)));
+
+        voting.CloseRound();
+
+        voting.HasVoted(Anna).ShouldBeFalse();
+        voting.VotedCount.ShouldBe(1);
     }
 
     [Fact]
@@ -355,7 +366,7 @@ public class VotingRoundsTests
             5,
             TenValues,
             TenValues.ToDictionary(value => value, _ => 0),
-            new HashSet<ParticipantId> { Anna },
+            1,
             [],
             TenValues
         );
