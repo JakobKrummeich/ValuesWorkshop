@@ -7,6 +7,7 @@ import {
   type Page,
 } from "@playwright/test";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
+import { castBallot, eligibleValueIdsOf } from "./support/finalVoting";
 import { assignedValueIdsOf } from "./support/groupWork";
 import { openSignedIn } from "./support/oidcLogin";
 import {
@@ -44,6 +45,10 @@ const FIRST_PAGE_ANIMAL_ID = EXPECTED_GROUP_ANIMAL_IDS[0];
 const SECOND_PAGE_ANIMAL_ID = EXPECTED_GROUP_ANIMAL_IDS[FULL_WALL_PAGE_SIZE];
 const WALL_PAGE_CYCLE_TIMEOUT_MILLISECONDS = 15_000;
 const REASSIGNED_GROUP_ANIMAL_ID = "otter";
+const MAIN_ROUND_ALLOTMENT = 5;
+const VOTE_TARGETS_BY_CARD_ORDER = [30, 25, 20, 17, 14, 14, 10, 8, 7, 5];
+const TIED_CARD_INDEXES = [4, 5];
+const TIEBREAK_WINNER_VOTES = 16;
 
 const workshopParticipants = participantAccounts.slice(0, PARTICIPANT_COUNT);
 
@@ -63,6 +68,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
   let facilitatorPage: Page;
   let presenterPage: Page;
   let sessionIdentity: string;
+  let eligibleValueIds: string[] = [];
 
   test.beforeAll(async ({ browser }) => {
     facilitatorContext = await browser.newContext();
@@ -471,6 +477,154 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     await advancePhaseButton(facilitatorPage).click();
     for (const page of [facilitatorPage, presenterPage]) {
       await expect(page.getByTestId("phase")).toHaveText("Phase 8");
+    }
+  });
+
+  function mainRoundBallotOf(participantIndex: number): Map<string, number> {
+    const voteUnits = VOTE_TARGETS_BY_CARD_ORDER.flatMap((target, cardIndex) =>
+      Array.from({ length: target }, () => eligibleValueIds[cardIndex]),
+    );
+    const ownUnits = voteUnits.slice(
+      participantIndex * MAIN_ROUND_ALLOTMENT,
+      (participantIndex + 1) * MAIN_ROUND_ALLOTMENT,
+    );
+    const ballot = new Map<string, number>();
+    for (const valueId of ownUnits) {
+      ballot.set(valueId, (ballot.get(valueId) ?? 0) + 1);
+    }
+    return ballot;
+  }
+
+  test("thirty participants spend their five votes and force a fifth-place tie", async ({
+    browser,
+  }) => {
+    test.setTimeout(300_000);
+
+    await expect(facilitatorPage.getByTestId("voted-count")).toHaveText(
+      `Round 1 · voted: 0/${PARTICIPANT_COUNT}`,
+    );
+    await expect(
+      presenterPage.getByTestId("presenter-final-voting-screen"),
+    ).toContainText("Voting ongoing");
+
+    await withParticipant(
+      browser,
+      workshopParticipants[0].accountName,
+      async (page) => {
+        eligibleValueIds = await eligibleValueIdsOf(page);
+        await expect(
+          page.getByTestId(`vote-card-${eligibleValueIds[0]}`),
+        ).toContainText("We start every meeting with a check-in");
+        await expect(
+          page.getByTestId(`vote-card-${eligibleValueIds[1]}`),
+        ).toContainText(/Action for /);
+      },
+    );
+    expect(eligibleValueIds).toHaveLength(TOP_VALUE_COUNT);
+
+    const batches = inBatches(workshopParticipants);
+    for (const [batchIndex, batch] of batches.entries()) {
+      await Promise.all(
+        batch.map((account) =>
+          withParticipant(browser, account.accountName, async (page) => {
+            await castBallot(
+              page,
+              mainRoundBallotOf(workshopParticipants.indexOf(account)),
+              MAIN_ROUND_ALLOTMENT,
+            );
+          }),
+        ),
+      );
+      if (batchIndex === 0) {
+        await expect(facilitatorPage.getByTestId("voted-count")).toHaveText(
+          `Round 1 · voted: ${SIGN_IN_BATCH_SIZE}/${PARTICIPANT_COUNT}`,
+        );
+      }
+    }
+
+    await expect(facilitatorPage.getByTestId("voted-count")).toHaveText(
+      `Round 1 · voted: ${PARTICIPANT_COUNT}/${PARTICIPANT_COUNT}`,
+    );
+
+    await facilitatorPage.getByTestId("close-voting-button").click();
+
+    await expect(
+      facilitatorPage.getByTestId("closed-round-tallies"),
+    ).toBeVisible({ timeout: 10_000 });
+    await expect(
+      facilitatorPage.getByTestId(`tally-${eligibleValueIds[0]}`),
+    ).toContainText("30 votes");
+    for (const cardIndex of TIED_CARD_INDEXES) {
+      await expect(
+        facilitatorPage.getByTestId(`tally-${eligibleValueIds[cardIndex]}`),
+      ).toContainText("14 votes");
+    }
+    await expect(facilitatorPage.getByTestId("tie-callout")).toContainText(
+      "(14 votes)",
+    );
+    await expect(
+      facilitatorPage.getByTestId("start-tiebreak-button"),
+    ).toBeEnabled();
+    await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
+    await expect(
+      presenterPage.getByTestId("presenter-final-voting-screen"),
+    ).toBeVisible();
+  });
+
+  test("a tiebreak round over the tied values resolves and unlocks phase 9", async ({
+    browser,
+  }) => {
+    test.setTimeout(300_000);
+
+    const [firstTiedValueId, secondTiedValueId] = TIED_CARD_INDEXES.map(
+      (cardIndex) => eligibleValueIds[cardIndex],
+    );
+
+    await facilitatorPage.getByTestId("start-tiebreak-button").click();
+    await expect(facilitatorPage.getByTestId("voted-count")).toHaveText(
+      `Round 2 · voted: 0/${PARTICIPANT_COUNT}`,
+      { timeout: 10_000 },
+    );
+
+    for (const batch of inBatches(workshopParticipants)) {
+      await Promise.all(
+        batch.map((account) =>
+          withParticipant(browser, account.accountName, async (page) => {
+            await expect(page.getByTestId(/^vote-card-/)).toHaveCount(2, {
+              timeout: 15_000,
+            });
+            await expect(
+              page.getByTestId("submit-votes-button"),
+            ).toHaveText("Submit 1 vote");
+            const participantIndex = workshopParticipants.indexOf(account);
+            const chosenValueId =
+              participantIndex < TIEBREAK_WINNER_VOTES
+                ? firstTiedValueId
+                : secondTiedValueId;
+            await castBallot(page, new Map([[chosenValueId, 1]]), 1);
+          }),
+        ),
+      );
+    }
+
+    await expect(facilitatorPage.getByTestId("voted-count")).toHaveText(
+      `Round 2 · voted: ${PARTICIPANT_COUNT}/${PARTICIPANT_COUNT}`,
+    );
+
+    await facilitatorPage.getByTestId("close-voting-button").click();
+
+    await expect(
+      facilitatorPage.getByTestId(`tally-${firstTiedValueId}`),
+    ).toContainText("16 votes", { timeout: 10_000 });
+    await expect(
+      facilitatorPage.getByTestId(`tally-${secondTiedValueId}`),
+    ).toContainText("14 votes");
+    await expect(facilitatorPage.getByTestId("tie-callout")).toHaveCount(0);
+
+    await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
+    await advancePhaseButton(facilitatorPage).click();
+    for (const page of [facilitatorPage, presenterPage]) {
+      await expect(page.getByTestId("phase")).toHaveText("Phase 9");
     }
   });
 });
