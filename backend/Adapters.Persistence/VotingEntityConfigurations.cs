@@ -4,6 +4,46 @@ using ValuesWorkshop.Adapters.Persistence.Entities;
 
 namespace ValuesWorkshop.Adapters.Persistence;
 
+internal sealed class VotingRoundEntityConfiguration : IEntityTypeConfiguration<VotingRoundEntity>
+{
+    public void Configure(EntityTypeBuilder<VotingRoundEntity> builder)
+    {
+        builder.ToTable("voting_rounds");
+        builder.HasKey(round => new { round.SessionIdentity, round.RoundNumber });
+        builder.Property(round => round.SessionIdentity).HasColumnName("session_identity");
+        builder.Property(round => round.RoundNumber).HasColumnName("round_number");
+        builder.Property(round => round.Allotment).HasColumnName("allotment");
+        builder.Property(round => round.VotedCount).HasColumnName("voted_count");
+        builder
+            .HasOne(round => round.Session)
+            .WithMany(session => session.VotingRounds)
+            .HasForeignKey(round => round.SessionIdentity);
+    }
+}
+
+internal sealed class VotingRoundTieEntityConfiguration
+    : IEntityTypeConfiguration<VotingRoundTieEntity>
+{
+    public void Configure(EntityTypeBuilder<VotingRoundTieEntity> builder)
+    {
+        builder.ToTable("voting_round_ties");
+        builder.HasKey(tie => new
+        {
+            tie.SessionIdentity,
+            tie.RoundNumber,
+            tie.ValueId,
+        });
+        builder.Property(tie => tie.SessionIdentity).HasColumnName("session_identity");
+        builder.Property(tie => tie.RoundNumber).HasColumnName("round_number");
+        builder.Property(tie => tie.ValueId).HasColumnName("value_id");
+        builder.Property(tie => tie.SortOrder).HasColumnName("sort_order");
+        builder
+            .HasOne(tie => tie.Session)
+            .WithMany(session => session.VotingRoundTies)
+            .HasForeignKey(tie => tie.SessionIdentity);
+    }
+}
+
 internal sealed class VoteTallyEntityConfiguration : IEntityTypeConfiguration<VoteTallyEntity>
 {
     public void Configure(EntityTypeBuilder<VoteTallyEntity> builder)
@@ -19,6 +59,7 @@ internal sealed class VoteTallyEntityConfiguration : IEntityTypeConfiguration<Vo
         builder.Property(tally => tally.RoundNumber).HasColumnName("round_number");
         builder.Property(tally => tally.ValueId).HasColumnName("value_id");
         builder.Property(tally => tally.VoteCount).HasColumnName("vote_count");
+        builder.Property(tally => tally.SortOrder).HasColumnName("sort_order");
         builder
             .HasOne(tally => tally.Session)
             .WithMany(session => session.VoteTallies)
@@ -57,6 +98,7 @@ internal sealed class WinningValueEntityConfiguration : IEntityTypeConfiguration
         builder.Property(winner => winner.SessionIdentity).HasColumnName("session_identity");
         builder.Property(winner => winner.ValueId).HasColumnName("value_id");
         builder.Property(winner => winner.Rank).HasColumnName("rank");
+        builder.Property(winner => winner.RoundNumber).HasColumnName("round_number");
         builder
             .HasOne(winner => winner.Session)
             .WithMany(session => session.WinningValues)

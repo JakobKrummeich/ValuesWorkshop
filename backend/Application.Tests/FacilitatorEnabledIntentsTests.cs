@@ -180,6 +180,39 @@ public class FacilitatorEnabledIntentsTests
     }
 
     [Fact]
+    public void An_open_voting_round_enables_exactly_the_close()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalVoting,
+            voting: TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 10))
+        );
+
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.CloseVoting]);
+    }
+
+    [Fact]
+    public void A_closed_round_with_a_tie_enables_exactly_the_tiebreak_start()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalVoting,
+            voting: TestVoting.AfterLocking(TestValueIds.Numbered(1, 4))
+        );
+
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.StartTiebreakRound]);
+    }
+
+    [Fact]
+    public void Standing_winners_enable_exactly_the_phase_advance()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalVoting,
+            voting: TestVoting.AfterLocking(TestValueIds.Numbered(1, 5))
+        );
+
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.AdvancePhase]);
+    }
+
+    [Fact]
     public void The_final_phase_enables_no_phase_advance_because_no_phase_follows()
     {
         var session = SessionFixtures.InPhase(Phase.FinalPresentation);

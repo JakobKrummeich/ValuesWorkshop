@@ -199,9 +199,22 @@ export type PresenterPresentationView = z.infer<
   typeof presenterPresentationViewSchema
 >;
 
-export const votingViewSchema = z.object({
+export const participantVotingViewSchema = z.object({
   roundNumber: z.int(),
+  allotment: z.int(),
+  eligibleValueIds: valueIdsSchema,
   isRoundOpen: z.boolean(),
+  hasVotedThisRound: z.boolean(),
+});
+
+export const facilitatorVotingViewSchema = z.object({
+  roundNumber: z.int(),
+  allotment: z.int(),
+  eligibleValueIds: valueIdsSchema,
+  isRoundOpen: z.boolean(),
+  votedCount: z.int(),
+  closedRoundTallies: z.record(z.string(), z.int()).optional(),
+  tiedValueIds: valueIdsSchema.optional(),
 });
 
 export const presenterVotingViewSchema = z.object({

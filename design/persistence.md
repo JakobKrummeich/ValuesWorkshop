@@ -208,11 +208,28 @@ CREATE TABLE group_actions (
 ### Final voting (anonymous by schema)
 
 ```sql
+CREATE TABLE voting_rounds (
+    session_identity TEXT    NOT NULL REFERENCES sessions(identity),
+    round_number     INTEGER NOT NULL,
+    allotment        INTEGER NOT NULL,
+    voted_count      INTEGER NOT NULL,
+    PRIMARY KEY (session_identity, round_number)
+);
+
 CREATE TABLE vote_tallies (
     session_identity TEXT    NOT NULL REFERENCES sessions(identity),
     round_number     INTEGER NOT NULL,
     value_id         TEXT    NOT NULL,
     vote_count       INTEGER NOT NULL,
+    sort_order       INTEGER NOT NULL,
+    PRIMARY KEY (session_identity, round_number, value_id)
+);
+
+CREATE TABLE voting_round_ties (
+    session_identity TEXT    NOT NULL REFERENCES sessions(identity),
+    round_number     INTEGER NOT NULL,
+    value_id         TEXT    NOT NULL,
+    sort_order       INTEGER NOT NULL,
     PRIMARY KEY (session_identity, round_number, value_id)
 );
 
@@ -227,9 +244,14 @@ CREATE TABLE winning_values (
     session_identity TEXT    NOT NULL REFERENCES sessions(identity),
     value_id         TEXT    NOT NULL,
     rank             INTEGER NOT NULL,
+    round_number     INTEGER NOT NULL,
     PRIMARY KEY (session_identity, value_id)
 );
 ```
+
+`voted_participants` holds rows only while a round is open — it exists to
+refuse a second ballot. Closing a round deletes its rows; the round's
+anonymous `voted_count` on `voting_rounds` is all that survives.
 
 ---
 

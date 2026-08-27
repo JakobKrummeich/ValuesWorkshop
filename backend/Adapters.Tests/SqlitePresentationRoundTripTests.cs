@@ -48,7 +48,7 @@ public sealed class SqlitePresentationRoundTripTests : IAsyncLifetime, IDisposab
             SelectionRound.Restore([], []),
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore("Eagle", null, 2),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 0
         );
 

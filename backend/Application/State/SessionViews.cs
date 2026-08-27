@@ -63,9 +63,37 @@ internal static class SessionViews
         );
     }
 
-    internal static VotingView Voting(Session session)
+    internal static ParticipantVotingView Voting(Session session, ParticipantId caller)
     {
-        return new VotingView(session.Voting.RoundNumber, session.Voting.RoundOpen);
+        return new ParticipantVotingView(
+            session.Voting.RoundNumber,
+            session.Voting.Allotment,
+            ValueIdsOf(session.Voting.EligibleValues),
+            session.Voting.RoundOpen,
+            session.Voting.HasVoted(caller)
+        );
+    }
+
+    internal static FacilitatorVotingView FacilitatorVoting(Session session)
+    {
+        var lastClosedRound = session.Voting.LastClosedRound;
+
+        return new FacilitatorVotingView(
+            session.Voting.RoundNumber,
+            session.Voting.Allotment,
+            ValueIdsOf(session.Voting.EligibleValues),
+            session.Voting.RoundOpen,
+            session.Voting.VotedCount,
+            lastClosedRound?.Tallies.ToDictionary(tally => tally.Key.Value, tally => tally.Value),
+            lastClosedRound is { TiedValues.Count: > 0 }
+                ? ValueIdsOf(lastClosedRound.TiedValues)
+                : null
+        );
+    }
+
+    internal static PresenterVotingView PresenterVoting(Session session)
+    {
+        return new PresenterVotingView(session.Voting.RoundOpen);
     }
 
     internal static ConclusionView Conclusion(Session session)

@@ -238,7 +238,7 @@ public class ParticipantHubTests
                 ]
             ),
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 1
         );
         repository.Add(session);

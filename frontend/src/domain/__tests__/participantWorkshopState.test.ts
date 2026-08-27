@@ -357,6 +357,43 @@ describe("participant workshop state schema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("accepts a final-voting state with the caller's round view", () => {
+    const state = participantWorkshopStateSchema.parse({
+      revision: 12,
+      phase: 8,
+      participantCount: 9,
+      voting: {
+        roundNumber: 1,
+        allotment: 5,
+        eligibleValueIds: ["wert-1", "wert-2"],
+        isRoundOpen: true,
+        hasVotedThisRound: false,
+      },
+    });
+
+    if (state.phase !== Phase.FinalVoting) {
+      throw new Error("expected a final voting state");
+    }
+    expect(state.voting.allotment).toBe(5);
+    expect(state.voting.hasVotedThisRound).toBe(false);
+  });
+
+  it("rejects a final-voting state without the vote allotment", () => {
+    const result = participantWorkshopStateSchema.safeParse({
+      revision: 12,
+      phase: 8,
+      participantCount: 9,
+      voting: {
+        roundNumber: 1,
+        eligibleValueIds: ["wert-1"],
+        isRoundOpen: true,
+        hasVotedThisRound: false,
+      },
+    });
+
+    expect(result.success).toBe(false);
+  });
+
   it("rejects a quiz state without the total question count", () => {
     const result = participantWorkshopStateSchema.safeParse({
       revision: 3,

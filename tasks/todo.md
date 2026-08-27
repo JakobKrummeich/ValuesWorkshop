@@ -547,15 +547,20 @@ submit status + scribe reassignment control.
 ### Task 21: Phase 7 — Value presentation
 **Description:** Facilitator selects which group is presenting; presenter
 shows that group's values + actions; participants see passive view.
+> Pivoted in spec review 2026-08-26: no free group selection — the walk runs
+> in per-group blocks in formation order, each block opening with a group
+> intro screen (`PresentingGroupName` set, `PresentedValueId` null), then
+> that group's values one step each. `CorrectActionWording` fixes typos
+> live. Done in PR #44 (spec 21).
 **Acceptance criteria:**
-- [ ] Group switch reflects on presenter without reload
-- [ ] Only submitted content shown
-- [ ] **From Task 11 (Q1 deferral):** presentation walk cursor mechanics land
+- [x] Group switch reflects on presenter without reload
+- [x] Only submitted content shown
+- [x] **From Task 11 (Q1 deferral):** presentation walk cursor mechanics land
       here — `GoToNextValue` over group → value, persisted
-- [ ] **From Task 11:** turn on the phase exit guard by registering a
+- [x] **From Task 11:** turn on the phase exit guard by registering a
       `ValuePresentationExitGuard` with the real presented-value count in the
-      host `PhaseExitGuards`
-- [ ] Multi-client e2e extended through phase 7
+      host `PhaseExitGuards` (became per-session `GuardsFor(session)`, D3)
+- [x] Multi-client e2e extended through phase 7
 **Verification:** FE tests + Playwright switch check.
 **Dependencies:** 20. **Size:** S
 
@@ -563,8 +568,9 @@ shows that group's values + actions; participants see passive view.
 **Description:** 5 votes per participant across all presented values;
 multi-votes up to 5 on one value; storage anonymous (tallies + has-voted
 flag only — no voter↔vote rows). Tie at 5th place → tiebreak round over
-tied values only, votes-per-participant = number of tied values, repeat
-until exactly 5 survive. Facilitator sub-control starts each tiebreak.
+tied values only, votes-per-participant = number of winner places still
+open, repeat until exactly 5 survive. Facilitator sub-control starts each
+tiebreak.
 **Acceptance criteria:**
 - [ ] >5 votes rejected; vote data contains no participant identifier
       (asserted by test against DB schema/rows)

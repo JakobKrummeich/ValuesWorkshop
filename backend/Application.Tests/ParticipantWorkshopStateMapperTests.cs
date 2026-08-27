@@ -468,17 +468,38 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Final_voting_state_reports_the_round_and_whether_it_is_open()
+    public void Final_voting_state_carries_the_open_round_without_any_tallies()
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
-            voting: VotingRounds.Restore(true, 2, [])
+            voting: TestVoting.TiebreakOpen(2, TestValueIds.Numbered(1, 3), allotment: 2)
         );
 
         var voting = Map(session).ShouldBeOfType<ParticipantFinalVotingState>().Voting;
 
         voting.RoundNumber.ShouldBe(2);
+        voting.Allotment.ShouldBe(2);
+        voting.EligibleValueIds.ShouldBe(["wert-1", "wert-2", "wert-3"]);
         voting.IsRoundOpen.ShouldBeTrue();
+        voting.HasVotedThisRound.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void Final_voting_state_tells_the_caller_whether_they_voted_this_round()
+    {
+        var voting = TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 10));
+        voting.RecordBallot(
+            SessionFixtures.Anna,
+            new Dictionary<ValueId, int> { [new ValueId("wert-1")] = 5 }
+        );
+        var session = SessionFixtures.InPhase(Phase.FinalVoting, voting: voting);
+
+        Map(session, SessionFixtures.Anna)
+            .ShouldBeOfType<ParticipantFinalVotingState>()
+            .Voting.HasVotedThisRound.ShouldBeTrue();
+        Map(session, SessionFixtures.Ben)
+            .ShouldBeOfType<ParticipantFinalVotingState>()
+            .Voting.HasVotedThisRound.ShouldBeFalse();
     }
 
     [Fact]
@@ -486,7 +507,7 @@ public class ParticipantWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalPresentation,
-            voting: VotingRounds.Restore(false, 2, [new ValueId("honesty"), new ValueId("courage")])
+            voting: TestVoting.AfterLocking([new ValueId("honesty"), new ValueId("courage")])
         );
 
         Map(session)

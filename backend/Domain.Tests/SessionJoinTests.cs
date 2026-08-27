@@ -191,7 +191,7 @@ public class SessionJoinTests
             SelectionRound.Restore([], []),
             formation,
             PresentationWalk.Restore(null, null, 0),
-            VotingRounds.Restore(false, 0, []),
+            VotingRounds.Restore([], null),
             revision: 0
         );
     }

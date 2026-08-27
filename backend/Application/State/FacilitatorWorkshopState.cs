@@ -105,7 +105,7 @@ public sealed record FacilitatorFinalVotingState(
     long Revision,
     RosterView Roster,
     IReadOnlyList<FacilitatorIntent> EnabledIntents,
-    VotingView Voting
+    FacilitatorVotingView Voting
 ) : FacilitatorWorkshopState(Revision, Roster, EnabledIntents)
 {
     [JsonIgnore]

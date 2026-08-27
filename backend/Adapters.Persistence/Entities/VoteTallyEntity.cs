@@ -6,6 +6,7 @@ public sealed class VoteTallyEntity
     public int RoundNumber { get; set; }
     public string ValueId { get; set; } = "";
     public int VoteCount { get; set; }
+    public int SortOrder { get; set; }
 
     public SessionEntity Session { get; set; } = null!;
 }

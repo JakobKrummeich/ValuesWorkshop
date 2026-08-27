@@ -18,7 +18,9 @@ public sealed class WorkshopDbContext(DbContextOptions<WorkshopDbContext> option
     public DbSet<GroupMemberEntity> GroupMembers => Set<GroupMemberEntity>();
     public DbSet<GroupAssignedValueEntity> GroupAssignedValues => Set<GroupAssignedValueEntity>();
     public DbSet<GroupActionEntity> GroupActions => Set<GroupActionEntity>();
+    public DbSet<VotingRoundEntity> VotingRounds => Set<VotingRoundEntity>();
     public DbSet<VoteTallyEntity> VoteTallies => Set<VoteTallyEntity>();
+    public DbSet<VotingRoundTieEntity> VotingRoundTies => Set<VotingRoundTieEntity>();
     public DbSet<VotedParticipantEntity> VotedParticipants => Set<VotedParticipantEntity>();
     public DbSet<WinningValueEntity> WinningValues => Set<WinningValueEntity>();
 
@@ -36,7 +38,9 @@ public sealed class WorkshopDbContext(DbContextOptions<WorkshopDbContext> option
         modelBuilder.ApplyConfiguration(new GroupMemberEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GroupAssignedValueEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GroupActionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new VotingRoundEntityConfiguration());
         modelBuilder.ApplyConfiguration(new VoteTallyEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new VotingRoundTieEntityConfiguration());
         modelBuilder.ApplyConfiguration(new VotedParticipantEntityConfiguration());
         modelBuilder.ApplyConfiguration(new WinningValueEntityConfiguration());
     }

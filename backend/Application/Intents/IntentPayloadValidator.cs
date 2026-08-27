@@ -45,6 +45,38 @@ internal static class IntentPayloadValidator
             );
     }
 
+    internal static IReadOnlyDictionary<ValueId, int> RequiredVotes(
+        IReadOnlyList<SubmitFinalVote>? votes
+    )
+    {
+        if (votes is null)
+        {
+            throw new MalformedPayloadException("A ballot needs its votes.");
+        }
+
+        var votesPerValue = new Dictionary<ValueId, int>();
+
+        foreach (var vote in votes)
+        {
+            if (string.IsNullOrWhiteSpace(vote.ValueId))
+            {
+                throw new MalformedPayloadException("Every vote needs its value identifier.");
+            }
+
+            if (vote.VoteCount is not { } voteCount)
+            {
+                throw new MalformedPayloadException("Every vote needs its vote count.");
+            }
+
+            if (!votesPerValue.TryAdd(new ValueId(vote.ValueId), voteCount))
+            {
+                throw new MalformedPayloadException("A ballot lists each value at most once.");
+            }
+        }
+
+        return votesPerValue;
+    }
+
     internal static ParticipantId RequiredParticipantId(string? participantId)
     {
         return Guid.TryParse(participantId, out var value)

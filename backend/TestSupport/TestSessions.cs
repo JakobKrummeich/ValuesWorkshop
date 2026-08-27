@@ -39,7 +39,7 @@ public static class TestSessions
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),
-            voting ?? VotingRounds.Restore(false, 0, []),
+            voting ?? VotingRounds.Restore([], null),
             revision
         );
     }

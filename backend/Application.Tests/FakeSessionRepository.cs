@@ -41,9 +41,16 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
                 session.Presentation.ShownValueCount
             ),
             VotingRounds.Restore(
-                session.Voting.RoundOpen,
-                session.Voting.RoundNumber,
-                session.Voting.WinningValues
+                [.. session.Voting.ClosedRounds],
+                session.Voting.RoundOpen
+                    ? new OpenVotingRound(
+                        session.Voting.RoundNumber,
+                        session.Voting.Allotment,
+                        session.Voting.EligibleValues,
+                        session.Voting.OpenRoundTallies,
+                        session.Voting.OpenRoundVotedParticipants
+                    )
+                    : null
             ),
             session.Revision
         );

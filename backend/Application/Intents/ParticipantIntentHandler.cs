@@ -121,6 +121,22 @@ public sealed class ParticipantIntentHandler(IntentPipeline pipeline, IValuesCat
         );
     }
 
+    public Task<IntentResult> HandleAsync(SubmitFinalVotesCommand command)
+    {
+        return pipeline.ExecuteAsync(
+            command.SessionIdentity,
+            session =>
+            {
+                FinalVoting.SubmitVotes(
+                    session,
+                    command.ParticipantId,
+                    IntentPayloadValidator.RequiredVotes(command.Votes)
+                );
+                return true;
+            }
+        );
+    }
+
     private static void ApplyFinalEdits(
         Session session,
         ParticipantId participantId,

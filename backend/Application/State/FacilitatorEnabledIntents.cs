@@ -23,6 +23,11 @@ internal static class FacilitatorEnabledIntents
             AddPresentationWalkIntents(enabledIntents, session);
         }
 
+        if (session.PhaseProgress.CurrentPhase == Phase.FinalVoting)
+        {
+            AddVotingIntents(enabledIntents, session.Voting);
+        }
+
         if (session.PhaseProgress.HasNextPhase && PhaseExitGuards.PermitExitOf(session))
         {
             enabledIntents.Add(FacilitatorIntent.AdvancePhase);
@@ -44,6 +49,22 @@ internal static class FacilitatorEnabledIntents
         if (session.Presentation.PresentedValue is not null)
         {
             enabledIntents.Add(FacilitatorIntent.CorrectActionWording);
+        }
+    }
+
+    private static void AddVotingIntents(
+        List<FacilitatorIntent> enabledIntents,
+        VotingRounds voting
+    )
+    {
+        if (voting.RoundOpen)
+        {
+            enabledIntents.Add(FacilitatorIntent.CloseVoting);
+        }
+
+        if (voting.TiebreakPending)
+        {
+            enabledIntents.Add(FacilitatorIntent.StartTiebreakRound);
         }
     }
 

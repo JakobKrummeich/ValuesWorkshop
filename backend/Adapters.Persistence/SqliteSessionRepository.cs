@@ -189,8 +189,10 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
                 .ThenInclude(groupEntity => groupEntity.AssignedValues)
             .Include(sessionEntity => sessionEntity.Groups)
                 .ThenInclude(groupEntity => groupEntity.Actions)
+            .Include(sessionEntity => sessionEntity.VotingRounds)
             .Include(sessionEntity => sessionEntity.VoteTallies)
             .Include(sessionEntity => sessionEntity.VotedParticipants)
+            .Include(sessionEntity => sessionEntity.VotingRoundTies)
             .Include(sessionEntity => sessionEntity.WinningValues)
             .AsSplitQuery();
     }
@@ -201,8 +203,10 @@ public sealed class SqliteSessionRepository(WorkshopDbContext database) : ISessi
         database.RemoveRange(entity.QuizAnswers);
         database.RemoveRange(entity.ValueSelections);
         database.RemoveRange(entity.TopValues);
+        database.RemoveRange(entity.VotingRounds);
         database.RemoveRange(entity.VoteTallies);
         database.RemoveRange(entity.VotedParticipants);
+        database.RemoveRange(entity.VotingRoundTies);
         database.RemoveRange(entity.WinningValues);
 
         foreach (var group in entity.Groups)

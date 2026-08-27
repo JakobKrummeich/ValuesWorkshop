@@ -305,6 +305,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("value_id");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sort_order");
+
                     b.Property<int>("VoteCount")
                         .HasColumnType("INTEGER")
                         .HasColumnName("vote_count");
@@ -331,6 +335,52 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.HasKey("SessionIdentity", "RoundNumber", "ParticipantId");
 
                     b.ToTable("voted_participants", (string)null);
+                });
+
+            modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.VotingRoundEntity", b =>
+                {
+                    b.Property<string>("SessionIdentity")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("session_identity");
+
+                    b.Property<int>("RoundNumber")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("round_number");
+
+                    b.Property<int>("Allotment")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("allotment");
+
+                    b.Property<int>("VotedCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("voted_count");
+
+                    b.HasKey("SessionIdentity", "RoundNumber");
+
+                    b.ToTable("voting_rounds", (string)null);
+                });
+
+            modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.VotingRoundTieEntity", b =>
+                {
+                    b.Property<string>("SessionIdentity")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("session_identity");
+
+                    b.Property<int>("RoundNumber")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("round_number");
+
+                    b.Property<string>("ValueId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("value_id");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("sort_order");
+
+                    b.HasKey("SessionIdentity", "RoundNumber", "ValueId");
+
+                    b.ToTable("voting_round_ties", (string)null);
                 });
 
             modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.VotingStateEntity", b =>
@@ -365,6 +415,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.Property<int>("Rank")
                         .HasColumnType("INTEGER")
                         .HasColumnName("rank");
+
+                    b.Property<int>("RoundNumber")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("round_number");
 
                     b.HasKey("SessionIdentity", "ValueId");
 
@@ -503,6 +557,28 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.Navigation("Session");
                 });
 
+            modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.VotingRoundEntity", b =>
+                {
+                    b.HasOne("ValuesWorkshop.Adapters.Persistence.Entities.SessionEntity", "Session")
+                        .WithMany("VotingRounds")
+                        .HasForeignKey("SessionIdentity")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Session");
+                });
+
+            modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.VotingRoundTieEntity", b =>
+                {
+                    b.HasOne("ValuesWorkshop.Adapters.Persistence.Entities.SessionEntity", "Session")
+                        .WithMany("VotingRoundTies")
+                        .HasForeignKey("SessionIdentity")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Session");
+                });
+
             modelBuilder.Entity("ValuesWorkshop.Adapters.Persistence.Entities.VotingStateEntity", b =>
                 {
                     b.HasOne("ValuesWorkshop.Adapters.Persistence.Entities.SessionEntity", "Session")
@@ -555,6 +631,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                     b.Navigation("VoteTallies");
 
                     b.Navigation("VotedParticipants");
+
+                    b.Navigation("VotingRoundTies");
+
+                    b.Navigation("VotingRounds");
 
                     b.Navigation("VotingState")
                         .IsRequired();

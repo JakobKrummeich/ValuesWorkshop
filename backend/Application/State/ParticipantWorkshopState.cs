@@ -93,7 +93,7 @@ public sealed record ParticipantValuePresentationState(
 public sealed record ParticipantFinalVotingState(
     long Revision,
     int ParticipantCount,
-    VotingView Voting
+    ParticipantVotingView Voting
 ) : ParticipantWorkshopState(Revision, ParticipantCount)
 {
     [JsonIgnore]

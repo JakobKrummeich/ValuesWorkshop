@@ -47,6 +47,13 @@ internal static class DomainEntityMapper
                 RoundOpen = session.Voting.RoundOpen,
                 RoundNumber = session.Voting.RoundNumber,
             },
+            VotingRounds = VotingEntityMapper.RoundEntities(identityString, session.Voting),
+            VoteTallies = VotingEntityMapper.TallyEntities(identityString, session.Voting),
+            VotedParticipants = VotingEntityMapper.VotedParticipantEntities(
+                identityString,
+                session.Voting
+            ),
+            VotingRoundTies = VotingEntityMapper.TieEntities(identityString, session.Voting),
             Participants = session
                 .Roster.Participants.Select(
                     (participant, index) =>
@@ -77,17 +84,7 @@ internal static class DomainEntityMapper
             Groups = session
                 .Formation.Groups.Select(group => ToGroupEntity(identityString, group))
                 .ToList(),
-            WinningValues = session
-                .Voting.WinningValues.Select(
-                    (valueId, index) =>
-                        new WinningValueEntity
-                        {
-                            SessionIdentity = identityString,
-                            ValueId = valueId.Value,
-                            Rank = index + 1,
-                        }
-                )
-                .ToList(),
+            WinningValues = VotingEntityMapper.WinningValueEntities(identityString, session.Voting),
         };
     }
 
@@ -157,13 +154,7 @@ internal static class DomainEntityMapper
             entity.PresentationState.ShownValueCount
         );
 
-        var voting = VotingRounds.Restore(
-            entity.VotingState.RoundOpen,
-            entity.VotingState.RoundNumber,
-            entity
-                .WinningValues.OrderBy(winner => winner.Rank)
-                .Select(winner => new ValueId(winner.ValueId))
-        );
+        var voting = VotingEntityMapper.RestoreVoting(entity);
 
         var identity = new SessionIdentity(Guid.Parse(entity.Identity));
 
