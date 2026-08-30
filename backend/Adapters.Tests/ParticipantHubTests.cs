@@ -352,6 +352,55 @@ public class ParticipantHubTests
         broadcaster.Broadcasts.ShouldHaveSingleItem();
     }
 
+    private static readonly IReadOnlyList<ValueId> EligibleValues = TestValueIds.Numbered(1, 5);
+
+    private void SessionInFinalVoting()
+    {
+        var session = TestSessions.InPhase(
+            KnownSession,
+            Phase.FinalVoting,
+            voting: TestVoting.MainRoundOpen(EligibleValues)
+        );
+        session.Join(TestParticipants.Named(Anna, "Anna Schmidt"), new FixedRandomness(0));
+        repository.Add(session);
+    }
+
+    [Fact]
+    public async Task Casting_final_votes_puts_the_ballot_on_the_tallies_and_broadcasts()
+    {
+        SessionInFinalVoting();
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitFinalVotes([
+            new SubmitFinalVotePayload("wert-1", 2),
+            new SubmitFinalVotePayload("wert-2", 1),
+            new SubmitFinalVotePayload("wert-3", 1),
+            new SubmitFinalVotePayload("wert-4", 1),
+        ]);
+
+        result.ShouldBe(IntentResult.Accepted());
+        var saved = repository.Saved.ShouldHaveSingleItem();
+        saved.Voting.HasVoted(Anna).ShouldBeTrue();
+        saved.Voting.OpenRoundTallies[EligibleValues[0]].ShouldBe(2);
+        saved.Voting.OpenRoundTallies[EligibleValues[1]].ShouldBe(1);
+        saved.Voting.OpenRoundTallies[EligibleValues[4]].ShouldBe(0);
+        broadcaster.Broadcasts.ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public async Task Casting_a_ballot_without_votes_is_rejected_as_a_malformed_payload()
+    {
+        SessionInFinalVoting();
+        var hub = HubBoundTo(KnownSession, Subject);
+
+        var result = await hub.SubmitFinalVotes(null);
+
+        result.IsAccepted.ShouldBeFalse();
+        result.Code.ShouldBe(IntentRejectionCode.MalformedPayload);
+        repository.Saved.ShouldBeEmpty();
+        broadcaster.Broadcasts.ShouldBeEmpty();
+    }
+
     [Fact]
     public async Task Choosing_an_answer_without_an_authenticated_subject_is_refused()
     {
