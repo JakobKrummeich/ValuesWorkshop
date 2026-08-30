@@ -23,15 +23,15 @@ The top temporal-coupling pairs are all production↔its-own-test pairs
 0.74) — that is TDD, not erosion.
 
 What the module table cannot show is the one boundary that has **no module
-row at all**, because it runs *between* the two trees the analysis splits:
+row at all**, because it runs _between_ the two trees the analysis splits:
 the SignalR wire contract. Counting commits over the full history (542
 commits, 2026-07-19 → 2026-08-29) against the two sides of that seam:
 
-| Side | Paths counted | Commits |
-|---|---|---|
-| backend wire types only | `Application/State/**`, `IntentRejectionCode.cs`, `*Hub.cs`, `Submit*Payload.cs` | 37 |
-| frontend mirror only | `domain/workshopState*.ts`, `domain/intentResult.ts` | 18 |
-| **both sides in one commit** | | **9** |
+| Side                         | Paths counted                                                                    | Commits |
+| ---------------------------- | -------------------------------------------------------------------------------- | ------- |
+| backend wire types only      | `Application/State/**`, `IntentRejectionCode.cs`, `*Hub.cs`, `Submit*Payload.cs` | 37      |
+| frontend mirror only         | `domain/workshopState*.ts`, `domain/intentResult.ts`                             | 18      |
+| **both sides in one commit** |                                                                                  | **9**   |
 
 9 of 64 (14%). Widened to the ports and adapters that carry the same
 contract (`frontend/src/domain/ports/**`, `frontend/src/adapters/**`): 35
@@ -50,7 +50,7 @@ The mirrored surface, counted in today's tree:
   members (`FacilitatorIntent` 9, `ParticipantIntent` 7)
 - **7** wire enums (`Phase`, `IntentRejectionCode`, `FacilitatorIntent`,
   `QuizSubState`, `GroupWorkStatus`, `FormationSubState`, plus the
-  frontend-only `ParticipantIntent` whose *values are backend method names*)
+  frontend-only `ParticipantIntent` whose _values are backend method names_)
 - ~1 800 lines of C# ↔ ~465 lines of TypeScript
 
 Machine checks that cross the seam today: **one**. `pnpm --dir frontend lint`
@@ -72,7 +72,7 @@ values — is a hand-kept mirror with no driver.**
 intent catalog per hub, § 5 the per-role phase-discriminated state, § 6.2
 `IntentRejectionCode`, § 7 the frontend port slices. It opens with "Living
 document. The FE/BE contract for real-time communication." The contract is
-therefore *intentional and documented* — it is only unenforced. Per the
+therefore _intentional and documented_ — it is only unenforced. Per the
 evolutionary-architecture rule this run is written against: a boundary that
 is not machine-checked erodes silently.
 
@@ -112,7 +112,7 @@ commits whose only content is re-aligning one side with the other:
 Honest reading: none of these reached `main` broken — one author held both
 sides in one branch and caught each mismatch by inspection. That is exactly
 the point. The invariant is currently protected by a person's attention, and
-the *only* enforcement listed in the review checklist that counts —
+the _only_ enforcement listed in the review checklist that counts —
 types, tests, linters — is absent here.
 
 **That protection is already eroding.** The mirror is incomplete on `main`
@@ -134,8 +134,8 @@ this seam, one side at a time:
   `ParticipantHub.SubmitFinalVotes`.
 
 Both commit messages cite `a8e3540` as the precedent. Neither test can
-detect drift: the frontend test pins the frontend's *belief* about the
-contract, the backend test pins the backend's *own* signature, and nothing
+detect drift: the frontend test pins the frontend's _belief_ about the
+contract, the backend test pins the backend's _own_ signature, and nothing
 compares the two. This is the signature of a problem at the wrong zoom
 level — file-level fixes cannot buy the guarantee, so they keep being bought
 anyway.
@@ -180,7 +180,7 @@ Two properties make this affordable:
    new block or field does not break the frontend consumer; only a rename,
    a removal or a retype does — which is precisely the breaking set.
 2. **The frontend is allowed to lag.** The intent assertion runs
-   frontend ⊆ backend (every name the frontend can *send* must exist on a
+   frontend ⊆ backend (every name the frontend can _send_ must exist on a
    hub), so today's missing `SubmitFinalVotes` does not block adoption.
 
 Names are literal everywhere: `contract/intents.json` contains the string
@@ -210,7 +210,7 @@ run in size. Steps 1/3/5 add a producer plus its checked-in output; steps
 3. **`contract/enums.json` + producer** (~60 lines). Serialize every member
    of `Phase`, `IntentRejectionCode`, `FacilitatorIntent`, `QuizSubState`,
    `GroupWorkStatus` and the `FormationSubState` discriminators through the
-   *real* `JsonSerializerOptions`, so the file records the wire form
+   _real_ `JsonSerializerOptions`, so the file records the wire form
    (`3`, `"editing"`, `"forming"`) rather than a source-parsed guess.
 4. **Frontend enum consumer** (~40 lines,
    `frontend/src/domain/__tests__/wireEnums.test.ts`): each TypeScript enum
@@ -254,12 +254,26 @@ import { createParticipantGroupWorkPort } from "../participantGroupWorkAdapter";
 
 const catalog: Record<string, { name: string; parameters: string[] }[]> =
   JSON.parse(
-    readFileSync(resolve(__dirname, "../../../../contract/intents.json"), "utf8"),
+    readFileSync(
+      resolve(__dirname, "../../../../contract/intents.json"),
+      "utf8",
+    ),
   );
 
 function recordingConnection() {
-  const invoke = jest.fn(() => of({ isAccepted: true, code: null, detail: null }));
-  return { invoke, connection: { connectionState: NEVER, start: NEVER, stop: NEVER, on: () => NEVER, invoke } };
+  const invoke = jest.fn(() =>
+    of({ isAccepted: true, code: null, detail: null }),
+  );
+  return {
+    invoke,
+    connection: {
+      connectionState: NEVER,
+      start: NEVER,
+      stop: NEVER,
+      on: () => NEVER,
+      invoke,
+    },
+  };
 }
 
 describe("every intent the frontend can send exists on its hub", () => {
@@ -338,7 +352,7 @@ stops being folklore.
   Rejected: comparing two schema languages is a project of its own, and the
   result would be a fitness function nobody can debug at 3 a.m.
 - **Wait for e2e to cover phases 8–9 (Tasks 23, 24, 27).** Rejected as the
-  *primary* answer: e2e is the slowest, most expensive gate, it only checks
+  _primary_ answer: e2e is the slowest, most expensive gate, it only checks
   the paths a scenario happens to walk, and it arrives after the contract has
   been written. The contract corpus runs in unit-test time on both sides and
   covers every role × phase whether or not a scenario exists. e2e stays
