@@ -29,6 +29,7 @@ export function FacilitatorSessionBoundary({
             quizControlPort: session.quizControlPort,
             groupWorkControlPort: session.groupWorkControlPort,
             walkControlPort: session.walkControlPort,
+            votingControlPort: session.votingControlPort,
           }}
         >
           <div className="screenFacilitator">{children}</div>

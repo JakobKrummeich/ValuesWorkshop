@@ -2,9 +2,11 @@ import type { FacilitatorGroupWorkControlPort } from "../domain/ports/facilitato
 import type { FacilitatorWalkControlPort } from "../domain/ports/facilitator/walkControlPort";
 import type { FacilitatorLifecyclePort } from "../domain/ports/facilitator/lifecyclePort";
 import type { FacilitatorQuizControlPort } from "../domain/ports/facilitator/quizControlPort";
+import type { FacilitatorVotingControlPort } from "../domain/ports/facilitator/votingControlPort";
 import type { ParticipantGroupWorkPort } from "../domain/ports/participant/groupWorkPort";
 import type { ParticipantQuizPort } from "../domain/ports/participant/quizPort";
 import type { ParticipantSelectionPort } from "../domain/ports/participant/selectionPort";
+import type { ParticipantVotingPort } from "../domain/ports/participant/votingPort";
 import type { FacilitatorSessionStatePort } from "../domain/ports/facilitator/sessionStatePort";
 import type { ParticipantSessionStatePort } from "../domain/ports/participant/sessionStatePort";
 import type { PresenterSessionStatePort } from "../domain/ports/presenter/sessionStatePort";
@@ -21,9 +23,11 @@ import { createFacilitatorGroupWorkControlPort } from "./facilitatorGroupWorkCon
 import { createFacilitatorWalkControlPort } from "./facilitatorWalkControlAdapter";
 import { createFacilitatorLifecyclePort } from "./facilitatorLifecycleAdapter";
 import { createFacilitatorQuizControlPort } from "./facilitatorQuizControlAdapter";
+import { createFacilitatorVotingControlPort } from "./facilitatorVotingControlAdapter";
 import { createParticipantGroupWorkPort } from "./participantGroupWorkAdapter";
 import { createParticipantQuizPort } from "./participantQuizAdapter";
 import { createParticipantSelectionPort } from "./participantSelectionAdapter";
+import { createParticipantVotingPort } from "./participantVotingAdapter";
 import { withSerializedLifecycle } from "./serializedLifecycle";
 import { createSessionStatePort } from "./sessionStateAdapter";
 import { createSignalRConnection } from "./signalRConnection";
@@ -39,6 +43,7 @@ export interface ParticipantSession extends WorkshopSession {
   readonly quizPort: ParticipantQuizPort;
   readonly selectionPort: ParticipantSelectionPort;
   readonly groupWorkPort: ParticipantGroupWorkPort;
+  readonly votingPort: ParticipantVotingPort;
 }
 
 export interface FacilitatorSession extends WorkshopSession {
@@ -47,6 +52,7 @@ export interface FacilitatorSession extends WorkshopSession {
   readonly quizControlPort: FacilitatorQuizControlPort;
   readonly groupWorkControlPort: FacilitatorGroupWorkControlPort;
   readonly walkControlPort: FacilitatorWalkControlPort;
+  readonly votingControlPort: FacilitatorVotingControlPort;
 }
 
 export interface PresenterSession extends WorkshopSession {
@@ -69,6 +75,7 @@ export function createParticipantSession(
     quizPort: createParticipantQuizPort(connection),
     selectionPort: createParticipantSelectionPort(connection),
     groupWorkPort: createParticipantGroupWorkPort(connection),
+    votingPort: createParticipantVotingPort(connection),
     ...lifetimeOf(connection),
   };
 }
@@ -90,6 +97,7 @@ export function createFacilitatorSession(
     quizControlPort: createFacilitatorQuizControlPort(connection),
     groupWorkControlPort: createFacilitatorGroupWorkControlPort(connection),
     walkControlPort: createFacilitatorWalkControlPort(connection),
+    votingControlPort: createFacilitatorVotingControlPort(connection),
     ...lifetimeOf(connection),
   };
 }

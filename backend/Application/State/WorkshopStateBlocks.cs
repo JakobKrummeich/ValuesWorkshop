@@ -134,10 +134,16 @@ public sealed record PresenterPresentationView(
     IReadOnlyList<PresenterPresentedActionView> PresentedActions
 );
 
+public sealed record EligibleValueView(
+    string ValueId,
+    LocalizedTextView Text,
+    IReadOnlyList<string> Actions
+);
+
 public sealed record ParticipantVotingView(
     int RoundNumber,
     int Allotment,
-    IReadOnlyList<string> EligibleValueIds,
+    IReadOnlyList<EligibleValueView> EligibleValues,
     bool IsRoundOpen,
     bool HasVotedThisRound
 );
@@ -145,9 +151,10 @@ public sealed record ParticipantVotingView(
 public sealed record FacilitatorVotingView(
     int RoundNumber,
     int Allotment,
-    IReadOnlyList<string> EligibleValueIds,
+    IReadOnlyList<WorkshopValueView> EligibleValues,
     bool IsRoundOpen,
     int VotedCount,
+    int ParticipantCount,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         IReadOnlyDictionary<string, int>? ClosedRoundTallies,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

@@ -33,6 +33,7 @@ function mockGroupWorkPort(
     quizPort: { chooseAnswer: () => NEVER },
     selectionPort: { submitSelection: () => NEVER },
     groupWorkPort: port,
+    votingPort: { submitFinalVotes: () => NEVER },
   });
   return port;
 }

@@ -56,11 +56,12 @@ phase 8 → 9.
   > Amended in diff review 2026-08-26: closed rounds keep no has-voted
   > membership — only the voter count; the set lives on the open round
   > solely to stop double voting.
-- **D7 — wire blocks per protocol.** Participant `voting`: `roundNumber`,
-  `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound`.
-  Facilitator: those minus `hasVotedThisRound`, plus `votedCount`,
-  `closedRoundTallies?`, `tiedValueIds?`. Presenter: `isRoundOpen` only.
+- **D7 — wire blocks per protocol.** See `design/protocol.md` § 5.2–5.4
+  for current shapes. Presenter: `isRoundOpen` only.
   No tallies on any wire while a round is open.
+
+  > Amended by Task 23 (D1/D2): `eligibleValueIds` became `eligibleValues`
+  > with embedded texts/actions; facilitator gained `participantCount`.
 - **D8 — intents + `enabledIntents`.** `SubmitFinalVotes` (participant hub,
   payload `{ votes: [{ valueId, voteCount }] }`), `CloseVoting` and
   `StartTiebreakRound` (facilitator hub, no payload; enabled exactly when

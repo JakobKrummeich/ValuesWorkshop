@@ -37,6 +37,7 @@ function withChooseAnswer(
       submitGroupWork: () => NEVER,
       reopenGroupWork: () => NEVER,
     },
+    votingPort: { submitFinalVotes: () => NEVER },
   });
 }
 

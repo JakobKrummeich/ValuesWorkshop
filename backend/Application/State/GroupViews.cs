@@ -131,7 +131,7 @@ internal sealed class GroupViews(
         return session.PhaseProgress.CurrentPhase == Phase.GroupWork;
     }
 
-    private WorkshopValueView ValueViewOf(ValueId valueId)
+    internal WorkshopValueView ValueViewOf(ValueId valueId)
     {
         if (!valueOfId.TryGetValue(valueId.Value, out var value))
         {

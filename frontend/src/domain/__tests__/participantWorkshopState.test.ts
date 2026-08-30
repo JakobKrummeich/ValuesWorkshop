@@ -365,7 +365,18 @@ describe("participant workshop state schema", () => {
       voting: {
         roundNumber: 1,
         allotment: 5,
-        eligibleValueIds: ["wert-1", "wert-2"],
+        eligibleValues: [
+          {
+            valueId: "wert-1",
+            text: { de: "Wert 1", en: "Value 1" },
+            actions: ["We start meetings on time"],
+          },
+          {
+            valueId: "wert-2",
+            text: { de: "Wert 2", en: "Value 2" },
+            actions: [],
+          },
+        ],
         isRoundOpen: true,
         hasVotedThisRound: false,
       },
@@ -375,7 +386,29 @@ describe("participant workshop state schema", () => {
       throw new Error("expected a final voting state");
     }
     expect(state.voting.allotment).toBe(5);
+    expect(state.voting.eligibleValues[0].actions).toEqual([
+      "We start meetings on time",
+    ]);
     expect(state.voting.hasVotedThisRound).toBe(false);
+  });
+
+  it("rejects a final-voting state whose eligible value carries no actions list", () => {
+    const result = participantWorkshopStateSchema.safeParse({
+      revision: 12,
+      phase: 8,
+      participantCount: 9,
+      voting: {
+        roundNumber: 1,
+        allotment: 5,
+        eligibleValues: [
+          { valueId: "wert-1", text: { de: "Wert 1", en: "Value 1" } },
+        ],
+        isRoundOpen: true,
+        hasVotedThisRound: false,
+      },
+    });
+
+    expect(result.success).toBe(false);
   });
 
   it("rejects a final-voting state without the vote allotment", () => {
@@ -385,7 +418,7 @@ describe("participant workshop state schema", () => {
       participantCount: 9,
       voting: {
         roundNumber: 1,
-        eligibleValueIds: ["wert-1"],
+        eligibleValues: [],
         isRoundOpen: true,
         hasVotedThisRound: false,
       },

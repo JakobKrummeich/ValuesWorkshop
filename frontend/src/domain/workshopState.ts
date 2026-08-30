@@ -4,6 +4,7 @@ export {
   QuizSubState,
 } from "./workshopStateBlocks";
 export type {
+  EligibleValue,
   GroupActionView,
   GroupName,
   OwnGroupView,

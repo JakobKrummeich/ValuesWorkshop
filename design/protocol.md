@@ -407,7 +407,7 @@ variant carries it.
 | ownGroup | `name: {animalId, text: {de, en}}` (the animal label rides the wire — values-catalog precedent, the client never reads `config/`), `memberDisplayNames` (formation order), `assignedValues: [{valueId, text: {de, en}}]` (deal order; texts embedded because the participant variant carries no values catalog in phase 5), `isCallerScribe?`, `scribeName?`, `workStatus?` (`editing` \| `submitted`), `actions?: [{ actionId, valueId, text, sortOrder }]` (all four present during phase 6 only — group-work data leaves the wire when the phase ends; T19) |
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `ownGroup` (the block above, always present — every participant of a formed session is in a group) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` — a group intro is `presentingGroupName` set with `presentedValueId` null (empty `presentedActions`); a value position has both set |
-| voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `hasVotedThisRound` |
+| voting | `roundNumber`, `allotment`, `eligibleValues: [{valueId, text: {de, en}, actions: [text]}]` (the current round's eligible values in deal order; value texts and the value's submitted group-work actions embedded — `ownGroup.assignedValues` precedent, the client never reads `config/`), `isRoundOpen`, `hasVotedThisRound` |
 | conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
 
 Deliberately absent: any other participant's answer, selection, or votes;
@@ -425,7 +425,7 @@ join lobby shows back to the person who just signed in.
 | groups | `[{ name: {animalId, text: {de, en}}, members: [{participantId, displayName}] (formation order), assignedValues: [{valueId, text: {de, en}}], scribeParticipantId?, workStatus?, actionCountPerValue? }]` — `scribeParticipantId?`, `workStatus?` and `actionCountPerValue?` present during phase 6 only (T19) |
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` — group-intro encoding as in the participant block; no position counter (`design/screens.md`) |
-| voting | `roundNumber`, `allotment`, `eligibleValueIds`, `isRoundOpen`, `votedCount`, `closedRoundTallies?`, `tiedValueIds?` |
+| voting | `roundNumber`, `allotment`, `eligibleValues: [{valueId, text: {de, en}}]` (the full presented set that entered voting — constant across rounds, so `closedRoundTallies?` and `tiedValueIds?` keep their names while a tiebreak narrows the participants' round), `isRoundOpen`, `votedCount`, `participantCount` (roster size — the voted-count denominator), `closedRoundTallies?`, `tiedValueIds?` |
 | conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
 
 `enabledIntents: string[]` (§ 6.4) sits on the facilitator envelope — it is

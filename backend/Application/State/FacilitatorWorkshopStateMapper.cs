@@ -95,7 +95,7 @@ public sealed class FacilitatorWorkshopStateMapper(
                     revision,
                     SessionViews.Roster(session),
                     enabledIntents,
-                    SessionViews.FacilitatorVoting(session)
+                    VotingViews.ForFacilitator(session, groupViews)
                 ),
             [Phase.FinalPresentation] = (session, revision, enabledIntents) =>
                 new FacilitatorFinalPresentationState(
