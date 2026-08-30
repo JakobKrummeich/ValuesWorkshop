@@ -165,9 +165,14 @@ describe("facilitator workshop state schema", () => {
       voting: {
         roundNumber: 1,
         allotment: 5,
-        eligibleValueIds: ["wert-1", "wert-2", "wert-3"],
+        eligibleValues: [
+          { valueId: "wert-1", text: { de: "Wert 1", en: "Value 1" } },
+          { valueId: "wert-2", text: { de: "Wert 2", en: "Value 2" } },
+          { valueId: "wert-3", text: { de: "Wert 3", en: "Value 3" } },
+        ],
         isRoundOpen: false,
         votedCount: 7,
+        participantCount: 9,
         closedRoundTallies: { "wert-1": 9, "wert-2": 3, "wert-3": 3 },
         tiedValueIds: ["wert-2", "wert-3"],
       },
@@ -177,6 +182,8 @@ describe("facilitator workshop state schema", () => {
       throw new Error("expected a final voting state");
     }
     expect(state.voting.votedCount).toBe(7);
+    expect(state.voting.participantCount).toBe(9);
+    expect(state.voting.eligibleValues[1].text.en).toBe("Value 2");
     expect(state.voting.tiedValueIds).toEqual(["wert-2", "wert-3"]);
     expect(state.enabledIntents).toContain(
       FacilitatorIntent.StartTiebreakRound,
@@ -192,9 +199,12 @@ describe("facilitator workshop state schema", () => {
       voting: {
         roundNumber: 1,
         allotment: 5,
-        eligibleValueIds: ["wert-1"],
+        eligibleValues: [
+          { valueId: "wert-1", text: { de: "Wert 1", en: "Value 1" } },
+        ],
         isRoundOpen: true,
         votedCount: 0,
+        participantCount: 9,
       },
     });
 

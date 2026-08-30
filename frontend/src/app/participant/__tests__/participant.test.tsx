@@ -51,6 +51,7 @@ beforeEach(() => {
       submitGroupWork: jest.fn(() => EMPTY),
       reopenGroupWork: jest.fn(() => EMPTY),
     },
+    votingPort: { submitFinalVotes: jest.fn(() => EMPTY) },
     start: EMPTY,
     close: EMPTY,
   });

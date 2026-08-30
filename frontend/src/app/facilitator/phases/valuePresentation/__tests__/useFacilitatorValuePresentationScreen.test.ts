@@ -35,6 +35,10 @@ function mockWalkControl(
     },
     groupWorkControlPort: { reassignScribe: () => NEVER },
     walkControlPort: { goToNextValue, correctActionWording },
+    votingControlPort: {
+      closeVoting: () => NEVER,
+      startTiebreakRound: () => NEVER,
+    },
   });
 
   return { goToNextValue, correctActionWording };

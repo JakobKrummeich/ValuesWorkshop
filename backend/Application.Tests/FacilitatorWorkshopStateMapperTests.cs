@@ -315,20 +315,28 @@ public class FacilitatorWorkshopStateMapperTests
     [Fact]
     public void Final_voting_state_counts_voters_but_hides_the_open_rounds_tallies()
     {
-        var voting = TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 10));
+        var voting = TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 2));
         voting.RecordBallot(
             SessionFixtures.Anna,
             new Dictionary<ValueId, int> { [new ValueId("wert-1")] = 5 }
         );
-        var session = SessionFixtures.InPhase(Phase.FinalVoting, voting: voting);
+        var session = SessionFixtures.InPhase(
+            Phase.FinalVoting,
+            formation: SessionFixtures.TwoGroups(),
+            voting: voting
+        );
 
         var view = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
 
         view.RoundNumber.ShouldBe(1);
         view.Allotment.ShouldBe(5);
-        view.EligibleValueIds.Count.ShouldBe(10);
+        view.EligibleValues.ShouldBe([
+            new WorkshopValueView("wert-1", new LocalizedTextView("Wert 1", "Value 1")),
+            new WorkshopValueView("wert-2", new LocalizedTextView("Wert 2", "Value 2")),
+        ]);
         view.IsRoundOpen.ShouldBeTrue();
         view.VotedCount.ShouldBe(1);
+        view.ParticipantCount.ShouldBe(3);
         view.ClosedRoundTallies.ShouldBeNull();
         view.TiedValueIds.ShouldBeNull();
     }
@@ -338,6 +346,7 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
+            formation: SessionFixtures.TwoGroups(),
             voting: TestVoting.AfterLocking(TestValueIds.Numbered(1, 4))
         );
 
@@ -355,7 +364,8 @@ public class FacilitatorWorkshopStateMapperTests
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalVoting,
-            voting: TestVoting.TiebreakOpen(2, TestValueIds.Numbered(1, 3), allotment: 2)
+            formation: SessionFixtures.TwoGroups(),
+            voting: TestVoting.TiebreakOpen(2, TestValueIds.Numbered(1, 2), allotment: 2)
         );
 
         var view = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
@@ -363,7 +373,8 @@ public class FacilitatorWorkshopStateMapperTests
         view.RoundNumber.ShouldBe(2);
         view.IsRoundOpen.ShouldBeTrue();
         view.ClosedRoundTallies.ShouldNotBeNull();
-        view.TiedValueIds.ShouldBe(["wert-1", "wert-2", "wert-3"]);
+        view.TiedValueIds.ShouldBe(["wert-1", "wert-2"]);
+        view.EligibleValues.Select(value => value.ValueId).ShouldBe(["wert-1", "wert-2"]);
     }
 
     [Fact]

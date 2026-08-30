@@ -2,6 +2,7 @@ import { Phase } from "../../../domain/phases";
 import type { FacilitatorWorkshopState } from "../../../domain/workshopState";
 import { EmptyPhase } from "../../EmptyPhase";
 import type { PhaseComponents } from "../../PhaseView";
+import { FacilitatorFinalVotingScreen } from "./finalVoting/FacilitatorFinalVotingScreen";
 import { FacilitatorGroupFormationScreen } from "./groupFormation/FacilitatorGroupFormationScreen";
 import { FacilitatorGroupWorkScreen } from "./groupWork/FacilitatorGroupWorkScreen";
 import { FacilitatorJoinScreen } from "./join/FacilitatorJoinScreen";
@@ -18,6 +19,6 @@ export const facilitatorPhaseView: PhaseComponents<FacilitatorWorkshopState> = {
   [Phase.GroupFormation]: FacilitatorGroupFormationScreen,
   [Phase.GroupWork]: FacilitatorGroupWorkScreen,
   [Phase.ValuePresentation]: FacilitatorValuePresentationScreen,
-  [Phase.FinalVoting]: EmptyPhase,
+  [Phase.FinalVoting]: FacilitatorFinalVotingScreen,
   [Phase.FinalPresentation]: EmptyPhase,
 };

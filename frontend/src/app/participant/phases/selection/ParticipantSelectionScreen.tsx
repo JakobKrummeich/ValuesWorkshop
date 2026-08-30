@@ -4,9 +4,9 @@ import { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantSelectionState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./ParticipantSelectionScreen.module.css";
+import { SubmittedConfirmation } from "../../../SubmittedConfirmation";
 import { SelectionChipGrid } from "./SelectionChipGrid";
 import { SelectionConfirmDialog } from "./SelectionConfirmDialog";
-import { SelectionSubmittedConfirmation } from "./SelectionSubmittedConfirmation";
 import {
   requiredSelectionCount,
   useParticipantSelectionScreen,
@@ -35,7 +35,11 @@ export function ParticipantSelectionScreen({
   if (isSubmitted) {
     return (
       <section className={styles.selection}>
-        <SelectionSubmittedConfirmation />
+        <SubmittedConfirmation
+          heading={MessageKey.SelectionSubmittedHeading}
+          body={MessageKey.SelectionSubmittedBody}
+          testId="selection-submitted-confirmation"
+        />
       </section>
     );
   }

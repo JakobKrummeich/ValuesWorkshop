@@ -34,6 +34,10 @@ function mockDependencies(reassignScribe = jest.fn(() => of(accepted))) {
       goToNextValue: () => NEVER,
       correctActionWording: () => NEVER,
     },
+    votingControlPort: {
+      closeVoting: () => NEVER,
+      startTiebreakRound: () => NEVER,
+    },
   });
   return reassignScribe;
 }

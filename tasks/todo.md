@@ -571,14 +571,19 @@ flag only — no voter↔vote rows). Tie at 5th place → tiebreak round over
 tied values only, votes-per-participant = number of winner places still
 open, repeat until exactly 5 survive. Facilitator sub-control starts each
 tiebreak.
+> Amended in reviews 2026-08-26/27: allotment = winner slots still open
+> (main round 5; tiebreak searching 3 → 3 votes), and closed rounds keep
+> only an anonymous voter count — the has-voted set lives on the open
+> round solely to block double voting. Full per-round statistics history
+> persists for the Task 24 PDF. Done in PR #45 (spec 22).
 **Acceptance criteria:**
-- [ ] >5 votes rejected; vote data contains no participant identifier
+- [x] >5 votes rejected; vote data contains no participant identifier
       (asserted by test against DB schema/rows)
-- [ ] Tiebreak detection + round loop unit-tested (incl. repeated ties)
-- [ ] **From Task 11 (Q1 deferral):** voting round mechanics land here —
+- [x] Tiebreak detection + round loop unit-tested (incl. repeated ties)
+- [x] **From Task 11 (Q1 deferral):** voting round mechanics land here —
       `CloseVoting`, `StartTiebreakRound` bumping `RoundNumber`, tiebreak while
       a round is open rejected, persisted
-- [ ] **From Task 11:** phase 8→9 cannot be walked until this task lands the
+- [x] **From Task 11:** phase 8→9 cannot be walked until this task lands the
       winning values — the I15 exit guard blocks every advance out of final
       voting until `WinnersDetermined` produces exactly five winners
 **Verification:** BE voting suite incl. anonymity assertion.

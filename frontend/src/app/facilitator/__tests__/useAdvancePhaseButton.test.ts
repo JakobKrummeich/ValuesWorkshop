@@ -48,6 +48,10 @@ function withAdvancePhase(
       goToNextValue: () => NEVER,
       correctActionWording: () => NEVER,
     },
+    votingControlPort: {
+      closeVoting: () => NEVER,
+      startTiebreakRound: () => NEVER,
+    },
   });
 }
 

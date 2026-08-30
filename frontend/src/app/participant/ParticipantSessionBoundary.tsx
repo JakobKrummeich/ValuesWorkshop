@@ -19,6 +19,7 @@ export function ParticipantSessionBoundary({
             quizPort: session.quizPort,
             selectionPort: session.selectionPort,
             groupWorkPort: session.groupWorkPort,
+            votingPort: session.votingPort,
           }}
         >
           <div className="screenParticipant">{children}</div>

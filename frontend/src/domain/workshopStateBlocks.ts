@@ -199,10 +199,18 @@ export type PresenterPresentationView = z.infer<
   typeof presenterPresentationViewSchema
 >;
 
+const eligibleValueSchema = z.object({
+  valueId: z.string(),
+  text: localizedTextSchema,
+  actions: z.array(z.string()),
+});
+
+export type EligibleValue = z.infer<typeof eligibleValueSchema>;
+
 export const participantVotingViewSchema = z.object({
   roundNumber: z.int(),
   allotment: z.int(),
-  eligibleValueIds: valueIdsSchema,
+  eligibleValues: z.array(eligibleValueSchema),
   isRoundOpen: z.boolean(),
   hasVotedThisRound: z.boolean(),
 });
@@ -210,9 +218,10 @@ export const participantVotingViewSchema = z.object({
 export const facilitatorVotingViewSchema = z.object({
   roundNumber: z.int(),
   allotment: z.int(),
-  eligibleValueIds: valueIdsSchema,
+  eligibleValues: workshopValuesSchema,
   isRoundOpen: z.boolean(),
   votedCount: z.int(),
+  participantCount: z.int(),
   closedRoundTallies: z.record(z.string(), z.int()).optional(),
   tiedValueIds: valueIdsSchema.optional(),
 });
