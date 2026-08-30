@@ -13,6 +13,7 @@ values and pragmatic everyday actions. See `SPEC.md` for the product spec.
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
 | `design/` | Architecture, domain model, persistence, protocol, state machine, screens |
+| `docs/` | Architecture reviews (ADR-style proposals) |
 | `tasks/` | Plan, backlog, per-task mini-specs |
 
 ## Commands
