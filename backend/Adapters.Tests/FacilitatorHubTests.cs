@@ -284,6 +284,47 @@ public class FacilitatorHubTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
+    [Fact]
+    public async Task Closing_the_voting_round_mutates_persists_and_broadcasts()
+    {
+        repository.Add(
+            SessionInFinalVoting(TestVoting.MainRoundOpen(TestValueIds.Numbered(1, 10)))
+        );
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.CloseVoting();
+
+        result.ShouldBe(IntentResult.Accepted());
+        var saved = repository.Saved.ShouldHaveSingleItem();
+        saved.Voting.RoundOpen.ShouldBeFalse();
+        saved.Voting.ClosedRounds.ShouldHaveSingleItem();
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Starting_the_tiebreak_round_mutates_persists_and_broadcasts()
+    {
+        repository.Add(SessionInFinalVoting(TestVoting.AfterLocking(TestValueIds.Numbered(1, 4))));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.StartTiebreakRound();
+
+        result.ShouldBe(IntentResult.Accepted());
+        var saved = repository.Saved.ShouldHaveSingleItem();
+        saved.Voting.RoundOpen.ShouldBeTrue();
+        saved.Voting.RoundNumber.ShouldBe(2);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    private static Session SessionInFinalVoting(VotingRounds voting)
+    {
+        var session = TestSessions.InPhase(KnownSession, Phase.FinalVoting, voting: voting);
+
+        session.BumpRevision();
+
+        return session;
+    }
+
     private static Session SessionInQuiz(QuizProgress quiz)
     {
         var session = TestSessions.InPhase(KnownSession, Phase.Quiz, quiz);
