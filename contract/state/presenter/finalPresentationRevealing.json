@@ -1,0 +1,32 @@
+{
+  "phase": 9,
+  "conclusion": {
+    "revealedWinners": [
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        },
+        "place": 5,
+        "voteCount": 2,
+        "actions": []
+      },
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        },
+        "place": 4,
+        "voteCount": 3,
+        "actions": [
+          "We ask before we assume"
+        ]
+      }
+    ],
+    "isConcluded": false
+  },
+  "revision": 42,
+  "participantCount": 4
+}

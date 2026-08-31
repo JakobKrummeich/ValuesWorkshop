@@ -116,7 +116,7 @@ public sealed record FacilitatorFinalPresentationState(
     long Revision,
     RosterView Roster,
     IReadOnlyList<FacilitatorIntent> EnabledIntents,
-    ConclusionView Conclusion
+    FacilitatorConclusionView Conclusion
 ) : FacilitatorWorkshopState(Revision, Roster, EnabledIntents)
 {
     [JsonIgnore]

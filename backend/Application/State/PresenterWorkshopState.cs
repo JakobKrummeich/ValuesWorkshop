@@ -101,7 +101,7 @@ public sealed record PresenterFinalVotingState(
 public sealed record PresenterFinalPresentationState(
     long Revision,
     int ParticipantCount,
-    ConclusionView Conclusion
+    PresenterConclusionView Conclusion
 ) : PresenterWorkshopState(Revision, ParticipantCount)
 {
     [JsonIgnore]

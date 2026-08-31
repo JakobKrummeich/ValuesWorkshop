@@ -1,0 +1,170 @@
+{
+  "phase": 9,
+  "conclusion": {
+    "isConcluded": true,
+    "record": {
+      "winners": [
+        {
+          "valueId": "wert-1",
+          "text": {
+            "de": "Wert 1",
+            "en": "Value 1"
+          },
+          "place": 1,
+          "voteCount": 6,
+          "actions": [
+            "We name mistakes the day we make them"
+          ]
+        },
+        {
+          "valueId": "wert-3",
+          "text": {
+            "de": "Wert 3",
+            "en": "Value 3"
+          },
+          "place": 2,
+          "voteCount": 5,
+          "actions": [
+            "We decide in the room, not in the corridor"
+          ]
+        },
+        {
+          "valueId": "wert-2",
+          "text": {
+            "de": "Wert 2",
+            "en": "Value 2"
+          },
+          "place": 3,
+          "voteCount": 4,
+          "actions": [
+            "We ask before we assume"
+          ]
+        },
+        {
+          "valueId": "wert-4",
+          "text": {
+            "de": "Wert 4",
+            "en": "Value 4"
+          },
+          "place": 4,
+          "voteCount": 3,
+          "actions": []
+        },
+        {
+          "valueId": "wert-6",
+          "text": {
+            "de": "Wert 6",
+            "en": "Value 6"
+          },
+          "place": 5,
+          "voteCount": 1,
+          "actions": []
+        }
+      ],
+      "values": [
+        {
+          "valueId": "wert-1",
+          "text": {
+            "de": "Wert 1",
+            "en": "Value 1"
+          },
+          "actions": [
+            "We name mistakes the day we make them"
+          ]
+        },
+        {
+          "valueId": "wert-3",
+          "text": {
+            "de": "Wert 3",
+            "en": "Value 3"
+          },
+          "actions": [
+            "We decide in the room, not in the corridor"
+          ]
+        },
+        {
+          "valueId": "wert-5",
+          "text": {
+            "de": "Wert 5",
+            "en": "Value 5"
+          },
+          "actions": []
+        },
+        {
+          "valueId": "wert-2",
+          "text": {
+            "de": "Wert 2",
+            "en": "Value 2"
+          },
+          "actions": [
+            "We ask before we assume"
+          ]
+        },
+        {
+          "valueId": "wert-4",
+          "text": {
+            "de": "Wert 4",
+            "en": "Value 4"
+          },
+          "actions": []
+        },
+        {
+          "valueId": "wert-6",
+          "text": {
+            "de": "Wert 6",
+            "en": "Value 6"
+          },
+          "actions": []
+        }
+      ],
+      "rounds": [
+        {
+          "roundNumber": 1,
+          "allotment": 5,
+          "tallies": [
+            {
+              "valueId": "wert-1",
+              "count": 6
+            },
+            {
+              "valueId": "wert-3",
+              "count": 5
+            },
+            {
+              "valueId": "wert-5",
+              "count": 1
+            },
+            {
+              "valueId": "wert-2",
+              "count": 4
+            },
+            {
+              "valueId": "wert-4",
+              "count": 3
+            },
+            {
+              "valueId": "wert-6",
+              "count": 1
+            }
+          ]
+        },
+        {
+          "roundNumber": 2,
+          "allotment": 1,
+          "tallies": [
+            {
+              "valueId": "wert-5",
+              "count": 1
+            },
+            {
+              "valueId": "wert-6",
+              "count": 3
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "revision": 42,
+  "participantCount": 4
+}
