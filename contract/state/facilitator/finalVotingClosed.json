@@ -12,10 +12,38 @@
         }
       },
       {
+        "valueId": "wert-3",
+        "text": {
+          "de": "Wert 3",
+          "en": "Value 3"
+        }
+      },
+      {
+        "valueId": "wert-5",
+        "text": {
+          "de": "Wert 5",
+          "en": "Value 5"
+        }
+      },
+      {
         "valueId": "wert-2",
         "text": {
           "de": "Wert 2",
           "en": "Value 2"
+        }
+      },
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        }
+      },
+      {
+        "valueId": "wert-6",
+        "text": {
+          "de": "Wert 6",
+          "en": "Value 6"
         }
       }
     ],
@@ -24,8 +52,8 @@
     "participantCount": 4,
     "closedRoundTallies": {
       "wert-1": 10,
-      "wert-2": 9,
-      "wert-3": 8,
+      "wert-3": 9,
+      "wert-2": 8,
       "wert-4": 7,
       "wert-5": 3,
       "wert-6": 3

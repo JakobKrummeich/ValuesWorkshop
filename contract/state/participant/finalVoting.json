@@ -15,6 +15,24 @@
         ]
       },
       {
+        "valueId": "wert-3",
+        "text": {
+          "de": "Wert 3",
+          "en": "Value 3"
+        },
+        "actions": [
+          "We decide in the room, not in the corridor"
+        ]
+      },
+      {
+        "valueId": "wert-5",
+        "text": {
+          "de": "Wert 5",
+          "en": "Value 5"
+        },
+        "actions": []
+      },
+      {
         "valueId": "wert-2",
         "text": {
           "de": "Wert 2",
@@ -23,6 +41,22 @@
         "actions": [
           "We ask before we assume"
         ]
+      },
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        },
+        "actions": []
+      },
+      {
+        "valueId": "wert-6",
+        "text": {
+          "de": "Wert 6",
+          "en": "Value 6"
+        },
+        "actions": []
       }
     ],
     "isRoundOpen": true,

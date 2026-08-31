@@ -30,6 +30,19 @@ internal static class WireStateFixtures
     private static readonly ValueId FirstValue = new("wert-1");
     private static readonly ValueId SecondValue = new("wert-2");
 
+    // WHY: the voting rounds may only run over values the groups actually
+    // presented, so the eligible sets below stay the union of the two groups'
+    // assigned values.
+    private static readonly IReadOnlyList<ValueId> PresentedValues =
+    [
+        FirstValue,
+        Wert(3),
+        Wert(5),
+        SecondValue,
+        Wert(4),
+        Wert(6),
+    ];
+
     internal static IReadOnlyList<WireStateScenario> All =>
         [
             new("join", InPhase(Phase.Join), Anna),
@@ -40,6 +53,7 @@ internal static class WireStateFixtures
             new("groupFormation", InPhase(Phase.GroupFormation, formation: TwoGroups()), Anna),
             new("groupWork", Working(), Anna),
             new("groupWorkWithoutOwnGroup", Working(), Dana, [WireRoles.Participant]),
+            new("groupWorkSubmitted", Working(), Chris, [WireRoles.Participant]),
             new("valuePresentation", Presenting(), Anna),
             new("finalVoting", VotingRoundOpen(), Anna),
             new("finalVotingClosed", VotingRoundClosed(), Anna),
@@ -108,11 +122,8 @@ internal static class WireStateFixtures
 
     private static Session VotingRoundOpen()
     {
-        var voting = TestVoting.MainRoundOpen([FirstValue, SecondValue]);
-        voting.RecordBallot(
-            Ben,
-            new Dictionary<ValueId, int> { [FirstValue] = 3, [SecondValue] = 2 }
-        );
+        var voting = TestVoting.MainRoundOpen(PresentedValues);
+        voting.RecordBallot(Ben, new Dictionary<ValueId, int> { [FirstValue] = 3, [Wert(5)] = 2 });
 
         return InPhase(Phase.FinalVoting, formation: TwoGroups(), voting: voting);
     }
@@ -128,7 +139,7 @@ internal static class WireStateFixtures
             voting: VotingRounds.Restore(
                 [
                     ClosedRound(
-                        locked: [FirstValue, SecondValue, Wert(3), Wert(4)],
+                        locked: [FirstValue, Wert(3), SecondValue, Wert(4)],
                         tied: [Wert(5), Wert(6)]
                     ),
                 ],
@@ -145,7 +156,7 @@ internal static class WireStateFixtures
             voting: VotingRounds.Restore(
                 [
                     ClosedRound(
-                        locked: [FirstValue, SecondValue, Wert(3), Wert(4), Wert(5)],
+                        locked: [FirstValue, Wert(3), Wert(5), SecondValue, Wert(4)],
                         tied: []
                     ),
                 ],
@@ -191,7 +202,7 @@ internal static class WireStateFixtures
                 Group.Restore(
                     "tier-1",
                     [Anna, Ben],
-                    [FirstValue],
+                    [FirstValue, Wert(3), Wert(5)],
                     Anna,
                     false,
                     [
@@ -200,17 +211,22 @@ internal static class WireStateFixtures
                             FirstValue,
                             GroupActionText.Of("We name mistakes the day we make them")
                         ),
+                        new GroupAction(
+                            new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac02")),
+                            Wert(3),
+                            GroupActionText.Of("We decide in the room, not in the corridor")
+                        ),
                     ]
                 ),
                 Group.Restore(
                     "tier-2",
                     [Chris],
-                    [SecondValue],
+                    [SecondValue, Wert(4), Wert(6)],
                     Chris,
                     true,
                     [
                         new GroupAction(
-                            new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac02")),
+                            new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac03")),
                             SecondValue,
                             GroupActionText.Of("We ask before we assume")
                         ),

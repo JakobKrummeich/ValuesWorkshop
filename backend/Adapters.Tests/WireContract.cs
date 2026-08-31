@@ -23,7 +23,7 @@ internal static class WireContract
 
     internal static void ShouldMatchCheckedInFile(string json, params string[] pathSegments)
     {
-        var contractFile = ContractFile(pathSegments);
+        var contractFile = PathOf(pathSegments);
 
         if (Environment.GetEnvironmentVariable(RegenerateSwitch) == "1")
         {
@@ -42,7 +42,7 @@ internal static class WireContract
 
     internal static IReadOnlyList<string> CheckedInFilesIn(params string[] pathSegments)
     {
-        var directory = ContractFile(pathSegments);
+        var directory = PathOf(pathSegments);
 
         return
         [
@@ -69,7 +69,7 @@ internal static class WireContract
     private const string RegenerateHint =
         "Regenerate the corpus with: CONTRACT_WRITE=1 dotnet test backend/ValuesWorkshop.Tests.slnf";
 
-    private static string ContractFile(params string[] pathSegments)
+    internal static string PathOf(params string[] pathSegments)
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
         while (

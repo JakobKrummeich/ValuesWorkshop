@@ -3,10 +3,10 @@
   "conclusion": {
     "winningValueIds": [
       "wert-1",
-      "wert-2",
       "wert-3",
-      "wert-4",
-      "wert-5"
+      "wert-5",
+      "wert-2",
+      "wert-4"
     ]
   },
   "revision": 42,

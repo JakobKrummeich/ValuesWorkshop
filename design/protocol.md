@@ -6,6 +6,12 @@ discovered during implementation update this file in the same PR (Ask-first).
 Vocabulary is the ubiquitous language of `design/domain-model.md`; every
 transition referenced as `T*` is defined in `design/state-machine.md`.
 
+Sections 4 to 6 have a machine-checked shadow in `contract/`: intent names and
+parameters, the wire form of every enum, and one serialized state per role and
+phase. Backend tests produce it, frontend tests read it — see
+`contract/README.md`. Changing this document without regenerating the corpus
+fails the build.
+
 ---
 
 ## 1. Principles
