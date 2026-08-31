@@ -21,4 +21,15 @@
   --color-bg: var(--base-white);
   --color-text: var(--base-gray-900);
   --color-text-muted: var(--base-gray-700);
+
+  --text-reveal-place: clamp(var(--base-text-24), 5vh, 3.375rem);
+  --text-reveal-value: clamp(var(--base-text-40), 12vh, 8.5rem);
+  --text-reveal-votes: clamp(var(--base-text-20), 3.5vh, 2.375rem);
+  --text-reveal-action: clamp(var(--base-text-20), 3vh, var(--base-text-32));
+  --text-overview-winner: clamp(var(--base-text-24), 4.5vh, 3rem);
+
+  --color-reveal-bg: var(--base-green-900);
+  --color-reveal-text: var(--base-white);
+  --color-reveal-text-soft: var(--base-green-100);
+  --color-reveal-accent: var(--base-amber-300);
 }

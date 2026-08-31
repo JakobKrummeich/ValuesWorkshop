@@ -1,0 +1,62 @@
+.screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-gap);
+  min-height: 0;
+  padding: var(--space-gutter);
+  overflow: hidden;
+  background: var(--color-reveal-bg);
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-reveal-text-soft);
+  font-size: var(--text-reveal-votes);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.winnerList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.winner {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-gap);
+  padding: var(--space-tight) var(--space-gap);
+  border-radius: var(--radius-md);
+  color: var(--color-reveal-text);
+  font-size: var(--text-overview-winner);
+}
+
+.winner:first-child {
+  background: var(--color-reveal-accent);
+  color: var(--color-reveal-bg);
+}
+
+.place {
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.valueName {
+  flex: 1;
+  overflow-wrap: anywhere;
+  font-weight: var(--weight-bold);
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.voteCount {
+  font-variant-numeric: tabular-nums;
+}
