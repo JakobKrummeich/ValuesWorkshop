@@ -23,7 +23,7 @@ No production code changes: tests plus generated artifacts only.
 
 - **D1 — artifact layout continues step 1's.** `contract/enums.json` (each
   wire enum member in the form the serializer actually writes) and
-  `contract/state/<role>/<phase>.json` (27 samples) join `intents.json`,
+  `contract/state/<role>/<scenario>.json` join `intents.json`,
   same producer file, same `CONTRACT_WRITE=1 dotnet test
   backend/ValuesWorkshop.Tests.slnf` regeneration, same walk-up
   `contract/` lookup (extracted into one helper).
@@ -47,10 +47,14 @@ No production code changes: tests plus generated artifacts only.
   (roster, selection, groups, walk, voting rounds) with fixed `Guid`s and
   `FixedRandomness`, mapped per role and serialized exactly as
   `WireFormatTests` does, stored as the invocation's `arguments[0]` in
-  `contract/state/<role>/<phase>.json`.
+  `contract/state/<role>/<scenario>.json`. A phase contributes more than one
+  scenario where it has more than one shape worth checking
+  (`groupFormationForming`, `finalVotingClosed`), and a scenario may cover
+  fewer than three roles when only one role renders it
+  (`groupWorkWithoutOwnGroup`) — 13 scenarios, 35 files.
   `frontend/src/domain/__tests__/wireContract.test.ts` runs `it.each` over
-  the fixtures: the role schema parses, the parsed `phase` is the expected
-  one, and the fixture set is exactly 9 phases × 3 roles.
+  the fixtures: the role schema parses the sample back unchanged, and the
+  scenarios of each role cover all 9 phases.
 - **D5 — fixtures stay in `backend/Adapters.Tests`.** Built from
   `TestSupport` primitives; `TestSupport` gains what is missing (e.g. an
   optional roster on `TestSessions.InPhase`). No test project references
@@ -70,7 +74,7 @@ No production code changes: tests plus generated artifacts only.
 1. Frontend intent consumer over every port factory (step 2).
 2. `contract/enums.json` + producer (step 3).
 3. Frontend enum consumer (step 4).
-4. `contract/state/<role>/<phase>.json` + producer, 27 fixtures (step 5).
+4. `contract/state/<role>/<scenario>.json` + producer (step 5).
 5. Frontend state consumer, parse + completeness (step 6).
 6. Variant-coverage guard (step 7).
 7. Docs (D7).
