@@ -1,0 +1,84 @@
+{
+  "phase": 3,
+  "selection": {
+    "values": [
+      {
+        "valueId": "wert-1",
+        "text": {
+          "de": "Wert 1",
+          "en": "Value 1"
+        }
+      },
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        }
+      },
+      {
+        "valueId": "wert-3",
+        "text": {
+          "de": "Wert 3",
+          "en": "Value 3"
+        }
+      },
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        }
+      },
+      {
+        "valueId": "wert-5",
+        "text": {
+          "de": "Wert 5",
+          "en": "Value 5"
+        }
+      },
+      {
+        "valueId": "wert-6",
+        "text": {
+          "de": "Wert 6",
+          "en": "Value 6"
+        }
+      },
+      {
+        "valueId": "wert-7",
+        "text": {
+          "de": "Wert 7",
+          "en": "Value 7"
+        }
+      },
+      {
+        "valueId": "wert-8",
+        "text": {
+          "de": "Wert 8",
+          "en": "Value 8"
+        }
+      },
+      {
+        "valueId": "wert-9",
+        "text": {
+          "de": "Wert 9",
+          "en": "Value 9"
+        }
+      },
+      {
+        "valueId": "wert-10",
+        "text": {
+          "de": "Wert 10",
+          "en": "Value 10"
+        }
+      }
+    ],
+    "ownSelectedValueIds": [
+      "wert-1",
+      "wert-2"
+    ],
+    "isSubmitted": true
+  },
+  "revision": 42,
+  "participantCount": 4
+}

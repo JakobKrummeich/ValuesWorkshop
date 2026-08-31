@@ -1,0 +1,46 @@
+{
+  "Phase": {
+    "Join": 1,
+    "Quiz": 2,
+    "ValueSelection": 3,
+    "SelectionResults": 4,
+    "GroupFormation": 5,
+    "GroupWork": 6,
+    "ValuePresentation": 7,
+    "FinalVoting": 8,
+    "FinalPresentation": 9
+  },
+  "IntentRejectionCode": {
+    "WrongPhase": 1,
+    "NotAuthorized": 2,
+    "UnknownSession": 3,
+    "InvariantViolated": 4,
+    "MalformedPayload": 5,
+    "UnknownParticipant": 6,
+    "ConcurrencyConflict": 7
+  },
+  "FacilitatorIntent": {
+    "AdvancePhase": "AdvancePhase",
+    "RevealAnswer": "RevealAnswer",
+    "ShowLearningText": "ShowLearningText",
+    "PoseNextQuestion": "PoseNextQuestion",
+    "ReassignScribe": "ReassignScribe",
+    "GoToNextValue": "GoToNextValue",
+    "CorrectActionWording": "CorrectActionWording",
+    "CloseVoting": "CloseVoting",
+    "StartTiebreakRound": "StartTiebreakRound"
+  },
+  "QuizSubState": {
+    "Answering": 1,
+    "Revealed": 2,
+    "LearningTextShown": 3
+  },
+  "GroupWorkStatus": {
+    "Editing": "editing",
+    "Submitted": "submitted"
+  },
+  "FormationSubState": {
+    "Forming": "forming",
+    "Formed": "formed"
+  }
+}

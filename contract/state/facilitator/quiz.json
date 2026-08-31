@@ -1,0 +1,62 @@
+{
+  "phase": 2,
+  "quiz": {
+    "questionIndex": 1,
+    "questionCount": 5,
+    "subState": 2,
+    "question": {
+      "de": "Frage 1",
+      "en": "Question 1"
+    },
+    "answers": [
+      {
+        "de": "Falsch 1",
+        "en": "Wrong 1"
+      },
+      {
+        "de": "Richtig 1",
+        "en": "Right 1"
+      },
+      {
+        "de": "Witzig 1",
+        "en": "Funny 1"
+      }
+    ],
+    "answerTallies": [
+      1,
+      0,
+      0
+    ],
+    "answeredCount": 1,
+    "correctAnswerIndex": 1,
+    "learningText": {
+      "de": "Lerntext 1",
+      "en": "Learning text 1"
+    }
+  },
+  "revision": 42,
+  "roster": {
+    "participants": [
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000a1",
+        "displayName": "Anna Schmidt"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000b2",
+        "displayName": "Ben"
+      },
+      {
+        "participantId": "c3c3c3c3-0000-0000-0000-0000000000c3",
+        "displayName": "#c3c3c3"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000d4",
+        "displayName": "Dana"
+      }
+    ],
+    "participantCount": 4
+  },
+  "enabledIntents": [
+    "ShowLearningText"
+  ]
+}

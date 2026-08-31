@@ -87,6 +87,14 @@ module.exports = {
       to: { path: "^src/domain/" },
     },
     {
+      name: "production-must-not-import-testing",
+      severity: "error",
+      comment:
+        "src/testing/ is test-only scaffolding and reads from disk — production modules must not import it",
+      from: { path: "^src/", pathNot: "^src/testing/|__tests__|\\.test\\." },
+      to: { path: "^src/testing/" },
+    },
+    {
       name: "no-circular",
       severity: "error",
       comment: "No circular dependencies anywhere",

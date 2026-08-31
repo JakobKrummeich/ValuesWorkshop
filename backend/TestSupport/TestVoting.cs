@@ -40,7 +40,7 @@ public static class TestVoting
         return VotingRounds.Restore([ClosedRound(roundNumber, lockedValues, tiedValues)], null);
     }
 
-    private static ClosedVotingRound ClosedRound(
+    public static ClosedVotingRound ClosedRound(
         int roundNumber,
         IReadOnlyList<ValueId> lockedValues,
         IReadOnlyList<ValueId> tiedValues

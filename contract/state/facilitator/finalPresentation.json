@@ -1,0 +1,35 @@
+{
+  "phase": 9,
+  "conclusion": {
+    "winningValueIds": [
+      "wert-1",
+      "wert-3",
+      "wert-5",
+      "wert-2",
+      "wert-4"
+    ]
+  },
+  "revision": 42,
+  "roster": {
+    "participants": [
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000a1",
+        "displayName": "Anna Schmidt"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000b2",
+        "displayName": "Ben"
+      },
+      {
+        "participantId": "c3c3c3c3-0000-0000-0000-0000000000c3",
+        "displayName": "#c3c3c3"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000d4",
+        "displayName": "Dana"
+      }
+    ],
+    "participantCount": 4
+  },
+  "enabledIntents": []
+}

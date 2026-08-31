@@ -24,22 +24,21 @@ internal static class SessionFixtures
         long revision = 0
     )
     {
-        return Session.Restore(
+        return TestSessions.InPhase(
             new SessionIdentity(Guid.Parse("00000000-0000-0000-0000-00000000f00d")),
-            TestSessions.Facilitator,
-            TestSessions.Name,
-            Roster.Restore([
+            phase,
+            quiz,
+            selection,
+            formation,
+            presentation,
+            voting,
+            revision,
+            roster:
+            [
                 TestParticipants.Named(Anna, "Anna Schmidt"),
                 TestParticipants.Named(Ben, "Ben"),
                 TestParticipants.Unnamed(Chris),
-            ]),
-            PhaseProgress.Restore(phase),
-            quiz ?? QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []),
-            selection ?? SelectionRound.Restore([], []),
-            formation ?? FormationRecord.Restore(false, []),
-            presentation ?? PresentationWalk.Restore(null, null, 0),
-            voting ?? VotingRounds.Restore([], null),
-            revision
+            ]
         );
     }
 

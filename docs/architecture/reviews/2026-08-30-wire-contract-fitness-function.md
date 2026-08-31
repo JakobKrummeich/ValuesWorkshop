@@ -6,7 +6,8 @@
 `frontend/src/domain/workshopState{,Schemas,Blocks,Variants}.ts`,
 `frontend/src/domain/intentResult.ts`, `frontend/src/adapters/*Adapter.ts`,
 `frontend/scripts/generatePhasesModule.mts`, `design/protocol.md`
-**Status:** Adopted — implementation in progress
+**Status:** Adopted — implemented; step 1 in PR #52, steps 2-7 per
+`tasks/specs/23a-wire-contract-fitness-function.md`
 
 ---
 

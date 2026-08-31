@@ -1,0 +1,67 @@
+{
+  "phase": 8,
+  "voting": {
+    "roundNumber": 1,
+    "allotment": 5,
+    "eligibleValues": [
+      {
+        "valueId": "wert-1",
+        "text": {
+          "de": "Wert 1",
+          "en": "Value 1"
+        },
+        "actions": [
+          "We name mistakes the day we make them"
+        ]
+      },
+      {
+        "valueId": "wert-3",
+        "text": {
+          "de": "Wert 3",
+          "en": "Value 3"
+        },
+        "actions": [
+          "We decide in the room, not in the corridor"
+        ]
+      },
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        },
+        "actions": [
+          "We ask before we assume"
+        ]
+      },
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        },
+        "actions": []
+      },
+      {
+        "valueId": "wert-5",
+        "text": {
+          "de": "Wert 5",
+          "en": "Value 5"
+        },
+        "actions": []
+      },
+      {
+        "valueId": "wert-6",
+        "text": {
+          "de": "Wert 6",
+          "en": "Value 6"
+        },
+        "actions": []
+      }
+    ],
+    "isRoundOpen": false,
+    "hasVotedThisRound": false
+  },
+  "revision": 42,
+  "participantCount": 4
+}

@@ -10,7 +10,7 @@ values and pragmatic everyday actions. See `SPEC.md` for the product spec.
 | `frontend/` | Next.js app — `src/{domain,adapters,app}`; screen groups `app/{facilitator,participant,presenter}/`, each with its own DI context |
 | `backend/` | ASP.NET Core — `Domain` ← `Application` ← `Adapters.Persistence` / `Adapters.Web` ← `Host` (hexagonal; ports in `Domain`) |
 | `e2e/` | Playwright end-to-end tests |
-| `contract/` | Machine-checked FE/BE wire contract — produced by `backend/Adapters.Tests/WireContractTests.cs`, regenerate with `CONTRACT_WRITE=1 dotnet test backend/ValuesWorkshop.Tests.slnf` |
+| `contract/` | Machine-checked FE/BE wire contract — intents, enums and per-phase state samples; see `contract/README.md` |
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
 | `design/` | Architecture, domain model, persistence, protocol, state machine, screens |

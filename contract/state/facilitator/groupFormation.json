@@ -1,0 +1,188 @@
+{
+  "phase": 5,
+  "selection": {
+    "values": [
+      {
+        "valueId": "wert-1",
+        "text": {
+          "de": "Wert 1",
+          "en": "Value 1"
+        }
+      },
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        }
+      },
+      {
+        "valueId": "wert-3",
+        "text": {
+          "de": "Wert 3",
+          "en": "Value 3"
+        }
+      },
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        }
+      },
+      {
+        "valueId": "wert-5",
+        "text": {
+          "de": "Wert 5",
+          "en": "Value 5"
+        }
+      },
+      {
+        "valueId": "wert-6",
+        "text": {
+          "de": "Wert 6",
+          "en": "Value 6"
+        }
+      },
+      {
+        "valueId": "wert-7",
+        "text": {
+          "de": "Wert 7",
+          "en": "Value 7"
+        }
+      },
+      {
+        "valueId": "wert-8",
+        "text": {
+          "de": "Wert 8",
+          "en": "Value 8"
+        }
+      },
+      {
+        "valueId": "wert-9",
+        "text": {
+          "de": "Wert 9",
+          "en": "Value 9"
+        }
+      },
+      {
+        "valueId": "wert-10",
+        "text": {
+          "de": "Wert 10",
+          "en": "Value 10"
+        }
+      }
+    ],
+    "submittedCount": 0
+  },
+  "formation": {
+    "subState": "formed",
+    "groups": [
+      {
+        "name": {
+          "animalId": "tier-1",
+          "text": {
+            "de": "Tier 1",
+            "en": "Animal 1"
+          }
+        },
+        "members": [
+          {
+            "participantId": "00000000-0000-0000-0000-0000000000a1",
+            "displayName": "Anna Schmidt"
+          },
+          {
+            "participantId": "00000000-0000-0000-0000-0000000000b2",
+            "displayName": "Ben"
+          }
+        ],
+        "assignedValues": [
+          {
+            "valueId": "wert-1",
+            "text": {
+              "de": "Wert 1",
+              "en": "Value 1"
+            }
+          },
+          {
+            "valueId": "wert-3",
+            "text": {
+              "de": "Wert 3",
+              "en": "Value 3"
+            }
+          },
+          {
+            "valueId": "wert-5",
+            "text": {
+              "de": "Wert 5",
+              "en": "Value 5"
+            }
+          }
+        ]
+      },
+      {
+        "name": {
+          "animalId": "tier-2",
+          "text": {
+            "de": "Tier 2",
+            "en": "Animal 2"
+          }
+        },
+        "members": [
+          {
+            "participantId": "c3c3c3c3-0000-0000-0000-0000000000c3",
+            "displayName": "#c3c3c3"
+          }
+        ],
+        "assignedValues": [
+          {
+            "valueId": "wert-2",
+            "text": {
+              "de": "Wert 2",
+              "en": "Value 2"
+            }
+          },
+          {
+            "valueId": "wert-4",
+            "text": {
+              "de": "Wert 4",
+              "en": "Value 4"
+            }
+          },
+          {
+            "valueId": "wert-6",
+            "text": {
+              "de": "Wert 6",
+              "en": "Value 6"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "revision": 42,
+  "roster": {
+    "participants": [
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000a1",
+        "displayName": "Anna Schmidt"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000b2",
+        "displayName": "Ben"
+      },
+      {
+        "participantId": "c3c3c3c3-0000-0000-0000-0000000000c3",
+        "displayName": "#c3c3c3"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000d4",
+        "displayName": "Dana"
+      }
+    ],
+    "participantCount": 4
+  },
+  "enabledIntents": [
+    "AdvancePhase"
+  ]
+}

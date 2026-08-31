@@ -1,0 +1,51 @@
+{
+  "phase": 6,
+  "ownGroup": {
+    "name": {
+      "animalId": "tier-2",
+      "text": {
+        "de": "Tier 2",
+        "en": "Animal 2"
+      }
+    },
+    "memberDisplayNames": [
+      "#c3c3c3"
+    ],
+    "assignedValues": [
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        }
+      },
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        }
+      },
+      {
+        "valueId": "wert-6",
+        "text": {
+          "de": "Wert 6",
+          "en": "Value 6"
+        }
+      }
+    ],
+    "isCallerScribe": true,
+    "scribeName": "#c3c3c3",
+    "workStatus": "submitted",
+    "actions": [
+      {
+        "actionId": "00000000-0000-0000-0000-00000000ac03",
+        "valueId": "wert-2",
+        "text": "We ask before we assume",
+        "sortOrder": 0
+      }
+    ]
+  },
+  "revision": 42,
+  "participantCount": 4
+}
