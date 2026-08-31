@@ -27,6 +27,7 @@ public sealed class WireContractTests
             [nameof(FacilitatorHub.PoseNextQuestion)] = [],
             [nameof(FacilitatorHub.ReassignScribe)] = ["participantId"],
             [nameof(FacilitatorHub.RevealAnswer)] = [],
+            [nameof(FacilitatorHub.RevealNextValue)] = [],
             [nameof(FacilitatorHub.ShowLearningText)] = [],
             [nameof(FacilitatorHub.StartTiebreakRound)] = [],
         },

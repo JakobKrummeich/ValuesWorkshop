@@ -317,6 +317,27 @@ public class FacilitatorHubTests
         broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
     }
 
+    [Fact]
+    public async Task Revealing_the_next_winner_mutates_persists_and_broadcasts()
+    {
+        var session = TestSessions.InPhase(
+            KnownSession,
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            )
+        );
+        session.BumpRevision();
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.RevealNextValue();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Reveal.RevealedCount.ShouldBe(1);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
     private static Session SessionInFinalVoting(VotingRounds voting)
     {
         var session = TestSessions.InPhase(KnownSession, Phase.FinalVoting, voting: voting);
