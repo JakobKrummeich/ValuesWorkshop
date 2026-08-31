@@ -594,10 +594,27 @@ tiebreak.
 facilitator sub-controls (close voting, start tiebreak); presenter view per
 spec (no live individual votes).
 **Acceptance criteria:**
-- [ ] Cannot submit ≠ allotted votes; tiebreak round shows only tied values
-- [ ] Multi-client e2e extended through phase 8 incl. forced tiebreak
+- [x] Cannot submit ≠ allotted votes; tiebreak round shows only tied values
+- [x] Multi-client e2e extended through phase 8 incl. forced tiebreak
 **Verification:** FE tests + Playwright vote + forced-tiebreak scenario.
 **Dependencies:** 22. **Size:** M
+
+### Task 23a: Machine-checked FE/BE wire contract
+**Description:** Finish the accepted proposal in
+`docs/architecture/reviews/2026-08-30-wire-contract-fitness-function.md`
+(steps 2–7; step 1, `contract/intents.json` + its backend producer, landed
+in PR #52). The frontend starts reading the catalog, and the corpus grows
+to the wire enums and to one serialized state sample per role × phase.
+Tests and generated artifacts only — no production code changes.
+**Acceptance criteria:**
+- [ ] Frontend test fails when an intent name or arity drifts from
+      `contract/intents.json`
+- [ ] `contract/enums.json` + `contract/state/<role>/<phase>.json`
+      produced by backend tests, consumed by frontend tests
+- [ ] Every `[JsonDerivedType]` discriminator appears in the fixture corpus
+**Verification:** `./scripts/ci-lint.sh` + `./scripts/ci-test.sh`; drift
+proven by hand-editing the artifacts.
+**Dependencies:** 23. **Size:** M
 
 ### Task 24: Phase 9 — Final presentation + PDF
 **Description:** Winners (5 values + actions) on presenter. Participant
