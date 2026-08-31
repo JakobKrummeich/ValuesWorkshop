@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type {
@@ -27,6 +28,47 @@ export type PresenterFinalPresentationModel =
   | { stage: FinalPresentationStage.Reveal; winner: RevealedWinnerModel }
   | { stage: FinalPresentationStage.Overview; winners: RevealedWinnerModel[] };
 
+const finalWinnerHoldMilliseconds = 12_000;
+
+function prefersReducedMotion(): boolean {
+  if (
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function"
+  ) {
+    return false;
+  }
+
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function useFinalWinnerInterlude(isConcluded: boolean): boolean {
+  const [wasConcluded, setWasConcluded] = useState(isConcluded);
+  const [isInterludeActive, setIsInterludeActive] = useState(false);
+
+  if (isConcluded !== wasConcluded) {
+    setWasConcluded(isConcluded);
+
+    if (isConcluded && !prefersReducedMotion()) {
+      setIsInterludeActive(true);
+    }
+  }
+
+  useEffect(() => {
+    if (!isInterludeActive) {
+      return undefined;
+    }
+
+    const timer = setTimeout(
+      () => setIsInterludeActive(false),
+      finalWinnerHoldMilliseconds,
+    );
+
+    return () => clearTimeout(timer);
+  }, [isInterludeActive]);
+
+  return isConcluded && isInterludeActive;
+}
+
 function revealedWinnerModelOf(winner: WinnerWithActions): RevealedWinnerModel {
   return {
     ...winner,
@@ -41,8 +83,9 @@ export function usePresenterFinalPresentationScreen(
   state: PresenterFinalPresentationState,
 ): PresenterFinalPresentationModel {
   const { revealedWinners, isConcluded } = state.conclusion;
+  const isRevealingFinalWinner = useFinalWinnerInterlude(isConcluded);
 
-  if (isConcluded) {
+  if (isConcluded && !isRevealingFinalWinner) {
     return {
       stage: FinalPresentationStage.Overview,
       winners: revealedWinners

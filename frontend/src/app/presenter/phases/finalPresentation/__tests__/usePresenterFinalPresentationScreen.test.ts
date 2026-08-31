@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { MessageKey } from "../../../../../domain/i18n/messages";
 import { Phase } from "../../../../../domain/phases";
 import type {
@@ -35,6 +35,93 @@ function presentationState(
     conclusion: { revealedWinners, isConcluded },
   };
 }
+
+function stubMatchMedia(matches: boolean) {
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: (query: string) => ({ matches, media: query }),
+  });
+}
+
+function allWinners(): WinnerWithActions[] {
+  return [winner(5), winner(4), winner(3), winner(2), winner(1)];
+}
+
+describe("final winner interlude", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    delete (window as { matchMedia?: unknown }).matchMedia;
+  });
+
+  it("holds the place-one reveal before the overview when the conclusion arrives", () => {
+    const { result, rerender } = renderHook(
+      (state: PresenterFinalPresentationState) =>
+        usePresenterFinalPresentationScreen(state),
+      {
+        initialProps: presentationState([
+          winner(5),
+          winner(4),
+          winner(3),
+          winner(2),
+        ]),
+      },
+    );
+
+    rerender(presentationState(allWinners(), true));
+
+    expect(result.current).toMatchObject({
+      stage: FinalPresentationStage.Reveal,
+      winner: { place: 1 },
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(12_000);
+    });
+
+    expect(result.current).toMatchObject({
+      stage: FinalPresentationStage.Overview,
+    });
+  });
+
+  it("shows the overview immediately when mounted after the conclusion", () => {
+    const { result } = renderHook(() =>
+      usePresenterFinalPresentationScreen(
+        presentationState(allWinners(), true),
+      ),
+    );
+
+    expect(result.current).toMatchObject({
+      stage: FinalPresentationStage.Overview,
+    });
+  });
+
+  it("skips the interlude when the viewer prefers reduced motion", () => {
+    stubMatchMedia(true);
+
+    const { result, rerender } = renderHook(
+      (state: PresenterFinalPresentationState) =>
+        usePresenterFinalPresentationScreen(state),
+      {
+        initialProps: presentationState([
+          winner(5),
+          winner(4),
+          winner(3),
+          winner(2),
+        ]),
+      },
+    );
+
+    rerender(presentationState(allWinners(), true));
+
+    expect(result.current).toMatchObject({
+      stage: FinalPresentationStage.Overview,
+    });
+  });
+});
 
 describe("presenter final presentation screen logic", () => {
   it("builds anticipation before the first reveal", () => {
