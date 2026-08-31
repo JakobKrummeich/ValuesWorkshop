@@ -35,9 +35,9 @@ public static class TestSessions
             identity,
             Facilitator,
             Name,
-            RosterOf(roster),
+            Roster.Restore(roster ?? []),
             PhaseProgress.Restore(phase),
-            quiz ?? UnansweredQuiz(phase),
+            QuizOf(phase, quiz),
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),
@@ -47,14 +47,9 @@ public static class TestSessions
         );
     }
 
-    private static Roster RosterOf(IEnumerable<Participant>? roster)
+    private static QuizProgress QuizOf(Phase phase, QuizProgress? quiz)
     {
-        return Roster.Restore(roster ?? []);
-    }
-
-    private static QuizProgress UnansweredQuiz(Phase phase)
-    {
-        return QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []);
+        return quiz ?? QuizProgress.Restore(phase == Phase.Quiz ? 0 : null, false, false, []);
     }
 
     public static void WalkQuizToCompletion(Session session)
