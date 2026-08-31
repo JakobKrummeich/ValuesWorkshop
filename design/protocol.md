@@ -414,7 +414,7 @@ variant carries it.
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `ownGroup` (the block above, always present — every participant of a formed session is in a group) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` — a group intro is `presentingGroupName` set with `presentedValueId` null (empty `presentedActions`); a value position has both set |
 | voting | `roundNumber`, `allotment`, `eligibleValues: [{valueId, text: {de, en}, actions: [text]}]` (the current round's eligible values in deal order; value texts and the value's submitted group-work actions embedded — `ownGroup.assignedValues` precedent, the client never reads `config/`), `isRoundOpen`, `hasVotedThisRound` |
-| conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
+| conclusion | `isConcluded`, `record?` — `record` present iff concluded; while the winners are revealed the participant screen shows nothing, and data a screen must not show is data not sent (this supersedes the earlier `revealedWinners` sketch of this row). `record: { winners: [{ valueId, text: {de, en}, place, voteCount, actions: [text] }] (places 1–5; `voteCount` is always the value's first-round tally — tiebreak tallies appear only in `rounds`), values: [{ valueId, text: {de, en}, actions: [text] }] (the full presented set, deal order), rounds: [{ roundNumber, allotment, tallies: [{ valueId, count }] }] (every closed round, incl. tiebreaks) }` — value texts embedded (`ownGroup.assignedValues` precedent), actions are the submitted group-work texts, untranslated |
 
 Deliberately absent: any other participant's answer, selection, or votes;
 any tally during an open voting round; any participant identifier other than
@@ -432,7 +432,7 @@ join lobby shows back to the person who just signed in.
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` — group-intro encoding as in the participant block; no position counter (`design/screens.md`) |
 | voting | `roundNumber`, `allotment`, `eligibleValues: [{valueId, text: {de, en}}]` (the full presented set that entered voting — constant across rounds, so `closedRoundTallies?` and `tiedValueIds?` keep their names while a tiebreak narrows the participants' round), `isRoundOpen`, `votedCount`, `participantCount` (roster size — the voted-count denominator), `closedRoundTallies?`, `tiedValueIds?` |
-| conclusion | `winners: [{ valueId, voteCount }]`, `revealedCount` |
+| conclusion | `winners: [{ valueId, text: {de, en}, place, voteCount }]` (all five, places 1–5, `voteCount` the first-round tally — the facilitator sees ahead, quiz precedent), `revealedCount`, `isConcluded` |
 
 `enabledIntents: string[]` (§ 6.4) sits on the facilitator envelope — it is
 present on every variant, because every phase offers controls.
@@ -452,7 +452,7 @@ what they answered, selected, or voted for.
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ text }]` — group-intro encoding as in the participant block; the group name headlines the presented value and fills the intro screen |
 | voting | `isRoundOpen` only — no tallies while voting (`design/screens.md`) |
-| conclusion | `revealedWinners: [{ valueId, voteCount, actions }]`, `isConcluded` |
+| conclusion | `revealedWinners: [{ valueId, text: {de, en}, place, voteCount, actions: [text] }]` — reveal order (place 5 first), one entry per revealed winner, so the current reveal is the last entry, `voteCount` the first-round tally; `isConcluded` |
 
 `participantDisplayNames` is the join lobby only (phase 1): the projection
 shows who has arrived while the room fills. It carries names without
