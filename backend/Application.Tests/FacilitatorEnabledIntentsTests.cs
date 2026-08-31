@@ -215,9 +215,14 @@ public class FacilitatorEnabledIntentsTests
     [Fact]
     public void The_final_phase_enables_no_phase_advance_because_no_phase_follows()
     {
-        var session = SessionFixtures.InPhase(Phase.FinalPresentation);
+        var session = SessionFixtures.InPhase(
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            )
+        );
 
-        Map(session).EnabledIntents.ShouldBeEmpty();
+        Map(session).EnabledIntents.ShouldNotContain(FacilitatorIntent.AdvancePhase);
     }
 
     [Fact]

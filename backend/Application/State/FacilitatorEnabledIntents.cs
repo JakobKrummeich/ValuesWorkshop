@@ -35,7 +35,7 @@ internal static class FacilitatorEnabledIntents
                 AddVotingIntents(enabledIntents, session.Voting);
                 break;
             case Phase.FinalPresentation:
-                AddRevealIntent(enabledIntents, session);
+                AddRevealIntent(enabledIntents, session.Reveal);
                 break;
         }
     }
@@ -56,9 +56,9 @@ internal static class FacilitatorEnabledIntents
         }
     }
 
-    private static void AddRevealIntent(List<FacilitatorIntent> enabledIntents, Session session)
+    private static void AddRevealIntent(List<FacilitatorIntent> enabledIntents, WinnerReveal reveal)
     {
-        if (session.Reveal.HasUnrevealedWinners(session.Voting.WinningValues.Count))
+        if (!reveal.IsConcluded)
         {
             enabledIntents.Add(FacilitatorIntent.RevealNextValue);
         }

@@ -16,8 +16,8 @@ public class WinnerRevealTests
     {
         var reveal = new WinnerReveal();
 
-        reveal.RevealNext(VotingRounds.RequiredWinningValueCount);
-        reveal.RevealNext(VotingRounds.RequiredWinningValueCount);
+        reveal.RevealNext();
+        reveal.RevealNext();
 
         reveal.RevealedCount.ShouldBe(2);
         reveal.IsConcluded.ShouldBeFalse();
@@ -28,7 +28,7 @@ public class WinnerRevealTests
     {
         var reveal = WinnerReveal.Restore(VotingRounds.RequiredWinningValueCount - 1);
 
-        reveal.RevealNext(VotingRounds.RequiredWinningValueCount);
+        reveal.RevealNext();
 
         reveal.RevealedCount.ShouldBe(VotingRounds.RequiredWinningValueCount);
         reveal.IsConcluded.ShouldBeTrue();
@@ -40,18 +40,8 @@ public class WinnerRevealTests
         var reveal = WinnerReveal.Restore(VotingRounds.RequiredWinningValueCount);
 
         Should
-            .Throw<InvariantViolationException>(() =>
-                reveal.RevealNext(VotingRounds.RequiredWinningValueCount)
-            )
+            .Throw<InvariantViolationException>(() => reveal.RevealNext())
             .Message.ShouldBe("Every winner has been revealed; nothing is left to reveal.");
-    }
-
-    [Fact]
-    public void A_reveal_without_winners_is_an_invariant_violation()
-    {
-        var reveal = new WinnerReveal();
-
-        Should.Throw<InvariantViolationException>(() => reveal.RevealNext(0));
     }
 
     [Theory]

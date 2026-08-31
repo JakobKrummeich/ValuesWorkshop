@@ -6,14 +6,9 @@ public sealed class WinnerReveal
 
     public bool IsConcluded => RevealedCount == VotingRounds.RequiredWinningValueCount;
 
-    public bool HasUnrevealedWinners(int winnerCount)
+    internal void RevealNext()
     {
-        return RevealedCount < winnerCount;
-    }
-
-    internal void RevealNext(int winnerCount)
-    {
-        if (!HasUnrevealedWinners(winnerCount))
+        if (IsConcluded)
         {
             throw new InvariantViolationException(
                 "Every winner has been revealed; nothing is left to reveal."

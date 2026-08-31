@@ -11,6 +11,6 @@ public static class FinalPresentation
             );
         }
 
-        session.Reveal.RevealNext(session.Voting.WinningValues.Count);
+        session.Reveal.RevealNext();
     }
 }
