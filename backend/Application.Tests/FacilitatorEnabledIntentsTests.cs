@@ -220,6 +220,34 @@ public class FacilitatorEnabledIntentsTests
         Map(session).EnabledIntents.ShouldBeEmpty();
     }
 
+    [Fact]
+    public void Unrevealed_winners_enable_exactly_the_next_reveal()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            ),
+            reveal: WinnerReveal.Restore(VotingRounds.RequiredWinningValueCount - 1)
+        );
+
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.RevealNextValue]);
+    }
+
+    [Fact]
+    public void The_last_revealed_winner_leaves_nothing_enabled()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            ),
+            reveal: WinnerReveal.Restore(VotingRounds.RequiredWinningValueCount)
+        );
+
+        Map(session).EnabledIntents.ShouldBeEmpty();
+    }
+
     private static FacilitatorWorkshopState Map(Session session)
     {
         return TestMappers.Facilitator().Map(session, 1);

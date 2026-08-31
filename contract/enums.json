@@ -28,7 +28,8 @@
     "GoToNextValue": "GoToNextValue",
     "CorrectActionWording": "CorrectActionWording",
     "CloseVoting": "CloseVoting",
-    "StartTiebreakRound": "StartTiebreakRound"
+    "StartTiebreakRound": "StartTiebreakRound",
+    "RevealNextValue": "RevealNextValue"
   },
   "QuizSubState": {
     "Answering": 1,

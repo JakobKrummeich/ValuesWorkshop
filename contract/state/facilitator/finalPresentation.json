@@ -31,5 +31,7 @@
     ],
     "participantCount": 4
   },
-  "enabledIntents": []
+  "enabledIntents": [
+    "RevealNextValue"
+  ]
 }
