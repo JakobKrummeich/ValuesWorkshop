@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { LocalizedText } from "../../../../domain/i18n/localizedText";
-import { MessageKey } from "../../../../domain/i18n/messages";
+import type { MessageKey } from "../../../../domain/i18n/messages";
+import { voteCountMessageKeyOf } from "../../../../domain/i18n/voteCountMessageKey";
 import type {
   PresenterFinalPresentationState,
   WinnerWithActions,
@@ -30,17 +31,6 @@ export type PresenterFinalPresentationModel =
 
 const finalWinnerHoldMilliseconds = 12_000;
 
-function prefersReducedMotion(): boolean {
-  if (
-    typeof window === "undefined" ||
-    typeof window.matchMedia !== "function"
-  ) {
-    return false;
-  }
-
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
 function useFinalWinnerInterlude(isConcluded: boolean): boolean {
   const [wasConcluded, setWasConcluded] = useState(isConcluded);
   const [isInterludeActive, setIsInterludeActive] = useState(false);
@@ -48,7 +38,7 @@ function useFinalWinnerInterlude(isConcluded: boolean): boolean {
   if (isConcluded !== wasConcluded) {
     setWasConcluded(isConcluded);
 
-    if (isConcluded && !prefersReducedMotion()) {
+    if (isConcluded) {
       setIsInterludeActive(true);
     }
   }
@@ -72,10 +62,7 @@ function useFinalWinnerInterlude(isConcluded: boolean): boolean {
 function revealedWinnerModelOf(winner: WinnerWithActions): RevealedWinnerModel {
   return {
     ...winner,
-    voteCountKey:
-      winner.voteCount === 1
-        ? MessageKey.FinalPresentationVoteCountSingle
-        : MessageKey.FinalPresentationVoteCount,
+    voteCountKey: voteCountMessageKeyOf(winner.voteCount),
   };
 }
 

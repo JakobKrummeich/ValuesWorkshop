@@ -99,7 +99,7 @@ describe("final winner interlude", () => {
     });
   });
 
-  it("skips the interlude when the viewer prefers reduced motion", () => {
+  it("holds the place-one reveal even when the viewer prefers reduced motion", () => {
     stubMatchMedia(true);
 
     const { result, rerender } = renderHook(
@@ -118,7 +118,8 @@ describe("final winner interlude", () => {
     rerender(presentationState(allWinners(), true));
 
     expect(result.current).toMatchObject({
-      stage: FinalPresentationStage.Overview,
+      stage: FinalPresentationStage.Reveal,
+      winner: { place: 1 },
     });
   });
 });

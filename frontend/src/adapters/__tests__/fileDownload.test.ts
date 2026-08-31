@@ -37,12 +37,17 @@ describe("downloadBlob", () => {
     expect(anchor.download).toBe("workshop-record.pdf");
   });
 
-  it("revokes the object url after the click", () => {
+  it("revokes the object url only after the download had time to start", () => {
+    jest.useFakeTimers();
+
     downloadBlob(new Blob(["%PDF"]), "workshop-record.pdf");
 
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(revokeObjectUrl).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(10_000);
+
     expect(revokeObjectUrl).toHaveBeenCalledWith("blob:workshop-record");
-    expect(revokeObjectUrl.mock.invocationCallOrder[0]).toBeGreaterThan(
-      click.mock.invocationCallOrder[0],
-    );
+    jest.useRealTimers();
   });
 });

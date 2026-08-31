@@ -771,11 +771,25 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
   });
 
   test("the fifth reveal concludes the workshop with the winner overview", async () => {
+    test.setTimeout(90_000);
+
     await expect(revealNextValueButton()).toBeEnabled({ timeout: 10_000 });
     await revealNextValueButton().click();
 
+    const championCardIndex = 0;
+    await expect(presenterPage.getByTestId("winner-place")).toHaveText(
+      "Place 1",
+      { timeout: 10_000 },
+    );
+    await expect(presenterPage.getByTestId("winner-value")).toHaveText(
+      winnerValueNames[championCardIndex],
+    );
+    await expect(presenterPage.getByTestId("winner-vote-count")).toHaveText(
+      `${VOTE_TARGETS_BY_CARD_ORDER[championCardIndex]} votes`,
+    );
+
     await expect(presenterPage.getByTestId("winner-overview")).toBeVisible({
-      timeout: 10_000,
+      timeout: 30_000,
     });
     const overviewRows = presenterPage.getByTestId(/^overview-winner-/);
     await expect(overviewRows).toHaveCount(WINNER_COUNT);

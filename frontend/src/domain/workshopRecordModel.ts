@@ -2,6 +2,7 @@ import type { Language } from "./i18n/language";
 import { localizedText } from "./i18n/localizedText";
 import { MessageKey } from "./i18n/messages";
 import { translate } from "./i18n/translate";
+import { voteCountMessageKeyOf } from "./i18n/voteCountMessageKey";
 import type { WorkshopRecord } from "./workshopStateBlocks";
 
 export interface WorkshopRecordWinnerModel {
@@ -78,12 +79,9 @@ function winnerModelOf(
       place: winner.place,
     }),
     valueName: localizedText(language, winner.text),
-    votesLine:
-      winner.voteCount === 1
-        ? translate(language, MessageKey.FinalPresentationVoteCountSingle)
-        : translate(language, MessageKey.FinalPresentationVoteCount, {
-            count: winner.voteCount,
-          }),
+    votesLine: translate(language, voteCountMessageKeyOf(winner.voteCount), {
+      count: winner.voteCount,
+    }),
     actions: [...winner.actions],
   };
 }

@@ -45,8 +45,8 @@ export function WorkshopRecordDocument({
             <Text style={styles.entryLabel}>{winner.placeLabel}</Text>
             <Text style={styles.entryName}>{winner.valueName}</Text>
             <Text style={styles.entryLabel}>{winner.votesLine}</Text>
-            {winner.actions.map((action) => (
-              <Text key={action}>{action}</Text>
+            {winner.actions.map((action, actionIndex) => (
+              <Text key={actionIndex}>{action}</Text>
             ))}
           </View>
         ))}
@@ -56,8 +56,8 @@ export function WorkshopRecordDocument({
         {model.values.map((value) => (
           <View key={value.valueName} style={styles.entry}>
             <Text style={styles.entryName}>{value.valueName}</Text>
-            {value.actions.map((action) => (
-              <Text key={action}>{action}</Text>
+            {value.actions.map((action, actionIndex) => (
+              <Text key={actionIndex}>{action}</Text>
             ))}
           </View>
         ))}
@@ -67,8 +67,8 @@ export function WorkshopRecordDocument({
         {model.rounds.map((round) => (
           <View key={round.title} style={styles.entry}>
             <Text style={styles.entryName}>{round.title}</Text>
-            {round.tallyLines.map((tallyLine) => (
-              <Text key={tallyLine}>{tallyLine}</Text>
+            {round.tallyLines.map((tallyLine, tallyLineIndex) => (
+              <Text key={tallyLineIndex}>{tallyLine}</Text>
             ))}
           </View>
         ))}
