@@ -588,7 +588,8 @@ Screens depend only on their slice — never on a connection, never on
 | facilitator | `lifecyclePort` | `AdvancePhase` | **9** |
 | facilitator | `quizControlPort` | `RevealAnswer`, `ShowLearningText`, `PoseNextQuestion` | 14 |
 | facilitator | `formationPort` | `ReassignScribe` | 16 |
-| facilitator | `walkControlPort` | `GoToNextValue`, `CorrectActionWording`, `RevealNextValue` | 18 |
+| facilitator | `walkControlPort` | `GoToNextValue`, `CorrectActionWording` | 18 |
+| facilitator | `conclusionControlPort` | `RevealNextValue` | 24 |
 | facilitator | `votingControlPort` | `CloseVoting`, `StartTiebreakRound` | 17 |
 | presenter | `sessionStatePort` | state stream + connection state | **9** |
 
