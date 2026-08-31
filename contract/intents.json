@@ -1,0 +1,45 @@
+{
+  "stateCallback": "ReceiveWorkshopState",
+  "facilitator": {
+    "AdvancePhase": [],
+    "CloseVoting": [],
+    "CorrectActionWording": [
+      "actionId",
+      "text"
+    ],
+    "GoToNextValue": [],
+    "PoseNextQuestion": [],
+    "ReassignScribe": [
+      "participantId"
+    ],
+    "RevealAnswer": [],
+    "ShowLearningText": [],
+    "StartTiebreakRound": []
+  },
+  "participant": {
+    "AddAction": [
+      "valueId"
+    ],
+    "ChooseQuizAnswer": [
+      "questionIndex",
+      "answerIndex"
+    ],
+    "EditAction": [
+      "actionId",
+      "text"
+    ],
+    "RemoveAction": [
+      "actionId"
+    ],
+    "ReopenGroupWork": [],
+    "SubmitFinalVotes": [
+      "votes"
+    ],
+    "SubmitGroupWork": [
+      "values"
+    ],
+    "SubmitValueSelection": [
+      "valueIds"
+    ]
+  }
+}
