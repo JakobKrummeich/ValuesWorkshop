@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import {
   test,
   expect,
@@ -6,6 +7,7 @@ import {
   type Locator,
   type Page,
 } from "@playwright/test";
+import pdfParse from "pdf-parse";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
 import { castBallot, eligibleValueIdsOf } from "./support/finalVoting";
 import { assignedValueIdsOf } from "./support/groupWork";
@@ -49,6 +51,22 @@ const MAIN_ROUND_ALLOTMENT = 5;
 const VOTE_TARGETS_BY_CARD_ORDER = [30, 25, 20, 17, 14, 14, 10, 8, 7, 5];
 const TIED_CARD_INDEXES = [4, 5];
 const TIEBREAK_WINNER_VOTES = 16;
+const WINNER_COUNT = 5;
+const WORST_CASE_CARD_INDEX = 2;
+const MAXIMAL_ACTION_LENGTH = 200;
+const CORRECTED_ACTION_TEXT = "We start every meeting with a check-in";
+const REVEAL_SCREEN_PLACES = [5, 4, 3, 2];
+const PDF_FILE_NAME = "workshop-record.pdf";
+
+function maximalLengthActionTextOf(actionNumber: number): string {
+  const opening = `Worst case action ${actionNumber} of the winning value `;
+  const filler = "keeps every reveal screen honest about fitting the wall ";
+  return (opening + filler.repeat(4)).slice(0, MAXIMAL_ACTION_LENGTH - 1) + "z";
+}
+
+const worstCaseActionTexts = Array.from({ length: 5 }, (unused, actionIndex) =>
+  maximalLengthActionTextOf(actionIndex + 1),
+);
 
 const workshopParticipants = participantAccounts.slice(0, PARTICIPANT_COUNT);
 
@@ -69,10 +87,15 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
   let presenterPage: Page;
   let sessionIdentity: string;
   let eligibleValueIds: string[] = [];
+  let worstCaseValueId = "";
+  let winnerValueNames: string[] = [];
 
   test.beforeAll(async ({ browser }) => {
     facilitatorContext = await browser.newContext();
-    presenterContext = await browser.newContext({ viewport: WALL_VIEWPORT });
+    presenterContext = await browser.newContext({
+      viewport: WALL_VIEWPORT,
+      reducedMotion: "reduce",
+    });
     facilitatorPage = await facilitatorContext.newPage();
     presenterPage = await presenterContext.newPage();
 
@@ -366,7 +389,12 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
   }) => {
     test.setTimeout(300_000);
 
+    for (const actionText of worstCaseActionTexts) {
+      expect(actionText).toHaveLength(MAXIMAL_ACTION_LENGTH);
+    }
+
     const assignedValueCounts: number[] = [];
+    let presentationPosition = 0;
     for (const animalId of EXPECTED_GROUP_ANIMAL_IDS) {
       const scribeAccountName = accountNameOf(
         await currentScribeNameOf(animalId),
@@ -383,13 +411,22 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
         assignedValueCounts.push(valueIds.length);
 
         for (const valueId of valueIds) {
+          const actionTexts =
+            presentationPosition === WORST_CASE_CARD_INDEX
+              ? worstCaseActionTexts
+              : [`Action for ${valueId}`];
+          if (presentationPosition === WORST_CASE_CARD_INDEX) {
+            worstCaseValueId = valueId;
+          }
+          presentationPosition += 1;
+
           await page.getByTestId(`value-tab-${valueId}`).click();
-          await page.getByTestId("add-action-button").click();
-          await expect(page.getByTestId(/^action-input-/)).toBeVisible();
-          await page
-            .getByTestId(/^action-input-/)
-            .first()
-            .fill(`Action for ${valueId}`);
+          const actionInputs = page.getByTestId(/^action-input-/);
+          for (const [actionIndex, actionText] of actionTexts.entries()) {
+            await page.getByTestId("add-action-button").click();
+            await expect(actionInputs).toHaveCount(actionIndex + 1);
+            await actionInputs.nth(actionIndex).fill(actionText);
+          }
         }
 
         await expect(page.getByTestId("submit-group-work-button")).toBeEnabled({
@@ -512,15 +549,25 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
       workshopParticipants[0].accountName,
       async (page) => {
         eligibleValueIds = await eligibleValueIdsOf(page);
+        winnerValueNames = (
+          await page
+            .getByTestId(/^vote-card-/)
+            .locator("h3")
+            .allTextContents()
+        ).slice(0, WINNER_COUNT);
         await expect(
           page.getByTestId(`vote-card-${eligibleValueIds[0]}`),
-        ).toContainText("We start every meeting with a check-in");
+        ).toContainText(CORRECTED_ACTION_TEXT);
         await expect(
           page.getByTestId(`vote-card-${eligibleValueIds[1]}`),
         ).toContainText(/Action for /);
+        await expect(
+          page.getByTestId(`vote-card-${worstCaseValueId}`),
+        ).toContainText(worstCaseActionTexts[0]);
       },
     );
     expect(eligibleValueIds).toHaveLength(TOP_VALUE_COUNT);
+    expect(eligibleValueIds[WORST_CASE_CARD_INDEX]).toBe(worstCaseValueId);
 
     const batches = inBatches(workshopParticipants);
     for (const [batchIndex, batch] of batches.entries()) {
@@ -625,6 +672,193 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     await advancePhaseButton(facilitatorPage).click();
     for (const page of [facilitatorPage, presenterPage]) {
       await expect(page.getByTestId("phase")).toHaveText("Phase 9");
+    }
+  });
+
+  function revealNextValueButton(): Locator {
+    return facilitatorPage.getByRole("button", { name: "Reveal next value" });
+  }
+
+  function expectedActionTextsOf(cardIndex: number): string[] {
+    if (cardIndex === WORST_CASE_CARD_INDEX) {
+      return worstCaseActionTexts;
+    }
+    if (cardIndex === 0) {
+      return [CORRECTED_ACTION_TEXT];
+    }
+    return [`Action for ${eligibleValueIds[cardIndex]}`];
+  }
+
+  async function expectWorstCaseRevealToFitTheWall(): Promise<void> {
+    const actions = presenterPage.getByTestId("winner-action");
+    await expect(actions).toHaveText(worstCaseActionTexts);
+
+    for (const action of await actions.all()) {
+      const box = await action.boundingBox();
+      if (box === null) {
+        throw new Error("A revealed action has no bounding box");
+      }
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.y).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(WALL_VIEWPORT.width);
+      expect(box.y + box.height).toBeLessThanOrEqual(WALL_VIEWPORT.height);
+    }
+
+    const overflow = await presenterPage.evaluate(() => ({
+      horizontal:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      vertical:
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight,
+    }));
+    expect(overflow).toEqual({ horizontal: 0, vertical: 0 });
+
+    const clippedHeight = await presenterPage
+      .getByTestId("winner-reveal")
+      .evaluate((element) => element.scrollHeight - element.clientHeight);
+    expect(clippedHeight).toBe(0);
+  }
+
+  test("the facilitator reveals places five down to two on the wall", async ({
+    browser,
+  }) => {
+    test.setTimeout(180_000);
+
+    await expect(presenterPage.getByTestId("reveal-anticipation")).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(facilitatorPage.getByTestId("revealed-count")).toHaveText(
+      `Revealed: 0 of ${WINNER_COUNT}`,
+    );
+
+    for (const [revealIndex, place] of REVEAL_SCREEN_PLACES.entries()) {
+      await expect(revealNextValueButton()).toBeEnabled({ timeout: 10_000 });
+      await revealNextValueButton().click();
+
+      await expect(facilitatorPage.getByTestId("revealed-count")).toHaveText(
+        `Revealed: ${revealIndex + 1} of ${WINNER_COUNT}`,
+        { timeout: 10_000 },
+      );
+
+      const cardIndex = place - 1;
+      await expect(presenterPage.getByTestId("winner-place")).toHaveText(
+        `Place ${place}`,
+        { timeout: 10_000 },
+      );
+      await expect(presenterPage.getByTestId("winner-value")).toHaveText(
+        winnerValueNames[cardIndex],
+      );
+      await expect(presenterPage.getByTestId("winner-vote-count")).toHaveText(
+        `${VOTE_TARGETS_BY_CARD_ORDER[cardIndex]} votes`,
+      );
+      await expect(presenterPage.getByTestId("winner-action")).toHaveText(
+        expectedActionTextsOf(cardIndex),
+      );
+
+      if (cardIndex === WORST_CASE_CARD_INDEX) {
+        await expectWorstCaseRevealToFitTheWall();
+      }
+    }
+
+    for (const account of [workshopParticipants[0], workshopParticipants[29]]) {
+      await withParticipant(browser, account.accountName, async (page) => {
+        await expect(page.getByTestId("waiting-screen")).toBeVisible({
+          timeout: 15_000,
+        });
+      });
+    }
+  });
+
+  test("the fifth reveal concludes the workshop with the winner overview", async () => {
+    await expect(revealNextValueButton()).toBeEnabled({ timeout: 10_000 });
+    await revealNextValueButton().click();
+
+    await expect(presenterPage.getByTestId("winner-overview")).toBeVisible({
+      timeout: 10_000,
+    });
+    const overviewRows = presenterPage.getByTestId(/^overview-winner-/);
+    await expect(overviewRows).toHaveCount(WINNER_COUNT);
+    const rowTestIds = await overviewRows.evaluateAll((rows) =>
+      rows.map((row) => row.getAttribute("data-testid")),
+    );
+    expect(rowTestIds).toEqual([
+      "overview-winner-1",
+      "overview-winner-2",
+      "overview-winner-3",
+      "overview-winner-4",
+      "overview-winner-5",
+    ]);
+    for (const [cardIndex, valueName] of winnerValueNames.entries()) {
+      await expect(
+        presenterPage.getByTestId(`overview-winner-${cardIndex + 1}`),
+      ).toContainText(valueName);
+    }
+    await expect(presenterPage.getByTestId("overview-winner-1")).toContainText(
+      `${VOTE_TARGETS_BY_CARD_ORDER[0]} votes`,
+    );
+
+    await expect(facilitatorPage.getByTestId("revealed-count")).toHaveText(
+      `Revealed: ${WINNER_COUNT} of ${WINNER_COUNT}`,
+    );
+    await expect(facilitatorPage.getByTestId("concluded-note")).toBeVisible();
+    await expect(revealNextValueButton()).toHaveCount(0);
+  });
+
+  test("a participant downloads the workshop record as an anonymous PDF", async ({
+    browser,
+  }) => {
+    test.setTimeout(120_000);
+
+    let pdfText = "";
+    await withParticipant(
+      browser,
+      workshopParticipants[0].accountName,
+      async (page) => {
+        await expect(page.getByTestId("workshop-concluded")).toBeVisible({
+          timeout: 15_000,
+        });
+
+        const downloadPromise = page.waitForEvent("download");
+        await page
+          .getByRole("button", { name: "Download workshop record (PDF)" })
+          .click();
+        const download = await downloadPromise;
+        expect(download.suggestedFilename()).toBe(PDF_FILE_NAME);
+
+        const downloadPath = await download.path();
+        const parsed = await pdfParse(await readFile(downloadPath));
+        pdfText = parsed.text.replace(/\s+/g, " ");
+      },
+    );
+
+    expect(pdfText).toContain("Workshop record");
+    expect(pdfText).toContain("The winners");
+    expect(pdfText).toContain("All actions");
+    expect(pdfText).toContain("Votes per round");
+
+    for (const [cardIndex, valueName] of winnerValueNames.entries()) {
+      expect(pdfText).toContain(`Place ${cardIndex + 1}`);
+      expect(pdfText).toContain(valueName);
+    }
+
+    expect(pdfText).toContain(
+      `Round 1 — ${MAIN_ROUND_ALLOTMENT} votes per person`,
+    );
+    expect(pdfText).toContain("Round 2 — 1 vote per person");
+    expect(pdfText).toContain(`${winnerValueNames[0]} — 30`);
+    expect(pdfText).toContain(`${winnerValueNames[4]} — 14`);
+    expect(pdfText).toContain(
+      `${winnerValueNames[4]} — ${TIEBREAK_WINNER_VOTES}`,
+    );
+
+    expect(pdfText).toContain(CORRECTED_ACTION_TEXT);
+    for (const actionText of worstCaseActionTexts) {
+      expect(pdfText).toContain(actionText);
+    }
+
+    for (const account of workshopParticipants) {
+      expect(pdfText).not.toMatch(new RegExp(`\\b${account.displayName}\\b`));
     }
   });
 });
