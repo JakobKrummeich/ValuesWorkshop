@@ -32,6 +32,7 @@ export function readStateFixtures(
   const directory = resolve(repositoryRoot, "contract", "state", role);
 
   return readdirSync(directory)
+    .filter((fileName) => fileName.endsWith(".json"))
     .map((fileName) => fileName.replace(/\.json$/, ""))
     .sort()
     .map((name) => ({
