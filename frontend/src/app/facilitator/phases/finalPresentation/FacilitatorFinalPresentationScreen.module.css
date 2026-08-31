@@ -1,0 +1,45 @@
+.screen {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-gap);
+  min-height: 0;
+  padding: var(--space-gutter);
+}
+
+.revealedCount {
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
+}
+
+.controlButton {
+  min-height: var(--control-height);
+  padding: var(--space-tight) var(--space-gutter);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+}
+
+.controlButton:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.concludedNote {
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+
+.rejection {
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+}
