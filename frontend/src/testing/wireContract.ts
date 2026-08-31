@@ -10,10 +10,20 @@ const intentCatalogSchema = z.object({
   participant: z.record(z.string(), z.array(z.string())),
 });
 
+const enumCatalogSchema = z.record(
+  z.string(),
+  z.record(z.string(), z.union([z.string(), z.number()])),
+);
+
 export type IntentCatalog = z.infer<typeof intentCatalogSchema>;
+export type EnumCatalog = z.infer<typeof enumCatalogSchema>;
 
 export function readIntentCatalog(): IntentCatalog {
   return intentCatalogSchema.parse(readContractFile("intents.json"));
+}
+
+export function readEnumCatalog(): EnumCatalog {
+  return enumCatalogSchema.parse(readContractFile("enums.json"));
 }
 
 function readContractFile(...segments: string[]): unknown {

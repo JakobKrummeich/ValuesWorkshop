@@ -16,14 +16,6 @@ namespace ValuesWorkshop.Adapters.Tests;
 // Plan: docs/architecture/reviews/2026-08-30-wire-contract-fitness-function.md (step 1).
 public sealed class WireContractTests
 {
-    private const string RegenerateSwitch = "CONTRACT_WRITE";
-
-    private static readonly JsonSerializerOptions ContractJson = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true,
-    };
-
     private static readonly IntentCatalog Catalog = new(
         nameof(IParticipantClient.ReceiveWorkshopState),
         new SortedDictionary<string, string[]>(StringComparer.Ordinal)
@@ -54,20 +46,10 @@ public sealed class WireContractTests
     [Fact]
     public void The_checked_in_intent_catalog_matches_the_hubs()
     {
-        var catalogJson = JsonSerializer.Serialize(Catalog, ContractJson);
-        var contractFile = ContractFile();
-
-        if (Environment.GetEnvironmentVariable(RegenerateSwitch) == "1")
-        {
-            File.WriteAllText(contractFile, catalogJson + "\n");
-        }
-
-        Normalized(File.ReadAllText(contractFile))
-            .ShouldBe(
-                Normalized(catalogJson),
-                "contract/intents.json is stale. Regenerate it with: "
-                    + $"{RegenerateSwitch}=1 dotnet test backend/ValuesWorkshop.Tests.slnf"
-            );
+        WireContract.ShouldMatchCheckedInFile(
+            JsonSerializer.Serialize(Catalog, WireContract.Json),
+            "intents.json"
+        );
     }
 
     [Fact]
@@ -112,27 +94,6 @@ public sealed class WireContractTests
     private static string Signature(string name, IReadOnlyList<string> parameters)
     {
         return $"{name}({string.Join(", ", parameters)})";
-    }
-
-    // WHY: compare content, not platform line endings — Utf8JsonWriter indents with
-    // Environment.NewLine, so a byte comparison would fail on Windows checkouts only.
-    private static string Normalized(string json)
-    {
-        return json.ReplaceLineEndings("\n").TrimEnd();
-    }
-
-    private static string ContractFile()
-    {
-        var directory = new DirectoryInfo(AppContext.BaseDirectory);
-        while (
-            directory is not null && !Directory.Exists(Path.Combine(directory.FullName, "contract"))
-        )
-        {
-            directory = directory.Parent;
-        }
-
-        directory.ShouldNotBeNull($"No contract directory above {AppContext.BaseDirectory}.");
-        return Path.Combine(directory.FullName, "contract", "intents.json");
     }
 
     private sealed record IntentCatalog(
