@@ -22,10 +22,11 @@
   --color-text: var(--base-gray-900);
   --color-text-muted: var(--base-gray-700);
 
-  --text-reveal-place: clamp(var(--base-text-24), 5vh, 3.375rem);
-  --text-reveal-value: clamp(var(--base-text-40), 12vh, 8.5rem);
-  --text-reveal-votes: clamp(var(--base-text-20), 3.5vh, 2.375rem);
-  --text-reveal-action: clamp(var(--base-text-20), 3vh, var(--base-text-32));
+  --text-reveal-place: clamp(var(--base-text-24), 4vh, 3.375rem);
+  --text-reveal-value: clamp(var(--base-text-40), 10vh, 8.5rem);
+  --text-reveal-votes: clamp(var(--base-text-20), 3vh, 2.375rem);
+  --text-reveal-action: clamp(var(--base-text-16), 2vh, var(--base-text-24));
+  --space-reveal-list-gap: var(--base-space-8);
   --text-overview-winner: clamp(var(--base-text-24), 4.5vh, 3rem);
 
   --color-reveal-bg: var(--base-green-900);

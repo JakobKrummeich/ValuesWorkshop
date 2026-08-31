@@ -16,6 +16,7 @@
   font-size: var(--text-reveal-place);
   font-weight: var(--weight-bold);
   letter-spacing: 0.12em;
+  line-height: var(--leading-tight);
   text-transform: uppercase;
   animation: landing 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
 }
@@ -36,6 +37,7 @@
   color: var(--color-reveal-text-soft);
   font-size: var(--text-reveal-votes);
   font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
   animation: rising 0.6s ease-out 2.9s both;
 }
 
@@ -54,6 +56,7 @@
   color: var(--color-reveal-text-soft);
   font-size: var(--text-reveal-votes);
   letter-spacing: 0.12em;
+  line-height: var(--leading-tight);
   text-transform: uppercase;
 }
 
@@ -65,11 +68,11 @@
 }
 
 .action {
-  margin-top: var(--space-tight);
+  margin-top: var(--space-reveal-list-gap);
   color: var(--color-reveal-text);
   font-size: var(--text-reveal-action);
   font-weight: var(--weight-bold);
-  line-height: var(--leading-normal);
+  line-height: var(--leading-tight);
   overflow-wrap: anywhere;
 }
 
