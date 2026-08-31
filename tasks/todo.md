@@ -621,21 +621,22 @@ proven by hand-editing the artifacts.
 download button renders PDF client-side via `@react-pdf/renderer`: all
 anonymous vote tallies, all worked-out actions, winners; de+en.
 **Acceptance criteria:**
-- [ ] PDF downloads in Playwright; contains winners, tallies, actions
-- [ ] No participant names/ids anywhere in PDF
-- [ ] Multi-client e2e now covers all 9 phases end-to-end
+- [x] PDF downloads in Playwright; contains winners, tallies, actions
+- [x] No participant names/ids anywhere in PDF
+- [x] Multi-client e2e now covers all 9 phases end-to-end
 **Verification:** Playwright download + PDF text extraction assertions.
 **Dependencies:** 22, 23. **Size:** M
 
 ### Checkpoint E
-- [ ] Playwright: phases 7–9 incl. one tiebreak; PDF verified anonymous
+- [x] Playwright: phases 7–9 incl. one tiebreak; PDF verified anonymous
 
 ---
 
 ## Phase F: Hardening + Polish
 
 ### Task 25: Restart-recovery + reconnect e2e
-**Description:** Kill backend mid-quiz, mid-group-work, mid-voting; restart;
+**Description:** Kill backend mid-quiz, mid-group-work, mid-voting, and
+mid-reveal (phase 9, `revealed_winner_count` persisted in Task 24); restart;
 all three roles resume exactly. Tab close/reopen for facilitator and
 participant in same phases.
 **Acceptance criteria:**
