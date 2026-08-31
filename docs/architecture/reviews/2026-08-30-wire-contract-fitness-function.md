@@ -6,7 +6,7 @@
 `frontend/src/domain/workshopState{,Schemas,Blocks,Variants}.ts`,
 `frontend/src/domain/intentResult.ts`, `frontend/src/adapters/*Adapter.ts`,
 `frontend/scripts/generatePhasesModule.mts`, `design/protocol.md`
-**Status:** Proposed — needs a human decision, no code was changed
+**Status:** Adopted — implementation in progress
 
 ---
 
