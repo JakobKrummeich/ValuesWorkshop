@@ -1,0 +1,63 @@
+{
+  "phase": 8,
+  "voting": {
+    "roundNumber": 1,
+    "allotment": 5,
+    "eligibleValues": [
+      {
+        "valueId": "wert-1",
+        "text": {
+          "de": "Wert 1",
+          "en": "Value 1"
+        }
+      },
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        }
+      }
+    ],
+    "isRoundOpen": false,
+    "votedCount": 8,
+    "participantCount": 4,
+    "closedRoundTallies": {
+      "wert-1": 10,
+      "wert-2": 9,
+      "wert-3": 8,
+      "wert-4": 7,
+      "wert-5": 3,
+      "wert-6": 3
+    },
+    "tiedValueIds": [
+      "wert-5",
+      "wert-6"
+    ]
+  },
+  "revision": 42,
+  "roster": {
+    "participants": [
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000a1",
+        "displayName": "Anna Schmidt"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000b2",
+        "displayName": "Ben"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000c3",
+        "displayName": "#000000"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000d4",
+        "displayName": "Dana"
+      }
+    ],
+    "participantCount": 4
+  },
+  "enabledIntents": [
+    "StartTiebreakRound"
+  ]
+}

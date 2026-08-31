@@ -1,0 +1,383 @@
+{
+  "phase": 3,
+  "selection": {
+    "values": [
+      {
+        "valueId": "wert-1",
+        "text": {
+          "de": "Wert 1",
+          "en": "Value 1"
+        }
+      },
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        }
+      },
+      {
+        "valueId": "wert-3",
+        "text": {
+          "de": "Wert 3",
+          "en": "Value 3"
+        }
+      },
+      {
+        "valueId": "wert-4",
+        "text": {
+          "de": "Wert 4",
+          "en": "Value 4"
+        }
+      },
+      {
+        "valueId": "wert-5",
+        "text": {
+          "de": "Wert 5",
+          "en": "Value 5"
+        }
+      },
+      {
+        "valueId": "wert-6",
+        "text": {
+          "de": "Wert 6",
+          "en": "Value 6"
+        }
+      },
+      {
+        "valueId": "wert-7",
+        "text": {
+          "de": "Wert 7",
+          "en": "Value 7"
+        }
+      },
+      {
+        "valueId": "wert-8",
+        "text": {
+          "de": "Wert 8",
+          "en": "Value 8"
+        }
+      },
+      {
+        "valueId": "wert-9",
+        "text": {
+          "de": "Wert 9",
+          "en": "Value 9"
+        }
+      },
+      {
+        "valueId": "wert-10",
+        "text": {
+          "de": "Wert 10",
+          "en": "Value 10"
+        }
+      },
+      {
+        "valueId": "wert-11",
+        "text": {
+          "de": "Wert 11",
+          "en": "Value 11"
+        }
+      },
+      {
+        "valueId": "wert-12",
+        "text": {
+          "de": "Wert 12",
+          "en": "Value 12"
+        }
+      },
+      {
+        "valueId": "wert-13",
+        "text": {
+          "de": "Wert 13",
+          "en": "Value 13"
+        }
+      },
+      {
+        "valueId": "wert-14",
+        "text": {
+          "de": "Wert 14",
+          "en": "Value 14"
+        }
+      },
+      {
+        "valueId": "wert-15",
+        "text": {
+          "de": "Wert 15",
+          "en": "Value 15"
+        }
+      },
+      {
+        "valueId": "wert-16",
+        "text": {
+          "de": "Wert 16",
+          "en": "Value 16"
+        }
+      },
+      {
+        "valueId": "wert-17",
+        "text": {
+          "de": "Wert 17",
+          "en": "Value 17"
+        }
+      },
+      {
+        "valueId": "wert-18",
+        "text": {
+          "de": "Wert 18",
+          "en": "Value 18"
+        }
+      },
+      {
+        "valueId": "wert-19",
+        "text": {
+          "de": "Wert 19",
+          "en": "Value 19"
+        }
+      },
+      {
+        "valueId": "wert-20",
+        "text": {
+          "de": "Wert 20",
+          "en": "Value 20"
+        }
+      },
+      {
+        "valueId": "wert-21",
+        "text": {
+          "de": "Wert 21",
+          "en": "Value 21"
+        }
+      },
+      {
+        "valueId": "wert-22",
+        "text": {
+          "de": "Wert 22",
+          "en": "Value 22"
+        }
+      },
+      {
+        "valueId": "wert-23",
+        "text": {
+          "de": "Wert 23",
+          "en": "Value 23"
+        }
+      },
+      {
+        "valueId": "wert-24",
+        "text": {
+          "de": "Wert 24",
+          "en": "Value 24"
+        }
+      },
+      {
+        "valueId": "wert-25",
+        "text": {
+          "de": "Wert 25",
+          "en": "Value 25"
+        }
+      },
+      {
+        "valueId": "wert-26",
+        "text": {
+          "de": "Wert 26",
+          "en": "Value 26"
+        }
+      },
+      {
+        "valueId": "wert-27",
+        "text": {
+          "de": "Wert 27",
+          "en": "Value 27"
+        }
+      },
+      {
+        "valueId": "wert-28",
+        "text": {
+          "de": "Wert 28",
+          "en": "Value 28"
+        }
+      },
+      {
+        "valueId": "wert-29",
+        "text": {
+          "de": "Wert 29",
+          "en": "Value 29"
+        }
+      },
+      {
+        "valueId": "wert-30",
+        "text": {
+          "de": "Wert 30",
+          "en": "Value 30"
+        }
+      },
+      {
+        "valueId": "wert-31",
+        "text": {
+          "de": "Wert 31",
+          "en": "Value 31"
+        }
+      },
+      {
+        "valueId": "wert-32",
+        "text": {
+          "de": "Wert 32",
+          "en": "Value 32"
+        }
+      },
+      {
+        "valueId": "wert-33",
+        "text": {
+          "de": "Wert 33",
+          "en": "Value 33"
+        }
+      },
+      {
+        "valueId": "wert-34",
+        "text": {
+          "de": "Wert 34",
+          "en": "Value 34"
+        }
+      },
+      {
+        "valueId": "wert-35",
+        "text": {
+          "de": "Wert 35",
+          "en": "Value 35"
+        }
+      },
+      {
+        "valueId": "wert-36",
+        "text": {
+          "de": "Wert 36",
+          "en": "Value 36"
+        }
+      },
+      {
+        "valueId": "wert-37",
+        "text": {
+          "de": "Wert 37",
+          "en": "Value 37"
+        }
+      },
+      {
+        "valueId": "wert-38",
+        "text": {
+          "de": "Wert 38",
+          "en": "Value 38"
+        }
+      },
+      {
+        "valueId": "wert-39",
+        "text": {
+          "de": "Wert 39",
+          "en": "Value 39"
+        }
+      },
+      {
+        "valueId": "wert-40",
+        "text": {
+          "de": "Wert 40",
+          "en": "Value 40"
+        }
+      },
+      {
+        "valueId": "wert-41",
+        "text": {
+          "de": "Wert 41",
+          "en": "Value 41"
+        }
+      },
+      {
+        "valueId": "wert-42",
+        "text": {
+          "de": "Wert 42",
+          "en": "Value 42"
+        }
+      },
+      {
+        "valueId": "wert-43",
+        "text": {
+          "de": "Wert 43",
+          "en": "Value 43"
+        }
+      },
+      {
+        "valueId": "wert-44",
+        "text": {
+          "de": "Wert 44",
+          "en": "Value 44"
+        }
+      },
+      {
+        "valueId": "wert-45",
+        "text": {
+          "de": "Wert 45",
+          "en": "Value 45"
+        }
+      },
+      {
+        "valueId": "wert-46",
+        "text": {
+          "de": "Wert 46",
+          "en": "Value 46"
+        }
+      },
+      {
+        "valueId": "wert-47",
+        "text": {
+          "de": "Wert 47",
+          "en": "Value 47"
+        }
+      },
+      {
+        "valueId": "wert-48",
+        "text": {
+          "de": "Wert 48",
+          "en": "Value 48"
+        }
+      },
+      {
+        "valueId": "wert-49",
+        "text": {
+          "de": "Wert 49",
+          "en": "Value 49"
+        }
+      },
+      {
+        "valueId": "wert-50",
+        "text": {
+          "de": "Wert 50",
+          "en": "Value 50"
+        }
+      }
+    ],
+    "submittedCount": 1
+  },
+  "revision": 42,
+  "roster": {
+    "participants": [
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000a1",
+        "displayName": "Anna Schmidt"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000b2",
+        "displayName": "Ben"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000c3",
+        "displayName": "#000000"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000d4",
+        "displayName": "Dana"
+      }
+    ],
+    "participantCount": 4
+  },
+  "enabledIntents": [
+    "AdvancePhase"
+  ]
+}

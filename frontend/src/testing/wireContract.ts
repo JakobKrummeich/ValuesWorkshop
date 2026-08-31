@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
 
@@ -24,6 +24,20 @@ export function readIntentCatalog(): IntentCatalog {
 
 export function readEnumCatalog(): EnumCatalog {
   return enumCatalogSchema.parse(readContractFile("enums.json"));
+}
+
+export function readStateFixtures(
+  role: string,
+): { name: string; state: unknown }[] {
+  const directory = resolve(repositoryRoot, "contract", "state", role);
+
+  return readdirSync(directory)
+    .map((fileName) => fileName.replace(/\.json$/, ""))
+    .sort()
+    .map((name) => ({
+      name,
+      state: readContractFile("state", role, `${name}.json`),
+    }));
 }
 
 function readContractFile(...segments: string[]): unknown {

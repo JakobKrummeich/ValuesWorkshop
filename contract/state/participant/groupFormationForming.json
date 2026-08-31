@@ -1,0 +1,9 @@
+{
+  "phase": 5,
+  "formation": {
+    "subState": "forming",
+    "progress": 0.25
+  },
+  "revision": 42,
+  "participantCount": 4
+}

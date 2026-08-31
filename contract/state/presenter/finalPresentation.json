@@ -1,0 +1,14 @@
+{
+  "phase": 9,
+  "conclusion": {
+    "winningValueIds": [
+      "wert-1",
+      "wert-2",
+      "wert-3",
+      "wert-4",
+      "wert-5"
+    ]
+  },
+  "revision": 42,
+  "participantCount": 4
+}

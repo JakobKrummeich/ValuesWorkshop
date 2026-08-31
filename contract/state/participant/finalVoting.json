@@ -1,0 +1,33 @@
+{
+  "phase": 8,
+  "voting": {
+    "roundNumber": 1,
+    "allotment": 5,
+    "eligibleValues": [
+      {
+        "valueId": "wert-1",
+        "text": {
+          "de": "Wert 1",
+          "en": "Value 1"
+        },
+        "actions": [
+          "We name mistakes the day we make them"
+        ]
+      },
+      {
+        "valueId": "wert-2",
+        "text": {
+          "de": "Wert 2",
+          "en": "Value 2"
+        },
+        "actions": [
+          "We ask before we assume"
+        ]
+      }
+    ],
+    "isRoundOpen": true,
+    "hasVotedThisRound": false
+  },
+  "revision": 42,
+  "participantCount": 4
+}

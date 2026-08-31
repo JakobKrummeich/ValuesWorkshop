@@ -1,0 +1,30 @@
+{
+  "phase": 5,
+  "formation": {
+    "subState": "formed",
+    "ownGroup": {
+      "name": {
+        "animalId": "tier-1",
+        "text": {
+          "de": "Tier 1",
+          "en": "Animal 1"
+        }
+      },
+      "memberDisplayNames": [
+        "Anna Schmidt",
+        "Ben"
+      ],
+      "assignedValues": [
+        {
+          "valueId": "wert-1",
+          "text": {
+            "de": "Wert 1",
+            "en": "Value 1"
+          }
+        }
+      ]
+    }
+  },
+  "revision": 42,
+  "participantCount": 4
+}

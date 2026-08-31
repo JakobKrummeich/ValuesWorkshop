@@ -1,0 +1,93 @@
+{
+  "phase": 7,
+  "groups": [
+    {
+      "name": {
+        "animalId": "tier-1",
+        "text": {
+          "de": "Tier 1",
+          "en": "Animal 1"
+        }
+      },
+      "members": [
+        {
+          "participantId": "00000000-0000-0000-0000-0000000000a1",
+          "displayName": "Anna Schmidt"
+        },
+        {
+          "participantId": "00000000-0000-0000-0000-0000000000b2",
+          "displayName": "Ben"
+        }
+      ],
+      "assignedValues": [
+        {
+          "valueId": "wert-1",
+          "text": {
+            "de": "Wert 1",
+            "en": "Value 1"
+          }
+        }
+      ]
+    },
+    {
+      "name": {
+        "animalId": "tier-2",
+        "text": {
+          "de": "Tier 2",
+          "en": "Animal 2"
+        }
+      },
+      "members": [
+        {
+          "participantId": "00000000-0000-0000-0000-0000000000c3",
+          "displayName": "#000000"
+        }
+      ],
+      "assignedValues": [
+        {
+          "valueId": "wert-2",
+          "text": {
+            "de": "Wert 2",
+            "en": "Value 2"
+          }
+        }
+      ]
+    }
+  ],
+  "presentation": {
+    "presentingGroupName": "tier-1",
+    "presentedValueId": "wert-1",
+    "presentedActions": [
+      {
+        "actionId": "00000000-0000-0000-0000-00000000ac01",
+        "text": "We name mistakes the day we make them"
+      }
+    ]
+  },
+  "revision": 42,
+  "roster": {
+    "participants": [
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000a1",
+        "displayName": "Anna Schmidt"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000b2",
+        "displayName": "Ben"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000c3",
+        "displayName": "#000000"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000d4",
+        "displayName": "Dana"
+      }
+    ],
+    "participantCount": 4
+  },
+  "enabledIntents": [
+    "GoToNextValue",
+    "CorrectActionWording"
+  ]
+}

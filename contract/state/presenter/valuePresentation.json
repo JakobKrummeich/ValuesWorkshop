@@ -1,0 +1,59 @@
+{
+  "phase": 7,
+  "groups": [
+    {
+      "name": {
+        "animalId": "tier-1",
+        "text": {
+          "de": "Tier 1",
+          "en": "Animal 1"
+        }
+      },
+      "memberDisplayNames": [
+        "Anna Schmidt",
+        "Ben"
+      ],
+      "assignedValues": [
+        {
+          "valueId": "wert-1",
+          "text": {
+            "de": "Wert 1",
+            "en": "Value 1"
+          }
+        }
+      ]
+    },
+    {
+      "name": {
+        "animalId": "tier-2",
+        "text": {
+          "de": "Tier 2",
+          "en": "Animal 2"
+        }
+      },
+      "memberDisplayNames": [
+        "#000000"
+      ],
+      "assignedValues": [
+        {
+          "valueId": "wert-2",
+          "text": {
+            "de": "Wert 2",
+            "en": "Value 2"
+          }
+        }
+      ]
+    }
+  ],
+  "presentation": {
+    "presentingGroupName": "tier-1",
+    "presentedValueId": "wert-1",
+    "presentedActions": [
+      {
+        "text": "We name mistakes the day we make them"
+      }
+    ]
+  },
+  "revision": 42,
+  "participantCount": 4
+}

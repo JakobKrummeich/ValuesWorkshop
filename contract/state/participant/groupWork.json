@@ -1,0 +1,38 @@
+{
+  "phase": 6,
+  "ownGroup": {
+    "name": {
+      "animalId": "tier-1",
+      "text": {
+        "de": "Tier 1",
+        "en": "Animal 1"
+      }
+    },
+    "memberDisplayNames": [
+      "Anna Schmidt",
+      "Ben"
+    ],
+    "assignedValues": [
+      {
+        "valueId": "wert-1",
+        "text": {
+          "de": "Wert 1",
+          "en": "Value 1"
+        }
+      }
+    ],
+    "isCallerScribe": true,
+    "scribeName": "Anna Schmidt",
+    "workStatus": "editing",
+    "actions": [
+      {
+        "actionId": "00000000-0000-0000-0000-00000000ac01",
+        "valueId": "wert-1",
+        "text": "We name mistakes the day we make them",
+        "sortOrder": 0
+      }
+    ]
+  },
+  "revision": 42,
+  "participantCount": 4
+}

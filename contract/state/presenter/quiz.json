@@ -1,0 +1,34 @@
+{
+  "phase": 2,
+  "quiz": {
+    "questionIndex": 1,
+    "questionCount": 5,
+    "subState": 2,
+    "question": {
+      "de": "Frage 1",
+      "en": "Question 1"
+    },
+    "answers": [
+      {
+        "de": "Falsch 1",
+        "en": "Wrong 1"
+      },
+      {
+        "de": "Richtig 1",
+        "en": "Right 1"
+      },
+      {
+        "de": "Witzig 1",
+        "en": "Funny 1"
+      }
+    ],
+    "answerTallies": [
+      1,
+      0,
+      0
+    ],
+    "correctAnswerIndex": 1
+  },
+  "revision": 42,
+  "participantCount": 4
+}

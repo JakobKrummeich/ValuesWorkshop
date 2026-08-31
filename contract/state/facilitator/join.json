@@ -1,0 +1,28 @@
+{
+  "phase": 1,
+  "revision": 42,
+  "roster": {
+    "participants": [
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000a1",
+        "displayName": "Anna Schmidt"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000b2",
+        "displayName": "Ben"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000c3",
+        "displayName": "#000000"
+      },
+      {
+        "participantId": "00000000-0000-0000-0000-0000000000d4",
+        "displayName": "Dana"
+      }
+    ],
+    "participantCount": 4
+  },
+  "enabledIntents": [
+    "AdvancePhase"
+  ]
+}
