@@ -230,6 +230,61 @@ export const presenterVotingViewSchema = z.object({
   isRoundOpen: z.boolean(),
 });
 
-export const conclusionViewSchema = z.object({
-  winningValueIds: valueIdsSchema,
+const winnerSchema = z.object({
+  valueId: z.string(),
+  text: localizedTextSchema,
+  place: z.int().positive(),
+  voteCount: z.int().nonnegative(),
+});
+
+export type Winner = z.infer<typeof winnerSchema>;
+
+const winnerWithActionsSchema = winnerSchema.extend({
+  actions: z.array(z.string()),
+});
+
+export type WinnerWithActions = z.infer<typeof winnerWithActionsSchema>;
+
+const presentedValueRecordSchema = z.object({
+  valueId: z.string(),
+  text: localizedTextSchema,
+  actions: z.array(z.string()),
+});
+
+const votingRoundRecordSchema = z.object({
+  roundNumber: z.int().positive(),
+  allotment: z.int().positive(),
+  tallies: z.array(
+    z.object({
+      valueId: z.string(),
+      count: z.int().nonnegative(),
+    }),
+  ),
+});
+
+const workshopRecordSchema = z.object({
+  winners: z.array(winnerWithActionsSchema),
+  values: z.array(presentedValueRecordSchema),
+  rounds: z.array(votingRoundRecordSchema),
+});
+
+export type WorkshopRecord = z.infer<typeof workshopRecordSchema>;
+
+export const participantConclusionViewSchema = z.discriminatedUnion(
+  "isConcluded",
+  [
+    z.object({ isConcluded: z.literal(false) }),
+    z.object({ isConcluded: z.literal(true), record: workshopRecordSchema }),
+  ],
+);
+
+export const facilitatorConclusionViewSchema = z.object({
+  winners: z.array(winnerSchema),
+  revealedCount: z.int().nonnegative(),
+  isConcluded: z.boolean(),
+});
+
+export const presenterConclusionViewSchema = z.object({
+  revealedWinners: z.array(winnerWithActionsSchema),
+  isConcluded: z.boolean(),
 });

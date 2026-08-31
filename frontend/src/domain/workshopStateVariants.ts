@@ -128,3 +128,23 @@ export type PresenterFinalVotingState = InPhase<
 
 export type ParticipantVotingView = ParticipantFinalVotingState["voting"];
 export type FacilitatorVotingView = FacilitatorFinalVotingState["voting"];
+
+export type ParticipantFinalPresentationState = InPhase<
+  ParticipantWorkshopState,
+  Phase.FinalPresentation
+>;
+export type FacilitatorFinalPresentationState = InPhase<
+  FacilitatorWorkshopState,
+  Phase.FinalPresentation
+>;
+export type PresenterFinalPresentationState = InPhase<
+  PresenterWorkshopState,
+  Phase.FinalPresentation
+>;
+
+export type ParticipantConclusionView =
+  ParticipantFinalPresentationState["conclusion"];
+export type FacilitatorConclusionView =
+  FacilitatorFinalPresentationState["conclusion"];
+export type PresenterConclusionView =
+  PresenterFinalPresentationState["conclusion"];

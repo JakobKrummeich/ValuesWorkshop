@@ -39,6 +39,7 @@ function withVotingControl(votingControlPort: {
       correctActionWording: () => NEVER,
     },
     votingControlPort,
+    conclusionControlPort: { revealNextValue: () => NEVER },
   });
 }
 

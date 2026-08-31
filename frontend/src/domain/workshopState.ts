@@ -11,6 +11,9 @@ export type {
   PresentationView,
   PresentedAction,
   PresenterPresentationView,
+  Winner,
+  WinnerWithActions,
+  WorkshopRecord,
   WorkshopValue,
 } from "./workshopStateBlocks";
 export * from "./workshopStateSchemas";
