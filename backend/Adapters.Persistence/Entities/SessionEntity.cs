@@ -8,6 +8,7 @@ public sealed class SessionEntity
     public int CurrentPhase { get; set; }
     public long Revision { get; set; }
     public bool IsFormed { get; set; }
+    public int RevealedWinnerCount { get; set; }
     public string CreatedAt { get; set; } = "";
 
     public QuizStateEntity QuizState { get; set; } = null!;
