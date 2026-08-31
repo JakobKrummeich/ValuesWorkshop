@@ -40,4 +40,41 @@ export const finalPresentationMessages = {
     [Language.German]: "Die Gewinner",
     [Language.English]: "The winners",
   },
+  [MessageKey.FinalPresentationConcludedHeading]: {
+    [Language.German]: "Workshop abgeschlossen",
+    [Language.English]: "Workshop concluded",
+  },
+  [MessageKey.FinalPresentationThanks]: {
+    [Language.German]: "Danke fürs Mitmachen!",
+    [Language.English]: "Thanks for taking part!",
+  },
+  [MessageKey.FinalPresentationDownloadPdf]: {
+    [Language.German]: "Workshop-Protokoll (PDF) herunterladen",
+    [Language.English]: "Download workshop record (PDF)",
+  },
+  [MessageKey.FinalPresentationDownloadFailed]: {
+    [Language.German]:
+      "Der Download ist fehlgeschlagen — bitte erneut versuchen.",
+    [Language.English]: "The download failed — please try again.",
+  },
+  [MessageKey.FinalPresentationRecordTitle]: {
+    [Language.German]: "Workshop-Protokoll",
+    [Language.English]: "Workshop record",
+  },
+  [MessageKey.FinalPresentationRecordAllActionsHeading]: {
+    [Language.German]: "Alle Aktionen",
+    [Language.English]: "All actions",
+  },
+  [MessageKey.FinalPresentationRecordRoundsHeading]: {
+    [Language.German]: "Stimmen pro Runde",
+    [Language.English]: "Votes per round",
+  },
+  [MessageKey.FinalPresentationRecordRoundTitle]: {
+    [Language.German]: "Runde {round} — {allotment} Stimmen pro Person",
+    [Language.English]: "Round {round} — {allotment} votes per person",
+  },
+  [MessageKey.FinalPresentationRecordRoundTitleSingle]: {
+    [Language.German]: "Runde {round} — 1 Stimme pro Person",
+    [Language.English]: "Round {round} — 1 vote per person",
+  },
 } as const satisfies Partial<Readonly<Record<MessageKey, Message>>>;
