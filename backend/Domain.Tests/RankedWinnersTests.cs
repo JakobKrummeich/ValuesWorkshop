@@ -9,12 +9,22 @@ public class RankedWinnersTests
     private static readonly ValueId Respect = new("respect");
     private static readonly ValueId Curiosity = new("curiosity");
 
+    private static readonly IReadOnlyList<ValueId> CatalogOrder =
+    [
+        Honesty,
+        Courage,
+        Trust,
+        Openness,
+        Respect,
+        Curiosity,
+    ];
+
     [Fact]
     public void Without_a_closed_round_no_winner_is_ranked()
     {
         var voting = new VotingRounds();
 
-        voting.RankedWinners.ShouldBeEmpty();
+        voting.RankedWinners(CatalogOrder).ShouldBeEmpty();
     }
 
     [Fact]
@@ -43,24 +53,26 @@ public class RankedWinnersTests
             null
         );
 
-        voting.RankedWinners.ShouldBe([
-            new RankedWinner(1, Courage, 9),
-            new RankedWinner(2, Openness, 7),
-            new RankedWinner(3, Trust, 6),
-            new RankedWinner(4, Honesty, 4),
-            new RankedWinner(5, Respect, 3),
-        ]);
+        voting
+            .RankedWinners(CatalogOrder)
+            .ShouldBe([
+                new RankedWinner(1, Courage, 9),
+                new RankedWinner(2, Openness, 7),
+                new RankedWinner(3, Trust, 6),
+                new RankedWinner(4, Honesty, 4),
+                new RankedWinner(5, Respect, 3),
+            ]);
     }
 
     [Fact]
-    public void A_tally_tie_within_a_round_ranks_by_the_rounds_eligible_value_order()
+    public void A_tally_tie_within_a_round_ranks_by_catalog_order()
     {
         var voting = VotingRounds.Restore(
             [
                 new ClosedVotingRound(
                     1,
                     5,
-                    [Honesty, Courage, Trust, Openness, Respect],
+                    [Respect, Openness, Trust, Courage, Honesty],
                     new Dictionary<ValueId, int>
                     {
                         [Honesty] = 5,
@@ -78,7 +90,8 @@ public class RankedWinnersTests
         );
 
         voting
-            .RankedWinners.Select(winner => winner.ValueId)
+            .RankedWinners(CatalogOrder)
+            .Select(winner => winner.ValueId)
             .ShouldBe([Honesty, Courage, Trust, Openness, Respect]);
     }
 
@@ -117,12 +130,14 @@ public class RankedWinnersTests
             null
         );
 
-        voting.RankedWinners.ShouldBe([
-            new RankedWinner(1, Honesty, 8),
-            new RankedWinner(2, Courage, 6),
-            new RankedWinner(3, Trust, 5),
-            new RankedWinner(4, Openness, 4),
-            new RankedWinner(5, Curiosity, 2),
-        ]);
+        voting
+            .RankedWinners(CatalogOrder)
+            .ShouldBe([
+                new RankedWinner(1, Honesty, 8),
+                new RankedWinner(2, Courage, 6),
+                new RankedWinner(3, Trust, 5),
+                new RankedWinner(4, Openness, 4),
+                new RankedWinner(5, Curiosity, 2),
+            ]);
     }
 }

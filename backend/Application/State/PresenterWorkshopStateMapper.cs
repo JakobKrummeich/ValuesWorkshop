@@ -96,7 +96,7 @@ public sealed class PresenterWorkshopStateMapper(
                 new PresenterFinalPresentationState(
                     revision,
                     ParticipantCount(session),
-                    ConclusionViews.ForPresenter(session, groupViews)
+                    ConclusionViews.ForPresenter(session, groupViews, catalogView)
                 ),
         };
     }

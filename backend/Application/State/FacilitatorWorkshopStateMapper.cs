@@ -102,7 +102,7 @@ public sealed class FacilitatorWorkshopStateMapper(
                     revision,
                     SessionViews.Roster(session),
                     enabledIntents,
-                    ConclusionViews.ForFacilitator(session, groupViews)
+                    ConclusionViews.ForFacilitator(session, groupViews, catalogView)
                 ),
         };
     }

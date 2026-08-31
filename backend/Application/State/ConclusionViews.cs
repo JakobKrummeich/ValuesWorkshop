@@ -4,18 +4,27 @@ namespace ValuesWorkshop.Application.State;
 
 internal static class ConclusionViews
 {
-    internal static ParticipantConclusionView ForParticipant(Session session, GroupViews groupViews)
+    internal static ParticipantConclusionView ForParticipant(
+        Session session,
+        GroupViews groupViews,
+        IReadOnlyList<WorkshopValueView> catalogView
+    )
     {
         return new ParticipantConclusionView(
             session.Reveal.IsConcluded,
-            session.Reveal.IsConcluded ? RecordOf(session, groupViews) : null
+            session.Reveal.IsConcluded ? RecordOf(session, groupViews, catalogView) : null
         );
     }
 
-    internal static FacilitatorConclusionView ForFacilitator(Session session, GroupViews groupViews)
+    internal static FacilitatorConclusionView ForFacilitator(
+        Session session,
+        GroupViews groupViews,
+        IReadOnlyList<WorkshopValueView> catalogView
+    )
     {
         var winners = session
-            .Voting.RankedWinners.Select(winner => new WinnerView(
+            .Voting.RankedWinners(CatalogOrderOf(catalogView))
+            .Select(winner => new WinnerView(
                 winner.ValueId.Value,
                 groupViews.ValueViewOf(winner.ValueId).Text,
                 winner.Place,
@@ -30,10 +39,15 @@ internal static class ConclusionViews
         );
     }
 
-    internal static PresenterConclusionView ForPresenter(Session session, GroupViews groupViews)
+    internal static PresenterConclusionView ForPresenter(
+        Session session,
+        GroupViews groupViews,
+        IReadOnlyList<WorkshopValueView> catalogView
+    )
     {
         var revealedWinners = session
-            .Voting.RankedWinners.OrderByDescending(winner => winner.Place)
+            .Voting.RankedWinners(CatalogOrderOf(catalogView))
+            .OrderByDescending(winner => winner.Place)
             .Take(session.Reveal.RevealedCount)
             .Select(winner => RankedWinnerViewOf(session, groupViews, winner))
             .ToList();
@@ -41,10 +55,15 @@ internal static class ConclusionViews
         return new PresenterConclusionView(revealedWinners, session.Reveal.IsConcluded);
     }
 
-    private static WorkshopRecordView RecordOf(Session session, GroupViews groupViews)
+    private static WorkshopRecordView RecordOf(
+        Session session,
+        GroupViews groupViews,
+        IReadOnlyList<WorkshopValueView> catalogView
+    )
     {
         var winners = session
-            .Voting.RankedWinners.Select(winner => RankedWinnerViewOf(session, groupViews, winner))
+            .Voting.RankedWinners(CatalogOrderOf(catalogView))
+            .Select(winner => RankedWinnerViewOf(session, groupViews, winner))
             .ToList();
 
         return new WorkshopRecordView(
@@ -83,6 +102,13 @@ internal static class ConclusionViews
                 SessionViews.ActionTextsOf(session, valueId)
             ))
             .ToList();
+    }
+
+    private static IReadOnlyList<ValueId> CatalogOrderOf(
+        IReadOnlyList<WorkshopValueView> catalogView
+    )
+    {
+        return catalogView.Select(value => new ValueId(value.ValueId)).ToList();
     }
 
     private static IReadOnlyList<RecordedRoundView> RoundsOf(Session session)

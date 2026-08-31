@@ -27,35 +27,32 @@ public sealed class VotingRounds
 
     public bool WinnersStand => WinningValues.Count == RequiredWinningValueCount;
 
-    public IReadOnlyList<RankedWinner> RankedWinners
+    public IReadOnlyList<RankedWinner> RankedWinners(IReadOnlyList<ValueId> catalogOrder)
     {
-        get
+        if (closedRounds.Count == 0)
         {
-            if (closedRounds.Count == 0)
-            {
-                return [];
-            }
-
-            var firstRoundTallies = closedRounds[0].Tallies;
-
-            return closedRounds
-                .SelectMany(LockedInRankOrder)
-                .Select(
-                    (value, index) => new RankedWinner(index + 1, value, firstRoundTallies[value])
-                )
-                .ToList();
+            return [];
         }
+
+        var catalogPositions = catalogOrder
+            .Select((value, position) => (value, position))
+            .ToDictionary(entry => entry.value, entry => entry.position);
+        var firstRoundTallies = closedRounds[0].Tallies;
+
+        return closedRounds
+            .SelectMany(round => LockedInRankOrder(round, catalogPositions))
+            .Select((value, index) => new RankedWinner(index + 1, value, firstRoundTallies[value]))
+            .ToList();
     }
 
-    private static IEnumerable<ValueId> LockedInRankOrder(ClosedVotingRound round)
+    private static IEnumerable<ValueId> LockedInRankOrder(
+        ClosedVotingRound round,
+        IReadOnlyDictionary<ValueId, int> catalogPositions
+    )
     {
-        var eligiblePositions = round
-            .EligibleValues.Select((value, position) => (value, position))
-            .ToDictionary(entry => entry.value, entry => entry.position);
-
         return round
             .LockedValues.OrderByDescending(value => round.Tallies[value])
-            .ThenBy(value => eligiblePositions[value]);
+            .ThenBy(value => catalogPositions[value]);
     }
 
     public bool TiebreakPending => !RoundOpen && LastClosedRound is { TiedValues.Count: > 0 };
