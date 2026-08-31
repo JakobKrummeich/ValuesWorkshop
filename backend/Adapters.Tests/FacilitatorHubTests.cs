@@ -258,6 +258,7 @@ public class FacilitatorHubTests
             ),
             PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore([], null),
+            new WinnerReveal(),
             revision: 1
         );
         repository.Add(session);

@@ -169,6 +169,7 @@ internal static class DomainEntityMapper
             formation,
             presentation,
             voting,
+            new WinnerReveal(),
             entity.Revision
         );
     }

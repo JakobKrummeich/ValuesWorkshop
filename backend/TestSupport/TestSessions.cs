@@ -26,6 +26,7 @@ public static class TestSessions
         FormationRecord? formation = null,
         PresentationWalk? presentation = null,
         VotingRounds? voting = null,
+        WinnerReveal? reveal = null,
         long revision = 0,
         IEnumerable<Participant>? roster = null
     )
@@ -34,15 +35,21 @@ public static class TestSessions
             identity,
             Facilitator,
             Name,
-            Roster.Restore(roster ?? []),
+            RosterOf(roster),
             PhaseProgress.Restore(phase),
             quiz ?? UnansweredQuiz(phase),
             selection ?? SelectionRound.Restore([], []),
             formation ?? FormationRecord.Restore(false, []),
             presentation ?? PresentationWalk.Restore(null, null, 0),
             voting ?? VotingRounds.Restore([], null),
+            reveal ?? new WinnerReveal(),
             revision
         );
+    }
+
+    private static Roster RosterOf(IEnumerable<Participant>? roster)
+    {
+        return Roster.Restore(roster ?? []);
     }
 
     private static QuizProgress UnansweredQuiz(Phase phase)

@@ -52,6 +52,7 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
                     )
                     : null
             ),
+            WinnerReveal.Restore(session.Reveal.RevealedCount),
             session.Revision
         );
     }
