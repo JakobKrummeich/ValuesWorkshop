@@ -17,7 +17,7 @@ internal static class WireStateFixtures
         Guid.Parse("00000000-0000-0000-0000-0000000000b2")
     );
     private static readonly ParticipantId Chris = new(
-        Guid.Parse("00000000-0000-0000-0000-0000000000c3")
+        Guid.Parse("c3c3c3c3-0000-0000-0000-0000000000c3")
     );
     private static readonly ParticipantId Dana = new(
         Guid.Parse("00000000-0000-0000-0000-0000000000d4")
@@ -27,8 +27,8 @@ internal static class WireStateFixtures
         Guid.Parse("00000000-0000-0000-0000-00000000f00d")
     );
 
-    private static readonly ValueId FirstValue = new("wert-1");
-    private static readonly ValueId SecondValue = new("wert-2");
+    private static readonly ValueId FirstValue = ValueNumbered(1);
+    private static readonly ValueId SecondValue = ValueNumbered(2);
 
     // WHY: the voting rounds may only run over values the groups actually
     // presented, so the eligible sets below stay the union of the two groups'
@@ -36,11 +36,11 @@ internal static class WireStateFixtures
     private static readonly IReadOnlyList<ValueId> PresentedValues =
     [
         FirstValue,
-        Wert(3),
-        Wert(5),
+        ValueNumbered(3),
+        ValueNumbered(5),
         SecondValue,
-        Wert(4),
-        Wert(6),
+        ValueNumbered(4),
+        ValueNumbered(6),
     ];
 
     internal static IReadOnlyList<WireStateScenario> All =>
@@ -99,7 +99,7 @@ internal static class WireStateFixtures
                     new SelectedValue(Chris, FirstValue),
                     new SelectedValue(Anna, SecondValue),
                     new SelectedValue(Ben, SecondValue),
-                    new SelectedValue(Chris, Wert(9)),
+                    new SelectedValue(Chris, ValueNumbered(9)),
                 ],
                 [FirstValue, SecondValue]
             )
@@ -123,7 +123,10 @@ internal static class WireStateFixtures
     private static Session VotingRoundOpen()
     {
         var voting = TestVoting.MainRoundOpen(PresentedValues);
-        voting.RecordBallot(Ben, new Dictionary<ValueId, int> { [FirstValue] = 3, [Wert(5)] = 2 });
+        voting.RecordBallot(
+            Ben,
+            new Dictionary<ValueId, int> { [FirstValue] = 3, [ValueNumbered(5)] = 2 }
+        );
 
         return InPhase(Phase.FinalVoting, formation: TwoGroups(), voting: voting);
     }
@@ -138,9 +141,10 @@ internal static class WireStateFixtures
             formation: TwoGroups(),
             voting: VotingRounds.Restore(
                 [
-                    ClosedRound(
-                        locked: [FirstValue, Wert(3), SecondValue, Wert(4)],
-                        tied: [Wert(5), Wert(6)]
+                    TestVoting.ClosedRound(
+                        1,
+                        lockedValues: [FirstValue, ValueNumbered(3), SecondValue, ValueNumbered(4)],
+                        tiedValues: [ValueNumbered(5), ValueNumbered(6)]
                     ),
                 ],
                 null
@@ -155,9 +159,17 @@ internal static class WireStateFixtures
             formation: TwoGroups(),
             voting: VotingRounds.Restore(
                 [
-                    ClosedRound(
-                        locked: [FirstValue, Wert(3), Wert(5), SecondValue, Wert(4)],
-                        tied: []
+                    TestVoting.ClosedRound(
+                        1,
+                        lockedValues:
+                        [
+                            FirstValue,
+                            ValueNumbered(3),
+                            ValueNumbered(5),
+                            SecondValue,
+                            ValueNumbered(4),
+                        ],
+                        tiedValues: []
                     ),
                 ],
                 null
@@ -165,31 +177,9 @@ internal static class WireStateFixtures
         );
     }
 
-    private static ClosedVotingRound ClosedRound(
-        IReadOnlyList<ValueId> locked,
-        IReadOnlyList<ValueId> tied
-    )
+    private static ValueId ValueNumbered(int number)
     {
-        IReadOnlyList<ValueId> eligible = [.. locked, .. tied];
-        var tallies = eligible.ToDictionary(
-            value => value,
-            value => locked.Contains(value) ? 10 - locked.ToList().IndexOf(value) : 3
-        );
-
-        return new ClosedVotingRound(
-            1,
-            VotingRounds.RequiredWinningValueCount,
-            eligible,
-            tallies,
-            VotedCount: 8,
-            locked,
-            tied
-        );
-    }
-
-    private static ValueId Wert(int number)
-    {
-        return new ValueId($"wert-{number}");
+        return TestValueIds.Numbered(number, 1)[0];
     }
 
     // WHY: tier-1 keeps working while tier-2 has submitted, so a single sample
@@ -202,7 +192,7 @@ internal static class WireStateFixtures
                 Group.Restore(
                     "tier-1",
                     [Anna, Ben],
-                    [FirstValue, Wert(3), Wert(5)],
+                    [FirstValue, ValueNumbered(3), ValueNumbered(5)],
                     Anna,
                     false,
                     [
@@ -213,7 +203,7 @@ internal static class WireStateFixtures
                         ),
                         new GroupAction(
                             new ActionId(Guid.Parse("00000000-0000-0000-0000-00000000ac02")),
-                            Wert(3),
+                            ValueNumbered(3),
                             GroupActionText.Of("We decide in the room, not in the corridor")
                         ),
                     ]
@@ -221,7 +211,7 @@ internal static class WireStateFixtures
                 Group.Restore(
                     "tier-2",
                     [Chris],
-                    [SecondValue, Wert(4), Wert(6)],
+                    [SecondValue, ValueNumbered(4), ValueNumbered(6)],
                     Chris,
                     true,
                     [

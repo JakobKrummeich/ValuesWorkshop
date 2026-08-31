@@ -53,8 +53,8 @@
       },
       "members": [
         {
-          "participantId": "00000000-0000-0000-0000-0000000000c3",
-          "displayName": "#000000"
+          "participantId": "c3c3c3c3-0000-0000-0000-0000000000c3",
+          "displayName": "#c3c3c3"
         }
       ],
       "assignedValues": [
@@ -104,8 +104,8 @@
         "displayName": "Ben"
       },
       {
-        "participantId": "00000000-0000-0000-0000-0000000000c3",
-        "displayName": "#000000"
+        "participantId": "c3c3c3c3-0000-0000-0000-0000000000c3",
+        "displayName": "#c3c3c3"
       },
       {
         "participantId": "00000000-0000-0000-0000-0000000000d4",

@@ -9,7 +9,7 @@
       }
     },
     "memberDisplayNames": [
-      "#000000"
+      "#c3c3c3"
     ],
     "assignedValues": [
       {
@@ -35,7 +35,7 @@
       }
     ],
     "isCallerScribe": true,
-    "scribeName": "#000000",
+    "scribeName": "#c3c3c3",
     "workStatus": "submitted",
     "actions": [
       {

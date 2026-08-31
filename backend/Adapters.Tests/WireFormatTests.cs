@@ -1,8 +1,3 @@
-using System.Text;
-using System.Text.Json;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Protocol;
-using Microsoft.Extensions.Options;
 using ValuesWorkshop.Application;
 using ValuesWorkshop.Application.State;
 using ValuesWorkshop.Domain;
@@ -40,10 +35,8 @@ public class WireFormatTests
         session.AdvancePhase();
         session.BumpRevision();
 
-        var json = SerializeStateMessage(FacilitatorStateMapper.Map(session, 1));
+        var state = WireContract.WireFormOf(FacilitatorStateMapper.Map(session, 1));
 
-        using var document = JsonDocument.Parse(json);
-        var state = document.RootElement.GetProperty("arguments")[0];
         state.GetProperty("revision").GetInt64().ShouldBe(1);
         state.GetProperty("phase").GetInt32().ShouldBe((int)Phase.Quiz);
         state.GetProperty("roster").GetProperty("participantCount").GetInt32().ShouldBe(0);
@@ -55,10 +48,8 @@ public class WireFormatTests
     {
         var session = TestSessions.Open(new SessionIdentity(Guid.NewGuid()));
 
-        var json = SerializeStateMessage(FacilitatorStateMapper.Map(session, 0));
+        var state = WireContract.WireFormOf(FacilitatorStateMapper.Map(session, 0));
 
-        using var document = JsonDocument.Parse(json);
-        var state = document.RootElement.GetProperty("arguments")[0];
         state
             .EnumerateObject()
             .Select(property => property.Name)
@@ -89,18 +80,6 @@ public class WireFormatTests
 
     private static int DiscriminatorOf(object state)
     {
-        using var document = JsonDocument.Parse(SerializeStateMessage(state));
-
-        return document.RootElement.GetProperty("arguments")[0].GetProperty("phase").GetInt32();
-    }
-
-    private static string SerializeStateMessage(object state)
-    {
-        var protocol = new JsonHubProtocol(Options.Create(new JsonHubProtocolOptions()));
-
-        var message = new InvocationMessage("ReceiveWorkshopState", [state]);
-        var bytes = protocol.GetMessageBytes(message);
-
-        return Encoding.UTF8.GetString(bytes.ToArray()).TrimEnd('\u001e');
+        return WireContract.WireFormOf(state).GetProperty("phase").GetInt32();
     }
 }

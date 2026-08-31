@@ -15,8 +15,8 @@ const enumCatalogSchema = z.record(
   z.record(z.string(), z.union([z.string(), z.number()])),
 );
 
-export type IntentCatalog = z.infer<typeof intentCatalogSchema>;
-export type EnumCatalog = z.infer<typeof enumCatalogSchema>;
+type IntentCatalog = z.infer<typeof intentCatalogSchema>;
+type EnumCatalog = z.infer<typeof enumCatalogSchema>;
 
 export function readIntentCatalog(): IntentCatalog {
   return intentCatalogSchema.parse(readContractFile("intents.json"));

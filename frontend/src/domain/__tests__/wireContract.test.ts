@@ -25,10 +25,12 @@ const roles = Object.keys(schemaOfRole) as (keyof typeof schemaOfRole)[];
 describe.each(roles)("the %s wire state", (role) => {
   const fixtures = readStateFixtures(role);
 
+  // WHY: parsing alone would pass on a renamed optional field — zod strips what it
+  // does not know — so the parsed state must come back whole.
   it.each(fixtures)(
     "parses the $name sample the backend serializes",
     ({ state }) => {
-      expect(() => schemaOfRole[role].parse(state)).not.toThrow();
+      expect(schemaOfRole[role].parse(state)).toEqual(state);
     },
   );
 

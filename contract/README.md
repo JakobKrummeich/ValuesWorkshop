@@ -25,6 +25,11 @@ That rewrites the files from the hubs, the enums and the fixtures in
 change the frontend has to follow — and commit it with the code that caused it.
 Without the switch the same tests only compare and fail on drift.
 
+One drift stays invisible to the frontend: reordering two parameters of the same
+count. `intents.json` carries parameter names, but a frontend port only sends
+positions, so the backend reflection test is what catches it — regenerate and
+read the diff.
+
 Scenario names are phase names, plus a suffix where a phase has more than one
 shape worth checking (`groupFormationForming`, `finalVotingClosed`). A scenario
 may cover fewer than the three roles when only one role renders it, e.g.

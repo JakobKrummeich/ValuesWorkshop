@@ -16,7 +16,7 @@ public sealed class WireStateContractTests
     private const string StateDirectory = "state";
 
     private static readonly TestQuizCatalog QuizCatalog = new(QuizProgress.QuestionCount);
-    private static readonly TestValuesCatalog ValuesCatalog = new(50);
+    private static readonly TestValuesCatalog ValuesCatalog = new(10);
     private static readonly TestAnimalsCatalog AnimalsCatalog = new(8);
     private static readonly TestFormationProgress FormationProgress = new(0.25);
 
@@ -38,6 +38,21 @@ public sealed class WireStateContractTests
         AnimalsCatalog,
         FormationProgress
     );
+
+    private static readonly Dictionary<string, Func<WireStateScenario, object>> StateMapperOfRole =
+        new()
+        {
+            [WireRoles.Participant] = scenario =>
+                ParticipantStateMapper.MapFor(
+                    scenario.Session,
+                    scenario.Caller,
+                    scenario.Session.Revision
+                ),
+            [WireRoles.Facilitator] = scenario =>
+                FacilitatorStateMapper.Map(scenario.Session, scenario.Session.Revision),
+            [WireRoles.Presenter] = scenario =>
+                PresenterStateMapper.Map(scenario.Session, scenario.Session.Revision),
+        };
 
     public static TheoryData<string> ScenarioNames =>
         [.. WireStateFixtures.All.Select(scenario => scenario.Name)];
@@ -70,21 +85,6 @@ public sealed class WireStateContractTests
 
         WireContract.CheckedInFilesIn(StateDirectory).ShouldBe(expected);
     }
-
-    private static readonly Dictionary<string, Func<WireStateScenario, object>> StateMapperOfRole =
-        new()
-        {
-            [WireRoles.Participant] = scenario =>
-                ParticipantStateMapper.MapFor(
-                    scenario.Session,
-                    scenario.Caller,
-                    scenario.Session.Revision
-                ),
-            [WireRoles.Facilitator] = scenario =>
-                FacilitatorStateMapper.Map(scenario.Session, scenario.Session.Revision),
-            [WireRoles.Presenter] = scenario =>
-                PresenterStateMapper.Map(scenario.Session, scenario.Session.Revision),
-        };
 
     private static IReadOnlyList<(string Role, object State)> StatesOf(WireStateScenario scenario)
     {

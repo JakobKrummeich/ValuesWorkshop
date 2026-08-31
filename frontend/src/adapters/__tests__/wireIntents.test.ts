@@ -75,7 +75,7 @@ function recordingConnection(): {
 function callsMadeByEveryPortMethod(role: Role): {
   role: Role;
   methodName: string;
-  calls: unknown[][];
+  calls: [string, ...unknown[]][];
 }[] {
   return portFactoriesOfRole[role].flatMap((createPort) => {
     const { connection, invoke } = recordingConnection();
@@ -87,7 +87,11 @@ function callsMadeByEveryPortMethod(role: Role): {
           invoke.mockClear();
           method(...new Array<string>(method.length).fill("placeholder"));
 
-          return { role, methodName, calls: [...invoke.mock.calls] };
+          return {
+            role,
+            methodName,
+            calls: [...invoke.mock.calls] as [string, ...unknown[]][],
+          };
         },
       );
   });
@@ -98,25 +102,32 @@ const portMethods = roles.flatMap(callsMadeByEveryPortMethod);
 describe("the intents the frontend sends", () => {
   it.each(portMethods)(
     "$role port method $methodName invokes an intent its hub declares",
-    ({ role, methodName, calls }) => {
-      expect({ methodName, calls: calls.length }).toEqual({
-        methodName,
-        calls: 1,
-      });
+    ({ role, calls }) => {
+      expect(calls).toHaveLength(1);
 
       const [intentName, ...payload] = calls[0];
       const declaredIntents = catalog[role];
 
       expect(Object.keys(declaredIntents)).toContain(intentName);
-      expect(payload).toHaveLength(
-        declaredIntents[intentName as string].length,
-      );
+      expect(payload).toHaveLength(declaredIntents[intentName].length);
     },
   );
 
   it.each(roles)("every %s intent constant names a hub method", (role) => {
     expect(Object.keys(catalog[role])).toEqual(
       expect.arrayContaining(Object.values(intentEnumOfRole[role])),
+    );
+  });
+
+  // WHY: the port factories are a hand-kept list, so without this the suite would
+  // quietly stop covering an adapter nobody remembered to register here.
+  it.each(roles)("every %s intent constant is sent by a port", (role) => {
+    const intentsSent = portMethods
+      .filter((portMethod) => portMethod.role === role)
+      .map((portMethod) => portMethod.calls[0][0]);
+
+    expect(new Set(intentsSent)).toEqual(
+      new Set(Object.values(intentEnumOfRole[role])),
     );
   });
 });

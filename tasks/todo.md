@@ -607,11 +607,11 @@ in PR #52). The frontend starts reading the catalog, and the corpus grows
 to the wire enums and to one serialized state sample per role × phase.
 Tests and generated artifacts only — no production code changes.
 **Acceptance criteria:**
-- [ ] Frontend test fails when an intent name or arity drifts from
+- [x] Frontend test fails when an intent name or arity drifts from
       `contract/intents.json`
-- [ ] `contract/enums.json` + `contract/state/<role>/<phase>.json`
+- [x] `contract/enums.json` + `contract/state/<role>/<phase>.json`
       produced by backend tests, consumed by frontend tests
-- [ ] Every `[JsonDerivedType]` discriminator appears in the fixture corpus
+- [x] Every `[JsonDerivedType]` discriminator appears in the fixture corpus
 **Verification:** `./scripts/ci-lint.sh` + `./scripts/ci-test.sh`; drift
 proven by hand-editing the artifacts.
 **Dependencies:** 23. **Size:** M

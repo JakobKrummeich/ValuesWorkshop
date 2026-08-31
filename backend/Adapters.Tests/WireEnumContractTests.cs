@@ -56,6 +56,7 @@ public sealed class WireEnumContractTests
     {
         return constants
             .GetFields(BindingFlags.Public | BindingFlags.Static)
+            .Where(field => field.IsLiteral)
             .ToDictionary(
                 field => field.Name,
                 field => WireContract.WireFormOf(field.GetValue(null)!)

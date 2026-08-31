@@ -106,7 +106,11 @@ public sealed class WireVariantCoverageTests
     {
         foreach (var property in Properties(element))
         {
-            values.Add(WireValue(property.Name, property.Value.GetRawText()));
+            if (IsScalar(property.Value))
+            {
+                values.Add(WireValue(property.Name, property.Value.GetRawText()));
+            }
+
             Collect(property.Value, values);
         }
 
@@ -114,6 +118,13 @@ public sealed class WireVariantCoverageTests
         {
             Collect(item, values);
         }
+    }
+
+    // WHY: only scalars ever name a variant, and keeping whole objects out of the
+    // set keeps a failure message readable instead of a page of nested JSON.
+    private static bool IsScalar(JsonElement element)
+    {
+        return element.ValueKind is not (JsonValueKind.Object or JsonValueKind.Array);
     }
 
     private static IEnumerable<JsonProperty> Properties(JsonElement element)
