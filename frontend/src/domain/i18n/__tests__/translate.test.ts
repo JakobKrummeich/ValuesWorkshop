@@ -59,6 +59,25 @@ describe("translation", () => {
     expect(untranslated).toEqual([]);
   });
 
+  // WHY: `catalogs` mirrors the spread list in messages.ts by hand, and a
+  // catalog missing from the mirror does not fail — it silently shrinks the
+  // duplicate guard below. That is how groupWorkMessages, valuePresentation-
+  // Messages and finalVotingMessages (34 of 105 keys) stayed unguarded after
+  // the split in f066f48. Building `messages` from a loop instead would drop
+  // the exhaustiveness check tsc gets from the literal spreads, so the mirror
+  // stays and this assertion is what keeps it honest.
+  it("sees every message catalog the app merges", () => {
+    const catalogedKeys = new Set(
+      Object.values(catalogs).flatMap((catalog) => Object.keys(catalog)),
+    );
+
+    const unguarded = Object.values(MessageKey).filter(
+      (key) => !catalogedKeys.has(key),
+    );
+
+    expect(unguarded).toEqual([]);
+  });
+
   it("defines every message in exactly one catalog", () => {
     const catalogsByKey = new Map<string, string[]>();
     Object.entries(catalogs).forEach(([catalogName, catalog]) =>
