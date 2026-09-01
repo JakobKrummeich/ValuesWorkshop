@@ -445,18 +445,12 @@ test.describe.serial("restart recovery across the workshop", () => {
   });
 
   function ballotOf(participantIndex: number): Map<string, number> {
-    const voteUnits = VOTE_TARGETS_BY_CARD_ORDER.flatMap((target, cardIndex) =>
-      Array.from({ length: target }, () => eligibleValueIds[cardIndex]),
+    return spreadBallotOf(
+      participantIndex,
+      VOTE_TARGETS_BY_CARD_ORDER,
+      eligibleValueIds,
+      MAIN_ROUND_ALLOTMENT,
     );
-    const ownUnits = voteUnits.slice(
-      participantIndex * MAIN_ROUND_ALLOTMENT,
-      (participantIndex + 1) * MAIN_ROUND_ALLOTMENT,
-    );
-    const ballot = new Map<string, number>();
-    for (const valueId of ownUnits) {
-      ballot.set(valueId, (ballot.get(valueId) ?? 0) + 1);
-    }
-    return ballot;
   }
 
   test("two of the four participants cast their ballots", async () => {
