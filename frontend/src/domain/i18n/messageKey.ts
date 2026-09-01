@@ -116,6 +116,7 @@ export enum MessageKey {
   FinalPresentationDownloadPdf = "finalPresentation.downloadPdf",
   FinalPresentationDownloadFailed = "finalPresentation.downloadFailed",
   FinalPresentationRecordTitle = "finalPresentation.recordTitle",
+  FinalPresentationRecordFileName = "finalPresentation.recordFileName",
   FinalPresentationRecordAllActionsHeading = "finalPresentation.recordAllActionsHeading",
   FinalPresentationRecordRoundsHeading = "finalPresentation.recordRoundsHeading",
   FinalPresentationRecordRoundTitle = "finalPresentation.recordRoundTitle",

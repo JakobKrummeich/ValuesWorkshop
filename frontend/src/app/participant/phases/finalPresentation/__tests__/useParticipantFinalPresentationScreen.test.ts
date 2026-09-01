@@ -85,7 +85,7 @@ describe("participant final presentation screen logic", () => {
     expect(result.current.downloadFailedMessage).toBeNull();
   });
 
-  it("downloads the rendered record under the fixed file name", () => {
+  it("downloads the rendered record under the translated file name", () => {
     const blob = new Blob(["%PDF"], { type: "application/pdf" });
     renderPdf.mockReturnValue(of(blob));
     const { result } = renderScreenHook(concludedView());
@@ -102,15 +102,16 @@ describe("participant final presentation screen logic", () => {
     expect(renderPdf).toHaveBeenCalledTimes(1);
     expect(renderPdf.mock.calls[0][0].title).toBe("Workshop record");
     expect(renderPdf.mock.calls[0][0].winners[0].valueName).toBe("Trust");
-    expect(download).toHaveBeenCalledWith(blob, "workshop-record.pdf");
+    expect(download).toHaveBeenCalledWith(blob, "values-workshop-record.pdf");
     if (!result.current.isConcluded) {
       throw new Error("expected the concluded model");
     }
     expect(result.current.isDownloading).toBe(false);
   });
 
-  it("builds the record in the active language", () => {
-    renderPdf.mockReturnValue(of(new Blob(["%PDF"])));
+  it("builds the record and names the download in the active language", () => {
+    const blob = new Blob(["%PDF"], { type: "application/pdf" });
+    renderPdf.mockReturnValue(of(blob));
     const { result } = renderScreenHook(concludedView(), Language.German);
 
     act(() => {
@@ -121,6 +122,7 @@ describe("participant final presentation screen logic", () => {
 
     expect(renderPdf.mock.calls[0][0].title).toBe("Workshop-Protokoll");
     expect(renderPdf.mock.calls[0][0].winners[0].valueName).toBe("Vertrauen");
+    expect(download).toHaveBeenCalledWith(blob, "werte-workshop-protokoll.pdf");
   });
 
   it("locks the download while the rendering is in flight", () => {

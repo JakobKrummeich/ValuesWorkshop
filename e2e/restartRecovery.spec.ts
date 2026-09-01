@@ -42,7 +42,7 @@ const WINNER_COUNT = 5;
 const VOTE_TARGETS_BY_CARD_ORDER = [6, 5, 4, 3, 2];
 const PLACES_BEFORE_RESTART = [5, 4];
 const PLACES_AFTER_RESTART = [3, 2, 1];
-const PDF_FILE_NAME = "workshop-record.pdf";
+const PDF_FILE_NAME = "values-workshop-record.pdf";
 
 const workshopParticipants = participantAccounts.slice(0, PARTICIPANT_COUNT);
 
