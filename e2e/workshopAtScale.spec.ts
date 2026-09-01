@@ -9,7 +9,12 @@ import {
 } from "@playwright/test";
 import pdfParse from "pdf-parse";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
-import { castBallot, eligibleValueIdsOf } from "./support/finalVoting";
+import { revealNextValueButton } from "./support/finalPresentation";
+import {
+  castBallot,
+  eligibleValueIdsOf,
+  spreadBallotOf,
+} from "./support/finalVoting";
 import { assignedValueIdsOf } from "./support/groupWork";
 import { openSignedIn } from "./support/oidcLogin";
 import {
@@ -22,6 +27,7 @@ import {
   advancePhaseButton,
   fastForwardQuizAsFacilitatorAlone,
 } from "./support/quizFastForward";
+import { submitValueSelection } from "./support/valueSelection";
 
 const FACILITATOR_ACCOUNT = "facilitator";
 const SESSION_NAME = "Playwright workshop at scale";
@@ -29,7 +35,6 @@ const WALL_VIEWPORT = { width: 1920, height: 1080 };
 
 const PARTICIPANT_COUNT = 30;
 const SIGN_IN_BATCH_SIZE = 6;
-const VALUES_TO_PICK = 10;
 
 const EXPECTED_GROUP_ANIMAL_IDS = [
   "otter",
@@ -229,21 +234,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     for (const batch of inBatches(workshopParticipants)) {
       await Promise.all(
         batch.map((account) =>
-          withParticipant(browser, account.accountName, async (page) => {
-            const valueChips = page.getByTestId(/^value-chip-/);
-            await expect(valueChips.first()).toBeVisible({ timeout: 15_000 });
-            for (let pick = 0; pick < VALUES_TO_PICK; pick += 1) {
-              await valueChips.nth(pick).click();
-            }
-            await expect(page.getByTestId("selected-count")).toHaveText(
-              `Selected: ${VALUES_TO_PICK}/${VALUES_TO_PICK}`,
-            );
-            await page.getByTestId("submit-selection-button").click();
-            await page.getByTestId("confirm-submit-button").click();
-            await expect(
-              page.getByTestId("selection-submitted-confirmation"),
-            ).toBeVisible();
-          }),
+          withParticipant(browser, account.accountName, submitValueSelection),
         ),
       );
     }
@@ -518,18 +509,12 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
   });
 
   function mainRoundBallotOf(participantIndex: number): Map<string, number> {
-    const voteUnits = VOTE_TARGETS_BY_CARD_ORDER.flatMap((target, cardIndex) =>
-      Array.from({ length: target }, () => eligibleValueIds[cardIndex]),
+    return spreadBallotOf(
+      participantIndex,
+      VOTE_TARGETS_BY_CARD_ORDER,
+      eligibleValueIds,
+      MAIN_ROUND_ALLOTMENT,
     );
-    const ownUnits = voteUnits.slice(
-      participantIndex * MAIN_ROUND_ALLOTMENT,
-      (participantIndex + 1) * MAIN_ROUND_ALLOTMENT,
-    );
-    const ballot = new Map<string, number>();
-    for (const valueId of ownUnits) {
-      ballot.set(valueId, (ballot.get(valueId) ?? 0) + 1);
-    }
-    return ballot;
   }
 
   test("thirty participants spend their five votes and force a fifth-place tie", async ({
@@ -675,10 +660,6 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     }
   });
 
-  function revealNextValueButton(): Locator {
-    return facilitatorPage.getByRole("button", { name: "Reveal next value" });
-  }
-
   function expectedActionTextsOf(cardIndex: number): string[] {
     if (cardIndex === WORST_CASE_CARD_INDEX) {
       return worstCaseActionTexts;
@@ -733,8 +714,10 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     );
 
     for (const [revealIndex, place] of REVEAL_SCREEN_PLACES.entries()) {
-      await expect(revealNextValueButton()).toBeEnabled({ timeout: 10_000 });
-      await revealNextValueButton().click();
+      await expect(revealNextValueButton(facilitatorPage)).toBeEnabled({
+        timeout: 10_000,
+      });
+      await revealNextValueButton(facilitatorPage).click();
 
       await expect(facilitatorPage.getByTestId("revealed-count")).toHaveText(
         `Revealed: ${revealIndex + 1} of ${WINNER_COUNT}`,
@@ -773,8 +756,10 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
   test("the fifth reveal concludes the workshop with the winner overview", async () => {
     test.setTimeout(90_000);
 
-    await expect(revealNextValueButton()).toBeEnabled({ timeout: 10_000 });
-    await revealNextValueButton().click();
+    await expect(revealNextValueButton(facilitatorPage)).toBeEnabled({
+      timeout: 10_000,
+    });
+    await revealNextValueButton(facilitatorPage).click();
 
     const championCardIndex = 0;
     await expect(presenterPage.getByTestId("winner-place")).toHaveText(
@@ -816,7 +801,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
       `Revealed: ${WINNER_COUNT} of ${WINNER_COUNT}`,
     );
     await expect(facilitatorPage.getByTestId("concluded-note")).toBeVisible();
-    await expect(revealNextValueButton()).toHaveCount(0);
+    await expect(revealNextValueButton(facilitatorPage)).toHaveCount(0);
   });
 
   test("a participant downloads the workshop record as an anonymous PDF", async ({
