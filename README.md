@@ -54,8 +54,8 @@ npx playwright test sessionLifecycle    # one spec
 docker compose $compose down            # add -v to drop the database volume
 ```
 
-`e2e/sessionLifecycle.spec.ts` restarts the backend container mid-suite, so
-Playwright runs with one worker; `retries` stays `0`.
+The session lifecycle and restart recovery suites restart the backend
+container mid-suite, so Playwright runs with one worker; `retries` stays `0`.
 
 Two things bite when the stack is stale: the frontend image inlines the
 `NEXT_PUBLIC_*` values at build time (compose passes them as build args), so
