@@ -55,4 +55,13 @@ public class WinnerRevealTests
         reveal.RevealedCount.ShouldBe(revealedCount);
         reveal.IsConcluded.ShouldBe(concluded);
     }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(6)]
+    [InlineData(100)]
+    public void Restore_rejects_an_out_of_range_revealed_count(int revealedCount)
+    {
+        Should.Throw<ArgumentOutOfRangeException>(() => WinnerReveal.Restore(revealedCount));
+    }
 }

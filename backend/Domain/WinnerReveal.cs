@@ -20,6 +20,15 @@ public sealed class WinnerReveal
 
     internal static WinnerReveal Restore(int revealedCount)
     {
+        if (revealedCount < 0 || revealedCount > VotingRounds.RequiredWinningValueCount)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(revealedCount),
+                revealedCount,
+                $"Must be between 0 and {VotingRounds.RequiredWinningValueCount}."
+            );
+        }
+
         return new WinnerReveal { RevealedCount = revealedCount };
     }
 }
