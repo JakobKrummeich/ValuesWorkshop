@@ -10,17 +10,24 @@ import {
   restartBackendAwaitingReconnect,
 } from "./support/backendRestart";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
-import { castBallot, eligibleValueIdsOf } from "./support/finalVoting";
+import { revealNextValueButton } from "./support/finalPresentation";
+import {
+  castBallot,
+  eligibleValueIdsOf,
+  spreadBallotOf,
+} from "./support/finalVoting";
 import { assignedValueIdsOf } from "./support/groupWork";
 import { openSignedIn, signInThroughOidcProvider } from "./support/oidcLogin";
 import { participantAccounts } from "./support/participantAccounts";
 import {
   advancePhaseButton,
   answerButton,
+  clickThroughQuestionControls,
   expectQuestionHeading,
   fastForwardQuizQuestions,
   quizControlButton,
 } from "./support/quizFastForward";
+import { submitValueSelection } from "./support/valueSelection";
 
 const FACILITATOR_ACCOUNT = "facilitator";
 const SESSION_NAME = "Playwright restart recovery";
@@ -28,7 +35,6 @@ const PHONE_VIEWPORT = { width: 390, height: 844 };
 const WALL_VIEWPORT = { width: 1920, height: 1080 };
 
 const PARTICIPANT_COUNT = 4;
-const VALUES_TO_PICK = 10;
 const TOP_VALUE_COUNT = 10;
 const PREFILLED_ACTION_VALUE_COUNT = 3;
 const MAIN_ROUND_ALLOTMENT = 5;
@@ -100,6 +106,10 @@ test.describe.serial("restart recovery across the workshop", () => {
     await facilitatorPage.close();
     facilitatorPage = await facilitatorContext.newPage();
     await facilitatorPage.goto(facilitatorPath());
+    await expect(facilitatorPage.getByTestId("connection")).toHaveText(
+      "Connected",
+      { timeout: 15_000 },
+    );
     await expect(
       facilitatorPage.getByLabel("Facilitator passphrase"),
     ).toHaveCount(0);
@@ -121,10 +131,6 @@ test.describe.serial("restart recovery across the workshop", () => {
     return facilitatorPage
       .getByTestId(`scribe-select-${groupAnimalId}`)
       .locator("option:checked");
-  }
-
-  function revealNextValueButton(): Locator {
-    return facilitatorPage.getByRole("button", { name: "Reveal next value" });
   }
 
   test("the facilitator opens a session and four participants join", async () => {
@@ -224,26 +230,16 @@ test.describe.serial("restart recovery across the workshop", () => {
   test("the reveal still works and the quiz runs to its end", async () => {
     test.setTimeout(120_000);
 
-    await quizControlButton(facilitatorPage).click();
-    await expect(quizControlButton(facilitatorPage)).toHaveText(
-      "Show learning text",
-    );
-    await expect(presenterPage.getByTestId("answer-bar-0")).toHaveClass(
-      /correctBar/,
-    );
-
-    await quizControlButton(facilitatorPage).click();
-    await expect(quizControlButton(facilitatorPage)).toHaveText(
-      "Next question",
-    );
-    await quizControlButton(facilitatorPage).click();
-
+    await clickThroughQuestionControls(facilitatorPage, true);
     await fastForwardQuizQuestions(
       facilitatorPage,
       participantPages[0],
       everyRolePage(),
       2,
     );
+
+    await expect(presenterPage.getByTestId("learning-text")).toBeVisible();
+    await expect(presenterPage.locator('[class*="correctBar"]')).toHaveCount(1);
   });
 
   test("every participant submits ten values", async () => {
@@ -256,19 +252,7 @@ test.describe.serial("restart recovery across the workshop", () => {
     );
 
     for (const participantPage of participantPages) {
-      const valueChips = participantPage.getByTestId(/^value-chip-/);
-      await expect(valueChips.first()).toBeVisible({ timeout: 15_000 });
-      for (let pick = 0; pick < VALUES_TO_PICK; pick += 1) {
-        await valueChips.nth(pick).click();
-      }
-      await expect(participantPage.getByTestId("selected-count")).toHaveText(
-        `Selected: ${VALUES_TO_PICK}/${VALUES_TO_PICK}`,
-      );
-      await participantPage.getByTestId("submit-selection-button").click();
-      await participantPage.getByTestId("confirm-submit-button").click();
-      await expect(
-        participantPage.getByTestId("selection-submitted-confirmation"),
-      ).toBeVisible();
+      await submitValueSelection(participantPage);
     }
 
     await expect(facilitatorPage.getByTestId("submitted-count")).toHaveText(
@@ -367,6 +351,9 @@ test.describe.serial("restart recovery across the workshop", () => {
       facilitatorPage.getByTestId("group-row-action-count"),
     ).toHaveText(`${PREFILLED_ACTION_VALUE_COUNT}`);
     await expect(scribeSelectedOption()).toHaveText(scribeDisplayName);
+    await expect(
+      presenterPage.getByTestId(`presenter-group-status-${groupAnimalId}`),
+    ).toHaveText("Editing", { timeout: 15_000 });
 
     await expect(scribePage().getByTestId("add-action-button")).toBeVisible({
       timeout: 15_000,
@@ -394,11 +381,12 @@ test.describe.serial("restart recovery across the workshop", () => {
     await expect(
       reopenedScribePage.getByTestId("add-action-button"),
     ).toBeVisible({ timeout: 15_000 });
-    const firstValueId = assignedValueIds[0];
-    await reopenedScribePage.getByTestId(`value-tab-${firstValueId}`).click();
-    await expect(reopenedScribePage.getByTestId(/^action-input-/)).toHaveValue(
-      prefilledActionTexts.get(firstValueId) ?? "",
-    );
+    for (const [valueId, actionText] of prefilledActionTexts) {
+      await reopenedScribePage.getByTestId(`value-tab-${valueId}`).click();
+      await expect(
+        reopenedScribePage.getByTestId(/^action-input-/),
+      ).toHaveValue(actionText);
+    }
   });
 
   test("the scribe completes every value and submits the group work", async () => {
@@ -576,8 +564,10 @@ test.describe.serial("restart recovery across the workshop", () => {
     );
 
     for (const place of PLACES_BEFORE_RESTART) {
-      await expect(revealNextValueButton()).toBeEnabled({ timeout: 10_000 });
-      await revealNextValueButton().click();
+      await expect(revealNextValueButton(facilitatorPage)).toBeEnabled({
+        timeout: 10_000,
+      });
+      await revealNextValueButton(facilitatorPage).click();
       await expect(presenterPage.getByTestId("winner-place")).toHaveText(
         `Place ${place}`,
         { timeout: 10_000 },
@@ -621,7 +611,7 @@ test.describe.serial("restart recovery across the workshop", () => {
     }
   });
 
-  test("the facilitator reopens the tab mid-reveal", async () => {
+  test("the facilitator and a participant reopen their tabs mid-reveal", async () => {
     test.setTimeout(60_000);
 
     await reopenFacilitatorTab();
@@ -629,15 +619,22 @@ test.describe.serial("restart recovery across the workshop", () => {
       `Revealed: ${PLACES_BEFORE_RESTART.length} of ${WINNER_COUNT}`,
       { timeout: 15_000 },
     );
-    await expect(revealNextValueButton()).toBeEnabled();
+    await expect(revealNextValueButton(facilitatorPage)).toBeEnabled();
+
+    const reopenedParticipantPage = await reopenParticipantTab(0);
+    await expect(
+      reopenedParticipantPage.getByTestId("waiting-screen"),
+    ).toBeVisible({ timeout: 15_000 });
   });
 
   test("the remaining reveals conclude the workshop", async () => {
     test.setTimeout(120_000);
 
     for (const place of PLACES_AFTER_RESTART) {
-      await expect(revealNextValueButton()).toBeEnabled({ timeout: 10_000 });
-      await revealNextValueButton().click();
+      await expect(revealNextValueButton(facilitatorPage)).toBeEnabled({
+        timeout: 10_000,
+      });
+      await revealNextValueButton(facilitatorPage).click();
       await expect(presenterPage.getByTestId("winner-place")).toHaveText(
         `Place ${place}`,
         { timeout: 10_000 },
