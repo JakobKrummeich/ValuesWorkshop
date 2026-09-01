@@ -248,6 +248,10 @@ namespace ValuesWorkshop.Adapters.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("name");
 
+                    b.Property<int>("RevealedWinnerCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("revealed_winner_count");
+
                     b.Property<long>("Revision")
                         .HasColumnType("INTEGER")
                         .HasColumnName("revision");

@@ -21,6 +21,7 @@ internal static class SessionFixtures
         FormationRecord? formation = null,
         PresentationWalk? presentation = null,
         VotingRounds? voting = null,
+        WinnerReveal? reveal = null,
         long revision = 0
     )
     {
@@ -32,6 +33,7 @@ internal static class SessionFixtures
             formation,
             presentation,
             voting,
+            reveal,
             revision,
             roster:
             [

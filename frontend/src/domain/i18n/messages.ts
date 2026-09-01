@@ -1,6 +1,7 @@
 import { generalMessages } from "./generalMessages";
 import type { Message } from "./message";
 import { MessageKey } from "./messageKey";
+import { finalPresentationMessages } from "./phases/finalPresentationMessages";
 import { finalVotingMessages } from "./phases/finalVotingMessages";
 import { groupFormationMessages } from "./phases/groupFormationMessages";
 import { groupWorkMessages } from "./phases/groupWorkMessages";
@@ -22,4 +23,5 @@ export const messages: Readonly<Record<MessageKey, Message>> = {
   ...groupWorkMessages,
   ...valuePresentationMessages,
   ...finalVotingMessages,
+  ...finalPresentationMessages,
 };

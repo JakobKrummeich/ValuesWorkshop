@@ -73,13 +73,14 @@ that is actually created.
 
 ```sql
 CREATE TABLE sessions (
-    identity             TEXT    PRIMARY KEY,
-    facilitator_subject  TEXT    NOT NULL,
-    name                 TEXT    NOT NULL,
-    current_phase        INTEGER NOT NULL,
-    revision             INTEGER NOT NULL,
-    is_formed            INTEGER NOT NULL,
-    created_at           TEXT    NOT NULL
+    identity               TEXT    PRIMARY KEY,
+    facilitator_subject    TEXT    NOT NULL,
+    name                   TEXT    NOT NULL,
+    current_phase          INTEGER NOT NULL,
+    revision               INTEGER NOT NULL,
+    is_formed              INTEGER NOT NULL,
+    revealed_winner_count  INTEGER NOT NULL DEFAULT 0,
+    created_at             TEXT    NOT NULL
 );
 ```
 

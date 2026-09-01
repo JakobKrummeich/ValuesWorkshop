@@ -38,6 +38,7 @@ function mockDependencies(reassignScribe = jest.fn(() => of(accepted))) {
       closeVoting: () => NEVER,
       startTiebreakRound: () => NEVER,
     },
+    conclusionControlPort: { revealNextValue: () => NEVER },
   });
   return reassignScribe;
 }

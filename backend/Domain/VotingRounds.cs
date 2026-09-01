@@ -26,6 +26,35 @@ public sealed class VotingRounds
         closedRounds.SelectMany(round => round.LockedValues).ToList();
 
     public bool WinnersStand => WinningValues.Count == RequiredWinningValueCount;
+
+    public IReadOnlyList<RankedWinner> RankedWinners(IReadOnlyList<ValueId> catalogOrder)
+    {
+        if (closedRounds.Count == 0)
+        {
+            return [];
+        }
+
+        var catalogPositions = catalogOrder
+            .Select((value, position) => (value, position))
+            .ToDictionary(entry => entry.value, entry => entry.position);
+        var firstRoundTallies = closedRounds[0].Tallies;
+
+        return closedRounds
+            .SelectMany(round => LockedInRankOrder(round, catalogPositions))
+            .Select((value, index) => new RankedWinner(index + 1, value, firstRoundTallies[value]))
+            .ToList();
+    }
+
+    private static IEnumerable<ValueId> LockedInRankOrder(
+        ClosedVotingRound round,
+        IReadOnlyDictionary<ValueId, int> catalogPositions
+    )
+    {
+        return round
+            .LockedValues.OrderByDescending(value => round.Tallies[value])
+            .ThenBy(value => catalogPositions[value]);
+    }
+
     public bool TiebreakPending => !RoundOpen && LastClosedRound is { TiedValues.Count: > 0 };
 
     internal IReadOnlyDictionary<ValueId, int> OpenRoundTallies => openRound?.Tallies ?? NoTallies;

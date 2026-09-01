@@ -537,16 +537,15 @@ public class ParticipantWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Final_presentation_state_carries_the_winning_values()
+    public void Final_presentation_state_carries_the_pending_conclusion()
     {
-        var session = SessionFixtures.InPhase(
-            Phase.FinalPresentation,
-            voting: TestVoting.AfterLocking([new ValueId("honesty"), new ValueId("courage")])
-        );
+        var session = SessionFixtures.InPhase(Phase.FinalPresentation);
 
-        Map(session)
+        var conclusion = Map(session)
             .ShouldBeOfType<ParticipantFinalPresentationState>()
-            .Conclusion.WinningValueIds.ShouldBe(["honesty", "courage"]);
+            .Conclusion;
+        conclusion.IsConcluded.ShouldBeFalse();
+        conclusion.Record.ShouldBeNull();
     }
 
     private static ParticipantWorkshopState Map(

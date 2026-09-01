@@ -115,6 +115,13 @@ public sealed class FacilitatorHub(
         );
     }
 
+    public Task<IntentResult> RevealNextValue()
+    {
+        return intentHandler.HandleAsync(
+            new RevealNextValueCommand(HubSessionBinding.SessionIdentityOf(Context), Caller())
+        );
+    }
+
     public Task<IntentResult> CloseVoting()
     {
         return intentHandler.HandleAsync(

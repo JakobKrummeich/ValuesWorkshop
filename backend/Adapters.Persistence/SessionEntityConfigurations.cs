@@ -18,6 +18,9 @@ internal sealed class SessionEntityConfiguration : IEntityTypeConfiguration<Sess
         builder.Property(session => session.CurrentPhase).HasColumnName("current_phase");
         builder.Property(session => session.Revision).HasColumnName("revision");
         builder.Property(session => session.IsFormed).HasColumnName("is_formed");
+        builder
+            .Property(session => session.RevealedWinnerCount)
+            .HasColumnName("revealed_winner_count");
         builder.Property(session => session.CreatedAt).HasColumnName("created_at");
     }
 }

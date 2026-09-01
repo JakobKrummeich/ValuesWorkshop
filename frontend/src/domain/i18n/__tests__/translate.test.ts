@@ -3,11 +3,15 @@ import { connectionStateMessage } from "../connectionStateMessage";
 import { generalMessages } from "../generalMessages";
 import { Language, defaultLanguage, readLanguage } from "../language";
 import { MessageKey, messages } from "../messages";
+import { finalPresentationMessages } from "../phases/finalPresentationMessages";
+import { finalVotingMessages } from "../phases/finalVotingMessages";
 import { groupFormationMessages } from "../phases/groupFormationMessages";
+import { groupWorkMessages } from "../phases/groupWorkMessages";
 import { joinMessages } from "../phases/joinMessages";
 import { quizMessages } from "../phases/quizMessages";
 import { selectionMessages } from "../phases/selectionMessages";
 import { selectionResultsMessages } from "../phases/selectionResultsMessages";
+import { valuePresentationMessages } from "../phases/valuePresentationMessages";
 import { translate } from "../translate";
 
 const catalogs = {
@@ -17,6 +21,10 @@ const catalogs = {
   selection: selectionMessages,
   selectionResults: selectionResultsMessages,
   groupFormation: groupFormationMessages,
+  groupWork: groupWorkMessages,
+  valuePresentation: valuePresentationMessages,
+  finalVoting: finalVotingMessages,
+  finalPresentation: finalPresentationMessages,
 };
 
 describe("translation", () => {

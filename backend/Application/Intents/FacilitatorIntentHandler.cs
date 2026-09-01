@@ -112,6 +112,19 @@ public sealed class FacilitatorIntentHandler(
         );
     }
 
+    public Task<IntentResult> HandleAsync(RevealNextValueCommand command)
+    {
+        return ExecuteAsFacilitatorAsync(
+            command.SessionIdentity,
+            command.Caller,
+            session =>
+            {
+                FinalPresentation.RevealNextValue(session);
+                return true;
+            }
+        );
+    }
+
     public Task<IntentResult> HandleAsync(CloseVotingCommand command)
     {
         return ExecuteAsFacilitatorAsync(

@@ -1,13 +1,9 @@
 {
   "phase": 9,
   "conclusion": {
-    "winningValueIds": [
-      "wert-1",
-      "wert-3",
-      "wert-5",
-      "wert-2",
-      "wert-4"
-    ]
+    "revealedCount": 2,
+    "winnerCount": 5,
+    "isConcluded": false
   },
   "revision": 42,
   "roster": {
@@ -31,5 +27,7 @@
     ],
     "participantCount": 4
   },
-  "enabledIntents": []
+  "enabledIntents": [
+    "RevealNextValue"
+  ]
 }

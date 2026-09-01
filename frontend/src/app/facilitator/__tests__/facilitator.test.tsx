@@ -61,6 +61,9 @@ beforeEach(() => {
       closeVoting: jest.fn(() => EMPTY),
       startTiebreakRound: jest.fn(() => EMPTY),
     },
+    conclusionControlPort: {
+      revealNextValue: jest.fn(() => EMPTY),
+    },
     start: EMPTY,
     close: EMPTY,
   });

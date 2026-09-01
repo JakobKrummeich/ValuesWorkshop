@@ -163,4 +163,47 @@ public sealed record FacilitatorVotingView(
 
 public sealed record PresenterVotingView(bool IsRoundOpen);
 
-public sealed record ConclusionView(IReadOnlyList<string> WinningValueIds);
+public sealed record RankedWinnerView(
+    string ValueId,
+    LocalizedTextView Text,
+    int Place,
+    int VoteCount,
+    IReadOnlyList<string> Actions
+);
+
+public sealed record RecordedValueView(
+    string ValueId,
+    LocalizedTextView Text,
+    IReadOnlyList<string> Actions
+);
+
+public sealed record RecordedTallyView(string ValueId, int Count);
+
+public sealed record RecordedRoundView(
+    int RoundNumber,
+    int Allotment,
+    IReadOnlyList<RecordedTallyView> Tallies
+);
+
+public sealed record WorkshopRecordView(
+    IReadOnlyList<RankedWinnerView> Winners,
+    IReadOnlyList<RecordedValueView> Values,
+    IReadOnlyList<RecordedRoundView> Rounds
+);
+
+public sealed record ParticipantConclusionView(
+    bool IsConcluded,
+    [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        WorkshopRecordView? Record
+);
+
+public sealed record FacilitatorConclusionView(
+    int RevealedCount,
+    int WinnerCount,
+    bool IsConcluded
+);
+
+public sealed record PresenterConclusionView(
+    IReadOnlyList<RankedWinnerView> RevealedWinners,
+    bool IsConcluded
+);

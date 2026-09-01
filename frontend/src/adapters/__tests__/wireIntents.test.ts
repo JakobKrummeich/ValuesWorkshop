@@ -4,6 +4,7 @@ import {
   ParticipantIntent,
 } from "../../domain/workshopState";
 import { readIntentCatalog } from "../../testing/wireContract";
+import { createFacilitatorConclusionControlPort } from "../facilitatorConclusionControlAdapter";
 import { createFacilitatorGroupWorkControlPort } from "../facilitatorGroupWorkControlAdapter";
 import { createFacilitatorLifecyclePort } from "../facilitatorLifecycleAdapter";
 import { createFacilitatorQuizControlPort } from "../facilitatorQuizControlAdapter";
@@ -31,6 +32,7 @@ const portFactoriesOfRole: Record<
   ((connection: WebsocketConnection) => object)[]
 > = {
   facilitator: [
+    createFacilitatorConclusionControlPort,
     createFacilitatorGroupWorkControlPort,
     createFacilitatorLifecyclePort,
     createFacilitatorQuizControlPort,

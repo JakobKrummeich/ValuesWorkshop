@@ -95,7 +95,7 @@ public sealed class ParticipantWorkshopStateMapper(
                 new ParticipantFinalPresentationState(
                     revision,
                     ParticipantCount(session),
-                    SessionViews.Conclusion(session)
+                    ConclusionViews.ForParticipant(session, groupViews, catalogView)
                 ),
         };
     }

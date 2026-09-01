@@ -57,7 +57,8 @@ internal static class WireStateFixtures
             new("valuePresentation", Presenting(), Anna),
             new("finalVoting", VotingRoundOpen(), Anna),
             new("finalVotingClosed", VotingRoundClosed(), Anna),
-            new("finalPresentation", WinnersStanding(), Anna),
+            new("finalPresentationRevealing", Revealing(), Anna),
+            new("finalPresentationConcluded", Concluded(), Anna),
         ];
 
     private static Session Quizzing()
@@ -152,16 +153,24 @@ internal static class WireStateFixtures
         );
     }
 
-    private static Session WinnersStanding()
+    // WHY: the reveal walks the winners from the fifth place up, so the partially
+    // revealed sample and the concluded one together cover the participant's
+    // optional record, the presenter's growing reveal list and both isConcluded
+    // values. The concluded session went through a tiebreak so the record's
+    // per-round breakdown carries more than one round.
+    private static Session Revealing()
     {
         return InPhase(
             Phase.FinalPresentation,
             formation: TwoGroups(),
             voting: VotingRounds.Restore(
                 [
-                    TestVoting.ClosedRound(
+                    new ClosedVotingRound(
                         1,
-                        lockedValues:
+                        VotingRounds.RequiredWinningValueCount,
+                        PresentedValues,
+                        TalliesOver(PresentedValues, 6, 5, 4, 3, 2, 0),
+                        4,
                         [
                             FirstValue,
                             ValueNumbered(3),
@@ -169,12 +178,55 @@ internal static class WireStateFixtures
                             SecondValue,
                             ValueNumbered(4),
                         ],
-                        tiedValues: []
+                        []
                     ),
                 ],
                 null
-            )
+            ),
+            reveal: WinnerReveal.Restore(2)
         );
+    }
+
+    private static Session Concluded()
+    {
+        return InPhase(
+            Phase.FinalPresentation,
+            formation: TwoGroups(),
+            voting: VotingRounds.Restore(
+                [
+                    new ClosedVotingRound(
+                        1,
+                        VotingRounds.RequiredWinningValueCount,
+                        PresentedValues,
+                        TalliesOver(PresentedValues, 6, 5, 1, 4, 3, 1),
+                        4,
+                        [FirstValue, ValueNumbered(3), SecondValue, ValueNumbered(4)],
+                        [ValueNumbered(5), ValueNumbered(6)]
+                    ),
+                    new ClosedVotingRound(
+                        2,
+                        1,
+                        [ValueNumbered(5), ValueNumbered(6)],
+                        TalliesOver([ValueNumbered(5), ValueNumbered(6)], 1, 3),
+                        4,
+                        [ValueNumbered(6)],
+                        []
+                    ),
+                ],
+                null
+            ),
+            reveal: WinnerReveal.Restore(VotingRounds.RequiredWinningValueCount)
+        );
+    }
+
+    private static Dictionary<ValueId, int> TalliesOver(
+        IReadOnlyList<ValueId> values,
+        params int[] counts
+    )
+    {
+        return values
+            .Select((value, index) => (value, count: counts[index]))
+            .ToDictionary(tally => tally.value, tally => tally.count);
     }
 
     private static ValueId ValueNumbered(int number)
@@ -232,7 +284,8 @@ internal static class WireStateFixtures
         SelectionRound? selection = null,
         FormationRecord? formation = null,
         PresentationWalk? presentation = null,
-        VotingRounds? voting = null
+        VotingRounds? voting = null,
+        WinnerReveal? reveal = null
     )
     {
         return TestSessions.InPhase(
@@ -243,6 +296,7 @@ internal static class WireStateFixtures
             formation,
             presentation,
             voting,
+            reveal,
             revision: 42,
             roster:
             [

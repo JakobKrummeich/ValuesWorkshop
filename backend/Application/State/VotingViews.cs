@@ -51,18 +51,8 @@ internal static class VotingViews
             .Voting.EligibleValues.Select(valueId => new EligibleValueView(
                 valueId.Value,
                 groupViews.ValueViewOf(valueId).Text,
-                ActionTextsOf(session, valueId)
+                SessionViews.ActionTextsOf(session, valueId)
             ))
-            .ToList();
-    }
-
-    private static IReadOnlyList<string> ActionTextsOf(Session session, ValueId valueId)
-    {
-        return SessionViews
-            .Groups(session)
-            .SelectMany(group => group.Actions)
-            .Where(action => action.ValueId == valueId)
-            .Select(action => action.Text.Value)
             .ToList();
     }
 

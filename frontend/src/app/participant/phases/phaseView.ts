@@ -1,8 +1,8 @@
 import { Phase } from "../../../domain/phases";
 import type { ParticipantWorkshopState } from "../../../domain/workshopState";
-import { EmptyPhase } from "../../EmptyPhase";
 import type { PhaseComponents } from "../../PhaseView";
 import { WaitingScreen } from "../../WaitingScreen";
+import { ParticipantFinalPresentationScreen } from "./finalPresentation/ParticipantFinalPresentationScreen";
 import { ParticipantFinalVotingScreen } from "./finalVoting/ParticipantFinalVotingScreen";
 import { ParticipantGroupFormationScreen } from "./groupFormation/ParticipantGroupFormationScreen";
 import { ParticipantGroupWorkScreen } from "./groupWork/ParticipantGroupWorkScreen";
@@ -19,5 +19,5 @@ export const participantPhaseView: PhaseComponents<ParticipantWorkshopState> = {
   [Phase.GroupWork]: ParticipantGroupWorkScreen,
   [Phase.ValuePresentation]: WaitingScreen,
   [Phase.FinalVoting]: ParticipantFinalVotingScreen,
-  [Phase.FinalPresentation]: EmptyPhase,
+  [Phase.FinalPresentation]: ParticipantFinalPresentationScreen,
 };

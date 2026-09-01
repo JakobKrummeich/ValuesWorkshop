@@ -39,6 +39,7 @@ function mockWalkControl(
       closeVoting: () => NEVER,
       startTiebreakRound: () => NEVER,
     },
+    conclusionControlPort: { revealNextValue: () => NEVER },
   });
 
   return { goToNextValue, correctActionWording };

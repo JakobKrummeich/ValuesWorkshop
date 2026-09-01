@@ -258,6 +258,7 @@ public class FacilitatorHubTests
             ),
             PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore([], null),
+            new WinnerReveal(),
             revision: 1
         );
         repository.Add(session);
@@ -313,6 +314,27 @@ public class FacilitatorHubTests
         var saved = repository.Saved.ShouldHaveSingleItem();
         saved.Voting.RoundOpen.ShouldBeTrue();
         saved.Voting.RoundNumber.ShouldBe(2);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Revealing_the_next_winner_mutates_persists_and_broadcasts()
+    {
+        var session = TestSessions.InPhase(
+            KnownSession,
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            )
+        );
+        session.BumpRevision();
+        repository.Add(session);
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.RevealNextValue();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository.Saved.ShouldHaveSingleItem().Reveal.RevealedCount.ShouldBe(1);
         broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
     }
 

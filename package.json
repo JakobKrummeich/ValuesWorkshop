@@ -5,10 +5,12 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
+    "@types/pdf-parse": "^1.1.5",
     "@types/pngjs": "^6.0.5",
     "jscpd": "^4.2.5",
     "jsqr": "^1.4.0",
     "markdown-it": "^14.3.0",
+    "pdf-parse": "^1.1.4",
     "pngjs": "^7.0.0"
   }
 }

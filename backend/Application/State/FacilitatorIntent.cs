@@ -14,4 +14,5 @@ public enum FacilitatorIntent
     CorrectActionWording,
     CloseVoting,
     StartTiebreakRound,
+    RevealNextValue,
 }

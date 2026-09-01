@@ -14,6 +14,7 @@ public sealed class Session
     public FormationRecord Formation { get; }
     public PresentationWalk Presentation { get; }
     public VotingRounds Voting { get; }
+    public WinnerReveal Reveal { get; }
     public long Revision { get; private set; }
 
     public static Session Open(
@@ -195,6 +196,7 @@ public sealed class Session
         FormationRecord formation,
         PresentationWalk presentation,
         VotingRounds voting,
+        WinnerReveal reveal,
         long revision
     )
     {
@@ -208,7 +210,8 @@ public sealed class Session
             selection,
             formation,
             presentation,
-            voting
+            voting,
+            reveal
         )
         {
             Revision = revision,
@@ -226,7 +229,8 @@ public sealed class Session
             new SelectionRound(),
             new FormationRecord(),
             new PresentationWalk(),
-            new VotingRounds()
+            new VotingRounds(),
+            new WinnerReveal()
         ) { }
 
     private Session(
@@ -239,7 +243,8 @@ public sealed class Session
         SelectionRound selection,
         FormationRecord formation,
         PresentationWalk presentation,
-        VotingRounds voting
+        VotingRounds voting,
+        WinnerReveal reveal
     )
     {
         Identity = identity;
@@ -252,5 +257,6 @@ public sealed class Session
         Formation = formation;
         Presentation = presentation;
         Voting = voting;
+        Reveal = reveal;
     }
 }

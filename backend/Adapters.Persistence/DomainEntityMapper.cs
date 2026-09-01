@@ -17,6 +17,7 @@ internal static class DomainEntityMapper
             CurrentPhase = (int)session.PhaseProgress.CurrentPhase,
             Revision = session.Revision,
             IsFormed = session.Formation.IsFormed,
+            RevealedWinnerCount = session.Reveal.RevealedCount,
             CreatedAt = DateTime.UtcNow.ToString("o"),
             QuizState = new QuizStateEntity
             {
@@ -169,6 +170,7 @@ internal static class DomainEntityMapper
             formation,
             presentation,
             voting,
+            WinnerReveal.Restore(entity.RevealedWinnerCount),
             entity.Revision
         );
     }

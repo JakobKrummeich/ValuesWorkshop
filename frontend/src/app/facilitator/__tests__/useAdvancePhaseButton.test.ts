@@ -52,6 +52,7 @@ function withAdvancePhase(
       closeVoting: () => NEVER,
       startTiebreakRound: () => NEVER,
     },
+    conclusionControlPort: { revealNextValue: () => NEVER },
   });
 }
 

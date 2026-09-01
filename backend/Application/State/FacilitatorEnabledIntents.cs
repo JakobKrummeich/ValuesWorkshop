@@ -8,25 +8,7 @@ internal static class FacilitatorEnabledIntents
     {
         var enabledIntents = new List<FacilitatorIntent>();
 
-        if (session.PhaseProgress.CurrentPhase == Phase.Quiz)
-        {
-            AddQuizWalkIntent(enabledIntents, session.Quiz);
-        }
-
-        if (session.PhaseProgress.CurrentPhase == Phase.GroupWork)
-        {
-            enabledIntents.Add(FacilitatorIntent.ReassignScribe);
-        }
-
-        if (session.PhaseProgress.CurrentPhase == Phase.ValuePresentation)
-        {
-            AddPresentationWalkIntents(enabledIntents, session);
-        }
-
-        if (session.PhaseProgress.CurrentPhase == Phase.FinalVoting)
-        {
-            AddVotingIntents(enabledIntents, session.Voting);
-        }
+        AddPhaseIntents(enabledIntents, session);
 
         if (session.PhaseProgress.HasNextPhase && PhaseExitGuards.PermitExitOf(session))
         {
@@ -34,6 +16,28 @@ internal static class FacilitatorEnabledIntents
         }
 
         return enabledIntents;
+    }
+
+    private static void AddPhaseIntents(List<FacilitatorIntent> enabledIntents, Session session)
+    {
+        switch (session.PhaseProgress.CurrentPhase)
+        {
+            case Phase.Quiz:
+                AddQuizWalkIntent(enabledIntents, session.Quiz);
+                break;
+            case Phase.GroupWork:
+                enabledIntents.Add(FacilitatorIntent.ReassignScribe);
+                break;
+            case Phase.ValuePresentation:
+                AddPresentationWalkIntents(enabledIntents, session);
+                break;
+            case Phase.FinalVoting:
+                AddVotingIntents(enabledIntents, session.Voting);
+                break;
+            case Phase.FinalPresentation:
+                AddRevealIntent(enabledIntents, session.Reveal);
+                break;
+        }
     }
 
     private static void AddPresentationWalkIntents(
@@ -49,6 +53,14 @@ internal static class FacilitatorEnabledIntents
         if (session.Presentation.PresentedValue is not null)
         {
             enabledIntents.Add(FacilitatorIntent.CorrectActionWording);
+        }
+    }
+
+    private static void AddRevealIntent(List<FacilitatorIntent> enabledIntents, WinnerReveal reveal)
+    {
+        if (!reveal.IsConcluded)
+        {
+            enabledIntents.Add(FacilitatorIntent.RevealNextValue);
         }
     }
 

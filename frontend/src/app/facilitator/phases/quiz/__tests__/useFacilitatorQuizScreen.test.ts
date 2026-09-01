@@ -45,6 +45,7 @@ function withQuizControl(overrides: Partial<FacilitatorQuizControlPort> = {}) {
       closeVoting: () => NEVER,
       startTiebreakRound: () => NEVER,
     },
+    conclusionControlPort: { revealNextValue: () => NEVER },
   });
   return quizControl;
 }

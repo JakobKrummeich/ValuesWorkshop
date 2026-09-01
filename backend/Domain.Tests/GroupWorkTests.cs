@@ -200,6 +200,7 @@ public class GroupWorkTests
             ),
             PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore([], null),
+            new WinnerReveal(),
             0
         );
     }

@@ -1,14 +1,16 @@
 import { z } from "zod";
 import { Phase } from "./phases";
 import {
-  conclusionViewSchema,
+  facilitatorConclusionViewSchema,
   facilitatorFormationViewSchema,
   facilitatorGroupsSchema,
   facilitatorQuizViewSchema,
   ownGroupViewSchema,
+  participantConclusionViewSchema,
   participantFormationViewSchema,
   ownSelectionViewSchema,
   participantQuizViewSchema,
+  presenterConclusionViewSchema,
   presentationViewSchema,
   presenterFormationViewSchema,
   presenterGroupsSchema,
@@ -31,6 +33,7 @@ export enum FacilitatorIntent {
   CorrectActionWording = "CorrectActionWording",
   CloseVoting = "CloseVoting",
   StartTiebreakRound = "StartTiebreakRound",
+  RevealNextValue = "RevealNextValue",
 }
 
 export enum ParticipantIntent {
@@ -104,7 +107,7 @@ export const participantWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.FinalPresentation),
     ...participantEnvelope,
-    conclusion: conclusionViewSchema,
+    conclusion: participantConclusionViewSchema,
   }),
 ]);
 
@@ -150,7 +153,7 @@ export const facilitatorWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.FinalPresentation),
     ...facilitatorEnvelope,
-    conclusion: conclusionViewSchema,
+    conclusion: facilitatorConclusionViewSchema,
   }),
 ]);
 
@@ -200,7 +203,7 @@ export const presenterWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.FinalPresentation),
     ...presenterEnvelope,
-    conclusion: conclusionViewSchema,
+    conclusion: presenterConclusionViewSchema,
   }),
 ]);
 

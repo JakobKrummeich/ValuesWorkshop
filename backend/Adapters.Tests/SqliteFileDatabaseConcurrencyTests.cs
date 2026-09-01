@@ -232,6 +232,7 @@ public sealed class SqliteFileDatabaseConcurrencyTests : IAsyncLifetime, IDispos
             FormationRecord.Restore(false, []),
             PresentationWalk.Restore(null, null, 0),
             VotingRounds.Restore([], null),
+            new WinnerReveal(),
             revision
         );
     }

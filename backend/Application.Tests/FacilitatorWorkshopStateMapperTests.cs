@@ -378,16 +378,19 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Final_presentation_state_carries_the_winning_values()
+    public void Final_presentation_state_carries_the_reveal_progress()
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalPresentation,
-            voting: TestVoting.AfterLocking([new ValueId("courage")])
+            voting: TestVoting.AfterLocking([new ValueId("wert-3")])
         );
 
-        Map(session)
+        var conclusion = Map(session)
             .ShouldBeOfType<FacilitatorFinalPresentationState>()
-            .Conclusion.WinningValueIds.ShouldBe(["courage"]);
+            .Conclusion;
+        conclusion.RevealedCount.ShouldBe(0);
+        conclusion.WinnerCount.ShouldBe(VotingRounds.RequiredWinningValueCount);
+        conclusion.IsConcluded.ShouldBeFalse();
     }
 
     private static FacilitatorWorkshopState Map(Session session, long revision = 1)

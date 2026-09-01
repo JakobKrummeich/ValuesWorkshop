@@ -215,7 +215,40 @@ public class FacilitatorEnabledIntentsTests
     [Fact]
     public void The_final_phase_enables_no_phase_advance_because_no_phase_follows()
     {
-        var session = SessionFixtures.InPhase(Phase.FinalPresentation);
+        var session = SessionFixtures.InPhase(
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            )
+        );
+
+        Map(session).EnabledIntents.ShouldNotContain(FacilitatorIntent.AdvancePhase);
+    }
+
+    [Fact]
+    public void Unrevealed_winners_enable_exactly_the_next_reveal()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            ),
+            reveal: WinnerReveal.Restore(VotingRounds.RequiredWinningValueCount - 1)
+        );
+
+        Map(session).EnabledIntents.ShouldBe([FacilitatorIntent.RevealNextValue]);
+    }
+
+    [Fact]
+    public void The_last_revealed_winner_leaves_nothing_enabled()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalPresentation,
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            ),
+            reveal: WinnerReveal.Restore(VotingRounds.RequiredWinningValueCount)
+        );
 
         Map(session).EnabledIntents.ShouldBeEmpty();
     }
