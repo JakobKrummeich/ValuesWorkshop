@@ -16,25 +16,11 @@ internal static class ConclusionViews
         );
     }
 
-    internal static FacilitatorConclusionView ForFacilitator(
-        Session session,
-        GroupViews groupViews,
-        IReadOnlyList<WorkshopValueView> catalogView
-    )
+    internal static FacilitatorConclusionView ForFacilitator(Session session)
     {
-        var winners = session
-            .Voting.RankedWinners(CatalogOrderOf(catalogView))
-            .Select(winner => new WinnerView(
-                winner.ValueId.Value,
-                groupViews.ValueViewOf(winner.ValueId).Text,
-                winner.Place,
-                winner.VoteCount
-            ))
-            .ToList();
-
         return new FacilitatorConclusionView(
-            winners,
             session.Reveal.RevealedCount,
+            VotingRounds.RequiredWinningValueCount,
             session.Reveal.IsConcluded
         );
     }

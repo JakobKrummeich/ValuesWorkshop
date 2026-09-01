@@ -378,7 +378,7 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
-    public void Final_presentation_state_carries_the_ranked_winners()
+    public void Final_presentation_state_carries_the_reveal_progress()
     {
         var session = SessionFixtures.InPhase(
             Phase.FinalPresentation,
@@ -388,8 +388,8 @@ public class FacilitatorWorkshopStateMapperTests
         var conclusion = Map(session)
             .ShouldBeOfType<FacilitatorFinalPresentationState>()
             .Conclusion;
-        conclusion.Winners.ShouldHaveSingleItem().ValueId.ShouldBe("wert-3");
         conclusion.RevealedCount.ShouldBe(0);
+        conclusion.WinnerCount.ShouldBe(VotingRounds.RequiredWinningValueCount);
         conclusion.IsConcluded.ShouldBeFalse();
     }
 

@@ -163,8 +163,6 @@ public sealed record FacilitatorVotingView(
 
 public sealed record PresenterVotingView(bool IsRoundOpen);
 
-public sealed record WinnerView(string ValueId, LocalizedTextView Text, int Place, int VoteCount);
-
 public sealed record RankedWinnerView(
     string ValueId,
     LocalizedTextView Text,
@@ -200,8 +198,8 @@ public sealed record ParticipantConclusionView(
 );
 
 public sealed record FacilitatorConclusionView(
-    IReadOnlyList<WinnerView> Winners,
     int RevealedCount,
+    int WinnerCount,
     bool IsConcluded
 );
 

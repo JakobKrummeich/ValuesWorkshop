@@ -49,8 +49,10 @@ participant names or ids anywhere. Reveal position survives restart.
     actions: [text] }], values: [{ valueId, text, actions: [text] }]
     (the full presented set, deal order), rounds: [{ roundNumber,
     allotment, tallies: [{ valueId, count }] }] }`.
-  - facilitator `conclusion`: `{ winners: [{ valueId, text, place,
-    voteCount }], revealedCount, isConcluded }` (sees ahead — quiz
+  - facilitator `conclusion`: `{ revealedCount, winnerCount, isConcluded }`
+    — progress only, no winner list: the facilitator does not see the
+    winners ahead and follows the reveal on the wall like everyone else
+    (review decision; deliberate deviation from the quiz sees-ahead
     precedent).
   - presenter `conclusion`: `{ revealedWinners: [{ valueId, text, place,
     voteCount, actions: [text] }], isConcluded }` — reveal order, current

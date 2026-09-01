@@ -11,7 +11,6 @@ export type {
   PresentationView,
   PresentedAction,
   PresenterPresentationView,
-  Winner,
   WinnerWithActions,
   WorkshopRecord,
   WorkshopValue,

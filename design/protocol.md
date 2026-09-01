@@ -432,7 +432,7 @@ join lobby shows back to the person who just signed in.
 | formation | phase 5 only. `subState` (`forming` \| `formed`); `forming`: `progress` (double 0..1); `formed`: `groups` (the block above) |
 | presentation | `presentingGroupName`, `presentedValueId`, `presentedActions: [{ actionId, text }]` — group-intro encoding as in the participant block; no position counter (`design/screens.md`) |
 | voting | `roundNumber`, `allotment`, `eligibleValues: [{valueId, text: {de, en}}]` (the full presented set that entered voting — constant across rounds, so `closedRoundTallies?` and `tiedValueIds?` keep their names while a tiebreak narrows the participants' round), `isRoundOpen`, `votedCount`, `participantCount` (roster size — the voted-count denominator), `closedRoundTallies?`, `tiedValueIds?` |
-| conclusion | `winners: [{ valueId, text: {de, en}, place, voteCount }]` (all five, places 1–5, `voteCount` the first-round tally — the facilitator sees ahead, quiz precedent), `revealedCount`, `isConcluded` |
+| conclusion | `revealedCount`, `winnerCount`, `isConcluded` — progress only. The facilitator does not see the winners ahead: the reveal is a shared ceremony, and the facilitator watches it on the wall like everyone else (deliberate deviation from the quiz sees-ahead precedent) |
 
 `enabledIntents: string[]` (§ 6.4) sits on the facilitator envelope — it is
 present on every variant, because every phase offers controls.

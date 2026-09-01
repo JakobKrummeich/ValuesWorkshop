@@ -72,20 +72,12 @@ public class ConclusionWireTests
     }
 
     [Fact]
-    public void The_facilitator_sees_all_winners_ahead_while_they_are_revealed()
+    public void The_facilitator_sees_only_the_reveal_progress_while_winners_are_revealed()
     {
         var conclusion = FacilitatorConclusion(RevealingSession(revealedCount: 2));
 
-        conclusion
-            .Winners.Select(winner => (winner.ValueId, winner.Place, winner.VoteCount))
-            .ShouldBe([
-                ("wert-2", 1, 6),
-                ("wert-4", 2, 5),
-                ("wert-5", 3, 4),
-                ("wert-3", 4, 3),
-                ("wert-1", 5, 2),
-            ]);
         conclusion.RevealedCount.ShouldBe(2);
+        conclusion.WinnerCount.ShouldBe(VotingRounds.RequiredWinningValueCount);
         conclusion.IsConcluded.ShouldBeFalse();
     }
 

@@ -31,7 +31,7 @@ export function useFacilitatorFinalPresentationScreen(
 
   return {
     revealedCount: state.conclusion.revealedCount,
-    winnerCount: state.conclusion.winners.length,
+    winnerCount: state.conclusion.winnerCount,
     isConcluded: state.conclusion.isConcluded,
     isRevealNextEnabled: state.enabledIntents.includes(
       FacilitatorIntent.RevealNextValue,

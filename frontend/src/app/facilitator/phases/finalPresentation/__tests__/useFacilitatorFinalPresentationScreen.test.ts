@@ -45,21 +45,12 @@ function withConclusionControl(conclusionControlPort: {
   });
 }
 
-function winner(place: number) {
-  return {
-    valueId: `wert-${place}`,
-    text: { de: `Wert ${place}`, en: `Value ${place}` },
-    place,
-    voteCount: 10 - place,
-  };
-}
-
 function conclusionView(
   overrides: Partial<FacilitatorConclusionView> = {},
 ): FacilitatorConclusionView {
   return {
-    winners: [winner(1), winner(2), winner(3), winner(4), winner(5)],
     revealedCount: 2,
+    winnerCount: 5,
     isConcluded: false,
     ...overrides,
   };

@@ -237,8 +237,6 @@ const winnerSchema = z.object({
   voteCount: z.int().nonnegative(),
 });
 
-export type Winner = z.infer<typeof winnerSchema>;
-
 const winnerWithActionsSchema = winnerSchema.extend({
   actions: z.array(z.string()),
 });
@@ -279,8 +277,8 @@ export const participantConclusionViewSchema = z.discriminatedUnion(
 );
 
 export const facilitatorConclusionViewSchema = z.object({
-  winners: z.array(winnerSchema),
   revealedCount: z.int().nonnegative(),
+  winnerCount: z.int().positive(),
   isConcluded: z.boolean(),
 });
 

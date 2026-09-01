@@ -1,54 +1,8 @@
 {
   "phase": 9,
   "conclusion": {
-    "winners": [
-      {
-        "valueId": "wert-1",
-        "text": {
-          "de": "Wert 1",
-          "en": "Value 1"
-        },
-        "place": 1,
-        "voteCount": 6
-      },
-      {
-        "valueId": "wert-3",
-        "text": {
-          "de": "Wert 3",
-          "en": "Value 3"
-        },
-        "place": 2,
-        "voteCount": 5
-      },
-      {
-        "valueId": "wert-2",
-        "text": {
-          "de": "Wert 2",
-          "en": "Value 2"
-        },
-        "place": 3,
-        "voteCount": 4
-      },
-      {
-        "valueId": "wert-4",
-        "text": {
-          "de": "Wert 4",
-          "en": "Value 4"
-        },
-        "place": 4,
-        "voteCount": 3
-      },
-      {
-        "valueId": "wert-6",
-        "text": {
-          "de": "Wert 6",
-          "en": "Value 6"
-        },
-        "place": 5,
-        "voteCount": 1
-      }
-    ],
     "revealedCount": 5,
+    "winnerCount": 5,
     "isConcluded": true
   },
   "revision": 42,
