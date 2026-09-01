@@ -27,7 +27,7 @@ export async function expectQuestionHeading(
   }
 }
 
-async function clickThroughQuestionControls(
+export async function clickThroughQuestionControls(
   facilitatorPage: Page,
   hasNextQuestion: boolean,
 ): Promise<void> {

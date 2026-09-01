@@ -640,7 +640,7 @@ mid-reveal (phase 9, `revealed_winner_count` persisted in Task 24); restart;
 all three roles resume exactly. Tab close/reopen for facilitator and
 participant in same phases.
 **Acceptance criteria:**
-- [ ] All kill/restart scenarios pass; no lost votes/actions/phase state
+- [x] All kill/restart scenarios pass; no lost votes/actions/phase state
 **Verification:** dedicated Playwright suite.
 **Dependencies:** 24. **Size:** M
 

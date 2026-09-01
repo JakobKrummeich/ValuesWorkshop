@@ -1,7 +1,9 @@
-import { execFile } from "node:child_process";
-import path from "node:path";
-import { promisify } from "node:util";
 import { test, expect, type BrowserContext, type Page } from "@playwright/test";
+import {
+  RECONNECT_TIMEOUT_MILLISECONDS,
+  RESTART_TEST_TIMEOUT_MILLISECONDS,
+  restartBackendAwaitingReconnect,
+} from "./support/backendRestart";
 import {
   openSessionAsFacilitator,
   submitOpenSessionForm,
@@ -16,11 +18,6 @@ const PARTICIPANT_ACCOUNT = "participant1";
 const OTHER_FACILITATOR_ACCOUNT = "participant2";
 const WRONG_PASSPHRASE = "not-the-facilitator-passphrase";
 const SESSION_NAME = "Playwright lifecycle session";
-const RECONNECT_TIMEOUT_MILLISECONDS = 90_000;
-const RESTART_TEST_TIMEOUT_MILLISECONDS = 180_000;
-
-const runCommand = promisify(execFile);
-const repositoryRoot = path.resolve(__dirname, "..");
 
 test.describe.serial("session lifecycle and reconnect", () => {
   let facilitatorContext: BrowserContext;
@@ -115,34 +112,12 @@ test.describe.serial("session lifecycle and reconnect", () => {
     test.setTimeout(RESTART_TEST_TIMEOUT_MILLISECONDS);
 
     const pages = [facilitatorPage, participantPage, presenterPage];
-    for (const page of pages) {
-      await markPage(page);
-    }
-
-    const droppedConnections = pages.map((page) =>
-      page.waitForFunction(
-        () =>
-          document.querySelector('[data-testid="connection"]')?.textContent !==
-          "Connected",
-        undefined,
-        { timeout: RECONNECT_TIMEOUT_MILLISECONDS },
-      ),
-    );
-
-    await restartBackend();
-
-    for (const droppedConnection of droppedConnections) {
-      await droppedConnection;
-    }
+    await restartBackendAwaitingReconnect(pages);
 
     for (const page of pages) {
-      await expect(page.getByTestId("connection")).toHaveText("Connected", {
-        timeout: RECONNECT_TIMEOUT_MILLISECONDS,
-      });
       await expect(page.getByTestId("phase")).toHaveText("Phase 2", {
         timeout: RECONNECT_TIMEOUT_MILLISECONDS,
       });
-      expect(await isPageStillMarked(page)).toBe(true);
     }
   });
 
@@ -186,22 +161,6 @@ test.describe.serial("session lifecycle and reconnect", () => {
     }
   });
 });
-
-async function restartBackend(): Promise<void> {
-  await runCommand(
-    "docker",
-    [
-      "compose",
-      "-f",
-      "docker-compose.dev.yml",
-      "-f",
-      "docker-compose.e2e.yml",
-      "restart",
-      "backend",
-    ],
-    { cwd: repositoryRoot },
-  );
-}
 
 function facilitatorPath(identity: string): string {
   return `/facilitator?sessionIdentity=${identity}`;

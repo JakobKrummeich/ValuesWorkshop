@@ -9,6 +9,26 @@ export async function eligibleValueIdsOf(page: Page): Promise<string[]> {
   return testIds.map((testId) => testId.replace("vote-card-", ""));
 }
 
+export function spreadBallotOf(
+  participantIndex: number,
+  voteTargetsByCardOrder: readonly number[],
+  eligibleValueIds: readonly string[],
+  allotment: number,
+): Map<string, number> {
+  const voteUnits = voteTargetsByCardOrder.flatMap((voteTarget, cardIndex) =>
+    Array.from({ length: voteTarget }, () => eligibleValueIds[cardIndex]),
+  );
+  const ownUnits = voteUnits.slice(
+    participantIndex * allotment,
+    (participantIndex + 1) * allotment,
+  );
+  const ballot = new Map<string, number>();
+  for (const valueId of ownUnits) {
+    ballot.set(valueId, (ballot.get(valueId) ?? 0) + 1);
+  }
+  return ballot;
+}
+
 export async function castBallot(
   page: Page,
   ballot: ReadonlyMap<string, number>,
