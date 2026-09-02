@@ -681,5 +681,9 @@ join QR code, `participant1` joins as Alice, both counters show 1. Screenshots
 regenerate via `pnpm demo:media`; seed data proofread found nothing.
 **Dependencies:** 27. **Size:** S
 
-### Checkpoint F — Done
-- [ ] Every SPEC.md success criterion checked off
+### Checkpoint F — Done ✅
+- [x] Every SPEC.md success criterion checked off — each criterion in
+  `SPEC.md` now cites its evidence (test, gate, or e2e); the "seeded demo
+  session" wording was corrected to the shipped reality (seeded content +
+  dev accounts, session opened in the UI — the Task 3 seed row was
+  disposable by design and replaced by the real persistence in Task 7).
