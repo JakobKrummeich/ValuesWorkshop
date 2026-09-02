@@ -655,14 +655,17 @@ fails on missing translation keys.
 locale flip pinned by the `localeFlip.spec.ts` e2e.
 **Dependencies:** 24. **Size:** S
 
-### Task 27: Full 9-phase e2e stability
+### Task 27: Full 9-phase e2e stability ✅
+**Spec:** `tasks/specs/27-e2e-stability.md` (approved via Lavish).
 **Description:** The multi-client e2e has grown with every workshop phase
 (Tasks 14–24) and already covers all 9 phases. This task hardens it: single
 run with facilitator + presenter + several participants, deflaked, repeatable
 (SPEC.md success criterion).
 **Acceptance criteria:**
-- [ ] Green in CI pipeline and no-mistakes gate, repeatably (3 consecutive runs)
-**Verification:** run 3×.
+- [x] Green in CI pipeline and no-mistakes gate, repeatably (3 consecutive runs)
+**Verification:** 3 consecutive `./scripts/ci-e2e.sh` runs green with
+`retries: 0`, `workers: 1` — 92 passed in 3.6m, 3.5m, 3.7m; no code change
+needed (suite already deflaked during Tasks 24–26).
 **Dependencies:** 25. **Size:** S
 
 ### Task 28: README + demo polish
