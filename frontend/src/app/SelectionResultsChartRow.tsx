@@ -6,7 +6,13 @@ import { cssCustomProperty } from "../shared/cssCustomProperty";
 import { useTranslation } from "./i18n/useTranslation";
 import styles from "./SelectionResultsChartRow.module.css";
 
-export function SelectionResultsChartRow({ row }: { row: SelectionResultRow }) {
+export function SelectionResultsChartRow({
+  row,
+  index,
+}: {
+  row: SelectionResultRow;
+  index: number;
+}) {
   const { language } = useTranslation();
 
   return (
@@ -16,6 +22,7 @@ export function SelectionResultsChartRow({ row }: { row: SelectionResultRow }) {
       }
       data-testid={`result-row-${row.valueId}`}
       data-top-value={row.isTopValue}
+      style={cssCustomProperty("--index", index)}
     >
       <span
         className={styles.label}

@@ -7,11 +7,14 @@
 }
 
 .heading {
-  color: var(--color-text);
-  font-size: var(--text-heading);
-  font-weight: var(--weight-bold);
+  margin: 0;
+  color: var(--color-highlight);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-eyebrow);
   line-height: var(--leading-tight);
   text-align: center;
+  text-transform: uppercase;
 }
 
 .emptyNote {
