@@ -1,44 +1,90 @@
 .screen {
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: var(--space-gap);
   align-items: center;
   justify-content: center;
   min-height: 0;
   padding: var(--space-gutter);
+  overflow: hidden;
+  isolation: isolate;
+  text-align: center;
 }
 
-.pulse {
-  display: grid;
-  place-items: center;
-  width: 7rem;
-  height: 7rem;
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
+.aurora {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  width: 60%;
+  aspect-ratio: 1;
   border-radius: var(--radius-full);
-  animation: pulse 2.5s ease-in-out infinite;
+  opacity: 0.55;
+  filter: blur(3rem);
+  animation: drift var(--aurora-loop) var(--ease-in-out) infinite alternate;
 }
 
-.icon {
-  width: 3rem;
-  height: 3rem;
+.blobOne {
+  --aurora-loop: 14s;
+
+  top: -15%;
+  left: -10%;
+  background: radial-gradient(circle, var(--color-glow-1), transparent 70%);
 }
 
-@keyframes pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
+.blobTwo {
+  --aurora-loop: 18s;
+
+  right: -15%;
+  bottom: -20%;
+  background: radial-gradient(circle, var(--color-glow-2), transparent 70%);
+  animation-direction: alternate-reverse;
+}
+
+.blobThree {
+  --aurora-loop: 22s;
+
+  top: 30%;
+  left: 35%;
+  width: 45%;
+  background: radial-gradient(circle, var(--color-glow-3), transparent 70%);
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.body {
+  max-width: 28em;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
   }
 
-  50% {
-    transform: scale(1.1);
-    opacity: 0.7;
+  to {
+    transform: translate3d(18%, 12%, 0) scale(1.15);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pulse {
+  .blob {
     animation: none;
   }
 }

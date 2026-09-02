@@ -16,7 +16,12 @@ export function ParticipantFinalPresentationScreen({
   const model = useParticipantFinalPresentationScreen(state.conclusion);
 
   if (!model.isConcluded) {
-    return <WaitingScreen />;
+    return (
+      <WaitingScreen
+        heading={MessageKey.WaitingEyesUpFront}
+        body={MessageKey.WaitingForReveal}
+      />
+    );
   }
 
   return (

@@ -119,6 +119,30 @@ export const generalMessages = {
     [Language.German]: "Schau auf die Präsentationswand",
     [Language.English]: "Look at the presenter wall",
   },
+  [MessageKey.WaitingEyesUpFront]: {
+    [Language.German]: "Blick nach vorn",
+    [Language.English]: "Eyes up front",
+  },
+  [MessageKey.WaitingResultsOnScreen]: {
+    [Language.German]: "Die Ergebnisse sind vorn zu sehen.",
+    [Language.English]: "The results are on the screen.",
+  },
+  [MessageKey.WaitingListenToGroups]: {
+    [Language.German]: "Hört den Gruppen zu",
+    [Language.English]: "Listen to the groups",
+  },
+  [MessageKey.WaitingGroupPresents]: {
+    [Language.German]: "{group} stellt {value} vor.",
+    [Language.English]: "{group} is presenting {value}.",
+  },
+  [MessageKey.WaitingOwnGroupUp]: {
+    [Language.German]: "Eure Gruppe ist dran!",
+    [Language.English]: "Your group is up!",
+  },
+  [MessageKey.WaitingForReveal]: {
+    [Language.German]: "Gleich werden die Sieger enthüllt.",
+    [Language.English]: "The winners are about to be revealed.",
+  },
   [MessageKey.OpenSessionTitle]: {
     [Language.German]: "ValuesWorkshop · Workshop eröffnen",
     [Language.English]: "ValuesWorkshop · Open a session",

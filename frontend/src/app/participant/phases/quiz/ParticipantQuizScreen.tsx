@@ -1,6 +1,7 @@
 "use client";
 
 import { localizedText } from "../../../../domain/i18n/localizedText";
+import { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { QuizQuestion } from "../../../QuizQuestion";
@@ -22,7 +23,7 @@ export function ParticipantQuizScreen({
     useParticipantQuizScreen(state.quiz);
 
   if (view.kind === QuizScreenKind.Waiting) {
-    return <WaitingScreen />;
+    return <WaitingScreen heading={MessageKey.WaitingEyesUpFront} />;
   }
 
   return (
