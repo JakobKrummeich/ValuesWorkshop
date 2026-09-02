@@ -1,0 +1,72 @@
+.confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  top: -1em;
+  left: calc(var(--x) * 1%);
+  width: 0.5em;
+  height: 0.8em;
+  opacity: 0.9;
+  animation: fall 2s var(--ease-in-out) both;
+  animation-delay: calc(var(--delay) * 1s);
+}
+
+.particle[data-hue="0"] {
+  background: var(--color-animal-otter);
+}
+
+.particle[data-hue="1"] {
+  background: var(--color-animal-fuchs);
+}
+
+.particle[data-hue="2"] {
+  background: var(--color-animal-eule);
+}
+
+.particle[data-hue="3"] {
+  background: var(--color-animal-igel);
+}
+
+.particle[data-hue="4"] {
+  background: var(--color-animal-dachs);
+}
+
+.particle[data-hue="5"] {
+  background: var(--color-animal-luchs);
+}
+
+.particle[data-hue="6"] {
+  background: var(--color-animal-biber);
+}
+
+.particle[data-hue="7"] {
+  background: var(--color-animal-marder);
+}
+
+.particle[data-hue="8"] {
+  background: var(--color-accent);
+}
+
+@keyframes fall {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0turn);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(calc(var(--drift) * 1em), calc(100vh + 2em), 0)
+      rotate(calc(var(--spin) * 1turn));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti {
+    display: none;
+  }
+}
