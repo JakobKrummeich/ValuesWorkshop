@@ -111,6 +111,22 @@ describe("phase view", () => {
 
     const { container } = render(phaseView());
 
-    expect(container).toBeEmptyDOMElement();
+    expect(container.firstElementChild).toBeEmptyDOMElement();
+  });
+
+  it("remounts the entering wrapper when the phase changes", () => {
+    phaseState.mockReturnValue(joinState);
+    const { container, rerender } = render(phaseView());
+    const joinWrapper = container.firstElementChild;
+
+    phaseState.mockReturnValue({
+      revision: 5,
+      phase: Phase.ValueSelection,
+      participantCount: 1,
+      selection: emptySelection,
+    });
+    rerender(phaseView());
+
+    expect(container.firstElementChild).not.toBe(joinWrapper);
   });
 });

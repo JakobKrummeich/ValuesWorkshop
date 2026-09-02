@@ -4,6 +4,7 @@ import type { ComponentType } from "react";
 import type { Phase } from "../domain/phases";
 import type { SessionStatePort } from "../domain/ports/sessionStatePort";
 import type { PhasedWorkshopState } from "../domain/workshopState";
+import styles from "./PhaseView.module.css";
 import { usePhaseView } from "./usePhaseView";
 
 export type PhaseComponents<TState extends PhasedWorkshopState> = Readonly<{
@@ -29,5 +30,9 @@ export function PhaseView<TState extends PhasedWorkshopState>({
     state: TState;
   }>;
 
-  return <CurrentPhase key={state.phase} state={state} />;
+  return (
+    <div key={state.phase} className={styles.phase}>
+      <CurrentPhase state={state} />
+    </div>
+  );
 }
