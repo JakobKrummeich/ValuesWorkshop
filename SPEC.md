@@ -39,7 +39,7 @@ verified by a multi-client Playwright e2e test.
 | Architecture | Hexagonal (ports & adapters) in FE and BE, enforced by arch tests: ArchUnitNET (BE), dependency-cruiser (FE) |
 | Quality gates | Cyclomatic complexity: eslint `complexity` (FE), CA1502 as error (BE). Duplication: jscpd threshold over FE+BE. Formatting: Prettier check (TS/CSS), CSharpier check (C#). Unit coverage: ≥ 80 % lines, FE (Jest `coverageThreshold`) and BE (coverlet threshold) each — hard gate. All deterministic. |
 | CI/CD | GitHub Actions on PRs to `main`: build, unit tests, lint, arch tests, complexity, duplication, coverage (≥ 80 % lines FE+BE), e2e. `main` protected — merge only on green pipeline. |
-| Deploy | Local only: one-command `docker compose up` with seeded demo session. No public deploy. README gets screenshots of all three screens. |
+| Deploy | Local only: one-command `docker compose up` with seeded demo content (bilingual values/quiz/animals catalogs, 31 dev OIDC accounts); the facilitator opens the session in the UI. No public deploy. README gets screenshots of all three screens. |
 
 ## Domain Model
 
@@ -179,17 +179,42 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
 
 ## Success Criteria
 
-- [ ] `docker compose up` → full workshop playable locally with seeded demo.
-- [ ] Multi-client Playwright e2e passes: 9 phases end-to-end.
-- [ ] Kill & restart backend mid-workshop → session resumes exactly.
-- [ ] CP-SAT assignment returns within 3 s for 30 participants / ~10 values.
-- [ ] Votes anonymous: no voter↔vote linkage in DB or PDF.
-- [ ] PDF downloads in final phase with votes, actions, winners.
-- [ ] stylelint fails on raw color/spacing values outside token files.
-- [ ] de + en locales complete.
-- [ ] PR pipeline runs all deterministic gates (build, tests, lint, format,
+- [x] `docker compose up` → full workshop playable locally with seeded demo
+      content — README "Run the demo", verified by a fresh-clone dry run
+      (Task 28).
+- [x] Multi-client Playwright e2e passes: 9 phases end-to-end —
+      `e2e/workshopAtScale.spec.ts` (30 participants, tiebreak, PDF), three
+      consecutive green runs recorded in Task 27.
+- [x] Kill & restart backend mid-workshop → session resumes exactly —
+      `e2e/restartRecovery.spec.ts` restarts the container mid-quiz,
+      mid-group-work, mid-voting, and mid-reveal.
+- [x] CP-SAT assignment returns within 3 s for 30 participants / ~10 values —
+      `CpSatGroupSolverTests.Thirty_participants_solve_within_three_seconds`.
+- [x] Votes anonymous: no voter↔vote linkage in DB or PDF —
+      `VotingAnonymityTests.No_vote_table_carries_a_participant_column`
+      (`voted_participants` records only who has voted, never what); the
+      at-scale e2e asserts no participant name in the PDF text.
+- [x] PDF downloads in final phase with votes, actions, winners — at-scale
+      e2e parses the download and asserts winners, all actions, votes per
+      round.
+- [x] stylelint fails on raw color/spacing values outside token files —
+      `frontend/stylelint.config.mjs` (`declaration-strict-value`,
+      `color-no-hex`, `unit-disallowed-list`; `tokens*.css` exempt).
+- [x] de + en locales complete — `Record<MessageKey, Message>` fails the FE
+      build on a missing key or language; `translate.test.ts`; backend
+      catalog tests require both locales per shipped entry; locale flip
+      pinned by `e2e/localeFlip.spec.ts`.
+- [x] PR pipeline runs all deterministic gates (build, tests, lint, format,
       arch, complexity, duplication, coverage ≥ 80 % lines FE+BE, e2e);
-      `main` merge blocked unless green.
+      `main` merge blocked unless green — `.github/workflows/ci.yml` job
+      `ci`: FE lint (eslint `complexity` 7, stylelint, Prettier, tsc,
+      dependency-cruiser, audit), FE build, Jest with coverage threshold,
+      BE build with analyzers (VW1001 complexity, ArchUnitNET in tests),
+      CSharpier, coverlet threshold, vulnerability scan, jscpd; job `e2e`:
+      `scripts/ci-e2e.sh`. `scripts/ci-lint.sh` and `scripts/ci-test.sh`
+      mirror them locally. The `main` ruleset requires a pull request with
+      one approval and the `ci` status check, strict (up to date with
+      `main`); the `e2e` job runs on every PR but is not a required check.
 
 ## Open Questions
 
