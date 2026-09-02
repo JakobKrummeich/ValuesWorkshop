@@ -1,0 +1,36 @@
+.counter {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-gap);
+  margin: 0;
+  color: var(--color-text);
+}
+
+.value {
+  font-family: var(--font-display);
+  font-size: var(--text-counter);
+  font-variant-numeric: tabular-nums;
+  font-variation-settings: "opsz" 144;
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.02em;
+  line-height: var(--leading-display);
+}
+
+.suffix {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-eyebrow);
+  line-height: var(--leading-tight);
+  text-transform: uppercase;
+}
+
+.wall .value {
+  text-shadow: 0 0 var(--glow-radius) var(--color-accent-soft);
+}
+
+.phone,
+.laptop {
+  gap: var(--space-tight);
+}

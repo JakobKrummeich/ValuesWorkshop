@@ -121,6 +121,15 @@ function resolveReferences(
   });
 }
 
+export function baseTokenValue(token: string): string {
+  const value = declarationsOf(baseTokenFile).get(token);
+  if (value === undefined) {
+    throw new Error(`${baseTokenFile} does not define ${token}`);
+  }
+
+  return value;
+}
+
 export function surfaceColors(
   surfaceFileName: string,
 ): (token: string) => Rgba {

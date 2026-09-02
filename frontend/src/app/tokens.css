@@ -75,6 +75,8 @@
 
   --base-border-hairline: 1px;
   --base-border-ring: 2px;
+  --base-border-rule: 3px;
+  --base-glow-radius: 32px;
 
   --base-radius-sm: 8px;
   --base-radius-md: 14px;
@@ -181,6 +183,8 @@
   --progress-track-height: 48px;
   --border-hairline: var(--base-border-hairline);
   --border-ring: var(--base-border-ring);
+  --border-rule: var(--base-border-rule);
+  --glow-radius: var(--base-glow-radius);
 
   --radius-sm: var(--base-radius-sm);
   --radius-md: var(--base-radius-md);
