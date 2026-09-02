@@ -1,0 +1,71 @@
+.ledger {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.action {
+  display: flex;
+  gap: var(--space-gap);
+  align-items: flex-start;
+  min-width: 0;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.action::before {
+  flex: none;
+  width: var(--border-rule);
+  height: 1.2em;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  content: "";
+}
+
+.rows .action {
+  padding: var(--space-tight) 0;
+  border-top: var(--border-hairline) solid var(--color-border);
+}
+
+.slabs {
+  gap: var(--space-tight);
+}
+
+.slabs .action {
+  padding: var(--space-tight) var(--space-gap);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-size: var(--text-action);
+  font-weight: var(--weight-bold);
+}
+
+.staggered .action {
+  animation: slide var(--motion-base) var(--ease-out) backwards;
+  animation-delay: calc(var(--index, 0) * var(--motion-stagger));
+}
+
+.rows .action:first-child {
+  border-top: 0;
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .staggered .action {
+    animation: none;
+  }
+}
