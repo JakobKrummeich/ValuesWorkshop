@@ -1,5 +1,6 @@
 "use client";
 
+import { LanguageSwitcher } from "../i18n/LanguageSwitcher";
 import { PhaseView } from "../PhaseView";
 import { SessionStatusBanner } from "../SessionStatusBanner";
 import { usePresenterDependencies } from "./dependencies";
@@ -11,6 +12,7 @@ export default function PresenterHome() {
 
   return (
     <main className={styles.page}>
+      <LanguageSwitcher />
       <SessionStatusBanner sessionStatePort={sessionStatePort} />
       <PhaseView
         sessionStatePort={sessionStatePort}

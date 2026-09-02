@@ -319,8 +319,8 @@ circle) so attention goes to the presenter wall — no chart, no counts.
 │ 6 cards per page, each mirroring the  │
 │ participant card; cycles every 7 s,   │
 │ static single page when all fit —     │
-│ no heading, no language switcher, no  │
-│ page indicator                        │
+│ no heading, no page indicator;        │
+│ language switcher present              │
 └───────────────────────────────────────┘
 ```
 

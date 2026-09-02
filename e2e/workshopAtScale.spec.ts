@@ -61,7 +61,7 @@ const WORST_CASE_CARD_INDEX = 2;
 const MAXIMAL_ACTION_LENGTH = 200;
 const CORRECTED_ACTION_TEXT = "We start every meeting with a check-in";
 const REVEAL_SCREEN_PLACES = [5, 4, 3, 2];
-const PDF_FILE_NAME = "workshop-record.pdf";
+const PDF_FILE_NAME = "values-workshop-record.pdf";
 
 function maximalLengthActionTextOf(actionNumber: number): string {
   const opening = `Worst case action ${actionNumber} of the winning value `;
