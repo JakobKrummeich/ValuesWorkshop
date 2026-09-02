@@ -1,17 +1,15 @@
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) 3fr auto;
-  gap: var(--space-gap);
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid;
   align-items: center;
   text-align: left;
 }
 
 .label {
-  overflow: hidden;
   color: var(--color-text-muted);
   font-size: var(--text-body);
   line-height: var(--leading-tight);
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 

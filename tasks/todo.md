@@ -668,12 +668,17 @@ run with facilitator + presenter + several participants, deflaked, repeatable
 needed (suite already deflaked during Tasks 24–26).
 **Dependencies:** 25. **Size:** S
 
-### Task 28: README + demo polish
+### Task 28: README + demo polish ✅
+**Spec:** `tasks/specs/28-readme-demo-polish.md` (approved via Lavish).
 **Description:** README with setup, one-command demo, GIF/screenshots of all
 three screens (portfolio substitute for live deploy); seed data polish.
 **Acceptance criteria:**
-- [ ] Fresh-clone-to-running-demo works following README only
-**Verification:** clean checkout dry run.
+- [x] Fresh-clone-to-running-demo works following README only
+**Verification:** fresh `git clone` of the branch into a temp dir, the README
+compose command verbatim, then a Playwright probe following the "Run the
+demo" steps: facilitator signs in and opens a session, the wall shows the
+join QR code, `participant1` joins as Alice, both counters show 1. Screenshots
+regenerate via `pnpm demo:media`; seed data proofread found nothing.
 **Dependencies:** 27. **Size:** S
 
 ### Checkpoint F — Done

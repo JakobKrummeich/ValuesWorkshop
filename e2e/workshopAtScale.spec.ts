@@ -2,7 +2,6 @@ import { readFile } from "node:fs/promises";
 import {
   test,
   expect,
-  type Browser,
   type BrowserContext,
   type Locator,
   type Page,
@@ -15,23 +14,26 @@ import {
   eligibleValueIdsOf,
   spreadBallotOf,
 } from "./support/finalVoting";
-import { assignedValueIdsOf } from "./support/groupWork";
+import { assignedValueIdsOf, currentScribeNameOf } from "./support/groupWork";
 import { openSignedIn } from "./support/oidcLogin";
 import {
   participantAccounts,
   accountNameOf,
   type ParticipantAccount,
 } from "./support/participantAccounts";
-import { openParticipantSession } from "./support/participantSession";
+import {
+  openParticipantSession,
+  withParticipant,
+} from "./support/participantSession";
 import {
   advancePhaseButton,
   fastForwardQuizAsFacilitatorAlone,
 } from "./support/quizFastForward";
 import { submitValueSelection } from "./support/valueSelection";
+import { WALL_VIEWPORT } from "./support/viewports";
 
 const FACILITATOR_ACCOUNT = "facilitator";
 const SESSION_NAME = "Playwright workshop at scale";
-const WALL_VIEWPORT = { width: 1920, height: 1080 };
 
 const PARTICIPANT_COUNT = 30;
 const SIGN_IN_BATCH_SIZE = 6;
@@ -120,35 +122,8 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     await presenterContext.close();
   });
 
-  async function withParticipant(
-    browser: Browser,
-    accountName: string,
-    interact: (page: Page) => Promise<void>,
-  ): Promise<void> {
-    const { context, page } = await openParticipantSession(
-      browser,
-      sessionIdentity,
-      accountName,
-    );
-    try {
-      await interact(page);
-    } finally {
-      await context.close();
-    }
-  }
-
   function scribeSelect(animalId: string): Locator {
     return facilitatorPage.getByTestId(`scribe-select-${animalId}`);
-  }
-
-  async function currentScribeNameOf(animalId: string): Promise<string> {
-    const scribeName = await scribeSelect(animalId)
-      .locator("option:checked")
-      .textContent();
-    if (scribeName === null) {
-      throw new Error(`The ${animalId} group shows no scribe`);
-    }
-    return scribeName.trim();
   }
 
   async function wallCardCounts(wallPage: Page) {
@@ -187,12 +162,17 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     for (const batch of inBatches(workshopParticipants)) {
       await Promise.all(
         batch.map((account) =>
-          withParticipant(browser, account.accountName, async (page) => {
-            await expect(page.getByTestId("own-display-name")).toHaveText(
-              `You are in, ${account.displayName}.`,
-              { timeout: 15_000 },
-            );
-          }),
+          withParticipant(
+            browser,
+            sessionIdentity,
+            account.accountName,
+            async (page) => {
+              await expect(page.getByTestId("own-display-name")).toHaveText(
+                `You are in, ${account.displayName}.`,
+                { timeout: 15_000 },
+              );
+            },
+          ),
         ),
       );
     }
@@ -234,7 +214,12 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     for (const batch of inBatches(workshopParticipants)) {
       await Promise.all(
         batch.map((account) =>
-          withParticipant(browser, account.accountName, submitValueSelection),
+          withParticipant(
+            browser,
+            sessionIdentity,
+            account.accountName,
+            submitValueSelection,
+          ),
         ),
       );
     }
@@ -299,7 +284,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
       await expect(
         facilitatorPage.getByTestId(`group-status-${animalId}`),
       ).toHaveText("Editing");
-      expect(await currentScribeNameOf(animalId)).not.toBe("");
+      expect(await currentScribeNameOf(facilitatorPage, animalId)).not.toBe("");
     }
   });
 
@@ -321,6 +306,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     const reassignedSelect = scribeSelect(REASSIGNED_GROUP_ANIMAL_ID);
     const previousScribeIdentity = await reassignedSelect.inputValue();
     const previousScribeName = await currentScribeNameOf(
+      facilitatorPage,
       REASSIGNED_GROUP_ANIMAL_ID,
     );
 
@@ -388,51 +374,58 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     let presentationPosition = 0;
     for (const animalId of EXPECTED_GROUP_ANIMAL_IDS) {
       const scribeAccountName = accountNameOf(
-        await currentScribeNameOf(animalId),
+        await currentScribeNameOf(facilitatorPage, animalId),
       );
 
-      await withParticipant(browser, scribeAccountName, async (page) => {
-        await expect(page.getByTestId("group-work-card")).toBeVisible({
-          timeout: 15_000,
-        });
-        await expect(page.getByTestId("add-action-button")).toBeVisible();
+      await withParticipant(
+        browser,
+        sessionIdentity,
+        scribeAccountName,
+        async (page) => {
+          await expect(page.getByTestId("group-work-card")).toBeVisible({
+            timeout: 15_000,
+          });
+          await expect(page.getByTestId("add-action-button")).toBeVisible();
 
-        const valueIds = await assignedValueIdsOf(page);
-        expect(valueIds.length).toBeGreaterThan(0);
-        assignedValueCounts.push(valueIds.length);
+          const valueIds = await assignedValueIdsOf(page);
+          expect(valueIds.length).toBeGreaterThan(0);
+          assignedValueCounts.push(valueIds.length);
 
-        for (const valueId of valueIds) {
-          const actionTexts =
-            presentationPosition === WORST_CASE_CARD_INDEX
-              ? worstCaseActionTexts
-              : [`Action for ${valueId}`];
-          if (presentationPosition === WORST_CASE_CARD_INDEX) {
-            worstCaseValueId = valueId;
+          for (const valueId of valueIds) {
+            const actionTexts =
+              presentationPosition === WORST_CASE_CARD_INDEX
+                ? worstCaseActionTexts
+                : [`Action for ${valueId}`];
+            if (presentationPosition === WORST_CASE_CARD_INDEX) {
+              worstCaseValueId = valueId;
+            }
+            presentationPosition += 1;
+
+            await page.getByTestId(`value-tab-${valueId}`).click();
+            const actionInputs = page.getByTestId(/^action-input-/);
+            for (const [actionIndex, actionText] of actionTexts.entries()) {
+              await page.getByTestId("add-action-button").click();
+              await expect(actionInputs).toHaveCount(actionIndex + 1);
+              await actionInputs.nth(actionIndex).fill(actionText);
+            }
           }
-          presentationPosition += 1;
 
-          await page.getByTestId(`value-tab-${valueId}`).click();
-          const actionInputs = page.getByTestId(/^action-input-/);
-          for (const [actionIndex, actionText] of actionTexts.entries()) {
-            await page.getByTestId("add-action-button").click();
-            await expect(actionInputs).toHaveCount(actionIndex + 1);
-            await actionInputs.nth(actionIndex).fill(actionText);
-          }
-        }
+          await expect(
+            page.getByTestId("submit-group-work-button"),
+          ).toBeEnabled({
+            timeout: 5_000,
+          });
+          await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
 
-        await expect(page.getByTestId("submit-group-work-button")).toBeEnabled({
-          timeout: 5_000,
-        });
-        await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
-
-        await page.getByTestId("submit-group-work-button").click();
-        await expect(page.getByTestId("reopen-button")).toBeVisible({
-          timeout: 5_000,
-        });
-        await expect(
-          facilitatorPage.getByTestId(`group-status-${animalId}`),
-        ).toHaveText("Submitted", { timeout: 5_000 });
-      });
+          await page.getByTestId("submit-group-work-button").click();
+          await expect(page.getByTestId("reopen-button")).toBeVisible({
+            timeout: 5_000,
+          });
+          await expect(
+            facilitatorPage.getByTestId(`group-status-${animalId}`),
+          ).toHaveText("Submitted", { timeout: 5_000 });
+        },
+      );
     }
 
     expect(assignedValueCounts.reduce((sum, count) => sum + count, 0)).toBe(
@@ -467,6 +460,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
 
     await withParticipant(
       browser,
+      sessionIdentity,
       workshopParticipants[0].accountName,
       async (page) => {
         await expect(page.getByTestId("waiting-screen")).toBeVisible({
@@ -531,6 +525,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
 
     await withParticipant(
       browser,
+      sessionIdentity,
       workshopParticipants[0].accountName,
       async (page) => {
         eligibleValueIds = await eligibleValueIdsOf(page);
@@ -558,13 +553,18 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     for (const [batchIndex, batch] of batches.entries()) {
       await Promise.all(
         batch.map((account) =>
-          withParticipant(browser, account.accountName, async (page) => {
-            await castBallot(
-              page,
-              mainRoundBallotOf(workshopParticipants.indexOf(account)),
-              MAIN_ROUND_ALLOTMENT,
-            );
-          }),
+          withParticipant(
+            browser,
+            sessionIdentity,
+            account.accountName,
+            async (page) => {
+              await castBallot(
+                page,
+                mainRoundBallotOf(workshopParticipants.indexOf(account)),
+                MAIN_ROUND_ALLOTMENT,
+              );
+            },
+          ),
         ),
       );
       if (batchIndex === 0) {
@@ -621,20 +621,25 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     for (const batch of inBatches(workshopParticipants)) {
       await Promise.all(
         batch.map((account) =>
-          withParticipant(browser, account.accountName, async (page) => {
-            await expect(page.getByTestId(/^vote-card-/)).toHaveCount(2, {
-              timeout: 15_000,
-            });
-            await expect(page.getByTestId("submit-votes-button")).toHaveText(
-              "Submit 1 vote",
-            );
-            const participantIndex = workshopParticipants.indexOf(account);
-            const chosenValueId =
-              participantIndex < TIEBREAK_WINNER_VOTES
-                ? firstTiedValueId
-                : secondTiedValueId;
-            await castBallot(page, new Map([[chosenValueId, 1]]), 1);
-          }),
+          withParticipant(
+            browser,
+            sessionIdentity,
+            account.accountName,
+            async (page) => {
+              await expect(page.getByTestId(/^vote-card-/)).toHaveCount(2, {
+                timeout: 15_000,
+              });
+              await expect(page.getByTestId("submit-votes-button")).toHaveText(
+                "Submit 1 vote",
+              );
+              const participantIndex = workshopParticipants.indexOf(account);
+              const chosenValueId =
+                participantIndex < TIEBREAK_WINNER_VOTES
+                  ? firstTiedValueId
+                  : secondTiedValueId;
+              await castBallot(page, new Map([[chosenValueId, 1]]), 1);
+            },
+          ),
         ),
       );
     }
@@ -695,10 +700,25 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     }));
     expect(overflow).toEqual({ horizontal: 0, vertical: 0 });
 
-    const clippedHeight = await presenterPage
+    const revealBox = await presenterPage
       .getByTestId("winner-reveal")
-      .evaluate((element) => element.scrollHeight - element.clientHeight);
-    expect(clippedHeight).toBe(0);
+      .evaluate((element) => {
+        const wall = element.parentElement;
+        if (wall === null) {
+          throw new Error("The winner reveal is not mounted on the wall");
+        }
+        const wallStyle = getComputedStyle(wall);
+        const wallContentWidth =
+          wall.clientWidth -
+          parseFloat(wallStyle.paddingLeft) -
+          parseFloat(wallStyle.paddingRight);
+        return {
+          clippedHeight: element.scrollHeight - element.clientHeight,
+          spansTheWall:
+            element.getBoundingClientRect().width === wallContentWidth,
+        };
+      });
+    expect(revealBox).toEqual({ clippedHeight: 0, spansTheWall: true });
   }
 
   test("the facilitator reveals places five down to two on the wall", async ({
@@ -745,11 +765,16 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     }
 
     for (const account of [workshopParticipants[0], workshopParticipants[29]]) {
-      await withParticipant(browser, account.accountName, async (page) => {
-        await expect(page.getByTestId("waiting-screen")).toBeVisible({
-          timeout: 15_000,
-        });
-      });
+      await withParticipant(
+        browser,
+        sessionIdentity,
+        account.accountName,
+        async (page) => {
+          await expect(page.getByTestId("waiting-screen")).toBeVisible({
+            timeout: 15_000,
+          });
+        },
+      );
     }
   });
 
@@ -812,6 +837,7 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     let pdfText = "";
     await withParticipant(
       browser,
+      sessionIdentity,
       workshopParticipants[0].accountName,
       async (page) => {
         await expect(page.getByTestId("workshop-concluded")).toBeVisible({

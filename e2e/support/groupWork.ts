@@ -12,3 +12,17 @@ export async function assignedValueIdsOf(page: Page): Promise<string[]> {
   }
   return ids;
 }
+
+export async function currentScribeNameOf(
+  facilitatorPage: Page,
+  animalId: string,
+): Promise<string> {
+  const scribeName = await facilitatorPage
+    .getByTestId(`scribe-select-${animalId}`)
+    .locator("option:checked")
+    .textContent();
+  if (scribeName === null) {
+    throw new Error(`The ${animalId} group shows no scribe`);
+  }
+  return scribeName.trim();
+}

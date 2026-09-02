@@ -6,10 +6,11 @@
 }
 
 .column {
-  display: flex;
+  display: grid;
   flex: 1;
-  flex-direction: column;
+  grid-template-columns: minmax(max-content, 2fr) 3fr auto;
   gap: var(--space-gap);
+  align-content: start;
   min-width: 0;
 }
 
