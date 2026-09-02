@@ -3,7 +3,7 @@ import {
   type ParticipantGroupFormationState,
 } from "../../../../domain/workshopState";
 import { FormationProgressBar } from "../../../FormationProgressBar";
-import { GroupCard } from "../../../GroupCard";
+import { GroupCard, GroupCardVariant } from "../../../GroupCard";
 import styles from "./ParticipantGroupFormationScreen.module.css";
 
 export function ParticipantGroupFormationScreen({
@@ -25,6 +25,7 @@ export function ParticipantGroupFormationScreen({
         name={formation.ownGroup.name}
         memberDisplayNames={formation.ownGroup.memberDisplayNames}
         assignedValues={formation.ownGroup.assignedValues}
+        variant={GroupCardVariant.Phone}
       />
     </section>
   );

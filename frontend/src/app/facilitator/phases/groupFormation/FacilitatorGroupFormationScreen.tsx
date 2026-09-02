@@ -5,7 +5,7 @@ import {
   type FacilitatorGroupFormationState,
 } from "../../../../domain/workshopState";
 import { FormationProgressBar } from "../../../FormationProgressBar";
-import { GroupCard } from "../../../GroupCard";
+import { GroupCard, GroupCardVariant } from "../../../GroupCard";
 import styles from "./FacilitatorGroupFormationScreen.module.css";
 
 export function FacilitatorGroupFormationScreen({
@@ -24,7 +24,7 @@ export function FacilitatorGroupFormationScreen({
   return (
     <section className={styles.screen}>
       <ul className={styles.groups}>
-        {formation.groups.map((group) => (
+        {formation.groups.map((group, index) => (
           <li key={group.name.animalId}>
             <GroupCard
               name={group.name}
@@ -32,6 +32,8 @@ export function FacilitatorGroupFormationScreen({
                 (member) => member.displayName,
               )}
               assignedValues={group.assignedValues}
+              variant={GroupCardVariant.Paper}
+              index={index}
             />
           </li>
         ))}

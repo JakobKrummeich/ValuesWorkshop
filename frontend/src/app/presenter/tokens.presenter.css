@@ -80,9 +80,6 @@
   --control-height: 44px;
   --progress-track-height: 64px;
 
-  --text-group-card-name: var(--base-text-32);
-  --text-group-card-chip: var(--base-text-20);
-  --space-group-card-padding: var(--base-space-24);
   --text-reveal-place: clamp(var(--base-text-24), 4vh, 3.375rem);
   --text-reveal-value: clamp(var(--base-text-40), 10vh, 8.5rem);
   --text-reveal-votes: clamp(var(--base-text-20), 3vh, 2.375rem);
