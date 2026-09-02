@@ -9,8 +9,6 @@ import { buildWorkshopRecord } from "../../../../domain/workshopRecordModel";
 import type { ParticipantConclusionView } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 
-const RECORD_FILE_NAME = "workshop-record.pdf";
-
 export type ParticipantFinalPresentationModel =
   | { isConcluded: false }
   | {
@@ -23,7 +21,7 @@ export type ParticipantFinalPresentationModel =
 export function useParticipantFinalPresentationScreen(
   conclusion: ParticipantConclusionView,
 ): ParticipantFinalPresentationModel {
-  const { language } = useTranslation();
+  const { language, translate } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadFailedMessage, setDownloadFailedMessage] =
     useState<MessageKey | null>(null);
@@ -46,7 +44,11 @@ export function useParticipantFinalPresentationScreen(
     subscriptionRef.current = renderWorkshopRecordPdf(
       buildWorkshopRecord(record, language),
     ).subscribe({
-      next: (blob) => downloadBlob(blob, RECORD_FILE_NAME),
+      next: (blob) =>
+        downloadBlob(
+          blob,
+          translate(MessageKey.FinalPresentationRecordFileName),
+        ),
       error: () => {
         setIsDownloading(false);
         setDownloadFailedMessage(MessageKey.FinalPresentationDownloadFailed);

@@ -61,6 +61,10 @@ export const finalPresentationMessages = {
     [Language.German]: "Workshop-Protokoll",
     [Language.English]: "Workshop record",
   },
+  [MessageKey.FinalPresentationRecordFileName]: {
+    [Language.German]: "werte-workshop-protokoll.pdf",
+    [Language.English]: "values-workshop-record.pdf",
+  },
   [MessageKey.FinalPresentationRecordAllActionsHeading]: {
     [Language.German]: "Alle Aktionen",
     [Language.English]: "All actions",

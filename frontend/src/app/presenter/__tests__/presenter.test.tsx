@@ -69,7 +69,7 @@ describe("presenter screen group", () => {
     );
   });
 
-  it("carries no heading and no language switcher on the wall", async () => {
+  it("carries no heading but offers the language switcher", async () => {
     await act(async () => {
       render(
         <PresenterLayout>
@@ -80,6 +80,6 @@ describe("presenter screen group", () => {
     });
 
     expect(screen.queryByRole("heading")).not.toBeInTheDocument();
-    expect(screen.queryByRole("group")).not.toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
   });
 });

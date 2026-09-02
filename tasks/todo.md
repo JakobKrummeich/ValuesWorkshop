@@ -644,12 +644,15 @@ participant in same phases.
 **Verification:** dedicated Playwright suite.
 **Dependencies:** 24. **Size:** M
 
-### Task 26: i18n completeness
+### Task 26: i18n completeness ✅
+**Spec:** `tasks/specs/26-i18n-completeness.md` (approved via Lavish).
 **Description:** de+en for every screen and PDF; guard (test or lint) that
 fails on missing translation keys.
 **Acceptance criteria:**
-- [ ] Key-parity check in CI; app fully usable in both locales
-**Verification:** guard test + manual locale flip.
+- [x] Key-parity check in CI; app fully usable in both locales
+**Verification:** key parity fails the FE build (tsc over
+`Record<MessageKey, Message>`) plus `translate.test.ts` in `ci-test.sh`;
+locale flip pinned by the `localeFlip.spec.ts` e2e.
 **Dependencies:** 24. **Size:** S
 
 ### Task 27: Full 9-phase e2e stability
