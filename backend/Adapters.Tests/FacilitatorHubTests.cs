@@ -13,6 +13,12 @@ public class FacilitatorHubTests
         Guid.Parse("00000000-0000-0000-0000-00000000f00d")
     );
 
+    private static readonly ValueId PresentedValue = new("wert-1");
+
+    private static readonly ActionId PresentedAction = new(
+        Guid.Parse("00000000-0000-0000-0000-0000000000ac")
+    );
+
     private readonly InMemorySessionRepository repository = new();
     private readonly RecordingBroadcaster broadcaster = new();
     private readonly RecordingHubClients<IFacilitatorClient> clients = new();
@@ -285,6 +291,51 @@ public class FacilitatorHubTests
         broadcaster.Broadcasts.ShouldBeEmpty();
     }
 
+    // WHY: the walk intents are the only facilitator hub methods whose body no gate
+    // executes — the Application tests build the commands directly, and
+    // WireContractTests compares the hub's *signature* against contract/intents.json,
+    // never what the method passes on. Both payload arguments of
+    // CorrectActionWording are `string?`, so swapping or dropping one still compiles
+    // and still matches the contract; it would reach a live workshop as a typo fix
+    // that overwrites the action with an identifier, on the wall and in the PDF
+    // record. Until these two tests, only the Playwright suite ran that wiring, and
+    // that suite is not part of `dotnet test`.
+    [Fact]
+    public async Task Stepping_the_walk_to_the_next_value_mutates_persists_and_broadcasts()
+    {
+        repository.Add(SessionPresenting(PresentationWalk.Restore("tier-1", null, 0)));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.GoToNextValue();
+
+        result.ShouldBe(IntentResult.Accepted());
+        repository
+            .Saved.ShouldHaveSingleItem()
+            .Presentation.PresentedValue.ShouldBe(PresentedValue);
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    [Fact]
+    public async Task Correcting_the_presented_actions_wording_mutates_persists_and_broadcasts()
+    {
+        repository.Add(SessionPresenting(PresentationWalk.Restore("tier-1", PresentedValue, 1)));
+        var hub = HubBoundTo(KnownSession);
+
+        var result = await hub.CorrectActionWording(
+            PresentedAction.Value.ToString(),
+            "We speak openly about mistakes"
+        );
+
+        result.ShouldBe(IntentResult.Accepted());
+        var corrected = repository
+            .Saved.ShouldHaveSingleItem()
+            .Formation.Groups[0]
+            .Actions.ShouldHaveSingleItem();
+        corrected.ActionId.ShouldBe(PresentedAction);
+        corrected.Text.Value.ShouldBe("We speak openly about mistakes");
+        broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
     [Fact]
     public async Task Closing_the_voting_round_mutates_persists_and_broadcasts()
     {
@@ -336,6 +387,40 @@ public class FacilitatorHubTests
         result.ShouldBe(IntentResult.Accepted());
         repository.Saved.ShouldHaveSingleItem().Reveal.RevealedCount.ShouldBe(1);
         broadcaster.Broadcasts.ShouldHaveSingleItem().Revision.ShouldBe(2);
+    }
+
+    private static Session SessionPresenting(PresentationWalk walk)
+    {
+        var scribe = new ParticipantId(Guid.Parse("00000000-0000-0000-0000-0000000000a1"));
+        var session = TestSessions.InPhase(
+            KnownSession,
+            Phase.ValuePresentation,
+            formation: FormationRecord.Restore(
+                true,
+                [
+                    Group.Restore(
+                        "tier-1",
+                        [scribe],
+                        [PresentedValue],
+                        scribe,
+                        true,
+                        [
+                            new GroupAction(
+                                PresentedAction,
+                                PresentedValue,
+                                GroupActionText.Of("We start meetings on time")
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+            presentation: walk,
+            roster: [TestParticipants.Named(scribe, "Anna Schmidt")]
+        );
+
+        session.BumpRevision();
+
+        return session;
     }
 
     private static Session SessionInFinalVoting(VotingRounds voting)
