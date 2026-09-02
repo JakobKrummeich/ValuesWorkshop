@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "jscpd": "jscpd"
+    "jscpd": "jscpd",
+    "demo:media": "playwright test --config playwright.demoMedia.config.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",

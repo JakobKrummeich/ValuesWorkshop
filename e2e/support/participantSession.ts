@@ -1,7 +1,6 @@
 import type { Browser, BrowserContext, Page } from "@playwright/test";
 import { signInThroughOidcProvider } from "./oidcLogin";
-
-const PHONE_VIEWPORT = { width: 390, height: 844 };
+import { PHONE_VIEWPORT } from "./viewports";
 
 export type ParticipantSession = {
   context: BrowserContext;
@@ -20,4 +19,22 @@ export async function openParticipantSession(
   await signInThroughOidcProvider(page, accountName);
 
   return { context, page };
+}
+
+export async function withParticipant(
+  browser: Browser,
+  sessionIdentity: string,
+  accountName: string,
+  interact: (page: Page) => Promise<void>,
+): Promise<void> {
+  const { context, page } = await openParticipantSession(
+    browser,
+    sessionIdentity,
+    accountName,
+  );
+  try {
+    await interact(page);
+  } finally {
+    await context.close();
+  }
 }
