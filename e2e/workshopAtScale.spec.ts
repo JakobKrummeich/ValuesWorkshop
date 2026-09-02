@@ -695,10 +695,25 @@ test.describe.serial("a workshop at scale with thirty participants", () => {
     }));
     expect(overflow).toEqual({ horizontal: 0, vertical: 0 });
 
-    const clippedHeight = await presenterPage
+    const revealBox = await presenterPage
       .getByTestId("winner-reveal")
-      .evaluate((element) => element.scrollHeight - element.clientHeight);
-    expect(clippedHeight).toBe(0);
+      .evaluate((element) => {
+        const wall = element.parentElement;
+        if (wall === null) {
+          throw new Error("The winner reveal is not mounted on the wall");
+        }
+        const wallStyle = getComputedStyle(wall);
+        const wallContentWidth =
+          wall.clientWidth -
+          parseFloat(wallStyle.paddingLeft) -
+          parseFloat(wallStyle.paddingRight);
+        return {
+          clippedHeight: element.scrollHeight - element.clientHeight,
+          spansTheWall:
+            element.getBoundingClientRect().width === wallContentWidth,
+        };
+      });
+    expect(revealBox).toEqual({ clippedHeight: 0, spansTheWall: true });
   }
 
   test("the facilitator reveals places five down to two on the wall", async ({

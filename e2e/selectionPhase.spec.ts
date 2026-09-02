@@ -374,6 +374,27 @@ test.describe.serial("value selection through group formation", () => {
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
   });
 
+  test("the wall shows the longest value name in full and keeps both bar columns comparable", async () => {
+    const longestLabel = presenterPage.getByTestId(
+      "result-label-anpassungsfaehigkeit",
+    );
+    const labelFit = await longestLabel.evaluate((element) => ({
+      clippedWidth: element.scrollWidth - element.clientWidth,
+      lineCount: Math.round(
+        element.getBoundingClientRect().height /
+          parseFloat(getComputedStyle(element).lineHeight),
+      ),
+    }));
+    expect(labelFit).toEqual({ clippedWidth: 0, lineCount: 1 });
+
+    const trackWidths = await presenterPage
+      .getByTestId(/^result-bar-/)
+      .evaluateAll((bars) =>
+        bars.map((bar) => bar.parentElement?.getBoundingClientRect().width),
+      );
+    expect(new Set(trackWidths).size).toBe(1);
+  });
+
   test("the advance into phase 5 runs the progress bar on every screen", async () => {
     await advancePhaseButton(facilitatorPage).click();
 
@@ -592,5 +613,4 @@ test.describe.serial("value selection through group formation", () => {
     }
     throw new Error("No member page found among participants");
   }
-
 });

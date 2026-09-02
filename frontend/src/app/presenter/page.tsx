@@ -12,8 +12,10 @@ export default function PresenterHome() {
 
   return (
     <main className={styles.page}>
-      <LanguageSwitcher />
-      <SessionStatusBanner sessionStatePort={sessionStatePort} />
+      <header className={styles.chrome}>
+        <LanguageSwitcher />
+        <SessionStatusBanner sessionStatePort={sessionStatePort} />
+      </header>
       <PhaseView
         sessionStatePort={sessionStatePort}
         components={presenterPhaseView}

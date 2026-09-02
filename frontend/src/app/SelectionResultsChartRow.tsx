@@ -17,7 +17,12 @@ export function SelectionResultsChartRow({ row }: { row: SelectionResultRow }) {
       data-testid={`result-row-${row.valueId}`}
       data-top-value={row.isTopValue}
     >
-      <span className={styles.label}>{localizedText(language, row.text)}</span>
+      <span
+        className={styles.label}
+        data-testid={`result-label-${row.valueId}`}
+      >
+        {localizedText(language, row.text)}
+      </span>
       <div className={styles.track}>
         <div
           className={styles.bar}
