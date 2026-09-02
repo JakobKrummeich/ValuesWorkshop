@@ -22,7 +22,7 @@
   max-width: min(45vw, 100%);
   padding: var(--space-tight);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-qr-paper);
   box-shadow: var(--shadow-md);
 }
 

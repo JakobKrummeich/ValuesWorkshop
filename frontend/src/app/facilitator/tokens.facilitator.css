@@ -2,6 +2,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: var(--color-bg);
+  color: var(--color-text);
 
   --color-bg: var(--base-paper-100);
   --color-bg-alt: var(--base-paper-200);

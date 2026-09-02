@@ -4,7 +4,6 @@ import { useCallback } from "react";
 import { MessageKey } from "../../domain/i18n/messages";
 import { phaseNameKey } from "../../domain/i18n/phaseNameKey";
 import { nextPhase } from "../../domain/phaseSequence";
-import type { Phase } from "../../domain/phases";
 import { FacilitatorIntent } from "../../domain/workshopState";
 import { useTranslation } from "../i18n/useTranslation";
 import { useIntentSender } from "../useIntentSender";
@@ -29,7 +28,7 @@ export function useAdvancePhaseButton(): AdvancePhaseButtonResult {
     sendIntent(lifecyclePort.advancePhase());
   }, [lifecyclePort, sendIntent]);
 
-  const upcoming: Phase | null = state === null ? null : nextPhase(state.phase);
+  const upcoming = state === null ? null : nextPhase(state.phase);
 
   return {
     nextPhaseLabel:

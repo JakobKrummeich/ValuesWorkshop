@@ -41,7 +41,7 @@
   margin: 0;
   color: var(--color-text);
   font-family: var(--font-display);
-  font-size: var(--text-counter);
+  font-size: calc(var(--text-counter) * 1.5);
   font-variant-numeric: tabular-nums;
   font-variation-settings: "opsz" 144;
   font-weight: var(--weight-semibold);
@@ -79,4 +79,8 @@
   padding: var(--space-gap) var(--space-gutter);
   border-top: var(--border-hairline) solid var(--color-border);
   background: var(--color-surface);
+}
+
+.bottomBar:empty {
+  display: none;
 }
