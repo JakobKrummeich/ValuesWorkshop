@@ -24,19 +24,20 @@ export function SubmittedConfirmation({
       tabIndex={-1}
       ref={focusOnMount}
     >
-      <svg
-        className={styles.icon}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="m8.5 12.5 2.5 2.5 5-6" />
-      </svg>
+      <span className={styles.disc}>
+        <svg
+          className={styles.icon}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m6 12.5 4 4 8-9" />
+        </svg>
+      </span>
       <h2 className={styles.heading}>{translate(heading)}</h2>
       <p className={styles.body}>{translate(body)}</p>
     </div>
