@@ -39,7 +39,7 @@ verified by a multi-client Playwright e2e test.
 | Architecture | Hexagonal (ports & adapters) in FE and BE, enforced by arch tests: ArchUnitNET (BE), dependency-cruiser (FE) |
 | Quality gates | Cyclomatic complexity: eslint `complexity` (FE), CA1502 as error (BE). Duplication: jscpd threshold over FE+BE. Formatting: Prettier check (TS/CSS), CSharpier check (C#). Unit coverage: ≥ 80 % lines, FE (Jest `coverageThreshold`) and BE (coverlet threshold) each — hard gate. All deterministic. |
 | CI/CD | GitHub Actions on PRs to `main`: build, unit tests, lint, arch tests, complexity, duplication, coverage (≥ 80 % lines FE+BE), e2e. `main` protected — merge only on green pipeline. |
-| Deploy | Local only: one-command `docker compose up` with seeded demo session. No public deploy. README gets GIF/screenshots of all three screens. |
+| Deploy | Local only: one-command `docker compose up` with seeded demo session. No public deploy. README gets screenshots of all three screens. |
 
 ## Domain Model
 
