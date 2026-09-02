@@ -11,8 +11,10 @@ export default function ParticipantLayout({
   children: ReactNode;
 }) {
   return (
-    <AuthGuard>
-      <ParticipantSessionBoundary>{children}</ParticipantSessionBoundary>
-    </AuthGuard>
+    <div className="screenParticipant">
+      <AuthGuard>
+        <ParticipantSessionBoundary>{children}</ParticipantSessionBoundary>
+      </AuthGuard>
+    </div>
   );
 }

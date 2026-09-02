@@ -8,14 +8,16 @@ import "./tokens.presenter.css";
 
 export default function PresenterLayout({ children }: { children: ReactNode }) {
   return (
-    <SessionBoundary createSession={createPresenterSession}>
-      {(session) => (
-        <PresenterDependencyProvider
-          dependencies={{ sessionStatePort: session.sessionStatePort }}
-        >
-          <div className="screenPresenter">{children}</div>
-        </PresenterDependencyProvider>
-      )}
-    </SessionBoundary>
+    <div className="screenPresenter">
+      <SessionBoundary createSession={createPresenterSession}>
+        {(session) => (
+          <PresenterDependencyProvider
+            dependencies={{ sessionStatePort: session.sessionStatePort }}
+          >
+            {children}
+          </PresenterDependencyProvider>
+        )}
+      </SessionBoundary>
+    </div>
   );
 }

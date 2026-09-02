@@ -1,0 +1,162 @@
+.stepper {
+  display: flex;
+  min-width: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+}
+
+.headline {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+}
+
+.steps {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.wall .name,
+.phone .name,
+.sidebar .headline {
+  position: absolute;
+  width: var(--border-hairline);
+  height: var(--border-hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* wall: an ember pill for the live phase, then nine dots */
+
+.wall {
+  gap: var(--space-tight);
+  align-items: center;
+}
+
+.wall .headline {
+  padding: calc(var(--space-tight) * 0.25) var(--space-tight);
+  border: var(--border-hairline) solid var(--color-accent);
+  border-radius: var(--radius-full);
+  color: var(--color-accent);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.06em;
+  line-height: var(--leading-tight);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wall .currentName::before {
+  content: "·";
+  margin: 0 calc(var(--space-tight) * 0.5);
+}
+
+.wall .steps {
+  gap: calc(var(--space-tight) * 0.6);
+}
+
+.wall .step {
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  font-size: var(--text-eyebrow);
+  transition: background var(--motion-base) var(--ease-out);
+}
+
+.wall .step.done {
+  background: var(--color-highlight);
+}
+
+.wall .step.current {
+  background: var(--color-accent);
+  box-shadow: var(--shadow-glow-accent);
+}
+
+/* phone: the phase name above nine pips */
+
+.phone {
+  flex-direction: column;
+  gap: var(--space-tight);
+}
+
+.phone .headline {
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.phone .headline .currentLabel {
+  position: absolute;
+  width: var(--border-hairline);
+  height: var(--border-hairline);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.phone .steps {
+  gap: calc(var(--space-tight) * 0.5);
+}
+
+.phone .step {
+  width: 1em;
+  height: 0.35em;
+  border-radius: var(--radius-sm);
+  background: var(--color-border);
+  font-size: var(--text-small);
+  transition: background var(--motion-base) var(--ease-out);
+}
+
+.phone .step.done {
+  background: var(--color-highlight);
+}
+
+.phone .step.current {
+  background: var(--color-accent);
+}
+
+/* sidebar: a vertical timeline */
+
+.sidebar .steps {
+  flex-direction: column;
+  gap: var(--space-tight);
+}
+
+.sidebar .step {
+  gap: var(--space-gap);
+  padding: var(--space-tight) var(--space-gap);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  transition:
+    background var(--motion-base) var(--ease-out),
+    color var(--motion-base) var(--ease-out);
+}
+
+.sidebar .step.current {
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: var(--weight-black);
+  box-shadow: var(--shadow-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step {
+    transition: none;
+  }
+}

@@ -69,7 +69,7 @@ describe("presenter screen group", () => {
     );
   });
 
-  it("carries no heading but offers the language switcher", async () => {
+  it("carries no heading and no language switcher, only the wordmark", async () => {
     await act(async () => {
       render(
         <PresenterLayout>
@@ -80,6 +80,7 @@ describe("presenter screen group", () => {
     });
 
     expect(screen.queryByRole("heading")).not.toBeInTheDocument();
-    expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Language" })).toBeNull();
+    expect(screen.getByText("Values Workshop")).toBeInTheDocument();
   });
 });

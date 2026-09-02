@@ -1,4 +1,7 @@
+import { type Language, readLanguage } from "../domain/i18n/language";
+
 const SESSION_IDENTITY_PARAMETER = "sessionIdentity";
+const LANGUAGE_PARAMETER = "language";
 const PARTICIPANT_PATH = "/participant";
 
 export function currentReturnUrl(): string {
@@ -12,6 +15,12 @@ export function currentSessionIdentity(): string | null {
 
   return new URLSearchParams(window.location.search).get(
     SESSION_IDENTITY_PARAMETER,
+  );
+}
+
+export function requestedLanguage(): Language | undefined {
+  return readLanguage(
+    new URLSearchParams(window.location.search).get(LANGUAGE_PARAMETER),
   );
 }
 

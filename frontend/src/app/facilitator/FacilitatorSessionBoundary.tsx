@@ -16,9 +16,7 @@ export function FacilitatorSessionBoundary({
     <SessionBoundary
       createSession={createFacilitatorSession}
       missingSession={
-        <div className="screenFacilitator">
-          <OpenSessionForm sessionCreation={facilitatorSessionCreation} />
-        </div>
+        <OpenSessionForm sessionCreation={facilitatorSessionCreation} />
       }
     >
       {(session) => (
@@ -33,7 +31,7 @@ export function FacilitatorSessionBoundary({
             conclusionControlPort: session.conclusionControlPort,
           }}
         >
-          <div className="screenFacilitator">{children}</div>
+          {children}
         </FacilitatorDependencyProvider>
       )}
     </SessionBoundary>
