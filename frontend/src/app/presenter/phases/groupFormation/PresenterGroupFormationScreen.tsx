@@ -1,11 +1,13 @@
 "use client";
 
+import { MessageKey } from "../../../../domain/i18n/messages";
 import {
   FormationSubState,
   type PresenterGroupFormationState,
 } from "../../../../domain/workshopState";
-import { FormationProgressBar } from "../../../FormationProgressBar";
 import { GroupCard, GroupCardVariant } from "../../../GroupCard";
+import { useTranslation } from "../../../i18n/useTranslation";
+import { ProgressRing } from "../../../ProgressRing";
 import styles from "./PresenterGroupFormationScreen.module.css";
 import { usePresenterGroupFormationScreen } from "./usePresenterGroupFormationScreen";
 
@@ -14,12 +16,17 @@ export function PresenterGroupFormationScreen({
 }: {
   state: PresenterGroupFormationState;
 }) {
+  const { translate } = useTranslation();
   const { currentPageGroups } = usePresenterGroupFormationScreen(formation);
 
   if (formation.subState === FormationSubState.Forming) {
     return (
       <section className={styles.screen}>
-        <FormationProgressBar progress={formation.progress} />
+        <ProgressRing
+          fraction={formation.progress}
+          label={translate(MessageKey.GroupFormationFormingGroups)}
+          testId="formation-progress"
+        />
       </section>
     );
   }
