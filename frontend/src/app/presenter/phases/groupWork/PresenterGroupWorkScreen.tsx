@@ -30,7 +30,7 @@ export function PresenterGroupWorkScreen({
             variant={GroupCardVariant.Wall}
             index={index}
             status={
-              group.workStatus !== undefined && (
+              group.workStatus === undefined ? undefined : (
                 <span
                   className={`${styles.statusBadge} ${
                     group.workStatus === GroupWorkStatus.Submitted

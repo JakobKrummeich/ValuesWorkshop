@@ -83,4 +83,25 @@ describe("PresenterGroupWorkScreen", () => {
       screen.getByTestId("presenter-group-status-otter"),
     ).toHaveTextContent("Submitted");
   });
+
+  it("leaves the card without a status slot while the group has no work status", () => {
+    screenHook.mockReturnValue(
+      model({
+        currentPageGroups: [
+          {
+            name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+            memberDisplayNames: ["Alice"],
+            assignedValues: [],
+          },
+        ],
+      }),
+    );
+
+    const { container } = render(<PresenterGroupWorkScreen state={state()} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.queryByTestId("presenter-group-status-otter")).toBeNull();
+    expect(container.querySelector(".status")).toBeNull();
+  });
 });
