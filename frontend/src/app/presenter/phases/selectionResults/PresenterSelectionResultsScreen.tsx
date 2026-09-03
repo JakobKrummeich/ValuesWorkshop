@@ -1,7 +1,10 @@
 "use client";
 
 import type { PresenterSelectionResultsState } from "../../../../domain/workshopState";
-import { SelectionResultsView } from "../../../SelectionResultsView";
+import {
+  SelectionResultsView,
+  SelectionResultsViewVariant,
+} from "../../../SelectionResultsView";
 import styles from "./PresenterSelectionResultsScreen.module.css";
 
 export function PresenterSelectionResultsScreen({
@@ -11,7 +14,10 @@ export function PresenterSelectionResultsScreen({
 }) {
   return (
     <section className={styles.screen}>
-      <SelectionResultsView selection={state.selection} />
+      <SelectionResultsView
+        selection={state.selection}
+        variant={SelectionResultsViewVariant.Wall}
+      />
     </section>
   );
 }

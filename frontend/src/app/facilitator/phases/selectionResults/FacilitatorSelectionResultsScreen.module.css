@@ -1,5 +1,6 @@
 .screen {
   display: flex;
   flex-direction: column;
-  padding: var(--space-gutter);
+  width: 100%;
+  max-width: 64rem;
 }
