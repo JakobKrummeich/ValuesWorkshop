@@ -1,6 +1,7 @@
 "use client";
 
-import type { ConnectionState } from "../../domain/connectionState";
+import type { SessionStatePort } from "../../domain/ports/sessionStatePort";
+import type { PhasedWorkshopState } from "../../domain/workshopState";
 import styles from "./ConnectionStatus.module.css";
 import { useConnectionStatus } from "./useConnectionStatus";
 
@@ -11,13 +12,13 @@ export enum ConnectionStatusVariant {
 }
 
 export function ConnectionStatus({
-  connectionState,
+  sessionStatePort,
   variant,
 }: {
-  connectionState: ConnectionState;
+  sessionStatePort: SessionStatePort<PhasedWorkshopState>;
   variant: ConnectionStatusVariant;
 }) {
-  const { text, isConnected } = useConnectionStatus(connectionState);
+  const { text, isConnected } = useConnectionStatus(sessionStatePort);
 
   return (
     <p

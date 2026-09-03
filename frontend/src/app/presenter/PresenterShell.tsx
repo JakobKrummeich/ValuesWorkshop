@@ -7,7 +7,7 @@ import {
   ConnectionStatusVariant,
 } from "../chrome/ConnectionStatus";
 import { PhaseStepper, PhaseStepperVariant } from "../chrome/PhaseStepper";
-import { useSessionStatus } from "../chrome/useSessionStatus";
+import { usePhaseStatus } from "../chrome/usePhaseStatus";
 import { Wordmark, WordmarkSize } from "../chrome/Wordmark";
 import styles from "./PresenterShell.module.css";
 
@@ -18,7 +18,7 @@ export function PresenterShell({
   sessionStatePort: PresenterSessionStatePort;
   children: ReactNode;
 }) {
-  const { phase, connectionState } = useSessionStatus(sessionStatePort);
+  const phase = usePhaseStatus(sessionStatePort);
 
   return (
     <div className={styles.shell}>
@@ -28,7 +28,7 @@ export function PresenterShell({
       </header>
       <main className={styles.content}>{children}</main>
       <ConnectionStatus
-        connectionState={connectionState}
+        sessionStatePort={sessionStatePort}
         variant={ConnectionStatusVariant.Wall}
       />
     </div>
