@@ -2,7 +2,9 @@
 
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { FacilitatorFinalPresentationState } from "../../../../domain/workshopState";
+import { CheckMark } from "../../../CheckMark";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { Pips } from "../../../Pips";
 import styles from "./FacilitatorFinalPresentationScreen.module.css";
 import { useFacilitatorFinalPresentationScreen } from "./useFacilitatorFinalPresentationScreen";
 
@@ -33,6 +35,7 @@ export function FacilitatorFinalPresentationScreen({
           total: winnerCount,
         })}
       </p>
+      <Pips filled={revealedCount} total={winnerCount} testId="reveal-pips" />
       {!isConcluded && (
         <button
           type="button"
@@ -45,9 +48,14 @@ export function FacilitatorFinalPresentationScreen({
         </button>
       )}
       {isConcluded && (
-        <p className={styles.concludedNote} data-testid="concluded-note">
-          {translate(MessageKey.FinalPresentationConcluded)}
-        </p>
+        <div className={styles.concluded}>
+          <span className={styles.concludedMark}>
+            <CheckMark />
+          </span>
+          <p className={styles.concludedNote} data-testid="concluded-note">
+            {translate(MessageKey.FinalPresentationConcluded)}
+          </p>
+        </div>
       )}
       {rejectionMessage !== null && (
         <p className={styles.rejection} role="status">
