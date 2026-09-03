@@ -96,10 +96,10 @@
 .selectFrame::after {
   position: absolute;
   right: var(--space-gutter);
-  width: 0.5em;
-  height: 0.5em;
-  border-right: var(--border-rule) solid currentcolor;
-  border-bottom: var(--border-rule) solid currentcolor;
+  width: 0.45em;
+  height: 0.45em;
+  border-right: var(--border-ring) solid currentcolor;
+  border-bottom: var(--border-ring) solid currentcolor;
   color: var(--color-accent);
   transform: translateY(-25%) rotate(45deg);
   content: "";
