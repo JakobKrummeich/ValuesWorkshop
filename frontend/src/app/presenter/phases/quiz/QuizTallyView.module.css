@@ -1,0 +1,14 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gutter);
+  width: min(100%, 80vw);
+  align-self: center;
+  text-align: center;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+}

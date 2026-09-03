@@ -8,7 +8,6 @@
 
 .value {
   font-family: var(--font-display);
-  font-size: var(--text-counter);
   font-variant-numeric: tabular-nums;
   font-variation-settings: "opsz" 144;
   font-weight: var(--weight-semibold);
@@ -24,6 +23,14 @@
   letter-spacing: var(--tracking-eyebrow);
   line-height: var(--leading-tight);
   text-transform: uppercase;
+}
+
+.giant .value {
+  font-size: var(--text-counter);
+}
+
+.display .value {
+  font-size: var(--text-display);
 }
 
 .wall .value {
