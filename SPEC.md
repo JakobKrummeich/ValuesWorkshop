@@ -104,8 +104,9 @@ verified by a multi-client Playwright e2e test.
 
 Participant attention rule: the participant device never mirrors presenter or
 beamer content. Whenever a participant has no pending input, their device
-shows either the shared calm waiting screen (pulsating circle, zero
-interactivity, no caption) or a minimal confirmation of their own submission
+shows either the calm waiting screen (aurora motif with a short phase-aware
+caption; see `design/visual-system.md` §6) or a minimal confirmation of their
+own submission
 — the room's attention belongs up front, not on the phone.
 
 ## Design System

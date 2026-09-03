@@ -77,7 +77,7 @@ also drops the database volume so the next run starts clean.
 | `contract/` | Machine-checked FE/BE wire contract — intents, enums and per-phase state samples; see `contract/README.md` |
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
-| `design/` | Architecture, domain model, persistence, protocol, state machine, screens |
+| `design/` | Architecture, domain model, persistence, protocol, state machine, screens, visual system |
 | `docs/` | Architecture reviews (ADR-style proposals); `docs/media/` holds the README screenshots |
 | `scripts/` | CI gate scripts and the `demoMedia/` screenshot capture (`pnpm demo:media`) |
 | `tasks/` | Plan, backlog, per-task mini-specs |

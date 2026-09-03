@@ -27,12 +27,12 @@ they fire. "Mirror" = passive copy of the presenter content, phone-sized.
 | **1 Join** | Live roster (names, count). **AdvancePhase** | Large QR invitation + live names of joined participants | Lobby: "you're in", waiting notice, participant count |
 | **2 Quiz** | Current question with answer tally and answered-count; one morphing sub-control button. **RevealAnswer**, **ShowLearningText**, **PoseNextQuestion**, **AdvancePhase** (disabled until the fifth question's learning text was shown) | Question + three answer cards (two top, one centered below), live bars under each card scaled relative to the max tally; correct card highlighted after reveal; learning text on a centered card | Three answer buttons while the question is open. **ChooseQuizAnswer**; after picking: own-answer confirmation ("Your answer: X") until the next question — no correct-answer display, no learning text on the device; whoever never picked gets the waiting screen from the reveal on, never the question with dead buttons |
 | **3 Value selection** | Submission progress count. **AdvancePhase** | Prompt + submission progress | Values grid (~50), pick exactly ten. **SubmitValueSelection** (enabled at 10/10); after submit: "submission successful" confirmation replacing the grid |
-| **4 Selection results** | Top-values bar chart (same as presenter). **AdvancePhase** · System: DetermineTopValues on entry | Bar chart of the 20 most-selected values in two columns (ranks 1–10 left, 11–20 right), label + count + bar ∝ selections (most-selected = full width); top set color-highlighted (tie at 10th → 11+ highlighted); "and x more" hint below the cutoff; zero submissions → empty-state note | Waiting screen: centered icon with a slow pulsating circle — attention goes to the presenter wall; no tallies, no chart |
+| **4 Selection results** | Top-values bar chart (same as presenter). **AdvancePhase** · System: DetermineTopValues on entry | Bar chart of the 20 most-selected values in two columns (ranks 1–10 left, 11–20 right), label + count + bar ∝ selections (most-selected = full width); top set color-highlighted (tie at 10th → 11+ highlighted); "and x more" hint below the cutoff; zero submissions → empty-state note | Calm waiting screen (aurora motif with phase-aware copy) — attention goes to the presenter wall; no tallies, no chart |
 | **5 Group formation** | Progress bar while forming (T19b), then all groups: names, members, assigned values. **AdvancePhase** (disabled until the groups stand) · System: FormGroups when the 3 s window is over | Server-driven 3 s progress bar while forming (T19b), then paginated 3×2 group cards mirroring the participant card (name, member chips, value chips); cycles every 7 s, static single page when all groups fit | Server-driven 3 s progress bar while forming (T19b), then own group card: animal name, member chips grouped top-left, value chips grouped bottom-right — one color for all member chips, another for all value chips, no section labels, no icon |
 | **6 Group work** | Per-group table: scribe, action count, editing/submitted status. **ReassignScribe**, **AdvancePhase** (disabled until every group submitted) · System: AppointScribes on entry | Same paginated 3×2 cards + working/submitted indicator per group | **Scribe:** value tabs + actions editor. **AddAction**, **EditAction**, **RemoveAction**, **SubmitGroupWork**, **ReopenGroupWork** · **Member:** same value tabs, read-only, synced with the scribe's state every 0.5 s |
-| **7 Value presentation** | Presenting position (group intro, or group + value with presented actions and edit affordance). **GoToNextValue**, **EditAction** (wording/typo fixes only, T17a; value positions only), **AdvancePhase** (disabled until all values presented) | Per-group blocks: group-intro fullscreen ("up next"), then per value the presenting group, the value + its actions numbered; no position counter | Calm waiting screen (shared pulsating circle) — no mirror; attention to the wall |
+| **7 Value presentation** | Presenting position (group intro, or group + value with presented actions and edit affordance). **GoToNextValue**, **EditAction** (wording/typo fixes only, T17a; value positions only), **AdvancePhase** (disabled until all values presented) | Per-group blocks: group-intro fullscreen ("up next"), then per value the presenting group, the value + its actions numbered; no position counter | Calm waiting screen (aurora motif with phase-aware copy) — no mirror; attention to the wall |
 | **8 Final voting** | Round + voted-count progress; tie indicator after close. **CloseVoting**, **StartTiebreakRound**, **AdvancePhase** (winners must stand) | "Voting ongoing…" screen — no tallies shown | One card per presented value (value + its actions + vote stepper), allotment counter. **SubmitFinalVotes** (enabled at full allotment; irrevocable). After the own submission and while voting is closed: "votes submitted successfully" confirmation. Tiebreak round reopens the voting UI: tied values only, allotment = number of winner places still open |
-| **9 Final presentation** | Reveal position. **RevealNextValue** | One full screen per winning value *with* its actions, least → most voted; final overview after the last reveal | During reveal: calm waiting screen (shared pulsating circle). After conclusion: prominent Download-PDF button (workshop record) |
+| **9 Final presentation** | Reveal position. **RevealNextValue** | One full screen per winning value *with* its actions, least → most voted; final overview after the last reveal | During reveal: calm waiting screen (aurora motif with phase-aware copy). After conclusion: prominent Download-PDF button (workshop record) |
 
 All 27 phase cells filled; the single intentionally-empty cell is
 presenter × phase 0 (no session exists to show yet).
@@ -280,8 +280,8 @@ appointed on entry to phase 6.
 
 Facilitator phase 3: submission progress count + Advance. Facilitator
 phase 4: mirror of the presenter bar chart, keeping the Advance control.
-Participant phase 4: waiting screen (centered icon, slow pulsating
-circle) so attention goes to the presenter wall — no chart, no counts.
+Participant phase 4: calm waiting screen (aurora motif with phase-aware
+copy) so attention goes to the presenter wall — no chart, no counts.
 
 ### Phase 5 — Group formation
 
@@ -319,8 +319,7 @@ circle) so attention goes to the presenter wall — no chart, no counts.
 │ 6 cards per page, each mirroring the  │
 │ participant card; cycles every 7 s,   │
 │ static single page when all fit —     │
-│ no heading, no page indicator;        │
-│ language switcher present              │
+│ no heading, no page indicator          │
 └───────────────────────────────────────┘
 ```
 
@@ -458,8 +457,8 @@ On a group intro the position line reads "Up next: Otter" — no actions,
 nothing to edit; "Next value" moves onto the group's first value. On the
 last value of the last group "Next value" disables and Advance unlocks.
 
-Participant phase 7: the shared calm waiting screen (pulsating circle, zero
-interactivity) — the device never mirrors the presented value.
+Participant phase 7: calm waiting screen (aurora motif with phase-aware
+copy) — the device never mirrors the presented value.
 
 ### Phase 8 — Final voting
 
@@ -566,13 +565,10 @@ tiebreak round brings the voting UI back (tied values only).
 │ Herbst 2024          │
 ├──────────────────────┤
 │                      │
-│      (  ◯  )         │
-│   slow pulsating     │
-│   circle             │
-│                      │
-│ (shared calm waiting │
-│  screen — no caption,│
-│  zero interactivity) │
+│   (calm waiting      │
+│    screen — aurora    │
+│    motif with phase- │
+│    aware copy)       │
 │                      │
 └──────────────────────┘
 ```
