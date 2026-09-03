@@ -23,6 +23,10 @@ export const groupWorkMessages = {
     [Language.German]: "Aktion beschreiben\u2026",
     [Language.English]: "Describe an action\u2026",
   },
+  [MessageKey.GroupWorkNoActionsYet]: {
+    [Language.German]: "Noch keine Aktionen.",
+    [Language.English]: "No actions yet.",
+  },
   [MessageKey.GroupWorkSubmit]: {
     [Language.German]: "Ergebnis abgeben",
     [Language.English]: "Submit result",

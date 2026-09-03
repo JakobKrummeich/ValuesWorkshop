@@ -99,6 +99,7 @@ export enum MessageKey {
   GroupWorkAddAction = "groupWork.addAction",
   GroupWorkRemoveAction = "groupWork.removeAction",
   GroupWorkActionPlaceholder = "groupWork.actionPlaceholder",
+  GroupWorkNoActionsYet = "groupWork.noActionsYet",
   GroupWorkSubmit = "groupWork.submit",
   GroupWorkReopen = "groupWork.reopen",
   GroupWorkSubmitDisabledHint = "groupWork.submitDisabledHint",

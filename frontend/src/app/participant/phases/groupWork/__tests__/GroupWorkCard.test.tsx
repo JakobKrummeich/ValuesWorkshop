@@ -189,6 +189,29 @@ describe("GroupWorkCard", () => {
     expect(screen.queryByTestId("add-action-button")).not.toBeInTheDocument();
   });
 
+  it("tells the other members when nothing has been written yet", () => {
+    screenHook.mockReturnValue(model({ isCallerScribe: false }));
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("group-work-empty")).toHaveTextContent(
+      "No actions yet.",
+    );
+  });
+
+  it("keeps the empty note away from the scribe, who has the add button", () => {
+    screenHook.mockReturnValue(model());
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.queryByTestId("group-work-empty")).not.toBeInTheDocument();
+    expect(screen.getByTestId("add-action-button")).toBeInTheDocument();
+  });
+
   it("labels the remove control for screen readers", () => {
     const removeAction = jest.fn();
     screenHook.mockReturnValue(
@@ -297,6 +320,18 @@ describe("GroupWorkCard", () => {
     );
     expect(screen.getByTestId("group-work-status")).toHaveTextContent(
       "Abgegeben",
+    );
+  });
+
+  it("speaks German on the empty note too", () => {
+    screenHook.mockReturnValue(model({ isCallerScribe: false }));
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(Language.German),
+    });
+
+    expect(screen.getByTestId("group-work-empty")).toHaveTextContent(
+      "Noch keine Aktionen.",
     );
   });
 });

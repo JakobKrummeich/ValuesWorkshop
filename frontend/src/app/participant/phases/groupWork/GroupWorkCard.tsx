@@ -34,6 +34,7 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
   } = useGroupWorkCard(ownGroup);
 
   const isEditable = isCallerScribe && !isSubmitted;
+  const showsEmptyNote = !isEditable && actionsForSelectedValue.length === 0;
 
   return (
     <article
@@ -65,6 +66,11 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
           />
         ))}
       </ul>
+      {showsEmptyNote && (
+        <p className={styles.emptyNote} data-testid="group-work-empty">
+          {translate(MessageKey.GroupWorkNoActionsYet)}
+        </p>
+      )}
       {isEditable && (
         <button
           type="button"
