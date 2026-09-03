@@ -8,11 +8,6 @@
 }
 
 .grid {
-  --text-heading: var(--text-group-card-name);
-  --text-body: var(--text-group-card-chip);
-  --text-small: var(--text-group-card-chip);
-  --space-gutter: var(--space-group-card-padding);
-
   display: grid;
   flex: 1;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -21,30 +16,36 @@
   min-height: 0;
 }
 
-.cardWrapper {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
 .statusBadge {
-  position: absolute;
-  top: var(--space-tight);
-  right: var(--space-tight);
-  padding: var(--space-tight) var(--space-gap);
+  display: inline-flex;
+  padding: calc(var(--space-tight) * 0.25) var(--space-tight);
   border-radius: var(--radius-full);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.08em;
   line-height: var(--leading-tight);
+  text-transform: uppercase;
 }
 
 .statusEditing {
   background: var(--color-accent-soft);
   color: var(--color-accent);
+  animation: pulse 2.4s var(--ease-in-out) infinite;
 }
 
 .statusSubmitted {
-  background: var(--color-primary-soft);
-  color: var(--color-primary-strong);
+  background: color-mix(in srgb, var(--color-success) 18%, transparent);
+  color: var(--color-success);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statusEditing {
+    animation: none;
+  }
 }

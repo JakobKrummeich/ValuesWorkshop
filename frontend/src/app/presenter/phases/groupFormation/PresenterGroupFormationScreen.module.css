@@ -8,11 +8,6 @@
 }
 
 .grid {
-  --text-heading: var(--text-group-card-name);
-  --text-body: var(--text-group-card-chip);
-  --text-small: var(--text-group-card-chip);
-  --space-gutter: var(--space-group-card-padding);
-
   display: grid;
   flex: 1;
   grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -16,7 +16,7 @@
   padding: var(--space-gutter);
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-card);
 }
 
 .dialogTitle {

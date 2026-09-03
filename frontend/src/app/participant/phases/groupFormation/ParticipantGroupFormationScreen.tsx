@@ -1,9 +1,11 @@
+"use client";
+
 import {
   FormationSubState,
   type ParticipantGroupFormationState,
 } from "../../../../domain/workshopState";
-import { FormationProgressBar } from "../../../FormationProgressBar";
-import { GroupCard } from "../../../GroupCard";
+import { FormationProgress } from "../../../FormationProgress";
+import { GroupCard, GroupCardVariant } from "../../../GroupCard";
 import styles from "./ParticipantGroupFormationScreen.module.css";
 
 export function ParticipantGroupFormationScreen({
@@ -14,7 +16,7 @@ export function ParticipantGroupFormationScreen({
   if (formation.subState === FormationSubState.Forming) {
     return (
       <section className={styles.screen}>
-        <FormationProgressBar progress={formation.progress} />
+        <FormationProgress progress={formation.progress} />
       </section>
     );
   }
@@ -25,6 +27,7 @@ export function ParticipantGroupFormationScreen({
         name={formation.ownGroup.name}
         memberDisplayNames={formation.ownGroup.memberDisplayNames}
         assignedValues={formation.ownGroup.assignedValues}
+        variant={GroupCardVariant.Phone}
       />
     </section>
   );

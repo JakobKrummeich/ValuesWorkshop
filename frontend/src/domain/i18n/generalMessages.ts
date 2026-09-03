@@ -71,9 +71,77 @@ export const generalMessages = {
     [Language.German]: "Warten auf den Workshop\u2026",
     [Language.English]: "Waiting for the workshop\u2026",
   },
+  [MessageKey.SessionParticipantsLabel]: {
+    [Language.German]: "Teilnehmende",
+    [Language.English]: "Participants",
+  },
+  [MessageKey.PhaseStepperLabel]: {
+    [Language.German]: "Workshop-Phasen",
+    [Language.English]: "Workshop phases",
+  },
+  [MessageKey.PhaseNameJoin]: {
+    [Language.German]: "Ankommen",
+    [Language.English]: "Join",
+  },
+  [MessageKey.PhaseNameQuiz]: {
+    [Language.German]: "Quiz",
+    [Language.English]: "Quiz",
+  },
+  [MessageKey.PhaseNameValueSelection]: {
+    [Language.German]: "Auswahl",
+    [Language.English]: "Selection",
+  },
+  [MessageKey.PhaseNameSelectionResults]: {
+    [Language.German]: "Ergebnis",
+    [Language.English]: "Results",
+  },
+  [MessageKey.PhaseNameGroupFormation]: {
+    [Language.German]: "Gruppen",
+    [Language.English]: "Groups",
+  },
+  [MessageKey.PhaseNameGroupWork]: {
+    [Language.German]: "Gruppenarbeit",
+    [Language.English]: "Group work",
+  },
+  [MessageKey.PhaseNameValuePresentation]: {
+    [Language.German]: "Vorstellung",
+    [Language.English]: "Presentations",
+  },
+  [MessageKey.PhaseNameFinalVoting]: {
+    [Language.German]: "Abstimmung",
+    [Language.English]: "Vote",
+  },
+  [MessageKey.PhaseNameFinalPresentation]: {
+    [Language.German]: "Finale",
+    [Language.English]: "Finale",
+  },
   [MessageKey.WaitingWatchWall]: {
     [Language.German]: "Schau auf die Präsentationswand",
     [Language.English]: "Look at the presenter wall",
+  },
+  [MessageKey.WaitingEyesUpFront]: {
+    [Language.German]: "Blick nach vorn",
+    [Language.English]: "Eyes up front",
+  },
+  [MessageKey.WaitingResultsOnScreen]: {
+    [Language.German]: "Die Ergebnisse sind vorn zu sehen.",
+    [Language.English]: "The results are on the screen.",
+  },
+  [MessageKey.WaitingListenToGroups]: {
+    [Language.German]: "Hört den Gruppen zu",
+    [Language.English]: "Listen to the groups",
+  },
+  [MessageKey.WaitingGroupPresents]: {
+    [Language.German]: "{group} stellt {value} vor.",
+    [Language.English]: "{group} is presenting {value}.",
+  },
+  [MessageKey.WaitingOwnGroupUp]: {
+    [Language.German]: "Eure Gruppe ist dran!",
+    [Language.English]: "Your group is up!",
+  },
+  [MessageKey.WaitingForReveal]: {
+    [Language.German]: "Gleich werden die Sieger enthüllt.",
+    [Language.English]: "The winners are about to be revealed.",
   },
   [MessageKey.OpenSessionTitle]: {
     [Language.German]: "ValuesWorkshop · Workshop eröffnen",
@@ -120,9 +188,9 @@ export const generalMessages = {
       "Der Workshop konnte nicht eröffnet werden. Bitte erneut versuchen.",
     [Language.English]: "The session could not be opened. Please try again.",
   },
-  [MessageKey.AdvancePhase]: {
-    [Language.German]: "Phase weiterschalten",
-    [Language.English]: "Advance phase",
+  [MessageKey.AdvanceToPhase]: {
+    [Language.German]: "Weiter zu {phase} · {name}",
+    [Language.English]: "Advance to {phase} · {name}",
   },
   [MessageKey.IntentWrongPhase]: {
     [Language.German]: "In dieser Phase ist das nicht möglich.",

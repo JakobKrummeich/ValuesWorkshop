@@ -65,22 +65,20 @@ test.describe.serial("locale flip", () => {
     ).toBeVisible();
   });
 
-  test("the presenter wall flips to German and back", async () => {
-    await presenterPage.goto(`/presenter?sessionIdentity=${sessionIdentity}`);
-
-    await expectDocumentLanguage(presenterPage, "en");
-    await expect(
-      presenterPage.getByRole("img", { name: "Scan to join" }),
-    ).toBeVisible();
-
-    await presenterPage.getByRole("button", { name: "German" }).click();
+  test("the presenter wall follows the language named in its link", async () => {
+    await presenterPage.goto(
+      `/presenter?sessionIdentity=${sessionIdentity}&language=de`,
+    );
 
     await expectDocumentLanguage(presenterPage, "de");
     await expect(
       presenterPage.getByRole("img", { name: "Zum Mitmachen scannen" }),
     ).toBeVisible();
+    await expect(presenterPage.getByRole("button")).toHaveCount(0);
 
-    await presenterPage.getByRole("button", { name: "Englisch" }).click();
+    await presenterPage.goto(
+      `/presenter?sessionIdentity=${sessionIdentity}&language=en`,
+    );
 
     await expectDocumentLanguage(presenterPage, "en");
     await expect(

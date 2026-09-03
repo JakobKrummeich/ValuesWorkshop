@@ -2,14 +2,76 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: var(--color-bg);
+  color: var(--color-text);
 
+  --color-bg: var(--base-paper-100);
+  --color-bg-alt: var(--base-paper-200);
+  --color-surface: var(--base-white);
+  --color-surface-strong: var(--base-paper-200);
+  --color-border: var(--base-paper-hairline);
+  --color-text: var(--base-ink-900);
+  --color-text-muted: var(--base-ink-600);
+  --color-primary: var(--base-ember-700);
+  --color-primary-strong: var(--base-ember-600);
+  --color-primary-soft: color-mix(
+    in srgb,
+    var(--base-ember-700) 14%,
+    transparent
+  );
+  --color-on-primary: var(--base-ember-900);
+  --color-accent: var(--base-pine-700);
+  --color-accent-deep: var(--base-pine-800);
+  --color-accent-soft: color-mix(
+    in srgb,
+    var(--base-pine-700) 12%,
+    transparent
+  );
+  --color-on-accent: var(--base-white);
+  --color-highlight: var(--base-moss-500);
+  --color-eyebrow: var(--base-pine-700);
+  --color-success: var(--base-moss-500);
+  --color-danger: var(--base-clay-600);
+  --color-danger-soft: var(--base-clay-100);
+  --color-scrim: var(--base-paper-scrim);
+  --color-glow-1: var(--base-teal-500);
+  --color-glow-2: var(--base-ember-700);
+  --color-glow-3: var(--base-plum-500);
+  --color-member-chip: var(--base-pine-700);
+  --color-member-chip-soft: color-mix(
+    in srgb,
+    var(--base-pine-700) 12%,
+    transparent
+  );
+  --color-value-chip: var(--base-ember-800);
+  --color-value-chip-soft: color-mix(
+    in srgb,
+    var(--base-ember-700) 14%,
+    transparent
+  );
+  --color-animal-otter: var(--base-animal-otter);
+  --color-animal-fuchs: var(--base-animal-fuchs);
+  --color-animal-eule: var(--base-animal-eule);
+  --color-animal-igel: var(--base-animal-igel);
+  --color-animal-dachs: var(--base-animal-dachs);
+  --color-animal-luchs: var(--base-animal-luchs);
+  --color-animal-biber: var(--base-animal-biber);
+  --color-animal-marder: var(--base-animal-marder);
+  --color-qr-paper: var(--base-white);
+  --color-qr-ink: var(--base-ink-900);
+
+  --text-eyebrow: var(--base-text-12);
   --text-small: var(--base-text-14);
-  --text-body: var(--base-text-16);
-  --text-heading: var(--base-text-20);
+  --text-body: var(--base-text-15);
+  --text-action: var(--base-text-15);
+  --text-heading: var(--base-text-26);
+  --text-display: var(--base-text-32);
+  --text-counter: var(--base-text-32);
+  --text-numeral: var(--base-text-96);
 
   --space-tight: var(--base-space-4);
   --space-gap: var(--base-space-8);
   --space-gutter: var(--base-space-16);
 
-  --control-height: 32px;
+  --control-height: 40px;
 }

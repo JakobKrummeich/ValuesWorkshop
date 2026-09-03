@@ -7,6 +7,7 @@ import { Phase } from "../../../domain/phases";
 import type { FacilitatorWorkshopState } from "../../../domain/workshopState";
 import { FacilitatorIntent } from "../../../domain/workshopState";
 import type { Single } from "../../../shared/reactiveTypes";
+import { languageWrapper } from "../../../testing/languageWrapper";
 import { useFacilitatorDependencies } from "../dependencies";
 import { useAdvancePhaseButton } from "../useAdvancePhaseButton";
 
@@ -26,6 +27,16 @@ function stateListing(
     revision: 1,
     roster: { participants: [], participantCount: 0 },
     enabledIntents,
+  };
+}
+
+function stateInFinalPhase(): FacilitatorWorkshopState {
+  return {
+    phase: Phase.FinalPresentation,
+    revision: 1,
+    roster: { participants: [], participantCount: 0 },
+    enabledIntents: [],
+    conclusion: { revealedCount: 5, winnerCount: 5, isConcluded: true },
   };
 }
 
@@ -60,7 +71,9 @@ describe("advance phase button logic", () => {
   it("shows no rejection before anything is pressed", () => {
     withAdvancePhase(() => NEVER);
 
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     expect(result.current).toEqual(
       expect.objectContaining({ isAdvancing: false, rejectionMessage: null }),
@@ -71,7 +84,9 @@ describe("advance phase button logic", () => {
     withAdvancePhase(() =>
       of({ isAccepted: true, code: null, detail: null } as IntentResult),
     );
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     act(() => result.current.advancePhase());
 
@@ -87,7 +102,9 @@ describe("advance phase button logic", () => {
         detail: "the workshop is already in its last phase",
       } as IntentResult),
     );
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     act(() => result.current.advancePhase());
 
@@ -96,7 +113,9 @@ describe("advance phase button logic", () => {
 
   it("shows a transport failure as a generic failure message", () => {
     withAdvancePhase(() => throwError(() => new Error("connection is closed")));
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     act(() => result.current.advancePhase());
 
@@ -105,7 +124,9 @@ describe("advance phase button logic", () => {
 
   it("disables itself while the intent is in flight", () => {
     withAdvancePhase(() => NEVER);
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     act(() => result.current.advancePhase());
 
@@ -120,7 +141,9 @@ describe("advance phase button logic", () => {
           abandonedCount += 1;
         }),
     );
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     act(() => result.current.advancePhase());
     act(() => result.current.advancePhase());
@@ -131,7 +154,9 @@ describe("advance phase button logic", () => {
   it("keeps advancing disabled until a state has arrived", () => {
     withAdvancePhase(() => NEVER);
 
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     expect(result.current.isAdvanceEnabled).toBe(false);
   });
@@ -142,7 +167,9 @@ describe("advance phase button logic", () => {
       of(stateListing([FacilitatorIntent.AdvancePhase])),
     );
 
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     expect(result.current.isAdvanceEnabled).toBe(true);
   });
@@ -153,9 +180,41 @@ describe("advance phase button logic", () => {
       of(stateListing([FacilitatorIntent.RevealAnswer])),
     );
 
-    const { result } = renderHook(() => useAdvancePhaseButton());
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     expect(result.current.isAdvanceEnabled).toBe(false);
+  });
+
+  it("names the next phase while the workshop is not in its last phase", () => {
+    withAdvancePhase(() => NEVER, of(stateListing([])));
+
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
+
+    expect(result.current.nextPhaseLabel).toBe("Advance to 2 · Quiz");
+  });
+
+  it("offers no next phase before a state has arrived", () => {
+    withAdvancePhase(() => NEVER);
+
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
+
+    expect(result.current.nextPhaseLabel).toBeNull();
+  });
+
+  it("offers no next phase in the last phase", () => {
+    withAdvancePhase(() => NEVER, of(stateInFinalPhase()));
+
+    const { result } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
+
+    expect(result.current.nextPhaseLabel).toBeNull();
   });
 
   it("abandons an in-flight intent when the screen is left", () => {
@@ -166,7 +225,9 @@ describe("advance phase button logic", () => {
           isAbandoned = true;
         }),
     );
-    const { result, unmount } = renderHook(() => useAdvancePhaseButton());
+    const { result, unmount } = renderHook(() => useAdvancePhaseButton(), {
+      wrapper: languageWrapper(),
+    });
 
     act(() => result.current.advancePhase());
     unmount();

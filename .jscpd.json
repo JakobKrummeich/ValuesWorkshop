@@ -12,6 +12,7 @@
     "**/*.sln",
     "**/*.slnf",
     "**/tokens*.css",
+    "**/fonts/**",
     "**/Analyzers/**",
     "**/Migrations/**"
   ],

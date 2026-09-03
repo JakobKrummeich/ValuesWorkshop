@@ -1,0 +1,71 @@
+.shell {
+  position: relative;
+  display: grid;
+  flex: 1;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.shell::before {
+  position: absolute;
+  z-index: -1;
+  inset: -30%;
+  content: "";
+  background:
+    radial-gradient(
+      45% 40% at 15% 25%,
+      color-mix(in srgb, var(--color-glow-1) 28%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      40% 40% at 88% 80%,
+      color-mix(in srgb, var(--color-glow-2) 22%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      35% 35% at 70% 10%,
+      color-mix(in srgb, var(--color-glow-3) 16%, transparent),
+      transparent 65%
+    );
+  animation: drift 60s var(--ease-in-out) infinite alternate;
+  pointer-events: none;
+}
+
+.topBar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--space-gap);
+  align-items: center;
+  padding: var(--space-tight) var(--space-gap);
+  border-bottom: var(--border-hairline) solid var(--color-border);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  justify-content: safe center;
+  min-height: 0;
+  padding: var(--space-gutter);
+  text-align: center;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  to {
+    transform: translate3d(3%, -2%, 0) rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell::before {
+    animation: none;
+  }
+}

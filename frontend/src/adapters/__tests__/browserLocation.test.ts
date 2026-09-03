@@ -1,7 +1,9 @@
+import { Language } from "../../domain/i18n/language";
 import {
   currentReturnUrl,
   currentSessionIdentity,
   participantJoinUrl,
+  requestedLanguage,
   sessionUrl,
 } from "../browserLocation";
 
@@ -16,6 +18,22 @@ describe("session identity in the link", () => {
     window.history.replaceState({}, "", "/participant");
 
     expect(currentSessionIdentity()).toBeNull();
+  });
+});
+
+describe("language requested in the link", () => {
+  it("reads a supported language tag", () => {
+    window.history.replaceState({}, "", "/presenter?language=de");
+
+    expect(requestedLanguage()).toBe(Language.German);
+  });
+
+  it("is absent when the link names no language or an unknown one", () => {
+    window.history.replaceState({}, "", "/presenter");
+    expect(requestedLanguage()).toBeUndefined();
+
+    window.history.replaceState({}, "", "/presenter?language=fr");
+    expect(requestedLanguage()).toBeUndefined();
   });
 });
 

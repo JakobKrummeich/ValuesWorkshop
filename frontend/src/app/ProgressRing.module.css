@@ -1,0 +1,62 @@
+@property --ring-fraction {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  align-items: center;
+  width: 100%;
+}
+
+.ring {
+  --ring-thickness: 0.9em;
+
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 11em;
+  aspect-ratio: 1;
+  border-radius: var(--radius-full);
+  background: conic-gradient(
+    var(--color-accent) calc(var(--ring-fraction) * 360deg),
+    var(--color-surface-strong) 0
+  );
+  font-size: var(--text-body);
+  transition: --ring-fraction var(--motion-base) var(--ease-out);
+}
+
+.ring::before {
+  position: absolute;
+  inset: var(--ring-thickness);
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  content: "";
+}
+
+.percentage {
+  position: relative;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
+}
+
+.label {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+  line-height: var(--leading-tight);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring {
+    transition: none;
+  }
+}

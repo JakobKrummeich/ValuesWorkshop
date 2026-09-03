@@ -96,9 +96,7 @@ test.describe.serial("session lifecycle and reconnect", () => {
     await markPage(participantPage);
     await markPage(presenterPage);
 
-    await facilitatorPage
-      .getByRole("button", { name: "Advance phase" })
-      .click();
+    await facilitatorPage.getByTestId("advance-phase-button").click();
 
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 2");
     await expect(participantPage.getByTestId("phase")).toHaveText("Phase 2");
@@ -128,7 +126,7 @@ test.describe.serial("session lifecycle and reconnect", () => {
     await facilitatorPage.goto(facilitatorPath(sessionIdentity));
 
     await expect(
-      facilitatorPage.getByRole("button", { name: "Advance phase" }),
+      facilitatorPage.getByTestId("advance-phase-button"),
     ).toBeVisible();
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 2");
     await expect(facilitatorPage.getByTestId("connection")).toHaveText(

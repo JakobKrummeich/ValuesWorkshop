@@ -11,8 +11,10 @@ export default function FacilitatorLayout({
   children: ReactNode;
 }) {
   return (
-    <AuthGuard>
-      <FacilitatorSessionBoundary>{children}</FacilitatorSessionBoundary>
-    </AuthGuard>
+    <div className="screenFacilitator">
+      <AuthGuard>
+        <FacilitatorSessionBoundary>{children}</FacilitatorSessionBoundary>
+      </AuthGuard>
+    </div>
   );
 }

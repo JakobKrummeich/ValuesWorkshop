@@ -22,7 +22,7 @@ export function ParticipantSessionBoundary({
             votingPort: session.votingPort,
           }}
         >
-          <div className="screenParticipant">{children}</div>
+          {children}
         </ParticipantDependencyProvider>
       )}
     </SessionBoundary>
