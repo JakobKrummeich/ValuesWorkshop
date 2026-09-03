@@ -12,6 +12,7 @@ export enum MessageKey {
   LanguageGerman = "language.german",
   LanguageEnglish = "language.english",
   LanguageSwitcherLabel = "language.switcherLabel",
+  MissingSessionHeading = "session.missingHeading",
   MissingSession = "session.missing",
   SessionPhase = "session.phase",
   SessionWaiting = "session.waiting",

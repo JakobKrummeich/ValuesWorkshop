@@ -148,9 +148,8 @@ describe("participant screen group", () => {
 
     await renderScreen();
 
-    screen.getByText("This link carries no workshop session.", {
-      exact: false,
-    });
+    screen.getByRole("heading", { name: "No session in this link" });
+    screen.getByText("Please scan the QR code on the wall again.");
     expect(createSession).not.toHaveBeenCalled();
   });
 });

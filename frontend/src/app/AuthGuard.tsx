@@ -2,9 +2,9 @@
 
 import type { ReactNode } from "react";
 import { MessageKey } from "../domain/i18n/messages";
+import { EntryNotice } from "./EntryNotice";
 import { useTranslation } from "./i18n/useTranslation";
 import { useAuthGuard, AuthGuardState } from "./useAuthGuard";
-import styles from "./AuthGuard.module.css";
 
 type PendingAuthState = Exclude<AuthGuardState, AuthGuardState.Authenticated>;
 
@@ -22,9 +22,5 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
 
-  return (
-    <div className={styles.container}>
-      <p>{translate(noticeByState[state])}</p>
-    </div>
-  );
+  return <EntryNotice body={translate(noticeByState[state])} />;
 }
