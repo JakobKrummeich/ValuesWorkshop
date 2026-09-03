@@ -3,6 +3,5 @@
   flex: 1;
   flex-direction: column;
   gap: var(--space-gutter);
-  padding: var(--space-gutter);
-  overflow-y: auto;
+  min-height: 0;
 }

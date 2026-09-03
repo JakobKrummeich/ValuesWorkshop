@@ -3,7 +3,7 @@
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { GroupActionView } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
-import styles from "./GroupWorkCard.module.css";
+import styles from "./ActionListItem.module.css";
 
 export function ActionListItem({
   action,
@@ -22,13 +22,10 @@ export function ActionListItem({
 
   if (isEditable) {
     return (
-      <li
-        className={styles.actionItem}
-        data-testid={`action-${action.actionId}`}
-      >
+      <li className={styles.row} data-testid={`action-${action.actionId}`}>
         <input
           type="text"
-          className={styles.actionInput}
+          className={styles.input}
           data-testid={`action-input-${action.actionId}`}
           value={localText ?? action.text}
           placeholder={translate(MessageKey.GroupWorkActionPlaceholder)}
@@ -36,20 +33,21 @@ export function ActionListItem({
         />
         <button
           type="button"
-          className={styles.removeButton}
+          className={styles.remove}
           data-testid={`remove-action-${action.actionId}`}
+          aria-label={translate(MessageKey.GroupWorkRemoveAction)}
           onClick={() => onRemove(action.actionId)}
         >
-          {translate(MessageKey.GroupWorkRemoveAction)}
+          <span aria-hidden="true">×</span>
         </button>
       </li>
     );
   }
 
   return (
-    <li className={styles.actionItem} data-testid={`action-${action.actionId}`}>
+    <li className={styles.row} data-testid={`action-${action.actionId}`}>
       <span
-        className={styles.actionText}
+        className={styles.text}
         data-testid={`action-text-${action.actionId}`}
       >
         {action.text}

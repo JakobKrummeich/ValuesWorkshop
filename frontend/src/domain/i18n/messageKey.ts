@@ -95,6 +95,7 @@ export enum MessageKey {
   GroupFormationYourGroup = "groupFormation.yourGroup",
   GroupFormationFindEachOther = "groupFormation.findEachOther",
   GroupWorkScribeLabel = "groupWork.scribeLabel",
+  GroupWorkScribeIsYou = "groupWork.scribeIsYou",
   GroupWorkAddAction = "groupWork.addAction",
   GroupWorkRemoveAction = "groupWork.removeAction",
   GroupWorkActionPlaceholder = "groupWork.actionPlaceholder",

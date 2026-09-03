@@ -7,6 +7,10 @@ export const groupWorkMessages = {
     [Language.German]: "Schreiber/in: {name}",
     [Language.English]: "Scribe: {name}",
   },
+  [MessageKey.GroupWorkScribeIsYou]: {
+    [Language.German]: "Schreiber/in: {name} (du)",
+    [Language.English]: "Scribe: {name} (you)",
+  },
   [MessageKey.GroupWorkAddAction]: {
     [Language.German]: "Aktion hinzufügen",
     [Language.English]: "Add action",

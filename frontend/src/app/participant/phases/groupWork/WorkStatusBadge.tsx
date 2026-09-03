@@ -2,8 +2,9 @@
 
 import { MessageKey } from "../../../../domain/i18n/messages";
 import { GroupWorkStatus } from "../../../../domain/workshopState";
+import { CheckMark } from "../../../CheckMark";
 import { useTranslation } from "../../../i18n/useTranslation";
-import styles from "./GroupWorkCard.module.css";
+import styles from "./WorkStatusBadge.module.css";
 
 export function WorkStatusBadge({
   workStatus,
@@ -11,19 +12,21 @@ export function WorkStatusBadge({
   workStatus: GroupWorkStatus;
 }) {
   const { translate } = useTranslation();
+  const isSubmitted = workStatus === GroupWorkStatus.Submitted;
 
   return (
     <span
-      className={`${styles.statusBadge} ${
-        workStatus === GroupWorkStatus.Submitted
-          ? styles.statusSubmitted
-          : styles.statusEditing
+      className={`${styles.pill} ${
+        isSubmitted ? styles.submitted : styles.editing
       }`}
       data-testid="group-work-status"
     >
-      {workStatus === GroupWorkStatus.Submitted
-        ? translate(MessageKey.GroupWorkStatusSubmitted)
-        : translate(MessageKey.GroupWorkStatusEditing)}
+      {isSubmitted && <CheckMark />}
+      {translate(
+        isSubmitted
+          ? MessageKey.GroupWorkStatusSubmitted
+          : MessageKey.GroupWorkStatusEditing,
+      )}
     </span>
   );
 }

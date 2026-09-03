@@ -1,17 +1,17 @@
 "use client";
 
-import { localizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { OwnGroupView } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { ActionListItem } from "./ActionListItem";
 import styles from "./GroupWorkCard.module.css";
 import { GroupWorkControls } from "./GroupWorkControls";
+import { GroupWorkHeader } from "./GroupWorkHeader";
 import { useGroupWorkCard } from "./useGroupWorkCard";
-import { WorkStatusBadge } from "./WorkStatusBadge";
+import { ValueTabs } from "./ValueTabs";
 
 export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
-  const { language, translate } = useTranslation();
+  const { translate } = useTranslation();
   const {
     groupName,
     memberDisplayNames,
@@ -30,49 +30,29 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
     reopenGroupWork,
     canSubmit,
     isSending,
+    rejectionMessage,
   } = useGroupWorkCard(ownGroup);
 
   const isEditable = isCallerScribe && !isSubmitted;
 
   return (
-    <article className={styles.card} data-testid="group-work-card">
-      <div className={styles.header}>
-        <h2 className={styles.groupName} data-testid="group-work-name">
-          {localizedText(language, groupName.text)}
-        </h2>
-        <ul className={styles.members}>
-          {memberDisplayNames.map((displayName, index) => (
-            <li
-              key={index}
-              className={styles.member}
-              data-testid="group-work-member"
-            >
-              {displayName}
-            </li>
-          ))}
-        </ul>
-        {scribeName !== null && (
-          <p className={styles.scribeLabel} data-testid="group-work-scribe">
-            {translate(MessageKey.GroupWorkScribeLabel, { name: scribeName })}
-          </p>
-        )}
-      </div>
-      <ul className={styles.valueTabs} role="tablist" data-testid="value-tabs">
-        {assignedValues.map((value) => (
-          <li key={value.valueId}>
-            <button
-              type="button"
-              role="tab"
-              className={styles.valueTab}
-              aria-selected={value.valueId === selectedValueId}
-              data-testid={`value-tab-${value.valueId}`}
-              onClick={() => selectValue(value.valueId)}
-            >
-              {localizedText(language, value.text)}
-            </button>
-          </li>
-        ))}
-      </ul>
+    <article
+      className={styles.card}
+      data-testid="group-work-card"
+      data-animal={groupName.animalId}
+    >
+      <GroupWorkHeader
+        groupName={groupName}
+        memberDisplayNames={memberDisplayNames}
+        scribeName={scribeName}
+        isCallerScribe={isCallerScribe}
+        workStatus={ownGroup.workStatus}
+      />
+      <ValueTabs
+        values={assignedValues}
+        selectedValueId={selectedValueId}
+        onSelect={selectValue}
+      />
       <ul className={styles.actionList} data-testid="action-list">
         {actionsForSelectedValue.map((action) => (
           <ActionListItem
@@ -93,8 +73,14 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
           onClick={addAction}
           disabled={isSending}
         >
+          <span aria-hidden="true">+</span>
           {translate(MessageKey.GroupWorkAddAction)}
         </button>
+      )}
+      {rejectionMessage !== null && (
+        <p className={styles.rejection} role="status">
+          {translate(rejectionMessage)}
+        </p>
       )}
       {isCallerScribe && (
         <GroupWorkControls
@@ -104,9 +90,6 @@ export function GroupWorkCard({ ownGroup }: { ownGroup: OwnGroupView }) {
           onSubmit={submitGroupWork}
           onReopen={reopenGroupWork}
         />
-      )}
-      {ownGroup.workStatus !== undefined && (
-        <WorkStatusBadge workStatus={ownGroup.workStatus} />
       )}
     </article>
   );
