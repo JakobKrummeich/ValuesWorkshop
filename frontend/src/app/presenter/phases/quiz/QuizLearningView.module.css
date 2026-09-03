@@ -33,12 +33,6 @@
   animation-delay: var(--motion-stagger);
 }
 
-.check {
-  flex: none;
-  width: 1em;
-  height: 1em;
-}
-
 .text {
   margin: var(--space-gap) 0 0;
   color: var(--color-text);

@@ -2,6 +2,7 @@
 
 import { localizedText } from "../../../../domain/i18n/localizedText";
 import { cssCustomProperty } from "../../../../shared/cssCustomProperty";
+import { CheckMark } from "../../../CheckMark";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { useCountUp } from "../../../useCountUp";
 import styles from "./QuizAnswerRow.module.css";
@@ -29,20 +30,7 @@ export function QuizAnswerRow({
     >
       <span className={styles.answerText}>
         {localizedText(language, bar.text)}
-        {isCorrect && (
-          <svg
-            className={styles.check}
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M3 8.5l3.2 3L13 4.5" />
-          </svg>
-        )}
+        {isCorrect && <CheckMark className={styles.check} />}
       </span>
       <div className={styles.track}>
         <div

@@ -23,12 +23,6 @@
   color: var(--color-success);
 }
 
-.check {
-  flex: none;
-  width: 1em;
-  height: 1em;
-}
-
 @keyframes pulse {
   50% {
     opacity: 0.45;

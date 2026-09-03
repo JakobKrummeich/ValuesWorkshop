@@ -2,6 +2,7 @@
 
 import { MessageKey } from "../../../../domain/i18n/messages";
 import { GroupWorkStatus } from "../../../../domain/workshopState";
+import { CheckMark } from "../../../CheckMark";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./GroupWorkStatusPill.module.css";
 
@@ -22,20 +23,7 @@ export function GroupWorkStatusPill({
       }`}
       data-testid={`presenter-group-status-${animalId}`}
     >
-      {isSubmitted && (
-        <svg
-          className={styles.check}
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M3 8.5l3.2 3L13 4.5" />
-        </svg>
-      )}
+      {isSubmitted && <CheckMark />}
       {translate(
         isSubmitted
           ? MessageKey.GroupWorkStatusSubmitted

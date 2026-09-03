@@ -25,9 +25,6 @@
 }
 
 .check {
-  flex: none;
-  width: 1em;
-  height: 1em;
   animation: pop var(--motion-base) var(--ease-spring) backwards;
 }
 
