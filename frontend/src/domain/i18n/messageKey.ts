@@ -122,6 +122,8 @@ export enum MessageKey {
   ValuePresentationPresenting = "valuePresentation.presenting",
   ValuePresentationPresents = "valuePresentation.presents",
   ValuePresentationNextValue = "valuePresentation.nextValue",
+  ValuePresentationActionWording = "valuePresentation.actionWording",
+  ValuePresentationEditHint = "valuePresentation.editHint",
   FinalVotingVotesUsed = "finalVoting.votesUsed",
   FinalVotingYourVotes = "finalVoting.yourVotes",
   FinalVotingVotesLeft = "finalVoting.votesLeft",

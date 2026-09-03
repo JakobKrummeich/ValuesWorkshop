@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MessageKey } from "../../../../../domain/i18n/messages";
 import { PresentationPositionKind } from "../../../../../domain/presentationPosition";
 import { Phase } from "../../../../../domain/phases";
 import type { FacilitatorValuePresentationState } from "../../../../../domain/workshopState";
@@ -76,6 +77,11 @@ describe("FacilitatorValuePresentationScreen", () => {
     expect(screen.getByTestId("presented-action-input-action-1")).toHaveValue(
       "We ask before assuming",
     );
+    expect(
+      screen.getByText(
+        "Correct the wording right in the row – Enter saves, Escape reverts.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("announces the group up next on an intro position", () => {
@@ -89,6 +95,19 @@ describe("FacilitatorValuePresentationScreen", () => {
 
     expect(screen.getByTestId("presenting-position")).toHaveTextContent(
       "Up next: Otter",
+    );
+    expect(
+      screen.queryByText(
+        "Correct the wording right in the row – Enter saves, Escape reverts.",
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the rejection when the walk control was refused", () => {
+    renderWith({ rejectionMessage: MessageKey.IntentWrongPhase });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "That is not possible in this phase.",
     );
   });
 
