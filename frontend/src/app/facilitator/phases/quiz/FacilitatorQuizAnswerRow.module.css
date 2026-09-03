@@ -1,0 +1,122 @@
+.row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(6rem, 14rem) auto;
+  gap: var(--space-gutter);
+  align-items: center;
+  padding: var(--space-gap) var(--space-gutter);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  transition:
+    border-color var(--motion-base) var(--ease-out),
+    box-shadow var(--motion-base) var(--ease-out);
+}
+
+.letter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-small);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+.text {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-tight) var(--space-gap);
+  align-items: center;
+  min-width: 0;
+  color: var(--color-text);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.correctMarker {
+  display: inline-flex;
+  gap: calc(var(--space-tight) * 0.5);
+  align-items: center;
+  color: var(--color-success);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.track {
+  height: 0.6em;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-strong);
+  font-size: var(--text-body);
+}
+
+.bar {
+  display: block;
+  width: calc(var(--vote-fraction, 0) * 100%);
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-strong),
+    var(--color-primary)
+  );
+  transition:
+    width var(--motion-slow) var(--ease-out),
+    background var(--motion-slow) var(--ease-out);
+}
+
+.tally {
+  min-width: 5.5em;
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-bold);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.correct .letter {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.revealed.correct {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 var(--border-hairline) var(--color-success);
+}
+
+.revealed.correct .bar {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-success) 60%, var(--color-surface)),
+    var(--color-success)
+  );
+}
+
+.revealed.correct .tally {
+  color: var(--color-success);
+}
+
+.revealed:not(.correct) .bar {
+  background: color-mix(in srgb, var(--color-text-muted) 35%, transparent);
+}
+
+.revealed:not(.correct) .text {
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row,
+  .bar {
+    transition: none;
+  }
+}

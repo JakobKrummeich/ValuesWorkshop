@@ -1,73 +1,76 @@
 .quiz {
   display: flex;
   flex-direction: column;
-  gap: var(--space-gap);
-  padding: var(--space-gutter);
-}
-
-.answeredCount {
-  color: var(--color-accent);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
+  gap: var(--space-gutter);
+  width: 100%;
+  max-width: 56rem;
 }
 
 .answers {
   display: flex;
   flex-direction: column;
-  gap: var(--space-tight);
+  gap: var(--space-gap);
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
-.answer {
-  display: flex;
-  gap: var(--space-gap);
-  align-items: baseline;
-  padding: var(--space-tight) var(--space-gap);
-  border: var(--border-hairline) solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-}
-
-.correct {
-  border-color: var(--color-success);
-}
-
-.answerText {
-  flex: 1;
-  color: var(--color-text);
-  font-size: var(--text-body);
-}
-
-.correctMarker {
-  color: var(--color-success);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-}
-
-.tally {
-  color: var(--color-text-muted);
+.answeredCount {
+  margin: 0;
+  color: var(--color-accent);
   font-size: var(--text-small);
   font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-black);
+  line-height: var(--leading-tight);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-gap);
+  align-items: center;
+  min-height: var(--control-height);
 }
 
 .controlButton {
-  align-self: flex-start;
   min-height: var(--control-height);
-  padding: var(--space-tight) var(--space-gutter);
+  padding: var(--space-tight) calc(var(--space-gutter) * 1.5);
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-full);
   background: var(--color-accent);
-  color: var(--color-on-primary);
+  color: var(--color-on-accent);
   font-family: var(--font-sans);
-  font-size: var(--text-body);
+  font-size: var(--text-action);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-out);
 }
 
 .controlButton:disabled {
-  background: var(--color-text-muted);
+  background: var(--color-surface-strong);
+  color: var(--color-text-muted);
+}
+
+.controlButton:hover:enabled {
+  background: var(--color-accent-deep);
+}
+
+.controlButton:active:enabled {
+  transform: scale(0.98);
 }
 
 .rejection {
+  margin: 0;
   color: var(--color-danger);
   font-family: var(--font-sans);
   font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .controlButton {
+    transition: none;
+  }
 }

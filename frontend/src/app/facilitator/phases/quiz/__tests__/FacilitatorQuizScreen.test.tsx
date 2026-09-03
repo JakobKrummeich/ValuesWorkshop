@@ -46,6 +46,30 @@ function model(
 ): FacilitatorQuizScreenModel {
   return {
     questionNumber: 2,
+    answers: [
+      {
+        letter: "A",
+        text: { de: "Eins", en: "One" },
+        voteCount: 2,
+        widthFraction: 1,
+        isCorrect: true,
+      },
+      {
+        letter: "B",
+        text: { de: "Zwei", en: "Two" },
+        voteCount: 1,
+        widthFraction: 0.5,
+        isCorrect: false,
+      },
+      {
+        letter: "C",
+        text: { de: "Drei", en: "Three" },
+        voteCount: 0,
+        widthFraction: 0,
+        isCorrect: false,
+      },
+    ],
+    isRevealed: false,
     quizControl: null,
     isSending: false,
     rejectionMessage: null,
@@ -90,6 +114,19 @@ describe("facilitator quiz screen", () => {
       "data-correct",
       "false",
     );
+    expect(screen.getByTestId("answer-row-1")).toHaveTextContent("B");
+  });
+
+  it("scales the tally bars", () => {
+    screenHook.mockReturnValue(model());
+
+    render(<FacilitatorQuizScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(
+      screen.getByTestId("answer-row-1").querySelector("span[style]"),
+    ).toHaveStyle({ "--vote-fraction": "0.5" });
   });
 
   it("always shows the labelled learning text", () => {
