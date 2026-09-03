@@ -85,10 +85,11 @@ describe("participant final voting screen logic", () => {
 
     expect(result.current.showConfirmation).toBe(false);
     expect(result.current.usedVotes).toBe(0);
+    expect(result.current.remainingVotes).toBe(5);
     expect(result.current.allotment).toBe(5);
     expect(result.current.cards).toHaveLength(3);
     expect(result.current.cards[0].actions).toEqual([
-      "We start meetings on time",
+      { id: "0", text: "We start meetings on time" },
     ]);
     expect(result.current.cards.every((card) => card.voteCount === 0)).toBe(
       true,
@@ -105,6 +106,7 @@ describe("participant final voting screen logic", () => {
     castVotes(result, { "wert-1": 2, "wert-2": 1 });
 
     expect(result.current.usedVotes).toBe(3);
+    expect(result.current.remainingVotes).toBe(2);
     expect(result.current.cards[0].voteCount).toBe(2);
     expect(result.current.cards[1].voteCount).toBe(1);
     expect(result.current.cards[1].canRemove).toBe(true);

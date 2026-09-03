@@ -4,9 +4,12 @@ import { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantFinalVotingState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { SubmittedConfirmation } from "../../../SubmittedConfirmation";
+import { ActionBar } from "../../ActionBar";
+import { CallToAction } from "../../CallToAction";
 import styles from "./ParticipantFinalVotingScreen.module.css";
 import { useParticipantFinalVotingScreen } from "./useParticipantFinalVotingScreen";
 import { VoteCard } from "./VoteCard";
+import { VotePips } from "./VotePips";
 
 export function ParticipantFinalVotingScreen({
   state,
@@ -18,6 +21,7 @@ export function ParticipantFinalVotingScreen({
     showConfirmation,
     cards,
     usedVotes,
+    remainingVotes,
     allotment,
     canSubmit,
     addVote,
@@ -28,24 +32,28 @@ export function ParticipantFinalVotingScreen({
 
   if (showConfirmation) {
     return (
-      <section className={styles.screen}>
-        <SubmittedConfirmation
-          heading={MessageKey.FinalVotingSubmittedHeading}
-          body={MessageKey.FinalVotingSubmittedBody}
-          testId="votes-submitted-confirmation"
-        />
-      </section>
+      <SubmittedConfirmation
+        heading={MessageKey.FinalVotingSubmittedHeading}
+        body={MessageKey.FinalVotingSubmittedBody}
+        testId="votes-submitted-confirmation"
+      />
     );
   }
 
   return (
     <section className={styles.screen}>
-      <p className={styles.votesUsed} data-testid="votes-used">
-        {translate(MessageKey.FinalVotingVotesUsed, {
-          used: usedVotes,
-          total: allotment,
-        })}
-      </p>
+      <header className={styles.header}>
+        <h2 className={styles.heading}>
+          {translate(MessageKey.FinalVotingYourVotes)}
+        </h2>
+        <VotePips used={usedVotes} total={allotment} />
+        <p className="visuallyHidden" data-testid="votes-used">
+          {translate(MessageKey.FinalVotingVotesUsed, {
+            used: usedVotes,
+            total: allotment,
+          })}
+        </p>
+      </header>
       <ul className={styles.cards}>
         {cards.map((card) => (
           <li key={card.valueId}>
@@ -53,22 +61,34 @@ export function ParticipantFinalVotingScreen({
           </li>
         ))}
       </ul>
-      <button
-        type="button"
-        className={styles.submitButton}
-        data-testid="submit-votes-button"
-        disabled={!canSubmit}
-        onClick={submitVotes}
-      >
-        {allotment === 1
-          ? translate(MessageKey.FinalVotingSubmitSingle)
-          : translate(MessageKey.FinalVotingSubmit, { total: allotment })}
-      </button>
       {rejectionMessage !== null && (
         <p className={styles.rejection} role="status">
           {translate(rejectionMessage)}
         </p>
       )}
+      <ActionBar
+        hint={
+          remainingVotes === 0
+            ? undefined
+            : translate(
+                remainingVotes === 1
+                  ? MessageKey.FinalVotingVoteLeftSingle
+                  : MessageKey.FinalVotingVotesLeft,
+                { count: remainingVotes },
+              )
+        }
+        hintTestId="votes-left-hint"
+      >
+        <CallToAction
+          testId="submit-votes-button"
+          disabled={!canSubmit}
+          onClick={submitVotes}
+        >
+          {allotment === 1
+            ? translate(MessageKey.FinalVotingSubmitSingle)
+            : translate(MessageKey.FinalVotingSubmit, { total: allotment })}
+        </CallToAction>
+      </ActionBar>
     </section>
   );
 }

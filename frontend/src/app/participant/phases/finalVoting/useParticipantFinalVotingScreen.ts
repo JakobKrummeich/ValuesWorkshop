@@ -4,13 +4,14 @@ import { useCallback, useMemo, useState } from "react";
 import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import type { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantVotingView } from "../../../../domain/workshopState";
+import type { LedgerAction } from "../../../ActionLedger";
 import { useIntentSender } from "../../../useIntentSender";
 import { useParticipantDependencies } from "../../dependencies";
 
 export interface VoteCardModel {
   valueId: string;
   text: LocalizedText;
-  actions: readonly string[];
+  actions: LedgerAction[];
   voteCount: number;
   canAdd: boolean;
   canRemove: boolean;
@@ -20,6 +21,7 @@ export interface ParticipantFinalVotingScreenModel {
   showConfirmation: boolean;
   cards: VoteCardModel[];
   usedVotes: number;
+  remainingVotes: number;
   allotment: number;
   canSubmit: boolean;
   addVote: (valueId: string) => void;
@@ -106,12 +108,16 @@ export function useParticipantFinalVotingScreen(
     cards: voting.eligibleValues.map(({ valueId, text, actions }) => ({
       valueId,
       text,
-      actions,
+      actions: actions.map((actionText, index) => ({
+        id: String(index),
+        text: actionText,
+      })),
       voteCount: voteCounts[valueId] ?? 0,
       canAdd: canVote && usedVotes < allotment,
       canRemove: canVote && (voteCounts[valueId] ?? 0) > 0,
     })),
     usedVotes,
+    remainingVotes: allotment - usedVotes,
     allotment,
     canSubmit,
     addVote,

@@ -2,47 +2,35 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-gap);
+  gap: var(--space-gutter);
   min-height: 0;
-  padding: var(--space-gutter);
 }
 
-.votesUsed {
+.header {
+  display: flex;
+  gap: var(--space-gap);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heading {
+  margin: 0;
   color: var(--color-text);
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
-  font-variant-numeric: tabular-nums;
+  font-size: var(--text-heading);
+  line-height: var(--leading-tight);
 }
 
 .cards {
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: var(--space-gap);
   margin: 0;
   padding: 0;
-  overflow-y: auto;
   list-style: none;
 }
 
-.submitButton {
-  min-height: var(--control-height);
-  padding: var(--space-tight) var(--space-gutter);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
-}
-
-.submitButton:disabled {
-  background: var(--color-border);
-  color: var(--color-text-muted);
-}
-
 .rejection {
+  margin: 0;
   color: var(--color-danger);
   font-family: var(--font-sans);
   font-size: var(--text-small);
