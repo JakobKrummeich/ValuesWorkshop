@@ -28,6 +28,9 @@ export function runFfmpeg(args: readonly string[]): void {
     ],
     { stdio: "inherit" },
   );
+  if (finished.error) {
+    throw new Error(`ffmpeg failed to start: ${finished.error.message}`);
+  }
   if (finished.status !== 0) {
     throw new Error(`ffmpeg failed with status ${finished.status}`);
   }
@@ -50,6 +53,9 @@ export function probeVideo(hostPath: string, showEntries: string): string[] {
     ],
     { encoding: "utf8" },
   );
+  if (finished.error) {
+    throw new Error(`ffprobe failed to start: ${finished.error.message}`);
+  }
   if (finished.status !== 0) {
     throw new Error(`ffprobe failed: ${finished.stderr}`);
   }
