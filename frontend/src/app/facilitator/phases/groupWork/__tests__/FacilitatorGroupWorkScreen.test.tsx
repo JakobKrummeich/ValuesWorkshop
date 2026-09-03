@@ -49,7 +49,6 @@ function model(
       },
     ],
     reassignScribe: jest.fn(),
-    allSubmitted: false,
     isSending: false,
     rejectionMessage: null,
     ...overrides,
@@ -89,30 +88,6 @@ describe("FacilitatorGroupWorkScreen", () => {
     expect(screen.getByTestId("group-status-otter")).toHaveTextContent(
       "Editing",
     );
-  });
-
-  it("shows hint when not all submitted", () => {
-    screenHook.mockReturnValue(model({ allSubmitted: false }));
-
-    render(<FacilitatorGroupWorkScreen state={state()} />, {
-      wrapper: languageWrapper(),
-    });
-
-    expect(
-      screen.getByTestId("all-groups-must-submit-hint"),
-    ).toBeInTheDocument();
-  });
-
-  it("hides hint when all submitted", () => {
-    screenHook.mockReturnValue(model({ allSubmitted: true }));
-
-    render(<FacilitatorGroupWorkScreen state={state()} />, {
-      wrapper: languageWrapper(),
-    });
-
-    expect(
-      screen.queryByTestId("all-groups-must-submit-hint"),
-    ).not.toBeInTheDocument();
   });
 
   it("forwards scribe reassignment through the select", () => {

@@ -16,8 +16,7 @@ export function FacilitatorGroupWorkScreen({
   state: FacilitatorGroupWorkState;
 }) {
   const { language, translate } = useTranslation();
-  const { groups, reassignScribe, allSubmitted } =
-    useFacilitatorGroupWorkScreen(state);
+  const { groups, reassignScribe } = useFacilitatorGroupWorkScreen(state);
 
   return (
     <section
@@ -99,11 +98,6 @@ export function FacilitatorGroupWorkScreen({
           })}
         </tbody>
       </table>
-      {!allSubmitted && (
-        <p className={styles.hint} data-testid="all-groups-must-submit-hint">
-          {translate(MessageKey.GroupWorkAllGroupsMustSubmit)}
-        </p>
-      )}
     </section>
   );
 }

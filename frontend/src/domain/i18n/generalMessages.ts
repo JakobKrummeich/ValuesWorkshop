@@ -194,6 +194,38 @@ export const generalMessages = {
     [Language.German]: "Weiter zu {phase} · {name}",
     [Language.English]: "Advance to {phase} · {name}",
   },
+  [MessageKey.AdvanceGuardJoin]: {
+    [Language.German]: "Weiter, wenn alle da sind.",
+    [Language.English]: "Advance when everybody is in.",
+  },
+  [MessageKey.AdvanceGuardQuiz]: {
+    [Language.German]: "Weiter nach dem letzten Lerntext.",
+    [Language.English]: "Advance after the last learning text.",
+  },
+  [MessageKey.AdvanceGuardSelection]: {
+    [Language.German]: "Weiter, wenn alle abgegeben haben.",
+    [Language.English]: "Advance when everybody has submitted.",
+  },
+  [MessageKey.AdvanceGuardGroupFormation]: {
+    [Language.German]: "Weiter, sobald die Gruppen stehen.",
+    [Language.English]: "Advance once the groups stand.",
+  },
+  [MessageKey.AdvanceGuardGroupWork]: {
+    [Language.German]: "Weiter, sobald alle Gruppen abgegeben haben.",
+    [Language.English]: "Advance once every group has submitted.",
+  },
+  [MessageKey.AdvanceGuardValuePresentation]: {
+    [Language.German]: "Weiter, wenn der letzte Wert vorgestellt ist.",
+    [Language.English]: "Advance after the last value is presented.",
+  },
+  [MessageKey.AdvanceGuardFinalVoting]: {
+    [Language.German]: "Weiter, sobald die Gewinner feststehen.",
+    [Language.English]: "Advance once the winners stand.",
+  },
+  [MessageKey.SessionCodeLabel]: {
+    [Language.German]: "Workshop",
+    [Language.English]: "Session",
+  },
   [MessageKey.IntentWrongPhase]: {
     [Language.German]: "In dieser Phase ist das nicht möglich.",
     [Language.English]: "That is not possible in this phase.",

@@ -128,9 +128,27 @@
 
 /* sidebar: a vertical timeline */
 
+.sidebar {
+  width: 100%;
+}
+
 .sidebar .steps {
+  --marker-size: 1.5rem;
+
+  position: relative;
   flex-direction: column;
   gap: var(--space-tight);
+  width: 100%;
+}
+
+.sidebar .steps::before {
+  position: absolute;
+  top: var(--space-gap);
+  bottom: var(--space-gap);
+  left: calc(var(--space-gap) + var(--marker-size) / 2);
+  width: var(--border-hairline);
+  background: var(--color-border);
+  content: "";
 }
 
 .sidebar .step {
@@ -144,6 +162,10 @@
   transition:
     background var(--motion-base) var(--ease-out),
     color var(--motion-base) var(--ease-out);
+}
+
+.sidebar .step.done {
+  color: var(--color-text);
 }
 
 .sidebar .step.current {

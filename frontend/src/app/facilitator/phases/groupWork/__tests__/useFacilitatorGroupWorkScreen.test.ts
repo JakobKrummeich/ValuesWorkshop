@@ -58,44 +58,6 @@ function state(
 }
 
 describe("useFacilitatorGroupWorkScreen", () => {
-  it("reports all submitted when every group is submitted", () => {
-    mockDependencies();
-    const groups = [
-      {
-        name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
-        members: [{ participantId: "p1", displayName: "Alice" }],
-        assignedValues: [],
-        scribeParticipantId: "p1",
-        workStatus: GroupWorkStatus.Submitted,
-        actionCountPerValue: {},
-      },
-    ];
-    const { result } = renderHook(() =>
-      useFacilitatorGroupWorkScreen(state(groups)),
-    );
-
-    expect(result.current.allSubmitted).toBe(true);
-  });
-
-  it("reports not all submitted when any group is editing", () => {
-    mockDependencies();
-    const groups = [
-      {
-        name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
-        members: [{ participantId: "p1", displayName: "Alice" }],
-        assignedValues: [],
-        scribeParticipantId: "p1",
-        workStatus: GroupWorkStatus.Editing,
-        actionCountPerValue: {},
-      },
-    ];
-    const { result } = renderHook(() =>
-      useFacilitatorGroupWorkScreen(state(groups)),
-    );
-
-    expect(result.current.allSubmitted).toBe(false);
-  });
-
   it("sends reassignScribe through the port", () => {
     const reassignScribe = mockDependencies();
     const groups = [

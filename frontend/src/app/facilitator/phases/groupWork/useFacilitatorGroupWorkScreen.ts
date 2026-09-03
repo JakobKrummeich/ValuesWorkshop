@@ -2,10 +2,9 @@
 
 import { useCallback } from "react";
 import type { MessageKey } from "../../../../domain/i18n/messages";
-import {
-  GroupWorkStatus,
-  type FacilitatorGroupWorkState,
-  type FacilitatorGroupWorkGroups,
+import type {
+  FacilitatorGroupWorkState,
+  FacilitatorGroupWorkGroups,
 } from "../../../../domain/workshopState";
 import { useIntentSender } from "../../../useIntentSender";
 import { useFacilitatorDependencies } from "../../dependencies";
@@ -13,7 +12,6 @@ import { useFacilitatorDependencies } from "../../dependencies";
 export interface FacilitatorGroupWorkScreenModel {
   groups: FacilitatorGroupWorkGroups;
   reassignScribe: (participantId: string) => void;
-  allSubmitted: boolean;
   isSending: boolean;
   rejectionMessage: MessageKey | null;
 }
@@ -23,10 +21,6 @@ export function useFacilitatorGroupWorkScreen(
 ): FacilitatorGroupWorkScreenModel {
   const { groupWorkControlPort } = useFacilitatorDependencies();
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
-
-  const allSubmitted = state.groups.every(
-    (group) => group.workStatus === GroupWorkStatus.Submitted,
-  );
 
   const reassignScribe = useCallback(
     (participantId: string) => {
@@ -38,7 +32,6 @@ export function useFacilitatorGroupWorkScreen(
   return {
     groups: state.groups,
     reassignScribe,
-    allSubmitted,
     isSending,
     rejectionMessage,
   };
