@@ -7,6 +7,7 @@
   align-items: center;
   justify-content: center;
   min-height: 0;
+  margin: calc(-1 * var(--space-gutter));
   padding: var(--space-gutter);
   overflow: hidden;
   isolation: isolate;

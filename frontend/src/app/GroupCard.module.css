@@ -159,6 +159,7 @@
 }
 
 .phone {
+  height: auto;
   padding: var(--space-gutter);
 }
 
