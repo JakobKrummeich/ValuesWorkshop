@@ -58,19 +58,21 @@ function parseMix(inner: string): Rgba {
   const firstWeight = parseFraction(firstShare ?? "50%");
   const secondWeight =
     secondShare === undefined ? 1 - firstWeight : parseFraction(secondShare);
-  const a = parseColor(firstColor);
-  const b = parseColor(secondColor);
-  const alpha = a.alpha * firstWeight + b.alpha * secondWeight;
-  const mixChannel = (channelA: number, channelB: number) =>
+  const firstRgba = parseColor(firstColor);
+  const secondRgba = parseColor(secondColor);
+  const firstShareOfAlpha = firstRgba.alpha * firstWeight;
+  const secondShareOfAlpha = secondRgba.alpha * secondWeight;
+  const alpha = firstShareOfAlpha + secondShareOfAlpha;
+  const mixChannel = (firstChannel: number, secondChannel: number) =>
     Math.round(
-      (channelA * a.alpha * firstWeight + channelB * b.alpha * secondWeight) /
+      (firstChannel * firstShareOfAlpha + secondChannel * secondShareOfAlpha) /
         alpha,
     );
 
   return {
-    red: mixChannel(a.red, b.red),
-    green: mixChannel(a.green, b.green),
-    blue: mixChannel(a.blue, b.blue),
+    red: mixChannel(firstRgba.red, secondRgba.red),
+    green: mixChannel(firstRgba.green, secondRgba.green),
+    blue: mixChannel(firstRgba.blue, secondRgba.blue),
     alpha,
   };
 }
