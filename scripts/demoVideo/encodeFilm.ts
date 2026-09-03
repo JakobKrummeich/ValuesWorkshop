@@ -47,8 +47,19 @@ export function encodeMp4(): string {
     "slow",
     "-crf",
     "20",
-    "-pix_fmt",
-    "yuv420p",
+    // The stage frames are full-range JPEGs; without the explicit range
+    // conversion x264 keeps them as yuvj420p, which some players show washed
+    // out. Limited-range yuv420p with bt709 tags plays everywhere.
+    "-vf",
+    "scale=in_range=full:out_range=limited,format=yuv420p",
+    "-color_range",
+    "tv",
+    "-colorspace",
+    "bt709",
+    "-color_primaries",
+    "bt709",
+    "-color_trc",
+    "bt709",
     "-movflags",
     "+faststart",
     "-an",
@@ -80,6 +91,10 @@ export function encodeGif(gifFrameNumbers: readonly number[]): string {
     gifFrames,
     "-vf",
     `${scale},palettegen=stats_mode=diff:max_colors=128`,
+    "-frames:v",
+    "1",
+    "-update",
+    "1",
     containerPath(paletteFile),
   ]);
   runFfmpeg([

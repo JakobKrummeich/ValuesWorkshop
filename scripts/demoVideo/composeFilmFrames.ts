@@ -32,7 +32,6 @@ type StagePayload = {
   layout: string;
   eyebrow: string;
   caption: string;
-  panelEnter: number;
   captionEnter: number;
   filmProgress: number;
   imageUrlsByElementId: Record<string, string>;
@@ -99,7 +98,6 @@ function payloadOf(frame: StageFrame): StagePayload {
     layout: frame.layout,
     eyebrow: frame.eyebrow,
     caption: frame.caption,
-    panelEnter: frame.panelEnter,
     captionEnter: frame.captionEnter,
     filmProgress: frame.filmProgress,
     imageUrlsByElementId,
@@ -118,7 +116,6 @@ async function applyStageFrame(payload: StagePayload): Promise<void> {
   document.body.dataset.layout = payload.layout;
   elementById("eyebrow").textContent = payload.eyebrow;
   elementById("caption").textContent = payload.caption;
-  document.body.style.setProperty("--panel-enter", `${payload.panelEnter}`);
   document.body.style.setProperty("--caption-enter", `${payload.captionEnter}`);
   document.body.style.setProperty("--film-progress", `${payload.filmProgress}`);
 

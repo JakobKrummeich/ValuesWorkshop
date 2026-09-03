@@ -15,11 +15,10 @@ export type StoryboardBeat = {
   eyebrow: string;
   caption: string;
   seconds: number;
-  gifSeconds: number;
   segments: readonly BeatSegment[];
 };
 
-const SCENE_HOLD_MARGIN_MILLISECONDS = 1400;
+const SCENE_HOLD_MARGIN_MILLISECONDS = 2000;
 const UNFILMED_SCENE_HOLD_MILLISECONDS = 400;
 
 export const STORYBOARD: readonly StoryboardBeat[] = [
@@ -29,7 +28,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "",
     caption: "",
     seconds: 3,
-    gifSeconds: 2,
     segments: [],
   },
   {
@@ -38,7 +36,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "1 · Join",
     caption: "Everyone joins by scanning the QR code on the wall.",
     seconds: 8,
-    gifSeconds: 3,
     segments: [
       { scene: "roomFilled", seconds: 4 },
       { scene: "roomFilled", seconds: 4 },
@@ -50,7 +47,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "2 · Quiz",
     caption: "A warm-up quiz: the room answers, the wall counts along.",
     seconds: 8,
-    gifSeconds: 3,
     segments: [
       { scene: "quizTally", seconds: 4 },
       { scene: "quizLearning", seconds: 4 },
@@ -62,7 +58,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "3 · Selection",
     caption: "Everybody picks the ten values that matter most to them.",
     seconds: 8,
-    gifSeconds: 3,
     segments: [
       { scene: "valuesPicked", seconds: 4 },
       { scene: "selectionSubmitted", seconds: 4 },
@@ -74,7 +69,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "4 · Results",
     caption: "The wall counts up the values the room selected most.",
     seconds: 6,
-    gifSeconds: 2.5,
     segments: [{ scene: "selectionResults", seconds: 6 }],
   },
   {
@@ -83,7 +77,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "5 · Groups",
     caption: "Participants are dealt into groups named after forest animals.",
     seconds: 8,
-    gifSeconds: 3,
     segments: [
       { scene: "groupsForming", seconds: 2 },
       { scene: "groupsFormed", seconds: 6 },
@@ -95,7 +88,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "6 · Group work",
     caption: "Each group turns its values into concrete everyday actions.",
     seconds: 8,
-    gifSeconds: 3,
     segments: [
       { scene: "actionsWritten", seconds: 4 },
       { scene: "actionsWritten", seconds: 4 },
@@ -107,7 +99,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "7 · Presentations",
     caption: "Every group presents its actions to the room.",
     seconds: 6,
-    gifSeconds: 2,
     segments: [
       { scene: "actionsPresented", seconds: 2 },
       { scene: "actionsPresented", seconds: 2 },
@@ -120,7 +111,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "8 · Vote",
     caption: "Everyone spends five votes on the values with the best actions.",
     seconds: 8,
-    gifSeconds: 3,
     segments: [
       { scene: "votesInFlight", seconds: 4 },
       { scene: "ballotSubmitted", seconds: 4 },
@@ -132,7 +122,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "9 · Finale",
     caption: "The winning values are revealed one by one, actions first.",
     seconds: 10,
-    gifSeconds: 4,
     segments: [
       { scene: "winnersRevealed", seconds: 1.5 },
       { scene: "winnersRevealed", seconds: 1.5 },
@@ -147,7 +136,6 @@ export const STORYBOARD: readonly StoryboardBeat[] = [
     eyebrow: "",
     caption: "",
     seconds: 4,
-    gifSeconds: 2.5,
     segments: [],
   },
 ];
@@ -182,9 +170,6 @@ function validateStoryboard(): void {
 
     if (!Number.isInteger(beat.seconds * FRAMES_PER_SECOND)) {
       throw new Error(`Beat "${beat.name}" is not a whole number of frames`);
-    }
-    if (beat.gifSeconds > beat.seconds) {
-      throw new Error(`Beat "${beat.name}" cuts more gif than it has film`);
     }
 
     const filmedSeconds = beat.segments.reduce(

@@ -115,15 +115,19 @@ export async function driveDemoWorkshop(workshop: DemoWorkshop): Promise<void> {
   }
 }
 
-async function advanceTo(facilitatorPage: Page, phase: number): Promise<void> {
-  await expect(advancePhaseButton(facilitatorPage)).toBeEnabled({
+// Every filmed moment starts right after a drive step, so a step only counts
+// as done once the wall has caught up as well: the wall is the camera's
+// subject, and it renders a phase change a few frames behind the facilitator.
+async function advanceTo(workshop: DemoWorkshop, phase: number): Promise<void> {
+  await expect(advancePhaseButton(workshop.facilitatorPage)).toBeEnabled({
     timeout: STATE_TIMEOUT_MILLISECONDS,
   });
-  await advancePhaseButton(facilitatorPage).click();
-  await expect(facilitatorPage.getByTestId("phase")).toHaveText(
-    `Phase ${phase}`,
-    { timeout: STATE_TIMEOUT_MILLISECONDS },
-  );
+  await advancePhaseButton(workshop.facilitatorPage).click();
+  for (const page of [workshop.facilitatorPage, workshop.presenterPage]) {
+    await expect(page.getByTestId("phase")).toHaveText(`Phase ${phase}`, {
+      timeout: STATE_TIMEOUT_MILLISECONDS,
+    });
+  }
 }
 
 async function expectJoined(
@@ -191,7 +195,7 @@ async function runTheQuiz(
   workshop: DemoWorkshop,
   participants: readonly DemoParticipant[],
 ): Promise<void> {
-  await advanceTo(workshop.facilitatorPage, 2);
+  await advanceTo(workshop, 2);
 
   await expect(answerButton(workshop.capturedParticipantPage, 0)).toBeVisible({
     timeout: STATE_TIMEOUT_MILLISECONDS,
@@ -210,6 +214,9 @@ async function runTheQuiz(
   await pressQuizControl(workshop.facilitatorPage, "Reveal answer");
   await workshop.atMoment("quizTally");
   await pressQuizControl(workshop.facilitatorPage, "Show learning text");
+  await expect(workshop.presenterPage.getByTestId("learning-text")).toBeVisible(
+    { timeout: STATE_TIMEOUT_MILLISECONDS },
+  );
   await workshop.atMoment("quizLearning");
   await pressQuizControl(workshop.facilitatorPage, "Next question");
 
@@ -231,7 +238,7 @@ async function pickTheValues(
   workshop: DemoWorkshop,
   participants: readonly DemoParticipant[],
 ): Promise<void> {
-  await advanceTo(workshop.facilitatorPage, 3);
+  await advanceTo(workshop, 3);
 
   const [capturedParticipant, ...otherParticipants] = participants;
   for (const [order, participant] of otherParticipants.entries()) {
@@ -252,12 +259,12 @@ async function pickTheValues(
 }
 
 async function showTheSelectionResults(workshop: DemoWorkshop): Promise<void> {
-  await advanceTo(workshop.facilitatorPage, 4);
+  await advanceTo(workshop, 4);
   await workshop.atMoment("selectionResults");
 }
 
 async function formTheGroups(workshop: DemoWorkshop): Promise<void> {
-  await advanceTo(workshop.facilitatorPage, 5);
+  await advanceTo(workshop, 5);
   await workshop.atMoment("groupsForming");
   await expect(
     workshop.facilitatorPage.getByTestId("formation-progress"),
@@ -280,7 +287,7 @@ async function writeTheActions(
   workshop: DemoWorkshop,
   participants: readonly DemoParticipant[],
 ): Promise<number> {
-  await advanceTo(workshop.facilitatorPage, 6);
+  await advanceTo(workshop, 6);
   const animalIds = await animalIdsOf(workshop.facilitatorPage);
   const pageByDisplayName = new Map(
     participants.map((participant) => [
@@ -337,7 +344,7 @@ async function presentTheActions(
   workshop: DemoWorkshop,
   presentationStepCount: number,
 ): Promise<void> {
-  await advanceTo(workshop.facilitatorPage, 7);
+  await advanceTo(workshop, 7);
   const nextValueButton =
     workshop.facilitatorPage.getByTestId("next-value-button");
   const filmedSteps = new Set([
@@ -366,7 +373,7 @@ async function castTheVotes(
   workshop: DemoWorkshop,
   participants: readonly DemoParticipant[],
 ): Promise<void> {
-  await advanceTo(workshop.facilitatorPage, 8);
+  await advanceTo(workshop, 8);
 
   const [capturedParticipant, ...otherParticipants] = participants;
   const eligibleValueIds = await eligibleValueIdsOf(capturedParticipant.page);
@@ -421,7 +428,7 @@ async function castTheVotes(
 }
 
 async function revealTheWinners(workshop: DemoWorkshop): Promise<void> {
-  await advanceTo(workshop.facilitatorPage, 9);
+  await advanceTo(workshop, 9);
   await expect(
     workshop.presenterPage.getByTestId("reveal-anticipation"),
   ).toBeVisible({ timeout: STATE_TIMEOUT_MILLISECONDS });

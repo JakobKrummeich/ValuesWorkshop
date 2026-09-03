@@ -48,13 +48,15 @@ const VIEWPORT_BY_DEVICE: Record<
 
 const LOST_RECORDING_TOLERANCE_SECONDS = 5;
 
+function extractedFrameCount(device: FilmDevice): number {
+  return readdirSync(resolve(FRAMES_DIRECTORY, device)).length;
+}
+
 function frameCountByDevice(): Record<FilmDevice, number> {
-  const countOf = (device: FilmDevice) =>
-    readdirSync(resolve(FRAMES_DIRECTORY, device)).length;
   return {
-    wall: countOf("wall"),
-    phone: countOf("phone"),
-    laptop: countOf("laptop"),
+    wall: extractedFrameCount("wall"),
+    phone: extractedFrameCount("phone"),
+    laptop: extractedFrameCount("laptop"),
   };
 }
 
@@ -120,7 +122,7 @@ test.describe.serial("render the demo film", () => {
         resolve(FRAMES_DIRECTORY, device),
       );
 
-      const extractedSeconds = frameCountByDevice()[device] / FRAMES_PER_SECOND;
+      const extractedSeconds = extractedFrameCount(device) / FRAMES_PER_SECOND;
       const recordedSeconds = recording.spanMilliseconds / 1000;
       console.log(
         `${device}: extracted ${extractedSeconds.toFixed(1)}s of ${recordedSeconds.toFixed(1)}s recorded`,

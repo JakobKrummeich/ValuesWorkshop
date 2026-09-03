@@ -18,7 +18,6 @@
   --wall-height: 810px;
   --phone-height: 700px;
   --laptop-height: 400px;
-  --panel-enter: 1;
   --caption-enter: 1;
   --film-progress: 0;
 }
@@ -109,8 +108,6 @@ body {
   align-items: center;
   justify-content: center;
   height: 810px;
-  opacity: var(--panel-enter);
-  transform: scale(calc(0.988 + 0.012 * var(--panel-enter)));
 }
 
 .panel,
@@ -121,13 +118,14 @@ body {
 .wallFrame,
 .phoneFrame,
 .laptopFrame {
-  padding: 10px;
-  border: var(--border-hairline) solid var(--color-border);
+  padding: 12px;
+  border: var(--border-ring) solid
+    color-mix(in srgb, var(--color-text) 18%, transparent);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  background: var(--color-surface-strong);
   box-shadow:
-    0 40px 120px rgb(0 0 0 / 55%),
-    0 0 0 1px rgb(255 255 255 / 4%) inset;
+    0 0 140px color-mix(in srgb, var(--color-glow-1) 12%, transparent),
+    0 40px 120px rgb(0 0 0 / 55%);
 }
 
 .wallFrame img,
@@ -254,8 +252,8 @@ body[data-layout="outro"] .outroCard {
 }
 
 .cardMark {
-  width: 120px;
-  height: 120px;
+  width: 76px;
+  height: 76px;
   color: var(--color-brand-mark);
   filter: drop-shadow(
     0 0 48px color-mix(in srgb, var(--color-brand-mark) 50%, transparent)

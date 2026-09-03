@@ -3,7 +3,12 @@ import {
   frameFileName,
   GIF_FRAMES_PER_SECOND,
 } from "./filmWorkspace";
-import type { FilmDevice, SceneTimeline, SceneWindow } from "./sceneTimeline";
+import type {
+  DeviceRecording,
+  FilmDevice,
+  SceneTimeline,
+  SceneWindow,
+} from "./sceneTimeline";
 import { filmSeconds, type StageLayout, STORYBOARD } from "./storyboard";
 
 export type StageFrame = {
@@ -11,7 +16,6 @@ export type StageFrame = {
   eyebrow: string;
   caption: string;
   frameUrlsByDevice: Partial<Record<FilmDevice, string>>;
-  panelEnter: number;
   captionEnter: number;
   filmProgress: number;
 };
@@ -24,9 +28,15 @@ const DEVICES_BY_LAYOUT: Record<StageLayout, readonly FilmDevice[]> = {
   outro: [],
 };
 
-const PANEL_ENTER_MILLISECONDS = 300;
+// Beats cut, they do not cross-fade: fading a panel in from nothing would
+// leave the first frames of every beat empty.
 const CAPTION_ENTER_DELAY_MILLISECONDS = 120;
 const CAPTION_ENTER_MILLISECONDS = 380;
+
+// A scene window opens the instant the drive finished its click, so its first
+// frames catch the product's own enter and reveal animations half-played. The
+// cut starts a beat later, which the hold margin around every window pays for.
+const SCENE_LEAD_IN_MILLISECONDS = 500;
 
 export function planFilmFrames(
   timeline: SceneTimeline,
@@ -48,7 +58,7 @@ export function planFilmFrames(
         eyebrow: beat.eyebrow,
         caption: beat.caption,
         frameUrlsByDevice,
-        ...enterProgressAt(beatFrameIndex),
+        captionEnter: captionEnterAt(beatFrameIndex),
         filmProgress: frames.length / (filmFrameCount - 1),
       });
       beatFrameIndex += 1;
@@ -77,7 +87,13 @@ export function planFilmFrames(
       ) {
         const elapsedMilliseconds = (segmentFrame / FRAMES_PER_SECOND) * 1000;
         pushFrame(
-          frameUrlsOf(window, devices, elapsedMilliseconds, frameCountByDevice),
+          frameUrlsOf(
+            window,
+            devices,
+            elapsedMilliseconds,
+            timeline,
+            frameCountByDevice,
+          ),
         );
       }
     }
@@ -87,39 +103,23 @@ export function planFilmFrames(
 }
 
 export function planGifFrameNumbers(): number[] {
-  const gifFrameNumbers: number[] = [];
-  let beatStart = 0;
+  const filmFrameCount = filmSeconds() * FRAMES_PER_SECOND;
+  const gifFrameCount = Math.round(filmSeconds() * GIF_FRAMES_PER_SECOND);
 
-  for (const beat of STORYBOARD) {
-    const beatFrameCount = beat.seconds * FRAMES_PER_SECOND;
-    const gifFrameCount = Math.round(beat.gifSeconds * GIF_FRAMES_PER_SECOND);
-
-    for (let gifFrame = 0; gifFrame < gifFrameCount; gifFrame += 1) {
-      const offset = Math.round(
-        (gifFrame * FRAMES_PER_SECOND) / GIF_FRAMES_PER_SECOND,
-      );
-      gifFrameNumbers.push(
-        beatStart + Math.min(offset, beatFrameCount - 1) + 1,
-      );
-    }
-    beatStart += beatFrameCount;
-  }
-
-  return gifFrameNumbers;
+  return Array.from({ length: gifFrameCount }, (_, gifFrame) =>
+    Math.min(
+      Math.round((gifFrame * FRAMES_PER_SECOND) / GIF_FRAMES_PER_SECOND) + 1,
+      filmFrameCount,
+    ),
+  );
 }
 
-function enterProgressAt(beatFrameIndex: number): {
-  panelEnter: number;
-  captionEnter: number;
-} {
+function captionEnterAt(beatFrameIndex: number): number {
   const elapsedMilliseconds = (beatFrameIndex / FRAMES_PER_SECOND) * 1000;
-  return {
-    panelEnter: easeOut(elapsedMilliseconds / PANEL_ENTER_MILLISECONDS),
-    captionEnter: easeOut(
-      (elapsedMilliseconds - CAPTION_ENTER_DELAY_MILLISECONDS) /
-        CAPTION_ENTER_MILLISECONDS,
-    ),
-  };
+  return easeOut(
+    (elapsedMilliseconds - CAPTION_ENTER_DELAY_MILLISECONDS) /
+      CAPTION_ENTER_MILLISECONDS,
+  );
 }
 
 function easeOut(progress: number): number {
@@ -147,6 +147,7 @@ function frameUrlsOf(
   window: SceneWindow,
   devices: readonly FilmDevice[],
   elapsedMilliseconds: number,
+  timeline: SceneTimeline,
   frameCountByDevice: Record<FilmDevice, number>,
 ): Partial<Record<FilmDevice, string>> {
   const frameUrlsByDevice: Partial<Record<FilmDevice, string>> = {};
@@ -154,14 +155,12 @@ function frameUrlsOf(
   for (const device of devices) {
     const span = window.devices[device];
     const offsetMilliseconds = Math.min(
-      span.startMilliseconds + elapsedMilliseconds,
+      span.startMilliseconds + SCENE_LEAD_IN_MILLISECONDS + elapsedMilliseconds,
       span.endMilliseconds,
     );
-    const frameNumber = Math.min(
-      Math.max(
-        Math.round((offsetMilliseconds / 1000) * FRAMES_PER_SECOND) + 1,
-        1,
-      ),
+    const frameNumber = frameNumberAt(
+      offsetMilliseconds,
+      timeline.devices[device],
       frameCountByDevice[device],
     );
     frameUrlsByDevice[device] =
@@ -169,4 +168,18 @@ function frameUrlsOf(
   }
 
   return frameUrlsByDevice;
+}
+
+// The browser's recorder drops frames when a busy machine cannot keep up, so a
+// recording can hold slightly fewer frames than the wall-clock span it covers.
+// Reading a moment by proportion instead of by a constant 30 frames a second
+// keeps the cut on the intended screen even when that happens.
+function frameNumberAt(
+  offsetMilliseconds: number,
+  recording: DeviceRecording,
+  frameCount: number,
+): number {
+  const proportion = offsetMilliseconds / recording.spanMilliseconds;
+  const frameNumber = Math.round(proportion * (frameCount - 1)) + 1;
+  return Math.min(Math.max(frameNumber, 1), frameCount);
 }
