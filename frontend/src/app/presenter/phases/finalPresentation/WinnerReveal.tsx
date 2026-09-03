@@ -48,7 +48,7 @@ export function WinnerReveal({ winner }: { winner: RevealedWinnerModel }) {
           />
         </div>
       )}
-      {isCelebrating && <Confetti />}
+      {isCelebrating && winner.actions.length > 0 && <Confetti />}
     </section>
   );
 }
