@@ -1,4 +1,4 @@
-import { act, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { MessageKey } from "../../../../../domain/i18n/messages";
 import { Phase } from "../../../../../domain/phases";
 import type { PresenterFinalPresentationState } from "../../../../../domain/workshopState";
@@ -9,19 +9,30 @@ import {
   usePresenterFinalPresentationScreen,
   type RevealedWinnerModel,
 } from "../usePresenterFinalPresentationScreen";
+import { useRevealCelebration } from "../useRevealCelebration";
 
 jest.mock("../usePresenterFinalPresentationScreen", () => ({
   ...jest.requireActual("../usePresenterFinalPresentationScreen"),
   usePresenterFinalPresentationScreen: jest.fn(),
 }));
+jest.mock("../useRevealCelebration", () => ({
+  useRevealCelebration: jest.fn(),
+}));
 
 const screenHook = usePresenterFinalPresentationScreen as jest.MockedFunction<
   typeof usePresenterFinalPresentationScreen
+>;
+const celebration = useRevealCelebration as jest.MockedFunction<
+  typeof useRevealCelebration
 >;
 
 const state = {
   phase: Phase.FinalPresentation,
 } as unknown as PresenterFinalPresentationState;
+
+beforeEach(() => {
+  celebration.mockReturnValue(false);
+});
 
 function revealedWinner(
   place: number,
@@ -37,17 +48,6 @@ function revealedWinner(
     ...overrides,
   };
 }
-
-function stubMatchMedia(reducedMotion: boolean) {
-  Object.defineProperty(window, "matchMedia", {
-    configurable: true,
-    value: (query: string) => ({ matches: reducedMotion, media: query }),
-  });
-}
-
-afterEach(() => {
-  delete (window as { matchMedia?: unknown }).matchMedia;
-});
 
 describe("presenter final presentation screen", () => {
   it("builds anticipation before the first reveal", () => {
@@ -92,9 +92,23 @@ describe("presenter final presentation screen", () => {
     });
   });
 
-  it("bursts confetti once the slabs have slid in", () => {
-    jest.useFakeTimers();
-    stubMatchMedia(false);
+  it("bursts confetti while the celebration hook says so", () => {
+    celebration.mockReturnValue(true);
+    screenHook.mockReturnValue({
+      stage: FinalPresentationStage.Reveal,
+      winner: revealedWinner(1, { actions: ["a", "b", "c"] }),
+    });
+
+    const { container } = render(
+      <PresenterFinalPresentationScreen state={state} />,
+      { wrapper: languageWrapper() },
+    );
+
+    expect(celebration).toHaveBeenCalledWith(3);
+    expect(container.querySelectorAll("[data-hue]").length).toBeGreaterThan(0);
+  });
+
+  it("holds the confetti back until the celebration hook allows it", () => {
     screenHook.mockReturnValue({
       stage: FinalPresentationStage.Reveal,
       winner: revealedWinner(1),
@@ -106,11 +120,6 @@ describe("presenter final presentation screen", () => {
     );
 
     expect(container.querySelectorAll("[data-hue]")).toHaveLength(0);
-    act(() => {
-      jest.advanceTimersByTime(2_000);
-    });
-    expect(container.querySelectorAll("[data-hue]").length).toBeGreaterThan(0);
-    jest.useRealTimers();
   });
 
   it("hides the action list for a winner without actions", () => {
