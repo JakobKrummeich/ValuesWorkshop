@@ -1,0 +1,42 @@
+.pill {
+  display: inline-flex;
+  gap: calc(var(--space-tight) * 0.5);
+  align-items: center;
+  padding: calc(var(--space-tight) * 0.25) var(--space-tight);
+  border-radius: var(--radius-full);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: 0.08em;
+  line-height: var(--leading-tight);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.editing {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  animation: pulse 2.4s var(--ease-in-out) infinite;
+}
+
+.submitted {
+  background: color-mix(in srgb, var(--color-success) 18%, transparent);
+  color: var(--color-success);
+}
+
+.check {
+  flex: none;
+  width: 1em;
+  height: 1em;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editing {
+    animation: none;
+  }
+}
