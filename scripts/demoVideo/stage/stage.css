@@ -1,0 +1,303 @@
+@font-face {
+  font-family: Fraunces;
+  src: url("/product/fonts/Fraunces-latin.woff2") format("woff2");
+  font-weight: 300 900;
+  font-display: block;
+}
+
+@font-face {
+  font-family: Manrope;
+  src: url("/product/fonts/Manrope-latin.woff2") format("woff2");
+  font-weight: 400 800;
+  font-display: block;
+}
+
+:root {
+  --font-fraunces: Fraunces;
+  --font-manrope: Manrope;
+  --wall-height: 810px;
+  --phone-height: 700px;
+  --laptop-height: 400px;
+  --panel-enter: 1;
+  --caption-enter: 1;
+  --film-progress: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.film {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  background:
+    radial-gradient(
+      52% 46% at 8% 4%,
+      color-mix(in srgb, var(--color-glow-1) 20%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      58% 50% at 96% 96%,
+      color-mix(in srgb, var(--color-glow-2) 18%, transparent),
+      transparent 72%
+    ),
+    radial-gradient(
+      44% 40% at 88% 2%,
+      color-mix(in srgb, var(--color-glow-3) 12%, transparent),
+      transparent 70%
+    ),
+    var(--color-bg);
+}
+
+.topBar {
+  display: flex;
+  position: absolute;
+  top: 46px;
+  right: 96px;
+  left: 96px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wordmark {
+  display: inline-flex;
+  gap: 16px;
+  align-items: center;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-variation-settings: "opsz" 14;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.01em;
+}
+
+.brandMark {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  color: var(--color-brand-mark);
+  filter: drop-shadow(
+    0 0 12px color-mix(in srgb, var(--color-brand-mark) 45%, transparent)
+  );
+}
+
+.eyebrow {
+  color: var(--color-eyebrow);
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+}
+
+.devices {
+  display: flex;
+  position: absolute;
+  top: 130px;
+  right: 0;
+  left: 0;
+  gap: 56px;
+  align-items: center;
+  justify-content: center;
+  height: 810px;
+  opacity: var(--panel-enter);
+  transform: scale(calc(0.988 + 0.012 * var(--panel-enter)));
+}
+
+.panel,
+.card {
+  display: none;
+}
+
+.wallFrame,
+.phoneFrame,
+.laptopFrame {
+  padding: 10px;
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow:
+    0 40px 120px rgb(0 0 0 / 55%),
+    0 0 0 1px rgb(255 255 255 / 4%) inset;
+}
+
+.wallFrame img,
+.phoneFrame img,
+.laptopFrame img {
+  display: block;
+  border-radius: var(--radius-md);
+  width: auto;
+}
+
+.wallFrame img {
+  height: var(--wall-height);
+}
+
+.phoneFrame {
+  padding: 16px;
+  border-radius: 46px;
+}
+
+.phoneFrame img {
+  border-radius: 32px;
+  height: var(--phone-height);
+}
+
+.laptopPanel {
+  flex-direction: column;
+  align-items: center;
+}
+
+.laptopFrame {
+  padding: 12px;
+  border-radius: var(--radius-md);
+}
+
+.laptopFrame img {
+  border-radius: var(--radius-sm);
+  height: var(--laptop-height);
+}
+
+.laptopBase {
+  width: 116%;
+  height: 14px;
+  border-radius: 0 0 12px 12px;
+  background: linear-gradient(
+    180deg,
+    var(--color-surface-strong),
+    var(--color-bg-alt)
+  );
+  box-shadow: 0 18px 40px rgb(0 0 0 / 45%);
+}
+
+body[data-layout="wallHero"] .wallPanel,
+body[data-layout="wallWithPhone"] .wallPanel,
+body[data-layout="wallWithLaptop"] .wallPanel {
+  display: block;
+}
+
+body[data-layout="wallWithPhone"] .phonePanel {
+  display: block;
+}
+
+body[data-layout="wallWithLaptop"] .laptopPanel {
+  display: flex;
+}
+
+body[data-layout="wallWithPhone"] {
+  --wall-height: 660px;
+}
+
+body[data-layout="wallWithLaptop"] {
+  --wall-height: 600px;
+}
+
+.caption {
+  display: flex;
+  position: absolute;
+  top: 972px;
+  right: 96px;
+  left: 96px;
+  gap: 22px;
+  align-items: flex-start;
+  opacity: var(--caption-enter);
+  transform: translateY(calc((1 - var(--caption-enter)) * 14px));
+}
+
+.captionRule {
+  flex: none;
+  width: 5px;
+  height: 46px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  box-shadow: var(--shadow-glow-accent);
+}
+
+.captionText {
+  max-width: 1560px;
+  font-family: var(--font-sans);
+  font-size: 36px;
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+}
+
+body[data-layout="title"] .caption,
+body[data-layout="outro"] .caption,
+body[data-layout="title"] .topBar,
+body[data-layout="outro"] .topBar {
+  display: none;
+}
+
+body[data-layout="title"] .titleCard,
+body[data-layout="outro"] .outroCard {
+  display: flex;
+}
+
+.card {
+  position: absolute;
+  inset: 0;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+  justify-content: center;
+  opacity: var(--caption-enter);
+  transform: translateY(calc((1 - var(--caption-enter)) * 16px));
+}
+
+.cardMark {
+  width: 120px;
+  height: 120px;
+  color: var(--color-brand-mark);
+  filter: drop-shadow(
+    0 0 48px color-mix(in srgb, var(--color-brand-mark) 50%, transparent)
+  );
+}
+
+.cardName {
+  font-family: var(--font-display);
+  font-size: 108px;
+  font-variation-settings: "opsz" 144;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.005em;
+  line-height: var(--leading-display);
+}
+
+.cardLine {
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: 36px;
+  font-weight: var(--weight-semibold);
+}
+
+.cardLink {
+  color: var(--color-accent);
+  font-family: var(--font-sans);
+  font-size: 28px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+}
+
+.progressTrack {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+}
+
+.progressBar {
+  width: calc(var(--film-progress) * 100%);
+  height: 100%;
+  background: var(--color-accent);
+  box-shadow: var(--shadow-glow-accent);
+}
