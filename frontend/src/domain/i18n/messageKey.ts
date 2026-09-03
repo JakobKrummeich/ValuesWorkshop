@@ -92,6 +92,8 @@ export enum MessageKey {
   SelectionResultsHiddenValues = "selectionResults.hiddenValues",
   SelectionResultsNoSubmissions = "selectionResults.noSubmissions",
   GroupFormationFormingGroups = "groupFormation.formingGroups",
+  GroupFormationYourGroup = "groupFormation.yourGroup",
+  GroupFormationFindEachOther = "groupFormation.findEachOther",
   GroupWorkScribeLabel = "groupWork.scribeLabel",
   GroupWorkAddAction = "groupWork.addAction",
   GroupWorkRemoveAction = "groupWork.removeAction",
