@@ -3,13 +3,11 @@
 import {
   FormationSubState,
   type PresenterFormationView,
-  type PresenterGroups,
+  type PresenterGroup,
 } from "../../../../domain/workshopState";
 import { type GroupPages, useGroupPages } from "../../useGroupPages";
 
-export type PresenterGroupFormationScreenModel = GroupPages<
-  PresenterGroups[number]
->;
+export type PresenterGroupFormationScreenModel = GroupPages<PresenterGroup>;
 
 export function usePresenterGroupFormationScreen(
   formation: PresenterFormationView,

@@ -83,6 +83,7 @@ export type PresenterGroups = Extract<
   PresenterFormationView,
   { subState: FormationSubState.Formed }
 >["groups"];
+export type PresenterGroup = PresenterGroups[number];
 
 export type ParticipantGroupWorkState = InPhase<
   ParticipantWorkshopState,

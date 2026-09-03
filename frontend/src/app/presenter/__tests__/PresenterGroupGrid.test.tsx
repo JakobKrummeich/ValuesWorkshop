@@ -1,21 +1,24 @@
 import { render, screen } from "@testing-library/react";
+import {
+  GroupWorkStatus,
+  type PresenterGroup,
+} from "../../../domain/workshopState";
 import { languageWrapper } from "../../../testing/languageWrapper";
 import { PresenterGroupGrid } from "../PresenterGroupGrid";
 
-const groups = [
+const groups: PresenterGroup[] = [
   {
     name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
     memberDisplayNames: ["Ada"],
     assignedValues: [
       { valueId: "trust", text: { de: "Vertrauen", en: "Trust" } },
     ],
-    isReady: true,
+    workStatus: GroupWorkStatus.Submitted,
   },
   {
     name: { animalId: "fuchs", text: { de: "Fuchs", en: "Fox" } },
     memberDisplayNames: ["Grace"],
     assignedValues: [],
-    isReady: false,
   },
 ];
 
@@ -39,7 +42,9 @@ describe("presenter group grid", () => {
         pageIndex={1}
         groups={groups}
         statusOf={(group) =>
-          group.isReady ? <span data-testid="ready">Ready</span> : undefined
+          group.workStatus === GroupWorkStatus.Submitted ? (
+            <span data-testid="ready">Ready</span>
+          ) : undefined
         }
       />,
       { wrapper: languageWrapper() },

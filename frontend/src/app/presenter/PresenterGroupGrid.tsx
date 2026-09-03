@@ -1,24 +1,18 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { GroupName, WorkshopValue } from "../../domain/workshopState";
+import type { PresenterGroup } from "../../domain/workshopState";
 import { GroupCard, GroupCardVariant } from "../GroupCard";
 import styles from "./PresenterGroupGrid.module.css";
 
-export interface PresentedGroup {
-  name: GroupName;
-  memberDisplayNames: string[];
-  assignedValues: WorkshopValue[];
-}
-
-export function PresenterGroupGrid<TGroup extends PresentedGroup>({
+export function PresenterGroupGrid({
   pageIndex,
   groups,
   statusOf,
 }: {
   pageIndex: number;
-  groups: readonly TGroup[];
-  statusOf?: (group: TGroup) => ReactNode;
+  groups: readonly PresenterGroup[];
+  statusOf?: (group: PresenterGroup) => ReactNode;
 }) {
   return (
     <div className={styles.grid}>
