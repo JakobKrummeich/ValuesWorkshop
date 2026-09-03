@@ -180,7 +180,6 @@
   --space-gutter: var(--base-space-16);
 
   --control-height: 48px;
-  --progress-track-height: 48px;
   --border-hairline: var(--base-border-hairline);
   --border-ring: var(--base-border-ring);
   --border-rule: var(--base-border-rule);
@@ -193,8 +192,6 @@
   --shadow-card: var(--base-shadow-card);
   --shadow-glow-accent: var(--base-shadow-glow-ember);
   --shadow-glow-highlight: var(--base-shadow-glow-mint);
-  --shadow-sm: var(--base-shadow-card);
-  --shadow-md: var(--base-shadow-card);
 
   --motion-fast: var(--base-motion-fast);
   --motion-base: var(--base-motion-base);

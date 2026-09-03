@@ -78,7 +78,6 @@
   --space-gutter: var(--base-space-48);
 
   --control-height: 44px;
-  --progress-track-height: 64px;
 
   --text-reveal-place: clamp(var(--base-text-24), 4vh, 3.375rem);
   --text-reveal-value: clamp(var(--base-text-40), 10vh, 8.5rem);
