@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { ConnectionState } from "../../../domain/connectionState";
+import { NEVER } from "rxjs";
 import { ConnectionStatus, ConnectionStatusVariant } from "../ConnectionStatus";
 import { useConnectionStatus } from "../useConnectionStatus";
 
@@ -9,18 +9,15 @@ jest.mock("../useConnectionStatus", () => ({
 
 const status = jest.mocked(useConnectionStatus);
 
+const port = { workshopState: NEVER, connectionState: NEVER };
+
 describe("connection status", () => {
   it.each(Object.values(ConnectionStatusVariant))(
     "renders exactly the connection text under the e2e contract as %s",
     (variant) => {
       status.mockReturnValue({ text: "Connected", isConnected: true });
 
-      render(
-        <ConnectionStatus
-          connectionState={ConnectionState.Connected}
-          variant={variant}
-        />,
-      );
+      render(<ConnectionStatus sessionStatePort={port} variant={variant} />);
 
       expect(screen.getByTestId("connection")).toHaveTextContent(/^Connected$/);
       expect(screen.getByRole("status")).toHaveTextContent(/^Connected$/);
@@ -32,7 +29,7 @@ describe("connection status", () => {
 
     render(
       <ConnectionStatus
-        connectionState={ConnectionState.Connected}
+        sessionStatePort={port}
         variant={ConnectionStatusVariant.Wall}
       />,
     );
@@ -45,7 +42,7 @@ describe("connection status", () => {
 
     render(
       <ConnectionStatus
-        connectionState={ConnectionState.Reconnecting}
+        sessionStatePort={port}
         variant={ConnectionStatusVariant.Wall}
       />,
     );

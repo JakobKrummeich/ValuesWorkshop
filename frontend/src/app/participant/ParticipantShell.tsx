@@ -8,7 +8,7 @@ import {
   ConnectionStatusVariant,
 } from "../chrome/ConnectionStatus";
 import { PhaseStepper, PhaseStepperVariant } from "../chrome/PhaseStepper";
-import { useSessionStatus } from "../chrome/useSessionStatus";
+import { usePhaseStatus } from "../chrome/usePhaseStatus";
 import { LanguageSwitcher } from "../i18n/LanguageSwitcher";
 import { useTranslation } from "../i18n/useTranslation";
 import styles from "./ParticipantShell.module.css";
@@ -20,7 +20,7 @@ export function ParticipantShell({
   sessionStatePort: ParticipantSessionStatePort;
   children: ReactNode;
 }) {
-  const { phase, connectionState } = useSessionStatus(sessionStatePort);
+  const phase = usePhaseStatus(sessionStatePort);
   const { translate } = useTranslation();
 
   return (
@@ -36,7 +36,7 @@ export function ParticipantShell({
         <div className={styles.tools}>
           <LanguageSwitcher />
           <ConnectionStatus
-            connectionState={connectionState}
+            sessionStatePort={sessionStatePort}
             variant={ConnectionStatusVariant.Phone}
           />
         </div>

@@ -37,7 +37,6 @@ describe("facilitator shell", () => {
 
     expect(result.current).toEqual({
       phase: null,
-      connectionState: ConnectionState.Connecting,
       heading: "Facilitator",
       title: "Waiting for the workshop…",
       participantsLabel: "Participants",
@@ -56,17 +55,6 @@ describe("facilitator shell", () => {
     expect(result.current.phase).toBe(Phase.Join);
     expect(result.current.title).toBe("Join");
     expect(result.current.participantCount).toBe("12");
-  });
-
-  it("follows the connection state", () => {
-    const { port, connectionState } = fakePort();
-    const { result } = renderHook(() => useFacilitatorShell(port), {
-      wrapper: languageWrapper(),
-    });
-
-    act(() => connectionState.next(ConnectionState.Connected));
-
-    expect(result.current.connectionState).toBe(ConnectionState.Connected);
   });
 
   it("speaks the chosen language", () => {

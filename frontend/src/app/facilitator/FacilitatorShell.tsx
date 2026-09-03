@@ -20,14 +20,8 @@ export function FacilitatorShell({
   sessionStatePort: FacilitatorSessionStatePort;
   children: ReactNode;
 }) {
-  const {
-    phase,
-    connectionState,
-    heading,
-    title,
-    participantsLabel,
-    participantCount,
-  } = useFacilitatorShell(sessionStatePort);
+  const { phase, heading, title, participantsLabel, participantCount } =
+    useFacilitatorShell(sessionStatePort);
 
   return (
     <div className={styles.shell}>
@@ -44,7 +38,7 @@ export function FacilitatorShell({
         </dl>
         <div className={styles.tools}>
           <ConnectionStatus
-            connectionState={connectionState}
+            sessionStatePort={sessionStatePort}
             variant={ConnectionStatusVariant.Sidebar}
           />
           <LanguageSwitcher />

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { NEVER } from "rxjs";
+import { NEVER, of } from "rxjs";
 import { ConnectionState } from "../../../domain/connectionState";
 import { Phase } from "../../../domain/phases";
 import { languageWrapper } from "../../../testing/languageWrapper";
@@ -17,13 +17,15 @@ const shell = useFacilitatorShell as jest.MockedFunction<
   typeof useFacilitatorShell
 >;
 
-const port = { workshopState: NEVER, connectionState: NEVER };
+const port = {
+  workshopState: NEVER,
+  connectionState: of(ConnectionState.Connected),
+};
 
 describe("facilitator shell", () => {
   beforeEach(() => {
     shell.mockReturnValue({
       phase: Phase.GroupWork,
-      connectionState: ConnectionState.Connected,
       heading: "Facilitator",
       title: "Group work",
       participantsLabel: "Participants",
