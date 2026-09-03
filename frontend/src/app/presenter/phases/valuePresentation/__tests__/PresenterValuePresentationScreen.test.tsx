@@ -1,12 +1,13 @@
 import { render, screen } from "@testing-library/react";
+import { Language } from "../../../../../domain/i18n/language";
 import { Phase } from "../../../../../domain/phases";
+import { PresentationPositionKind } from "../../../../../domain/presentationPosition";
 import type { PresenterValuePresentationState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { PresenterValuePresentationScreen } from "../PresenterValuePresentationScreen";
-import { PresentationPositionKind } from "../../../../../domain/presentationPosition";
 import {
-  usePresenterValuePresentationScreen,
   type PresenterPresentationPosition,
+  usePresenterValuePresentationScreen,
 } from "../usePresenterValuePresentationScreen";
 
 jest.mock("../usePresenterValuePresentationScreen", () => ({
@@ -32,46 +33,75 @@ function state(): PresenterValuePresentationState {
   };
 }
 
-function renderWith(position: PresenterPresentationPosition | null) {
+function presentedValue(): PresenterPresentationPosition {
+  return {
+    kind: PresentationPositionKind.PresentedValue,
+    animalId: "otter",
+    groupName: { de: "Otter", en: "Otter" },
+    valueId: "trust",
+    valueName: { de: "Vertrauen", en: "Trust" },
+    actions: [
+      { text: "We start meetings on time" },
+      { text: "We ask before assuming" },
+    ],
+  };
+}
+
+function renderWith(
+  position: PresenterPresentationPosition | null,
+  language?: Language,
+) {
   screenHook.mockReturnValue(position);
 
   return render(<PresenterValuePresentationScreen state={state()} />, {
-    wrapper: languageWrapper(),
+    wrapper: languageWrapper(language),
   });
 }
 
 describe("PresenterValuePresentationScreen", () => {
-  it("renders the group intro fullscreen", () => {
+  it("introduces the group with its glyph in its hue", () => {
     renderWith({
       kind: PresentationPositionKind.GroupIntro,
       animalId: "otter",
       groupName: { de: "Otter", en: "Otter" },
     });
 
-    expect(screen.getByTestId("group-intro-otter")).toHaveTextContent("Otter");
+    const intro = screen.getByTestId("group-intro-otter");
+    expect(intro).toHaveTextContent("Up next");
+    expect(intro).toHaveTextContent("Otter");
+    expect(intro).toHaveAttribute("data-animal", "otter");
+    expect(intro.querySelector("svg")).not.toBeNull();
   });
 
-  it("renders the presented value with its numbered actions", () => {
-    renderWith({
-      kind: PresentationPositionKind.PresentedValue,
-      animalId: "otter",
-      groupName: { de: "Otter", en: "Otter" },
-      valueName: { de: "Vertrauen", en: "Trust" },
-      actions: [
-        { text: "We start meetings on time" },
-        { text: "We ask before assuming" },
-      ],
-    });
+  it("presents the value with the group and its actions as slabs", () => {
+    renderWith(presentedValue());
 
-    expect(screen.getByTestId("presenter-presenting-group")).toHaveTextContent(
-      "Otter",
+    expect(screen.getByTestId("presented-value-screen")).toHaveAttribute(
+      "data-animal",
+      "otter",
     );
+    expect(screen.getByTestId("presenter-presenting-group")).toHaveTextContent(
+      /^Otter$/,
+    );
+    expect(screen.getByText("presents")).toBeInTheDocument();
     expect(screen.getByTestId("presenter-presented-value")).toHaveTextContent(
       "Trust",
     );
     expect(
       screen.getAllByTestId("presented-action").map((item) => item.textContent),
     ).toEqual(["We start meetings on time", "We ask before assuming"]);
+    expect(screen.getAllByTestId("presented-action")[1]).toHaveStyle({
+      "--index": "1",
+    });
+  });
+
+  it("speaks German when German is chosen", () => {
+    renderWith(presentedValue(), Language.German);
+
+    expect(screen.getByText("präsentiert")).toBeInTheDocument();
+    expect(screen.getByTestId("presenter-presented-value")).toHaveTextContent(
+      "Vertrauen",
+    );
   });
 
   it("renders nothing without a presenting position", () => {

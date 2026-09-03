@@ -105,7 +105,7 @@ export enum MessageKey {
   ValuePresentationUpNext = "valuePresentation.upNext",
   ValuePresentationUpNextGroup = "valuePresentation.upNextGroup",
   ValuePresentationPresenting = "valuePresentation.presenting",
-  ValuePresentationGroupPresents = "valuePresentation.groupPresents",
+  ValuePresentationPresents = "valuePresentation.presents",
   ValuePresentationActions = "valuePresentation.actions",
   ValuePresentationNextValue = "valuePresentation.nextValue",
   FinalVotingVotesUsed = "finalVoting.votesUsed",

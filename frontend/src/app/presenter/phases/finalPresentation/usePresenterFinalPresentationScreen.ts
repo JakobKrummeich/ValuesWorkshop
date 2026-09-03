@@ -27,9 +27,14 @@ export interface RevealedWinnerModel {
 export type PresenterFinalPresentationModel =
   | { stage: FinalPresentationStage.Anticipation }
   | { stage: FinalPresentationStage.Reveal; winner: RevealedWinnerModel }
-  | { stage: FinalPresentationStage.Overview; winners: RevealedWinnerModel[] };
+  | {
+      stage: FinalPresentationStage.Overview;
+      podium: RevealedWinnerModel[];
+      runnersUp: RevealedWinnerModel[];
+    };
 
 const finalWinnerHoldMilliseconds = 12_000;
+const podiumSize = 3;
 
 function useFinalWinnerInterlude(isConcluded: boolean): boolean {
   const [wasConcluded, setWasConcluded] = useState(isConcluded);
@@ -73,11 +78,14 @@ export function usePresenterFinalPresentationScreen(
   const isRevealingFinalWinner = useFinalWinnerInterlude(isConcluded);
 
   if (isConcluded && !isRevealingFinalWinner) {
+    const ranked = revealedWinners
+      .map(revealedWinnerModelOf)
+      .sort((left, right) => left.place - right.place);
+
     return {
       stage: FinalPresentationStage.Overview,
-      winners: revealedWinners
-        .map(revealedWinnerModelOf)
-        .sort((left, right) => left.place - right.place),
+      podium: ranked.filter((winner) => winner.place <= podiumSize),
+      runnersUp: ranked.filter((winner) => winner.place > podiumSize),
     };
   }
 

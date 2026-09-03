@@ -79,15 +79,4 @@
   --space-gutter: var(--base-space-48);
 
   --control-height: 44px;
-
-  --text-reveal-place: clamp(var(--base-text-24), 4vh, 3.375rem);
-  --text-reveal-value: clamp(var(--base-text-40), 10vh, 8.5rem);
-  --text-reveal-votes: clamp(var(--base-text-20), 3vh, 2.375rem);
-  --text-reveal-action: clamp(var(--base-text-16), 2vh, var(--base-text-24));
-  --space-reveal-list-gap: var(--base-space-8);
-  --text-overview-winner: clamp(var(--base-text-24), 4.5vh, 3rem);
-  --color-reveal-bg: var(--base-night-800);
-  --color-reveal-text: var(--base-night-text);
-  --color-reveal-text-soft: var(--base-night-muted);
-  --color-reveal-accent: var(--base-ember-500);
 }

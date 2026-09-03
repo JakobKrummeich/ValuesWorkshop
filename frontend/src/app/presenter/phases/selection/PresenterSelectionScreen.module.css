@@ -1,23 +1,49 @@
-.selection {
+.screen {
   display: flex;
   flex: 1;
   flex-direction: column;
   gap: var(--space-gap);
   align-items: center;
   justify-content: center;
-  padding: 0 var(--space-gutter);
+  min-height: 0;
   text-align: center;
 }
 
 .prompt {
-  color: var(--color-text);
-  font-size: var(--text-heading);
-  font-weight: var(--weight-bold);
+  margin: 0;
+  color: var(--color-eyebrow);
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-eyebrow);
   line-height: var(--leading-tight);
+  text-transform: uppercase;
 }
 
-.progress {
-  color: var(--color-text-muted);
-  font-size: var(--text-body);
-  font-variant-numeric: tabular-nums;
+.track {
+  width: min(100%, 40vw);
+  height: var(--space-tight);
+  margin-top: var(--space-gap);
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-strong);
+}
+
+.fill {
+  width: calc(var(--progress, 0) * 100%);
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-accent-deep),
+    var(--color-accent)
+  );
+  box-shadow: var(--shadow-glow-accent);
+  transition: width var(--motion-slow) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
 }

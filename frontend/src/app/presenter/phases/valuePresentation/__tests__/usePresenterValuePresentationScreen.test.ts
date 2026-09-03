@@ -61,6 +61,7 @@ describe("usePresenterValuePresentationScreen", () => {
       kind: PresentationPositionKind.PresentedValue,
       animalId: "otter",
       groupName: { de: "Otter", en: "Otter" },
+      valueId: "wert-1",
       valueName: { de: "Vertrauen", en: "Trust" },
       actions: [{ text: "We start meetings on time" }],
     });

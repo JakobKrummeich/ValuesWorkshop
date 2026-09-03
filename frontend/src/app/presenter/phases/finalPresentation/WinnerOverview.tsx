@@ -7,9 +7,11 @@ import type { RevealedWinnerModel } from "./usePresenterFinalPresentationScreen"
 import styles from "./WinnerOverview.module.css";
 
 export function WinnerOverview({
-  winners,
+  podium,
+  runnersUp,
 }: {
-  winners: RevealedWinnerModel[];
+  podium: readonly RevealedWinnerModel[];
+  runnersUp: readonly RevealedWinnerModel[];
 }) {
   const { language, translate } = useTranslation();
 
@@ -18,23 +20,45 @@ export function WinnerOverview({
       <h2 className={styles.heading}>
         {translate(MessageKey.FinalPresentationOverviewHeading)}
       </h2>
-      <ol className={styles.winnerList}>
-        {winners.map((winner) => (
+      <ol className={styles.podium}>
+        {podium.map((winner) => (
           <li
             key={winner.valueId}
-            className={styles.winner}
+            className={styles.column}
+            data-place={winner.place}
             data-testid={`overview-winner-${winner.place}`}
           >
-            <span className={styles.place}>{winner.place}</span>
             <span className={styles.valueName}>
               {localizedText(language, winner.text)}
             </span>
             <span className={styles.voteCount}>
               {translate(winner.voteCountKey, { count: winner.voteCount })}
             </span>
+            <span className={styles.pillar}>
+              <span className={styles.place}>{winner.place}</span>
+            </span>
           </li>
         ))}
       </ol>
+      {runnersUp.length > 0 && (
+        <ol className={styles.runnersUp}>
+          {runnersUp.map((winner) => (
+            <li
+              key={winner.valueId}
+              className={styles.card}
+              data-testid={`overview-winner-${winner.place}`}
+            >
+              <span className={styles.cardPlace}>{winner.place}</span>
+              <span className={styles.cardValueName}>
+                {localizedText(language, winner.text)}
+              </span>
+              <span className={styles.cardVoteCount}>
+                {translate(winner.voteCountKey, { count: winner.voteCount })}
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
   );
 }

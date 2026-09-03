@@ -2,8 +2,11 @@
 
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { PresenterSelectionState } from "../../../../domain/workshopState";
+import { cssCustomProperty } from "../../../../shared/cssCustomProperty";
+import { Counter, CounterSize, CounterVariant } from "../../../Counter";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./PresenterSelectionScreen.module.css";
+import { usePresenterSelectionScreen } from "./usePresenterSelectionScreen";
 
 export function PresenterSelectionScreen({
   state,
@@ -11,16 +14,34 @@ export function PresenterSelectionScreen({
   state: PresenterSelectionState;
 }) {
   const { translate } = useTranslation();
+  const { submittedCount, participantCount, progressFraction } =
+    usePresenterSelectionScreen(state);
 
   return (
-    <section className={styles.selection}>
+    <section className={styles.screen}>
       <h2 className={styles.prompt}>{translate(MessageKey.SelectionPrompt)}</h2>
-      <p className={styles.progress} data-testid="submitted-count">
-        {translate(MessageKey.SelectionSubmittedCount, {
-          submitted: state.selection.submittedCount,
-          total: state.participantCount,
+      <Counter
+        value={submittedCount}
+        suffix={translate(MessageKey.SelectionSubmittedOfTotal, {
+          total: participantCount,
         })}
-      </p>
+        variant={CounterVariant.Wall}
+        size={CounterSize.Giant}
+        testId="submitted-count"
+      />
+      <div
+        className={styles.track}
+        role="progressbar"
+        aria-valuenow={Math.round(progressFraction * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className={styles.fill}
+          data-testid="selection-progress-bar"
+          style={cssCustomProperty("--progress", progressFraction)}
+        />
+      </div>
     </section>
   );
 }

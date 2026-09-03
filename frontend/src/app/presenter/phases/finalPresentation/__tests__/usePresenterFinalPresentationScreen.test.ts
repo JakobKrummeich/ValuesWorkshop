@@ -171,7 +171,7 @@ describe("presenter final presentation screen logic", () => {
     });
   });
 
-  it("ranks the overview most-voted first once concluded", () => {
+  it("ranks the overview into a podium and runners-up once concluded", () => {
     const { result } = renderHook(() =>
       usePresenterFinalPresentationScreen(
         presentationState(
@@ -185,9 +185,25 @@ describe("presenter final presentation screen logic", () => {
     if (result.current.stage !== FinalPresentationStage.Overview) {
       return;
     }
-    expect(result.current.winners.map(({ place }) => place)).toEqual([
-      1, 2, 3, 4, 5,
-    ]);
+    expect(result.current.podium.map(({ place }) => place)).toEqual([1, 2, 3]);
+    expect(result.current.runnersUp.map(({ place }) => place)).toEqual([4, 5]);
+  });
+
+  it("fills the podium alone when fewer than four values won", () => {
+    const { result } = renderHook(() =>
+      usePresenterFinalPresentationScreen(
+        presentationState([winner(2), winner(1)], true),
+      ),
+    );
+
+    expect(result.current).toEqual({
+      stage: FinalPresentationStage.Overview,
+      podium: [
+        expect.objectContaining({ place: 1 }),
+        expect.objectContaining({ place: 2 }),
+      ],
+      runnersUp: [],
+    });
   });
 
   it("leaves the wire's reveal order untouched while ranking the overview", () => {
