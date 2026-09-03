@@ -37,7 +37,7 @@ describe.each(surfaces)("%s", (surfaceFile) => {
     ).toBeGreaterThanOrEqual(TEXT_MINIMUM);
   });
 
-  it.each(["--color-accent", "--color-highlight"])(
+  it.each(["--color-accent", "--color-highlight", "--color-brand-mark"])(
     "sets %s apart from the background",
     (graphic) => {
       expect(

@@ -22,6 +22,7 @@
     transparent
   );
   --color-on-primary: var(--base-ember-900);
+  --color-brand-mark: var(--base-ember-500);
   --color-accent: var(--base-ember-500);
   --color-accent-deep: var(--base-ember-600);
   --color-accent-soft: color-mix(
