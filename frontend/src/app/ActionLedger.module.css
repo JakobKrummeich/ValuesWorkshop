@@ -40,7 +40,7 @@
   --slab-inset: 0.5em;
 
   gap: var(--slab-gap);
-  font-size: calc(var(--text-action) * var(--slab-scale, 1));
+  font-size: calc(var(--text-heading) * var(--slab-scale, 1));
 }
 
 .slabs .action {
