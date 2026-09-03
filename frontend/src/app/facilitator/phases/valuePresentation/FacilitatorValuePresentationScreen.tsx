@@ -6,6 +6,8 @@ import { PresentationPositionKind } from "../../../../domain/presentationPositio
 import type { FacilitatorValuePresentationState } from "../../../../domain/workshopState";
 import { AnimalGlyph } from "../../../AnimalGlyph";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { ControlButton } from "../../ControlButton";
+import { IntentRejection } from "../../IntentRejection";
 import styles from "./FacilitatorValuePresentationScreen.module.css";
 import { PresentedActionEditor } from "./PresentedActionEditor";
 import { useFacilitatorValuePresentationScreen } from "./useFacilitatorValuePresentationScreen";
@@ -68,20 +70,14 @@ export function FacilitatorValuePresentationScreen({
         </div>
       )}
       <div className={styles.controls}>
-        <button
-          type="button"
-          className={styles.nextButton}
-          data-testid="next-value-button"
-          disabled={isSending || !isNextValueEnabled}
+        <ControlButton
+          testId="next-value-button"
+          isDisabled={isSending || !isNextValueEnabled}
           onClick={goToNextValue}
         >
           {translate(MessageKey.ValuePresentationNextValue)}
-        </button>
-        {rejectionMessage !== null && (
-          <p className={styles.rejection} role="status">
-            {translate(rejectionMessage)}
-          </p>
-        )}
+        </ControlButton>
+        <IntentRejection message={rejectionMessage} />
       </div>
     </section>
   );

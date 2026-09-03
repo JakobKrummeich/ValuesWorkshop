@@ -49,44 +49,6 @@
   transition: width var(--motion-slow) var(--ease-out);
 }
 
-.controlButton {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--control-height);
-  padding: var(--space-tight) calc(var(--space-gutter) * 1.5);
-  border: none;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  font-family: var(--font-sans);
-  font-size: var(--text-action);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-  cursor: pointer;
-  transition:
-    background var(--motion-fast) var(--ease-out),
-    transform var(--motion-fast) var(--ease-out);
-}
-
-.controlButton:focus-visible {
-  outline: var(--border-ring) solid var(--color-accent);
-  outline-offset: 0.125em;
-}
-
-.controlButton:disabled {
-  background: var(--color-border);
-  color: var(--color-text-muted);
-  cursor: not-allowed;
-}
-
-.controlButton:hover:enabled {
-  background: var(--color-accent-deep);
-}
-
-.controlButton:active:enabled {
-  transform: scale(0.98);
-}
-
 .results {
   display: flex;
   flex-direction: column;
@@ -183,17 +145,8 @@
   line-height: var(--leading-tight);
 }
 
-.rejection {
-  margin: 0;
-  color: var(--color-danger);
-  font-family: var(--font-sans);
-  font-size: var(--text-small);
-  font-weight: var(--weight-semibold);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .fill,
-  .controlButton,
   .tallyBar {
     transition: none;
   }

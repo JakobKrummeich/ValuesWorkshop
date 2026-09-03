@@ -5,6 +5,8 @@ import type { FacilitatorFinalPresentationState } from "../../../../domain/works
 import { CheckMark } from "../../../CheckMark";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { Pips } from "../../../Pips";
+import { ControlButton } from "../../ControlButton";
+import { IntentRejection } from "../../IntentRejection";
 import styles from "./FacilitatorFinalPresentationScreen.module.css";
 import { useFacilitatorFinalPresentationScreen } from "./useFacilitatorFinalPresentationScreen";
 
@@ -37,15 +39,13 @@ export function FacilitatorFinalPresentationScreen({
       </p>
       <Pips filled={revealedCount} total={winnerCount} testId="reveal-pips" />
       {!isConcluded && (
-        <button
-          type="button"
-          className={styles.controlButton}
-          data-testid="reveal-next-button"
-          disabled={isSending || !isRevealNextEnabled}
+        <ControlButton
+          testId="reveal-next-button"
+          isDisabled={isSending || !isRevealNextEnabled}
           onClick={revealNextValue}
         >
           {translate(MessageKey.FinalPresentationRevealNext)}
-        </button>
+        </ControlButton>
       )}
       {isConcluded && (
         <div className={styles.concluded}>
@@ -57,11 +57,7 @@ export function FacilitatorFinalPresentationScreen({
           </p>
         </div>
       )}
-      {rejectionMessage !== null && (
-        <p className={styles.rejection} role="status">
-          {translate(rejectionMessage)}
-        </p>
-      )}
+      <IntentRejection message={rejectionMessage} />
     </section>
   );
 }

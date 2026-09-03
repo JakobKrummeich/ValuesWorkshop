@@ -6,6 +6,8 @@ import type { FacilitatorFinalVotingState } from "../../../../domain/workshopSta
 import { cssCustomProperty } from "../../../../shared/cssCustomProperty";
 import { Eyebrow } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { ControlButton } from "../../ControlButton";
+import { IntentRejection } from "../../IntentRejection";
 import styles from "./FacilitatorFinalVotingScreen.module.css";
 import { useFacilitatorFinalVotingScreen } from "./useFacilitatorFinalVotingScreen";
 
@@ -57,15 +59,13 @@ export function FacilitatorFinalVotingScreen({
           />
         </div>
         {isRoundOpen && (
-          <button
-            type="button"
-            className={styles.controlButton}
-            data-testid="close-voting-button"
-            disabled={isSending || !isCloseVotingEnabled}
+          <ControlButton
+            testId="close-voting-button"
+            isDisabled={isSending || !isCloseVotingEnabled}
             onClick={closeVoting}
           >
             {translate(MessageKey.FinalVotingCloseVoting)}
-          </button>
+          </ControlButton>
         )}
       </div>
       {tallies !== null && (
@@ -105,22 +105,16 @@ export function FacilitatorFinalVotingScreen({
               votes: translate(tie.voteCountKey, { count: tie.voteCount }),
             })}
           </p>
-          <button
-            type="button"
-            className={styles.controlButton}
-            data-testid="start-tiebreak-button"
-            disabled={isSending || !isStartTiebreakEnabled}
+          <ControlButton
+            testId="start-tiebreak-button"
+            isDisabled={isSending || !isStartTiebreakEnabled}
             onClick={startTiebreakRound}
           >
             {translate(MessageKey.FinalVotingStartTiebreak)}
-          </button>
+          </ControlButton>
         </div>
       )}
-      {rejectionMessage !== null && (
-        <p className={styles.rejection} role="status">
-          {translate(rejectionMessage)}
-        </p>
-      )}
+      <IntentRejection message={rejectionMessage} />
     </section>
   );
 }

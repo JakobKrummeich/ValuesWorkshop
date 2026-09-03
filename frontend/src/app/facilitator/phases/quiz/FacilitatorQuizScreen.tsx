@@ -5,6 +5,8 @@ import type { FacilitatorQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { QuizLearningText } from "../../../QuizLearningText";
 import { QuizQuestion } from "../../../QuizQuestion";
+import { ControlButton } from "../../ControlButton";
+import { IntentRejection } from "../../IntentRejection";
 import { FacilitatorQuizAnswerRow } from "./FacilitatorQuizAnswerRow";
 import styles from "./FacilitatorQuizScreen.module.css";
 import { useFacilitatorQuizScreen } from "./useFacilitatorQuizScreen";
@@ -51,21 +53,15 @@ export function FacilitatorQuizScreen({
       <QuizLearningText learningText={quiz.learningText} />
       <div className={styles.controls}>
         {quizControl !== null && (
-          <button
-            type="button"
-            className={styles.controlButton}
-            data-testid="quiz-control-button"
-            disabled={isSending}
+          <ControlButton
+            testId="quiz-control-button"
+            isDisabled={isSending}
             onClick={quizControl.send}
           >
             {translate(quizControl.label)}
-          </button>
+          </ControlButton>
         )}
-        {rejectionMessage !== null && (
-          <p className={styles.rejection} role="status">
-            {translate(rejectionMessage)}
-          </p>
-        )}
+        <IntentRejection message={rejectionMessage} />
       </div>
     </section>
   );

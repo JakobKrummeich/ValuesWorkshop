@@ -1,0 +1,8 @@
+.rejection {
+  margin: 0;
+  color: var(--color-danger);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
