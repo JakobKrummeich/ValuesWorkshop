@@ -1,15 +1,17 @@
 "use client";
 
-import { MessageKey } from "../../../../domain/i18n/messages";
-import { GroupWorkStatus } from "../../../../domain/workshopState";
-import { CheckMark } from "../../../CheckMark";
-import { useTranslation } from "../../../i18n/useTranslation";
-import styles from "./WorkStatusBadge.module.css";
+import { MessageKey } from "../domain/i18n/messages";
+import { GroupWorkStatus } from "../domain/workshopState";
+import { CheckMark } from "./CheckMark";
+import styles from "./GroupWorkStatusPill.module.css";
+import { useTranslation } from "./i18n/useTranslation";
 
-export function WorkStatusBadge({
+export function GroupWorkStatusPill({
   workStatus,
+  testId,
 }: {
   workStatus: GroupWorkStatus;
+  testId: string;
 }) {
   const { translate } = useTranslation();
   const isSubmitted = workStatus === GroupWorkStatus.Submitted;
@@ -19,7 +21,7 @@ export function WorkStatusBadge({
       className={`${styles.pill} ${
         isSubmitted ? styles.submitted : styles.editing
       }`}
-      data-testid="group-work-status"
+      data-testid={testId}
     >
       {isSubmitted && <CheckMark />}
       {translate(

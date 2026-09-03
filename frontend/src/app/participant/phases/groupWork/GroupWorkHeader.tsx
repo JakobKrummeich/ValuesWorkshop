@@ -7,9 +7,9 @@ import type {
   GroupWorkStatus,
 } from "../../../../domain/workshopState";
 import { AnimalGlyph } from "../../../AnimalGlyph";
+import { GroupWorkStatusPill } from "../../../GroupWorkStatusPill";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./GroupWorkHeader.module.css";
-import { WorkStatusBadge } from "./WorkStatusBadge";
 
 export function GroupWorkHeader({
   groupName,
@@ -39,7 +39,10 @@ export function GroupWorkHeader({
           <span>{localizedText(language, groupName.text)}</span>
         </h2>
         {workStatus !== undefined && (
-          <WorkStatusBadge workStatus={workStatus} />
+          <GroupWorkStatusPill
+            workStatus={workStatus}
+            testId="group-work-status"
+          />
         )}
       </div>
       <ul className={styles.members}>

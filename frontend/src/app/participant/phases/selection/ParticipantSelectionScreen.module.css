@@ -25,9 +25,8 @@
   flex: none;
   margin: 0;
   padding: var(--space-tight) var(--space-gap);
-  border: var(--border-hairline) solid var(--color-border);
   border-radius: var(--radius-full);
-  background: var(--color-surface);
+  background: var(--color-surface-strong);
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: var(--text-small);

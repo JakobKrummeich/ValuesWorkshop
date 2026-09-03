@@ -1,11 +1,10 @@
 .screen {
   position: relative;
-  display: flex;
+  display: grid;
   flex: 1;
-  flex-direction: column;
   gap: var(--space-gap);
-  align-items: center;
-  justify-content: center;
+  align-content: center;
+  justify-items: center;
   min-height: 0;
   margin: calc(-1 * var(--space-gutter));
   padding: var(--space-gutter);

@@ -31,13 +31,11 @@
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: var(--text-body);
-  font-weight: var(--weight-semibold);
-  line-height: var(--leading-tight);
+  line-height: var(--leading-normal);
 }
 
 .input::placeholder {
   color: var(--color-text-muted);
-  font-weight: var(--weight-regular);
 }
 
 .text {

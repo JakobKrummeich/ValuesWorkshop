@@ -1,9 +1,11 @@
 .pill {
   display: inline-flex;
+  flex: none;
   gap: calc(var(--space-tight) * 0.5);
   align-items: center;
   padding: calc(var(--space-tight) * 0.25) var(--space-tight);
   border-radius: var(--radius-full);
+  font-family: var(--font-sans);
   font-size: var(--text-eyebrow);
   font-weight: var(--weight-black);
   letter-spacing: 0.08em;
