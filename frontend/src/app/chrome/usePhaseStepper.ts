@@ -40,20 +40,20 @@ export function usePhaseStepper(
   const { translate } = useTranslation();
   const currentIndex =
     currentPhase === null ? -1 : phaseSequence.indexOf(currentPhase);
-  const steps = phaseSequence.map((phase, index) => ({
-    phase,
-    number: index + 1,
-    name: translate(phaseNameKey(phase)),
-    state: stateOf(index, currentIndex),
-  }));
 
   return {
     label: translate(MessageKey.PhaseStepperLabel),
-    steps,
+    steps: phaseSequence.map((phase, index) => ({
+      phase,
+      number: index + 1,
+      name: translate(phaseNameKey(phase)),
+      state: stateOf(index, currentIndex),
+    })),
     currentLabel:
       currentPhase === null
         ? translate(MessageKey.SessionWaiting)
         : translate(MessageKey.SessionPhase, { phase: currentPhase }),
-    currentName: steps[currentIndex]?.name ?? null,
+    currentName:
+      currentPhase === null ? null : translate(phaseNameKey(currentPhase)),
   };
 }
