@@ -6,7 +6,7 @@ function texts(count: number, length: number): string[] {
 
 describe("action slab scale", () => {
   it("keeps a handful of short actions at full size", () => {
-    expect(actionSlabScaleOf(texts(3, 60))).toBe(1);
+    expect(actionSlabScaleOf(texts(3, 30))).toBe(1);
   });
 
   it("keeps a single long action at full size", () => {
@@ -29,8 +29,8 @@ describe("action slab scale", () => {
   it("shrinks five maximal-length actions well below full size", () => {
     const scale = actionSlabScaleOf(texts(5, 199));
 
-    expect(scale).toBeLessThanOrEqual(0.6);
-    expect(scale).toBeGreaterThanOrEqual(0.5);
+    expect(scale).toBeLessThanOrEqual(0.5);
+    expect(scale).toBeGreaterThanOrEqual(0.4);
   });
 
   it("never shrinks below the smallest readable scale", () => {
