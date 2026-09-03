@@ -1,46 +1,47 @@
 .screen {
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
+  gap: var(--space-gap);
   align-items: center;
   justify-content: center;
-  gap: var(--space-gap);
+  min-height: 0;
+  margin: calc(-1 * var(--space-gutter));
   padding: var(--space-gutter);
+  overflow: hidden;
+  isolation: isolate;
   text-align: center;
 }
 
-.heading {
-  color: var(--color-text);
-  font-size: var(--text-heading);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-}
-
-.thanks {
-  color: var(--color-text-muted);
-  font-size: var(--text-body);
-}
-
-.downloadButton {
-  min-height: var(--control-height);
-  margin-top: var(--space-gap);
-  padding: var(--space-tight) var(--space-gutter);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
-}
-
-.downloadButton:disabled {
-  background: var(--color-border);
-  color: var(--color-text-muted);
+.glyph {
+  display: block;
+  width: 1em;
+  height: 1em;
+  margin-bottom: var(--space-gap);
+  color: var(--color-animal, var(--color-accent));
+  font-size: var(--text-numeral);
+  filter: drop-shadow(0 0 var(--glow-radius) currentcolor);
+  animation: bloom var(--motion-slow) var(--ease-spring) backwards;
 }
 
 .failure {
+  margin: 0;
   color: var(--color-danger);
   font-family: var(--font-sans);
   font-size: var(--text-small);
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph {
+    animation: none;
+  }
 }

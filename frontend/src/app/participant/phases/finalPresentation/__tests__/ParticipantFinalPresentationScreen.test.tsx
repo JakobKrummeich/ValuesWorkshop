@@ -3,16 +3,27 @@ import { MessageKey } from "../../../../../domain/i18n/messages";
 import { Phase } from "../../../../../domain/phases";
 import type { ParticipantFinalPresentationState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
+import { useRememberedOwnGroup } from "../../../OwnGroupMemoryProvider";
 import { ParticipantFinalPresentationScreen } from "../ParticipantFinalPresentationScreen";
 import { useParticipantFinalPresentationScreen } from "../useParticipantFinalPresentationScreen";
 
 jest.mock("../useParticipantFinalPresentationScreen", () => ({
   useParticipantFinalPresentationScreen: jest.fn(),
 }));
+jest.mock("../../../OwnGroupMemoryProvider", () => ({
+  useRememberedOwnGroup: jest.fn(),
+}));
 
 const screenHook = useParticipantFinalPresentationScreen as jest.MockedFunction<
   typeof useParticipantFinalPresentationScreen
 >;
+const rememberedOwnGroup = useRememberedOwnGroup as jest.MockedFunction<
+  typeof useRememberedOwnGroup
+>;
+
+beforeEach(() => {
+  rememberedOwnGroup.mockReturnValue(null);
+});
 
 const state = {
   phase: Phase.FinalPresentation,
@@ -68,6 +79,43 @@ describe("participant final presentation screen", () => {
       "Download workshop record (PDF)",
     );
     expect(screen.queryByTestId("waiting-screen")).not.toBeInTheDocument();
+  });
+
+  it("blooms the own group's glyph in its hue with confetti", () => {
+    screenHook.mockReturnValue(concludedModel());
+    rememberedOwnGroup.mockReturnValue({
+      animalId: "fuchs",
+      text: { de: "Fuchs", en: "Fox" },
+    });
+
+    const { container } = render(
+      <ParticipantFinalPresentationScreen state={state} />,
+      { wrapper: languageWrapper() },
+    );
+
+    expect(screen.getByTestId("workshop-concluded")).toHaveAttribute(
+      "data-animal",
+      "fuchs",
+    );
+    expect(
+      screen.getByTestId("conclusion-glyph").querySelector("svg"),
+    ).toHaveAttribute("viewBox", "0 0 32 32");
+    expect(container.querySelectorAll("[data-hue]").length).toBeGreaterThan(0);
+  });
+
+  it("falls back to the brand mark when the own group is unknown", () => {
+    screenHook.mockReturnValue(concludedModel());
+
+    render(<ParticipantFinalPresentationScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("workshop-concluded")).not.toHaveAttribute(
+      "data-animal",
+    );
+    expect(
+      screen.getByTestId("conclusion-glyph").querySelector("svg"),
+    ).toHaveAttribute("viewBox", "0 0 24 24");
   });
 
   it("starts the download on click", () => {

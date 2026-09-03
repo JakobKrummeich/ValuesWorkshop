@@ -32,7 +32,9 @@ describe("SessionBoundary", () => {
       { wrapper: languageWrapper() },
     );
 
-    expect(screen.getByText(/no workshop session/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "No session in this link" }),
+    ).toBeInTheDocument();
   });
 
   it("renders the screen's own fallback for a link that carries no session", () => {
@@ -49,7 +51,9 @@ describe("SessionBoundary", () => {
     );
 
     expect(screen.getByText("Open a session")).toBeInTheDocument();
-    expect(screen.queryByText(/no workshop session/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("No session in this link"),
+    ).not.toBeInTheDocument();
   });
 
   it("renders its children with the session bound to the link", () => {

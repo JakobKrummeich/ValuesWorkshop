@@ -8,6 +8,7 @@ import { WordmarkSize } from "../chrome/Wordmark";
 import { CounterSize, CounterVariant } from "../Counter";
 import { EyebrowTone } from "../Eyebrow";
 import { GroupCardVariant } from "../GroupCard";
+import { CallToActionVariant } from "../participant/CallToAction";
 import { AnswerBarEmphasis } from "../presenter/phases/quiz/presenterQuizScreenModel";
 
 const variantModules: ReadonlyArray<
@@ -23,6 +24,7 @@ const variantModules: ReadonlyArray<
   ["chrome/PhaseStepper.module.css", PhaseStepperVariant],
   ["chrome/PhaseStepper.module.css", PhaseStepState],
   ["chrome/Wordmark.module.css", WordmarkSize],
+  ["participant/CallToAction.module.css", CallToActionVariant],
   ["presenter/phases/quiz/QuizAnswerRow.module.css", AnswerBarEmphasis],
 ];
 
