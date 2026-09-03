@@ -78,4 +78,5 @@
   --space-gutter: var(--base-space-16);
 
   --control-height: 48px;
+  --control-height-compact: 44px;
 }

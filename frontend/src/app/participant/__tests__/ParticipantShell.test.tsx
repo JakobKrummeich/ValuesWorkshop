@@ -5,6 +5,7 @@ import { Language } from "../../../domain/i18n/language";
 import { Phase } from "../../../domain/phases";
 import { QuizSubState } from "../../../domain/workshopState";
 import { languageWrapper } from "../../../testing/languageWrapper";
+import { ActionBar } from "../ActionBar";
 import { ParticipantShell } from "../ParticipantShell";
 
 const port = {
@@ -35,9 +36,25 @@ describe("participant shell", () => {
 
     screen.getByRole("heading", { level: 1, name: "Participant" });
     screen.getByRole("group", { name: "Language" });
+    screen.getByText("Values Workshop");
     screen.getByText("phase content");
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 2");
     expect(screen.getByTestId("connection")).toHaveTextContent("Reconnecting");
+  });
+
+  it("keeps a screen's action bar outside the scrolling content", () => {
+    render(
+      <ParticipantShell sessionStatePort={port}>
+        <p>phase content</p>
+        <ActionBar>
+          <button type="button">Submit</button>
+        </ActionBar>
+      </ParticipantShell>,
+      { wrapper: languageWrapper() },
+    );
+
+    const button = screen.getByRole("button", { name: "Submit" });
+    expect(screen.getByRole("main")).not.toContainElement(button);
   });
 
   it("speaks the chosen language", () => {

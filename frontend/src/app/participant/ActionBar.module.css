@@ -1,0 +1,17 @@
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
+  width: 100%;
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  text-align: center;
+  text-wrap: balance;
+}

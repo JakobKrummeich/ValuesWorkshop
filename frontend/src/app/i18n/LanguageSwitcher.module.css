@@ -5,7 +5,7 @@
 }
 
 .choice {
-  min-height: calc(var(--control-height) * 0.75);
+  min-height: var(--control-height-compact);
   padding: 0 var(--space-gap);
   border: var(--border-hairline) solid var(--color-border);
   border-radius: var(--radius-full);

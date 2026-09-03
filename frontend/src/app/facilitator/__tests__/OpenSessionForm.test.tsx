@@ -51,7 +51,7 @@ describe("open session form", () => {
       wrapper: languageWrapper(),
     });
 
-    screen.getByRole("heading", { name: "ValuesWorkshop · Open a session" });
+    screen.getByRole("heading", { name: "Values Workshop · Open a session" });
     expect(sessionNameInput()).toHaveValue("Herbst 2024");
     expect(passphraseInput()).toHaveValue("secret");
   });
