@@ -19,10 +19,6 @@ export const valuePresentationMessages = {
     [Language.German]: "Es präsentiert: {group} · {value}",
     [Language.English]: "Presenting: {group} · {value}",
   },
-  [MessageKey.ValuePresentationActions]: {
-    [Language.German]: "Aktionen",
-    [Language.English]: "Actions",
-  },
   [MessageKey.ValuePresentationNextValue]: {
     [Language.German]: "Nächster Wert",
     [Language.English]: "Next value",

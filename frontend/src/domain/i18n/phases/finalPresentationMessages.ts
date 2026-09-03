@@ -32,10 +32,6 @@ export const finalPresentationMessages = {
     [Language.German]: "1 Stimme",
     [Language.English]: "1 vote",
   },
-  [MessageKey.FinalPresentationActions]: {
-    [Language.German]: "Aktionen",
-    [Language.English]: "Actions",
-  },
   [MessageKey.FinalPresentationOverviewHeading]: {
     [Language.German]: "Die Gewinner",
     [Language.English]: "The winners",
