@@ -126,9 +126,9 @@
 }
 
 .status {
-  grid-column: 1;
-  grid-row: 2;
-  place-self: end start;
+  grid-column: 1 / -1;
+  grid-row: 3;
+  justify-self: start;
 }
 
 .wall {
