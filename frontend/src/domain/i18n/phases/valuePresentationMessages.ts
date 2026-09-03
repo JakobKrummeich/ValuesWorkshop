@@ -11,6 +11,10 @@ export const valuePresentationMessages = {
     [Language.German]: "Als Nächstes: {group}",
     [Language.English]: "Up next: {group}",
   },
+  [MessageKey.ValuePresentationGroupPresents]: {
+    [Language.German]: "{group} präsentiert",
+    [Language.English]: "{group} presents",
+  },
   [MessageKey.ValuePresentationPresenting]: {
     [Language.German]: "Es präsentiert: {group} · {value}",
     [Language.English]: "Presenting: {group} · {value}",

@@ -20,7 +20,9 @@ describe("counter", () => {
     );
 
     expect(countUp).toHaveBeenCalledWith(12);
-    expect(screen.getByTestId("participant-count")).toHaveTextContent("7");
+    expect(screen.getByTestId("participant-count")).toHaveTextContent(
+      "7 of 30 joined",
+    );
     expect(screen.getByText("of 30 joined")).toBeInTheDocument();
   });
 

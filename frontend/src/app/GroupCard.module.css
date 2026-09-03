@@ -1,5 +1,5 @@
 .card {
-  --card-tint: var(--color-accent);
+  --card-tint: var(--color-animal, var(--color-accent));
   --card-tint-strength: 22%;
 
   position: relative;
@@ -31,38 +31,6 @@
     rise var(--motion-slow) var(--ease-out) backwards,
     glow var(--motion-reveal) var(--ease-out) backwards;
   animation-delay: calc(var(--index, 0) * var(--motion-stagger));
-}
-
-.card[data-animal="otter"] {
-  --card-tint: var(--color-animal-otter);
-}
-
-.card[data-animal="fuchs"] {
-  --card-tint: var(--color-animal-fuchs);
-}
-
-.card[data-animal="eule"] {
-  --card-tint: var(--color-animal-eule);
-}
-
-.card[data-animal="igel"] {
-  --card-tint: var(--color-animal-igel);
-}
-
-.card[data-animal="dachs"] {
-  --card-tint: var(--color-animal-dachs);
-}
-
-.card[data-animal="luchs"] {
-  --card-tint: var(--color-animal-luchs);
-}
-
-.card[data-animal="biber"] {
-  --card-tint: var(--color-animal-biber);
-}
-
-.card[data-animal="marder"] {
-  --card-tint: var(--color-animal-marder);
 }
 
 .watermark {
@@ -148,10 +116,24 @@
   text-align: right;
 }
 
+.members:has(> :nth-child(5)),
+.values:has(> :nth-child(4)) {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  column-gap: var(--space-gap);
+  justify-content: end;
+  justify-items: end;
+}
+
 .status {
   grid-column: 1;
   grid-row: 2;
   place-self: end start;
+}
+
+.wall {
+  height: auto;
+  row-gap: var(--space-tight);
 }
 
 .wall .name {

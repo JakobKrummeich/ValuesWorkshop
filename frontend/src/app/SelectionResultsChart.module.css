@@ -9,7 +9,7 @@
   display: grid;
   flex: 1;
   grid-template-columns: minmax(max-content, 2fr) 3fr auto;
-  gap: var(--space-gap);
+  gap: var(--space-tight) var(--space-gap);
   align-content: start;
   min-width: 0;
 }

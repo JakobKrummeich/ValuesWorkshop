@@ -23,11 +23,14 @@ export function Counter({
   const displayed = useCountUp(value);
 
   return (
-    <p className={`${styles.counter} ${styles[variant]}`}>
-      <span className={styles.value} data-testid={testId}>
-        {displayed}
-      </span>
-      {suffix !== undefined && <span className={styles.suffix}>{suffix}</span>}
+    <p className={`${styles.counter} ${styles[variant]}`} data-testid={testId}>
+      <span className={styles.value}>{displayed}</span>
+      {suffix !== undefined && (
+        <>
+          {" "}
+          <span className={styles.suffix}>{suffix}</span>
+        </>
+      )}
     </p>
   );
 }

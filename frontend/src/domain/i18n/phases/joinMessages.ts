@@ -27,6 +27,14 @@ export const joinMessages = {
     [Language.German]: "Noch niemand dabei",
     [Language.English]: "Nobody has joined yet",
   },
+  [MessageKey.JoinJoined]: {
+    [Language.German]: "dabei",
+    [Language.English]: "joined",
+  },
+  [MessageKey.JoinMoreNames]: {
+    [Language.German]: "+{count} weitere",
+    [Language.English]: "+{count} more",
+  },
   [MessageKey.JoinCopyUrl]: {
     [Language.German]: "Beitrittslink kopieren",
     [Language.English]: "Copy join link",
