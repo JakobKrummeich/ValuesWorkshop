@@ -3,6 +3,7 @@
 import { MessageKey } from "../../../../domain/i18n/messages";
 import { focusOnMount } from "../../../focusOnMount";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { CallToAction, CallToActionVariant } from "../../CallToAction";
 import styles from "./SelectionConfirmDialog.module.css";
 import { useSelectionConfirmDialog } from "./useSelectionConfirmDialog";
 
@@ -17,38 +18,33 @@ export function SelectionConfirmDialog({
   const { trapKeyboardFocus } = useSelectionConfirmDialog(onCancel);
 
   return (
-    <div className={styles.dialogBackdrop}>
+    <div className={styles.backdrop}>
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="selection-confirm-title"
-        className={styles.dialog}
+        className={styles.sheet}
         onKeyDown={trapKeyboardFocus}
       >
-        <h3 id="selection-confirm-title" className={styles.dialogTitle}>
+        <span className={styles.handle} aria-hidden="true" />
+        <h3 id="selection-confirm-title" className={styles.title}>
           {translate(MessageKey.SelectionConfirmTitle)}
         </h3>
-        <p className={styles.dialogBody}>
+        <p className={styles.body}>
           {translate(MessageKey.SelectionConfirmBody)}
         </p>
-        <div className={styles.dialogActions}>
-          <button
-            type="button"
-            className={styles.cancelButton}
-            data-testid="confirm-cancel-button"
-            ref={focusOnMount}
+        <div className={styles.actions}>
+          <CallToAction
+            variant={CallToActionVariant.Ghost}
+            testId="confirm-cancel-button"
+            buttonRef={focusOnMount}
             onClick={onCancel}
           >
             {translate(MessageKey.SelectionConfirmCancel)}
-          </button>
-          <button
-            type="button"
-            className={styles.confirmButton}
-            data-testid="confirm-submit-button"
-            onClick={onConfirm}
-          >
+          </CallToAction>
+          <CallToAction testId="confirm-submit-button" onClick={onConfirm}>
             {translate(MessageKey.SelectionConfirmSubmit)}
-          </button>
+          </CallToAction>
         </div>
       </div>
     </div>

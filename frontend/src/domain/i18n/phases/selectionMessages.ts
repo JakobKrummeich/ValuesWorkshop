@@ -15,6 +15,10 @@ export const selectionMessages = {
     [Language.German]: "Ausgewählt: {selected}/{total}",
     [Language.English]: "Selected: {selected}/{total}",
   },
+  [MessageKey.SelectionPickMore]: {
+    [Language.German]: "Noch {count} wählen",
+    [Language.English]: "Pick {count} more",
+  },
   [MessageKey.SelectionSubmit]: {
     [Language.German]: "Auswahl abgeben",
     [Language.English]: "Submit selection",

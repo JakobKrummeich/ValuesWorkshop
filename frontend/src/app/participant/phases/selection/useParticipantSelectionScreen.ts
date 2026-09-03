@@ -19,6 +19,7 @@ export interface SelectionChip {
 export interface ParticipantSelectionScreenModel {
   chips: SelectionChip[];
   selectedCount: number;
+  remainingCount: number;
   isSubmitted: boolean;
   canSubmit: boolean;
   isConfirming: boolean;
@@ -89,6 +90,7 @@ export function useParticipantSelectionScreen(
       };
     }),
     selectedCount: selectedValueIds.length,
+    remainingCount: requiredSelectionCount - selectedValueIds.length,
     isSubmitted: selection.isSubmitted,
     canSubmit,
     isConfirming,

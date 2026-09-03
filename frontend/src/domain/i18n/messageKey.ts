@@ -78,6 +78,7 @@ export enum MessageKey {
   SelectionPrompt = "selection.prompt",
   SelectionChoosePrompt = "selection.choosePrompt",
   SelectionSelectedCount = "selection.selectedCount",
+  SelectionPickMore = "selection.pickMore",
   SelectionSubmit = "selection.submit",
   SelectionConfirmTitle = "selection.confirmTitle",
   SelectionConfirmBody = "selection.confirmBody",

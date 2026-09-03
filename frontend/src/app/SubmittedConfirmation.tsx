@@ -1,6 +1,7 @@
 "use client";
 
 import type { MessageKey } from "../domain/i18n/messages";
+import { CheckMark } from "./CheckMark";
 import { focusOnMount } from "./focusOnMount";
 import { useTranslation } from "./i18n/useTranslation";
 import { ScreenCopy } from "./ScreenCopy";
@@ -26,18 +27,7 @@ export function SubmittedConfirmation({
       ref={focusOnMount}
     >
       <span className={styles.disc}>
-        <svg
-          className={styles.icon}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="m6 12.5 4 4 8-9" />
-        </svg>
+        <CheckMark className={styles.icon} />
       </span>
       <ScreenCopy heading={translate(heading)} body={translate(body)} />
     </div>
