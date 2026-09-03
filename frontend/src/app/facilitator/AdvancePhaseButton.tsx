@@ -31,6 +31,7 @@ export function AdvancePhaseButton() {
         onClick={advancePhase}
       >
         {nextPhaseLabel}
+        <span aria-hidden="true" className={styles.arrow}>→</span>
       </button>
     </div>
   );

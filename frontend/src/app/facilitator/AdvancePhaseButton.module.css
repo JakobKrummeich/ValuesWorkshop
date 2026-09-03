@@ -39,8 +39,7 @@
     transform var(--motion-fast) var(--ease-out);
 }
 
-.button::after {
-  content: "→";
+.arrow {
   transition: transform var(--motion-fast) var(--ease-out);
 }
 
@@ -54,7 +53,7 @@
   background: var(--color-primary-strong);
 }
 
-.button:hover:enabled::after {
+.button:hover:enabled .arrow {
   transform: translateX(0.15em);
 }
 
@@ -64,7 +63,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .button,
-  .button::after {
+  .arrow {
     transition: none;
   }
 }
