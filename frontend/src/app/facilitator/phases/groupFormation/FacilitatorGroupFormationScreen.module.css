@@ -1,14 +1,30 @@
 .screen {
   display: flex;
   flex-direction: column;
+  min-height: 100%;
   padding: var(--space-gutter);
 }
 
+.forming {
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
 .groups {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
   gap: var(--space-gap);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.groups > li {
+  display: flex;
+  min-width: 0;
+}
+
+.groups > li > * {
+  flex: 1;
 }
