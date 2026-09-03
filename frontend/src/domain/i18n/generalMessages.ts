@@ -146,8 +146,8 @@ export const generalMessages = {
     [Language.English]: "The winners are about to be revealed.",
   },
   [MessageKey.OpenSessionTitle]: {
-    [Language.German]: "Values Workshop · Workshop eröffnen",
-    [Language.English]: "Values Workshop · Open a session",
+    [Language.German]: "Einen Workshop eröffnen",
+    [Language.English]: "Open a session",
   },
   [MessageKey.OpenSessionName]: {
     [Language.German]: "Workshop-Name",
