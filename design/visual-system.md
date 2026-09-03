@@ -134,7 +134,7 @@ highlight on bg, on both skins.
 | body (sans) | `clamp(22px, 1.5vw, 32px)` | 16px | 15px |
 | action row (sans 700) | `clamp(30px, 2.5vw, 52px)` | 16px | 15px |
 | heading (display 600) | `clamp(40px, 3.6vw, 76px)` | 24px | 26px |
-| value name in finale/presentation (display 600) | `clamp(48px, 4.2vw, 88px)` | — | — |
+| value name in finale/presentation (display 600) | `clamp(30px, 2.5vw, 52px)` | — | — |
 | counter (display 600, tabular) | `clamp(96px, 11vw, 220px)` | 40px | 32px |
 | giant numeral watermark (display 700) | `clamp(200px, 22vw, 420px)` | — | — |
 
@@ -199,7 +199,7 @@ for small serif labels (the wordmark).
 - **Action ledger** (replaces bullets everywhere): rows, each with a short
   ember vertical rule at the left (3px × 1.2em, radius full), text
   left-aligned, sans 600, rows separated by hairlines. Wall variant
-  ("slabs"): surface cards, ember rule, action-row type, staggered entry.
+  ("slabs"): surface cards, ember rule, heading type, staggered entry.
 - **Animal card** (GroupCard): hue-tinted gradient surface (`--card-tint`
   custom property computed with `color-mix` from the animal token), hairline
   in the hue, a giant glyph watermark (opacity 12 %, ~9em, bottom-left,
