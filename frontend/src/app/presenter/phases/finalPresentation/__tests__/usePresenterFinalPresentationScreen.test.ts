@@ -149,7 +149,7 @@ describe("presenter final presentation screen logic", () => {
         text: { de: "Wert 4", en: "Value 4" },
         place: 4,
         voteCount: 6,
-        voteCountKey: MessageKey.FinalPresentationVoteCount,
+        voteCountKey: MessageKey.VoteCount,
         actions: ["Action for value 4"],
       },
     });
@@ -166,7 +166,7 @@ describe("presenter final presentation screen logic", () => {
       stage: FinalPresentationStage.Reveal,
       winner: {
         voteCount: 1,
-        voteCountKey: MessageKey.FinalPresentationVoteCountSingle,
+        voteCountKey: MessageKey.VoteCountSingle,
       },
     });
   });

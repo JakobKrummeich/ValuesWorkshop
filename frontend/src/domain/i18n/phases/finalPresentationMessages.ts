@@ -24,14 +24,6 @@ export const finalPresentationMessages = {
     [Language.German]: "Platz {place}",
     [Language.English]: "Place {place}",
   },
-  [MessageKey.FinalPresentationVoteCount]: {
-    [Language.German]: "{count} Stimmen",
-    [Language.English]: "{count} votes",
-  },
-  [MessageKey.FinalPresentationVoteCountSingle]: {
-    [Language.German]: "1 Stimme",
-    [Language.English]: "1 vote",
-  },
   [MessageKey.FinalPresentationOverviewHeading]: {
     [Language.German]: "Die Gewinner",
     [Language.English]: "The winners",

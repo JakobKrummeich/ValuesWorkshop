@@ -226,6 +226,14 @@ export const generalMessages = {
     [Language.German]: "Workshop",
     [Language.English]: "Session",
   },
+  [MessageKey.VoteCount]: {
+    [Language.German]: "{count} Stimmen",
+    [Language.English]: "{count} votes",
+  },
+  [MessageKey.VoteCountSingle]: {
+    [Language.German]: "1 Stimme",
+    [Language.English]: "1 vote",
+  },
   [MessageKey.IntentWrongPhase]: {
     [Language.German]: "In dieser Phase ist das nicht möglich.",
     [Language.English]: "That is not possible in this phase.",

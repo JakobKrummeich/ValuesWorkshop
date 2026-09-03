@@ -3,6 +3,8 @@
 import { localizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { FacilitatorFinalVotingState } from "../../../../domain/workshopState";
+import { cssCustomProperty } from "../../../../shared/cssCustomProperty";
+import { Eyebrow } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./FacilitatorFinalVotingScreen.module.css";
 import { useFacilitatorFinalVotingScreen } from "./useFacilitatorFinalVotingScreen";
@@ -17,6 +19,7 @@ export function FacilitatorFinalVotingScreen({
     roundNumber,
     votedCount,
     participantCount,
+    votedFraction,
     isRoundOpen,
     isCloseVotingEnabled,
     isStartTiebreakEnabled,
@@ -33,29 +36,41 @@ export function FacilitatorFinalVotingScreen({
       className={styles.screen}
       data-testid="facilitator-final-voting-screen"
     >
-      <p className={styles.votedCount} data-testid="voted-count">
-        {translate(MessageKey.FinalVotingRoundVoted, {
-          round: roundNumber,
-          voted: votedCount,
-          total: participantCount,
-        })}
-      </p>
-      {isRoundOpen && (
-        <button
-          type="button"
-          className={styles.controlButton}
-          data-testid="close-voting-button"
-          disabled={isSending || !isCloseVotingEnabled}
-          onClick={closeVoting}
+      <div className={styles.round}>
+        <p className={styles.votedCount} data-testid="voted-count">
+          {translate(MessageKey.FinalVotingRoundVoted, {
+            round: roundNumber,
+            voted: votedCount,
+            total: participantCount,
+          })}
+        </p>
+        <div
+          className={styles.track}
+          role="progressbar"
+          aria-valuenow={Math.round(votedFraction * 100)}
+          aria-valuemin={0}
+          aria-valuemax={100}
         >
-          {translate(MessageKey.FinalVotingCloseVoting)}
-        </button>
-      )}
+          <span
+            className={styles.fill}
+            style={cssCustomProperty("--voted-fraction", votedFraction)}
+          />
+        </div>
+        {isRoundOpen && (
+          <button
+            type="button"
+            className={styles.controlButton}
+            data-testid="close-voting-button"
+            disabled={isSending || !isCloseVotingEnabled}
+            onClick={closeVoting}
+          >
+            {translate(MessageKey.FinalVotingCloseVoting)}
+          </button>
+        )}
+      </div>
       {tallies !== null && (
-        <section className={styles.tallies}>
-          <h3 className={styles.talliesHeading}>
-            {translate(MessageKey.FinalVotingLastRoundResults)}
-          </h3>
+        <section className={styles.results}>
+          <Eyebrow>{translate(MessageKey.FinalVotingLastRoundResults)}</Eyebrow>
           <ol className={styles.tallyList} data-testid="closed-round-tallies">
             {tallies.map((tally) => (
               <li
@@ -63,11 +78,17 @@ export function FacilitatorFinalVotingScreen({
                 className={styles.tally}
                 data-testid={`tally-${tally.valueId}`}
               >
-                <span>{localizedText(language, tally.text)}</span>
+                <span className={styles.tallyName}>
+                  {localizedText(language, tally.text)}
+                </span>
+                <span className={styles.tallyTrack}>
+                  <span
+                    className={styles.tallyBar}
+                    style={cssCustomProperty("--share", tally.share)}
+                  />
+                </span>
                 <span className={styles.tallyCount}>
-                  {translate(MessageKey.FinalVotingVoteCount, {
-                    count: tally.voteCount,
-                  })}
+                  {translate(tally.voteCountKey, { count: tally.voteCount })}
                 </span>
               </li>
             ))}
@@ -81,7 +102,7 @@ export function FacilitatorFinalVotingScreen({
               values: tie.values
                 .map((text) => localizedText(language, text))
                 .join(" = "),
-              count: tie.voteCount,
+              votes: translate(tie.voteCountKey, { count: tie.voteCount }),
             })}
           </p>
           <button

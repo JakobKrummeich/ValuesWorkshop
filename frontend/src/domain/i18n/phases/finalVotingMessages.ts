@@ -55,13 +55,9 @@ export const finalVotingMessages = {
     [Language.German]: "Ergebnis der letzten Runde",
     [Language.English]: "Last round's results",
   },
-  [MessageKey.FinalVotingVoteCount]: {
-    [Language.German]: "{count} Stimmen",
-    [Language.English]: "{count} votes",
-  },
   [MessageKey.FinalVotingTie]: {
-    [Language.German]: "Gleichstand: {values} ({count} Stimmen)",
-    [Language.English]: "Tie: {values} ({count} votes)",
+    [Language.German]: "Gleichstand: {values} ({votes})",
+    [Language.English]: "Tie: {values} ({votes})",
   },
   [MessageKey.FinalVotingStartTiebreak]: {
     [Language.German]: "Stichwahl starten",
