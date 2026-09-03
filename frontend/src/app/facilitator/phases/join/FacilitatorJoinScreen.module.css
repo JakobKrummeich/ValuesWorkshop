@@ -1,7 +1,7 @@
 .join {
   display: flex;
   flex-direction: column;
-  gap: var(--space-gap);
+  gap: var(--space-gutter);
   align-items: flex-start;
 }
 
@@ -9,52 +9,102 @@
   display: flex;
   gap: var(--space-gap);
   align-items: center;
+  min-height: var(--control-height);
 }
 
 .copyButton {
+  display: inline-flex;
+  gap: var(--space-tight);
+  align-items: center;
   min-height: var(--control-height);
   padding: var(--space-tight) var(--space-gutter);
-  border: var(--border-hairline) solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-text);
+  border: var(--border-hairline) solid var(--color-accent);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-accent);
   font-family: var(--font-sans);
-  font-size: var(--text-body);
+  font-size: var(--text-action);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
 }
 
 .copyButton:disabled {
+  border-color: var(--color-border);
   color: var(--color-text-muted);
+}
+
+.copyButton:hover:enabled {
+  background: var(--color-accent-soft);
 }
 
 .copyOutcome {
+  margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
 }
 
-.rosterHeading {
-  color: var(--color-text);
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
+.rosterHeader {
+  display: flex;
+  gap: var(--space-gutter);
+  align-items: baseline;
 }
 
 .count {
+  margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
 }
 
 .empty {
+  margin: 0;
   color: var(--color-text-muted);
   font-size: var(--text-body);
 }
 
 .names {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-tight);
+  flex-wrap: wrap;
+  gap: var(--space-gap);
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
 .name {
+  padding: calc(var(--space-tight) * 1.5) var(--space-gap);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
   color: var(--color-text);
   font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  white-space: nowrap;
+  box-shadow: var(--shadow-card);
+  animation: pop var(--motion-base) var(--ease-spring) backwards;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copyButton {
+    transition: none;
+  }
+
+  .name {
+    animation: none;
+  }
 }
