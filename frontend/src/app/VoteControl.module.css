@@ -25,11 +25,6 @@
     opacity var(--motion-fast) var(--ease-out);
 }
 
-.button:focus-visible {
-  outline: var(--border-ring) solid var(--color-highlight);
-  outline-offset: var(--border-ring);
-}
-
 .button:disabled {
   cursor: default;
   opacity: 0.3;

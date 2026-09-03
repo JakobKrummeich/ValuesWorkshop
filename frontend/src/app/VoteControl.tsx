@@ -29,7 +29,7 @@ export function VoteControl({
     <div className={styles.control}>
       <button
         type="button"
-        className={`${styles.button} ${styles.remove}`}
+        className={styles.button}
         aria-label={removeLabel}
         disabled={!canRemove}
         onClick={onRemove}
