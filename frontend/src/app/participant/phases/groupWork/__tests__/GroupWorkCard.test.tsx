@@ -170,6 +170,27 @@ describe("GroupWorkCard", () => {
     expect(screen.getByTestId("remove-action-a1")).toBeInTheDocument();
   });
 
+  it("forwards the scribe's typing to the hook", () => {
+    const editActionText = jest.fn();
+    screenHook.mockReturnValue(
+      model({
+        editActionText,
+        actionsForSelectedValue: [
+          { actionId: "a1", valueId: "trust", text: "Talk", sortOrder: 0 },
+        ],
+      }),
+    );
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+    fireEvent.change(screen.getByTestId("action-input-a1"), {
+      target: { value: "Talk openly" },
+    });
+
+    expect(editActionText).toHaveBeenCalledWith("a1", "Talk openly");
+  });
+
   it("shows read-only text for non-scribe", () => {
     screenHook.mockReturnValue(
       model({

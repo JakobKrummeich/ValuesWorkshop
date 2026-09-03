@@ -69,6 +69,11 @@
   box-shadow: var(--shadow-glow-accent);
 }
 
+.picked:focus-visible {
+  outline-color: var(--color-highlight);
+  outline-offset: var(--border-ring);
+}
+
 .picked .letter {
   background: var(--color-accent);
   color: var(--color-on-accent);
