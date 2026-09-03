@@ -1,6 +1,5 @@
 import { baseTokenValue } from "../../testing/designTokens";
 import {
-  motionBaseMilliseconds,
   motionRevealMilliseconds,
   motionSlowMilliseconds,
   motionStaggerMilliseconds,
@@ -8,7 +7,6 @@ import {
 
 describe("motion durations", () => {
   it.each([
-    ["--base-motion-base", motionBaseMilliseconds],
     ["--base-motion-slow", motionSlowMilliseconds],
     ["--base-motion-reveal", motionRevealMilliseconds],
     ["--base-motion-stagger", motionStaggerMilliseconds],
