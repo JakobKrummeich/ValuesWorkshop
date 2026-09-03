@@ -35,6 +35,7 @@ tokens only. Hex/rgb values appear nowhere else.
 | `--base-night-700` | `#10251A` | night surface |
 | `--base-night-600` | `#173226` | night surface strong / hover |
 | `--base-night-hairline` | `rgb(255 255 255 / 10%)` | night borders |
+| `--base-night-scrim` | `rgb(7 21 15 / 75%)` | night dialog scrim |
 | `--base-night-text` | `#F1F6EE` | night text |
 | `--base-night-muted` | `#A3B8A8` | night muted text |
 | `--base-ember-500` | `#FFB63B` | accent, CTA (night) |
@@ -47,13 +48,15 @@ tokens only. Hex/rgb values appear nowhere else.
 | `--base-paper-100` | `#F7F1E6` | paper bg |
 | `--base-paper-200` | `#EFE7D8` | paper sidebar / inset |
 | `--base-paper-hairline` | `#E3DACA` | paper borders |
+| `--base-paper-scrim` | `rgb(22 33 27 / 45%)` | paper dialog scrim |
 | `--base-white` | `#FFFFFF` | paper surface |
 | `--base-ink-900` | `#16211B` | paper text |
 | `--base-ink-600` | `#5D6A62` | paper muted |
 | `--base-pine-700` | `#1B5E3C` | paper primary |
 | `--base-pine-800` | `#144A2F` | paper primary strong |
 | `--base-moss-500` | `#3B9A5C` | success on paper |
-| `--base-clay-600` | `#C4432B` | danger |
+| `--base-clay-600` | `#B33B26` | danger on paper (`#C4432B` fell short of 4.5:1 on paper-100) |
+| `--base-clay-400` | `#EC7A60` | danger on night (clay-600 fell short of 4.5:1 on night-900) |
 | `--base-clay-100` | `#FBE4DF` | danger soft (paper) |
 | `--base-animal-otter` | `#1FA3B5` | |
 | `--base-animal-fuchs` | `#F0672A` | |
@@ -107,12 +110,13 @@ by `data-animal`.
 Night mapping: bg night-900, bg-alt night-800, surface night-700, surface-strong
 night-600, border night-hairline, text night-text, muted night-muted, primary
 ember-500, on-primary ember-900, accent ember-500, accent-deep ember-600,
-highlight mint-400, success mint-400, danger clay-600, glow teal/ember/plum,
+highlight mint-400, success mint-400, danger clay-400, glow teal/ember/plum,
 member chip mint, value chip ember.
 
 Paper mapping: bg paper-100, bg-alt paper-200, surface white, surface-strong
 paper-200, border paper-hairline, text ink-900, muted ink-600, primary
-ember-700 (the Advance CTA), primary-strong ember-600, on-primary white,
+ember-700 (the Advance CTA), primary-strong ember-600, on-primary ember-900
+(white on ember-700 reads at 2.6:1, far below AA),
 accent pine-700, accent-deep pine-800, highlight moss-500, success moss-500,
 danger clay-600, danger-soft clay-100, member chip pine, value chip ember-700.
 
