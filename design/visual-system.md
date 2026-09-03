@@ -97,7 +97,9 @@ by `data-animal`.
 
 `--color-bg`, `--color-bg-alt`, `--color-surface`, `--color-surface-strong`,
 `--color-border`, `--color-text`, `--color-text-muted`, `--color-primary`,
-`--color-primary-strong`, `--color-on-primary`, `--color-accent`,
+`--color-primary-strong`, `--color-on-primary`, `--color-brand-mark`
+(wordmark ember mark — reads its own token so it stays ember on paper
+instead of taking the surface accent), `--color-accent`,
 `--color-accent-deep`, `--color-on-accent`, `--color-highlight`, `--color-eyebrow`
 (eyebrow text: mint on night, pine on paper — AA as text),
 `--color-success`, `--color-danger`, `--color-danger-soft`, `--color-glow-1`,
@@ -284,7 +286,7 @@ in a centred 34em column, chips/cards in two columns where they fit.
    as a small card row. P: aurora until concluded; concluded: own group glyph
    blooms in its hue + confetti, "Workshop concluded", "Thanks for taking
    part!", CTA "Download workshop record (PDF)". L: revealed count, "Reveal
-   next value", concluded note, PDF download.
+   next value", concluded note.
 
 Entry: L "Open a session" — paper card centred (session name, passphrase,
 ember "Open session"). P: AuthGuard states and MissingSession over the
