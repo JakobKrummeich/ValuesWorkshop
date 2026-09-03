@@ -6,6 +6,7 @@ import { PhaseStepperVariant } from "../chrome/PhaseStepper";
 import { PhaseStepState } from "../chrome/usePhaseStepper";
 import { WordmarkSize } from "../chrome/Wordmark";
 import { CounterSize, CounterVariant } from "../Counter";
+import { EyebrowTone } from "../Eyebrow";
 import { GroupCardVariant } from "../GroupCard";
 import { AnswerBarEmphasis } from "../presenter/phases/quiz/usePresenterQuizScreen";
 
@@ -15,6 +16,7 @@ const variantModules: ReadonlyArray<
   ["ActionLedger.module.css", ActionLedgerVariant],
   ["Counter.module.css", CounterSize],
   ["Counter.module.css", CounterVariant],
+  ["Eyebrow.module.css", EyebrowTone],
   ["GroupCard.module.css", GroupCardVariant],
   ["chrome/ConnectionStatus.module.css", ConnectionStatusVariant],
   ["chrome/PhaseStepMarker.module.css", PhaseStepState],

@@ -5,6 +5,7 @@ import { localizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import { ActionLedger, ActionLedgerVariant } from "../../../ActionLedger";
 import { AnimalGlyph } from "../../../AnimalGlyph";
+import { Eyebrow, EyebrowTone } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./PresentedValueView.module.css";
 
@@ -31,12 +32,12 @@ export function PresentedValueView({
         <div className={styles.glyph}>
           <AnimalGlyph animalId={animalId} />
         </div>
-        <p className={styles.eyebrow}>
+        <Eyebrow tone={EyebrowTone.Animal}>
           <span data-testid="presenter-presenting-group">
             {localizedText(language, groupName)}
           </span>{" "}
           {translate(MessageKey.ValuePresentationPresents)}
-        </p>
+        </Eyebrow>
         <h2
           className={styles.valueName}
           data-testid="presenter-presented-value"

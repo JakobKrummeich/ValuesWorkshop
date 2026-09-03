@@ -9,13 +9,6 @@
 }
 
 .eyebrow {
-  margin: 0;
-  color: var(--color-eyebrow);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
-  text-transform: uppercase;
   animation: rise var(--motion-base) var(--ease-out) backwards;
 }
 

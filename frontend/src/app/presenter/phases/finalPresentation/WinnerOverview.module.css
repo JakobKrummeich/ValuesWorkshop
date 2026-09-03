@@ -8,17 +8,6 @@
   text-align: center;
 }
 
-.heading {
-  margin: 0;
-  color: var(--color-eyebrow);
-  font-family: var(--font-sans);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
-  text-transform: uppercase;
-}
-
 .podium {
   display: flex;
   flex: 1;
@@ -82,12 +71,7 @@
 }
 
 .voteCount {
-  color: var(--color-text-muted);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
   font-variant-numeric: tabular-nums;
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
 }
 
 .pillar {

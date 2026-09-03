@@ -28,16 +28,6 @@
   animation-delay: calc(var(--motion-base) + var(--motion-reveal));
 }
 
-.eyebrow {
-  margin: 0;
-  color: var(--color-eyebrow);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
-  text-transform: uppercase;
-}
-
 .groupName {
   margin: 0;
   color: var(--color-text);

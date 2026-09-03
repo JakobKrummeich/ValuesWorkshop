@@ -24,16 +24,6 @@
   animation: bloom var(--motion-slow) var(--ease-spring) backwards;
 }
 
-.eyebrow {
-  margin: 0;
-  color: var(--color-animal);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
-  text-transform: uppercase;
-}
-
 .valueName {
   margin: 0;
   color: var(--color-text);

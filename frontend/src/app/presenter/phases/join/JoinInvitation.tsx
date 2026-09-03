@@ -2,6 +2,7 @@
 
 import { QrCodeImage } from "../../../../adapters/qrCodeImage";
 import { MessageKey } from "../../../../domain/i18n/messages";
+import { Eyebrow } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./JoinInvitation.module.css";
 
@@ -16,7 +17,7 @@ export function JoinInvitation({
   const caption = translate(MessageKey.JoinScanToJoin);
 
   return (
-    <figure className={styles.invitation}>
+    <div className={styles.invitation}>
       <div className={styles.card}>
         {pingKey > 0 && (
           <span
@@ -32,7 +33,7 @@ export function JoinInvitation({
           className={styles.qrCode}
         />
       </div>
-      <figcaption className={styles.caption}>{caption}</figcaption>
-    </figure>
+      <Eyebrow>{caption}</Eyebrow>
+    </div>
   );
 }

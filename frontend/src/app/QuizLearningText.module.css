@@ -9,16 +9,6 @@
   text-align: left;
 }
 
-.heading {
-  margin: 0;
-  color: var(--color-accent);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
-  text-transform: uppercase;
-}
-
 .body {
   margin: 0;
   color: var(--color-text);

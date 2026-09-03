@@ -4,7 +4,6 @@
   flex-direction: column;
   gap: var(--space-gap);
   align-items: center;
-  margin: 0;
 }
 
 .card {
@@ -32,15 +31,6 @@
   box-shadow: var(--shadow-glow-highlight);
   animation: ping var(--motion-reveal) var(--ease-out) forwards;
   pointer-events: none;
-}
-
-.caption {
-  color: var(--color-eyebrow);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
-  text-transform: uppercase;
 }
 
 @keyframes bloom {

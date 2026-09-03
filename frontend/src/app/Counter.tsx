@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "./Counter.module.css";
+import { Eyebrow, EyebrowTone } from "./Eyebrow";
 import { useCountUp } from "./useCountUp";
 
 export enum CounterVariant {
@@ -30,7 +31,7 @@ export function Counter({
   const displayed = useCountUp(value);
 
   return (
-    <p
+    <div
       className={`${styles.counter} ${styles[variant]} ${styles[size]}`}
       data-testid={testId}
     >
@@ -38,9 +39,9 @@ export function Counter({
       {suffix !== undefined && (
         <>
           {" "}
-          <span className={styles.suffix}>{suffix}</span>
+          <Eyebrow tone={EyebrowTone.Muted}>{suffix}</Eyebrow>
         </>
       )}
-    </p>
+    </div>
   );
 }

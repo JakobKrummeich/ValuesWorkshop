@@ -7,14 +7,7 @@
 }
 
 .heading {
-  margin: 0;
-  color: var(--color-eyebrow);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
   text-align: center;
-  text-transform: uppercase;
 }
 
 .emptyNote {

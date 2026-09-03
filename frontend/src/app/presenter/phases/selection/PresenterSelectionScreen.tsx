@@ -4,6 +4,7 @@ import { MessageKey } from "../../../../domain/i18n/messages";
 import type { PresenterSelectionState } from "../../../../domain/workshopState";
 import { cssCustomProperty } from "../../../../shared/cssCustomProperty";
 import { Counter, CounterSize, CounterVariant } from "../../../Counter";
+import { Eyebrow } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./PresenterSelectionScreen.module.css";
 import { usePresenterSelectionScreen } from "./usePresenterSelectionScreen";
@@ -19,7 +20,7 @@ export function PresenterSelectionScreen({
 
   return (
     <section className={styles.screen}>
-      <h2 className={styles.prompt}>{translate(MessageKey.SelectionPrompt)}</h2>
+      <Eyebrow>{translate(MessageKey.SelectionPrompt)}</Eyebrow>
       <Counter
         value={submittedCount}
         suffix={translate(MessageKey.SelectionSubmittedOfTotal, {

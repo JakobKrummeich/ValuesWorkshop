@@ -15,16 +15,6 @@
   line-height: var(--leading-display);
 }
 
-.suffix {
-  color: var(--color-text-muted);
-  font-family: var(--font-sans);
-  font-size: var(--text-eyebrow);
-  font-weight: var(--weight-black);
-  letter-spacing: var(--tracking-eyebrow);
-  line-height: var(--leading-tight);
-  text-transform: uppercase;
-}
-
 .giant .value {
   font-size: var(--text-counter);
 }

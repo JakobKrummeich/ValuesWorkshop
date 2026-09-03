@@ -5,6 +5,7 @@ import {
   type LocalizedText,
 } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
+import { Eyebrow } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./QuizLearningView.module.css";
 
@@ -19,9 +20,9 @@ export function QuizLearningView({
 
   return (
     <section className={styles.view} data-testid="learning-text">
-      <p className={styles.eyebrow}>
+      <Eyebrow className={styles.eyebrow}>
         {translate(MessageKey.QuizLearningTextHeading)}
-      </p>
+      </Eyebrow>
       <p className={styles.correctAnswer} data-testid="learning-correct-answer">
         <svg
           className={styles.check}

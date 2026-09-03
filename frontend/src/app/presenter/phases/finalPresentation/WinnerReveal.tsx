@@ -4,6 +4,7 @@ import { localizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import { ActionLedger, ActionLedgerVariant } from "../../../ActionLedger";
 import { Confetti } from "../../../Confetti";
+import { Eyebrow, EyebrowTone } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
 import type { RevealedWinnerModel } from "./usePresenterFinalPresentationScreen";
 import { useRevealCelebration } from "./useRevealCelebration";
@@ -19,7 +20,7 @@ export function WinnerReveal({ winner }: { winner: RevealedWinnerModel }) {
         <span className={styles.numeral} aria-hidden="true">
           {winner.place}
         </span>
-        <p className={styles.eyebrow}>
+        <Eyebrow tone={EyebrowTone.Accent} className={styles.eyebrow}>
           <span data-testid="winner-place">
             {translate(MessageKey.FinalPresentationPlace, {
               place: winner.place,
@@ -29,7 +30,7 @@ export function WinnerReveal({ winner }: { winner: RevealedWinnerModel }) {
           <span data-testid="winner-vote-count">
             {translate(winner.voteCountKey, { count: winner.voteCount })}
           </span>
-        </p>
+        </Eyebrow>
         <h2 className={styles.valueName} data-testid="winner-value">
           {localizedText(language, winner.text)}
         </h2>
