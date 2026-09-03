@@ -177,6 +177,11 @@ dates fast. A borrows C's ambient glow for the wall only.
   podium overview), not a top-to-bottom slide; the concluded phone screen
   blooms the own-group glyph with confetti instead of a generic check.
 - D17 Advance button names the next phase ("Advance to 6 · Group work →").
+- D18 (during 29c/29e) The redesign may change an e2e contract where the
+  screen itself changed — the two-step quiz answer, the missing-session copy,
+  the wall's `?language=` — as long as the specs keep asserting the same
+  behaviour through the shared helpers in `e2e/support/`, which the demo
+  tooling reuses instead of copying the drive.
 
 ## Verification before each PR
 
