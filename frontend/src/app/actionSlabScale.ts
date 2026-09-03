@@ -1,5 +1,5 @@
 const slabTextWidthEm = 22;
-const slabColumnHeightEm = 17;
+const slabColumnHeightEm = 14;
 const glyphWidthEm = 0.6;
 const lineHeight = 1.25;
 const slabChromeEm = 1.4;

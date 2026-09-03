@@ -17,7 +17,7 @@ describe("action slab scale", () => {
     const scale = actionSlabScaleOf(texts(5, 60));
 
     expect(scale).toBeLessThan(1);
-    expect(scale).toBeGreaterThanOrEqual(0.8);
+    expect(scale).toBeGreaterThanOrEqual(0.7);
   });
 
   it("shrinks more text further", () => {
