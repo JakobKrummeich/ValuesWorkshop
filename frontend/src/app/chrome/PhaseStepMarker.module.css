@@ -5,14 +5,18 @@
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-  border: var(--border-hairline) solid var(--color-border);
+  border: var(--border-hairline) solid;
   border-radius: var(--radius-full);
-  color: var(--color-text-muted);
   font-family: var(--font-sans);
   font-size: var(--text-eyebrow);
   font-variant-numeric: tabular-nums;
   font-weight: var(--weight-bold);
   line-height: var(--leading-tight);
+}
+
+.upcoming {
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
 }
 
 .done {

@@ -5,10 +5,14 @@
   margin: 0;
   color: var(--color-text-muted);
   font-family: var(--font-sans);
-  font-size: var(--text-small);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-tight);
   white-space: nowrap;
+}
+
+.phone,
+.sidebar {
+  font-size: var(--text-small);
 }
 
 .dot {

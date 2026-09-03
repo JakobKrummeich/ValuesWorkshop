@@ -70,9 +70,12 @@
   width: 0.55em;
   height: 0.55em;
   border-radius: var(--radius-full);
-  background: var(--color-border);
   font-size: var(--text-eyebrow);
   transition: background var(--motion-base) var(--ease-out);
+}
+
+.wall .step.upcoming {
+  background: var(--color-border);
 }
 
 .wall .step.done {
@@ -107,9 +110,12 @@
   width: 1em;
   height: 0.35em;
   border-radius: var(--radius-sm);
-  background: var(--color-border);
   font-size: var(--text-small);
   transition: background var(--motion-base) var(--ease-out);
+}
+
+.phone .step.upcoming {
+  background: var(--color-border);
 }
 
 .phone .step.done {
