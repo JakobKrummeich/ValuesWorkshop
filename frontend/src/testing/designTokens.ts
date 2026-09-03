@@ -63,6 +63,9 @@ function parseMix(inner: string): Rgba {
   const firstShareOfAlpha = firstRgba.alpha * firstWeight;
   const secondShareOfAlpha = secondRgba.alpha * secondWeight;
   const alpha = firstShareOfAlpha + secondShareOfAlpha;
+  if (alpha === 0) {
+    return transparent;
+  }
   const mixChannel = (firstChannel: number, secondChannel: number) =>
     Math.round(
       (firstChannel * firstShareOfAlpha + secondChannel * secondShareOfAlpha) /
