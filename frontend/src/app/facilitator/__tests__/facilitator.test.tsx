@@ -95,7 +95,7 @@ describe("facilitator screen group", () => {
     });
 
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 6");
-    screen.getByRole("button", { name: "Advance phase" });
+    screen.getByTestId("advance-phase-button");
   });
 
   it("offers the open session form when the link carries no session", async () => {

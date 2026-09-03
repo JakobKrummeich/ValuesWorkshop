@@ -41,6 +41,7 @@ tokens only. Hex/rgb values appear nowhere else.
 | `--base-ember-500` | `#FFB63B` | accent, CTA (night) |
 | `--base-ember-600` | `#F28C1E` | accent deep, gradients |
 | `--base-ember-700` | `#E58A12` | accent on paper |
+| `--base-ember-800` | `#8F5407` | value-chip text on paper (5.4:1) |
 | `--base-ember-900` | `#1A1200` | text on ember |
 | `--base-mint-400` | `#8EF0B4` | highlight, success on night |
 | `--base-teal-500` | `#2CC7B8` | ambient glow 1 |
@@ -97,7 +98,8 @@ by `data-animal`.
 `--color-bg`, `--color-bg-alt`, `--color-surface`, `--color-surface-strong`,
 `--color-border`, `--color-text`, `--color-text-muted`, `--color-primary`,
 `--color-primary-strong`, `--color-on-primary`, `--color-accent`,
-`--color-accent-deep`, `--color-on-accent`, `--color-highlight`,
+`--color-accent-deep`, `--color-on-accent`, `--color-highlight`, `--color-eyebrow`
+(eyebrow text: mint on night, pine on paper — AA as text),
 `--color-success`, `--color-danger`, `--color-danger-soft`, `--color-glow-1`,
 `--color-glow-2`, `--color-glow-3`, `--color-member-chip`,
 `--color-member-chip-soft`, `--color-value-chip`, `--color-value-chip-soft`,

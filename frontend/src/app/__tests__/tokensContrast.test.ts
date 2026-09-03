@@ -12,9 +12,13 @@ const surfaces = [
 const backgrounds = ["--color-bg", "--color-bg-alt", "--color-surface"];
 
 const textPairings = [
-  ...["--color-text", "--color-text-muted"].flatMap((text) =>
-    backgrounds.map((background) => [text, background]),
-  ),
+  ...[
+    "--color-text",
+    "--color-text-muted",
+    "--color-eyebrow",
+    "--color-value-chip",
+    "--color-member-chip",
+  ].flatMap((text) => backgrounds.map((background) => [text, background])),
   ["--color-on-primary", "--color-primary"],
   ["--color-on-accent", "--color-accent"],
   ["--color-danger", "--color-bg"],

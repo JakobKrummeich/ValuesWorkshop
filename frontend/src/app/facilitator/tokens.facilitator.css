@@ -29,6 +29,7 @@
   );
   --color-on-accent: var(--base-white);
   --color-highlight: var(--base-moss-500);
+  --color-eyebrow: var(--base-pine-700);
   --color-success: var(--base-moss-500);
   --color-danger: var(--base-clay-600);
   --color-danger-soft: var(--base-clay-100);
@@ -42,7 +43,7 @@
     var(--base-pine-700) 12%,
     transparent
   );
-  --color-value-chip: var(--base-ember-700);
+  --color-value-chip: var(--base-ember-800);
   --color-value-chip-soft: color-mix(
     in srgb,
     var(--base-ember-700) 14%,

@@ -24,7 +24,7 @@ describe("advance phase button", () => {
     });
     render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
 
-    fireEvent.click(screen.getByRole("button", { name: "Advance phase" }));
+    fireEvent.click(screen.getByTestId("advance-phase-button"));
 
     expect(advancePhase).toHaveBeenCalled();
   });
@@ -40,9 +40,9 @@ describe("advance phase button", () => {
 
     render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
 
-    expect(
-      screen.getByRole("button", { name: "Advance phase" }),
-    ).toHaveTextContent("Advance to 2 · Quiz");
+    expect(screen.getByTestId("advance-phase-button")).toHaveTextContent(
+      "Advance to 2 · Quiz",
+    );
   });
 
   it("is absent when there is no next phase", () => {
@@ -70,9 +70,7 @@ describe("advance phase button", () => {
 
     render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
 
-    expect(
-      screen.getByRole("button", { name: "Advance phase" }),
-    ).toBeDisabled();
+    expect(screen.getByTestId("advance-phase-button")).toBeDisabled();
   });
 
   it("is disabled while the workshop does not allow advancing", () => {
@@ -86,9 +84,7 @@ describe("advance phase button", () => {
 
     render(<AdvancePhaseButton />, { wrapper: languageWrapper() });
 
-    expect(
-      screen.getByRole("button", { name: "Advance phase" }),
-    ).toBeDisabled();
+    expect(screen.getByTestId("advance-phase-button")).toBeDisabled();
   });
 
   it("shows the rejection message", () => {

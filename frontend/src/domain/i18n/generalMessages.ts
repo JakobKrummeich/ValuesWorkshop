@@ -188,10 +188,6 @@ export const generalMessages = {
       "Der Workshop konnte nicht eröffnet werden. Bitte erneut versuchen.",
     [Language.English]: "The session could not be opened. Please try again.",
   },
-  [MessageKey.AdvancePhase]: {
-    [Language.German]: "Phase weiterschalten",
-    [Language.English]: "Advance phase",
-  },
   [MessageKey.AdvanceToPhase]: {
     [Language.German]: "Weiter zu {phase} · {name}",
     [Language.English]: "Advance to {phase} · {name}",

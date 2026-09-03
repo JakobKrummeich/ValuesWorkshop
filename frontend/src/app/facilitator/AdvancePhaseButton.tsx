@@ -1,6 +1,5 @@
 "use client";
 
-import { MessageKey } from "../../domain/i18n/messages";
 import { useTranslation } from "../i18n/useTranslation";
 import styles from "./AdvancePhaseButton.module.css";
 import { useAdvancePhaseButton } from "./useAdvancePhaseButton";
@@ -27,7 +26,7 @@ export function AdvancePhaseButton() {
       <button
         type="button"
         className={styles.button}
-        aria-label={translate(MessageKey.AdvancePhase)}
+        data-testid="advance-phase-button"
         disabled={isAdvancing || !isAdvanceEnabled}
         onClick={advancePhase}
       >

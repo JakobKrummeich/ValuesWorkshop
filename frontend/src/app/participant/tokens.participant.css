@@ -29,6 +29,7 @@
   );
   --color-on-accent: var(--base-ember-900);
   --color-highlight: var(--base-mint-400);
+  --color-eyebrow: var(--base-mint-400);
   --color-success: var(--base-mint-400);
   --color-danger: var(--base-clay-400);
   --color-danger-soft: color-mix(

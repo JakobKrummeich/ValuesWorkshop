@@ -43,7 +43,6 @@ export enum MessageKey {
   OpenSessionPassphraseRejected = "facilitator.openSession.passphraseRejected",
   OpenSessionNameRejected = "facilitator.openSession.nameRejected",
   OpenSessionUnexpected = "facilitator.openSession.unexpected",
-  AdvancePhase = "facilitator.advancePhase",
   AdvanceToPhase = "facilitator.advanceToPhase",
   IntentWrongPhase = "intent.wrongPhase",
   IntentNotAuthorized = "intent.notAuthorized",

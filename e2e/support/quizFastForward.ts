@@ -5,7 +5,7 @@ export const QUIZ_QUESTION_COUNT = 5;
 const FAST_FORWARD_ANSWER_INDEX = 0;
 
 export function advancePhaseButton(facilitatorPage: Page): Locator {
-  return facilitatorPage.getByRole("button", { name: "Advance phase" });
+  return facilitatorPage.getByTestId("advance-phase-button");
 }
 
 export function quizControlButton(facilitatorPage: Page): Locator {
