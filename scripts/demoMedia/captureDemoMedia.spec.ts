@@ -1,4 +1,10 @@
-import { type BrowserContext, expect, type Page, test } from "@playwright/test";
+import {
+  type BrowserContext,
+  expect,
+  type Locator,
+  type Page,
+  test,
+} from "@playwright/test";
 import { resolve } from "node:path";
 import {
   LAPTOP_VIEWPORT,
@@ -39,18 +45,40 @@ test("capture the README screenshots", async ({ browser }) => {
     const capture = (page: Page, fileName: string) =>
       page.screenshot({ path: resolve(MEDIA_DIRECTORY, fileName) });
 
+    const restingAt = (locator: Locator, property: string, resting: string) =>
+      expect(locator).toHaveCSS(property, resting, {
+        timeout: SETTLED_TIMEOUT_MILLISECONDS,
+      });
+
     const screenshotsByMoment: Partial<
       Record<DemoMoment, () => Promise<unknown>>
     > = {
       actionsWritten: () =>
         capture(facilitatorPage, "facilitator-group-work.png"),
-      votesInFlight: () =>
-        capture(capturedParticipantPage, "participant-final-voting.png"),
+      votesInFlight: async () => {
+        await restingAt(
+          capturedParticipantPage
+            .getByTestId("vote-pips")
+            .locator("[data-filled='true']")
+            .last(),
+          "transform",
+          "none",
+        );
+        await capturedParticipantPage.getByRole("main").evaluate((content) => {
+          content.scrollTop = 0;
+        });
+        await capture(capturedParticipantPage, "participant-final-voting.png");
+      },
       winnersRevealed: async () => {
-        await expect(presenterPage.getByTestId("winner-actions")).toHaveCSS(
+        await restingAt(
+          presenterPage.getByTestId("winner-value"),
           "opacity",
           "1",
-          { timeout: SETTLED_TIMEOUT_MILLISECONDS },
+        );
+        await restingAt(
+          presenterPage.getByTestId("winner-action").last(),
+          "opacity",
+          "1",
         );
         await capture(presenterPage, "presenter-final-presentation.png");
       },

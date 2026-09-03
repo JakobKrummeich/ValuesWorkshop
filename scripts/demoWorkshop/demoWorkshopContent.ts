@@ -20,4 +20,10 @@ export const ACTION_TEXTS_BY_ORDER = [
   "New joiners get a buddy and a first small win in their first week",
   "We say what we will not do when we plan the quarter",
   "Praise is spoken out loud in the team channel, feedback in private",
+  "Every pull request gets a first reply within one working day",
+  "We rotate who runs the meeting so everyone learns to hold the room",
+  "Anyone may stop a release when something feels wrong",
+  "We write down what we learned when an experiment fails",
+  "Questions from outside the team get an answer, not a forward",
+  "We keep one afternoon a month for cleaning up what slows us down",
 ];
