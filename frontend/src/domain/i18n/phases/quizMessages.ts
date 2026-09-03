@@ -11,6 +11,14 @@ export const quizMessages = {
     [Language.German]: "Deine Antwort:",
     [Language.English]: "Your answer:",
   },
+  [MessageKey.QuizPickAnswer]: {
+    [Language.German]: "Wähle eine Antwort",
+    [Language.English]: "Pick an answer",
+  },
+  [MessageKey.QuizLockInAnswer]: {
+    [Language.German]: "Antwort {letter} festlegen",
+    [Language.English]: "Lock in answer {letter}",
+  },
   [MessageKey.QuizAnsweredCount]: {
     [Language.German]: "{answered} von {total} haben geantwortet",
     [Language.English]: "{answered} of {total} have answered",
