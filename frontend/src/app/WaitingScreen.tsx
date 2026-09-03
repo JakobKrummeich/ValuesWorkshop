@@ -3,6 +3,7 @@
 import { MessageKey } from "../domain/i18n/messages";
 import type { MessageParameters } from "../domain/i18n/translate";
 import { useTranslation } from "./i18n/useTranslation";
+import { ScreenCopy } from "./ScreenCopy";
 import styles from "./WaitingScreen.module.css";
 
 export function WaitingScreen({
@@ -27,10 +28,10 @@ export function WaitingScreen({
         <span className={`${styles.blob} ${styles.blobTwo}`} />
         <span className={`${styles.blob} ${styles.blobThree}`} />
       </div>
-      <h2 className={styles.heading}>{translate(heading)}</h2>
-      {body !== undefined && (
-        <p className={styles.body}>{translate(body, bodyParameters)}</p>
-      )}
+      <ScreenCopy
+        heading={translate(heading)}
+        body={body === undefined ? undefined : translate(body, bodyParameters)}
+      />
     </section>
   );
 }

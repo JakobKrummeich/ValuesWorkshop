@@ -1,0 +1,25 @@
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-tight);
+  align-items: center;
+  text-align: center;
+}
+
+.heading {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-heading);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+.body {
+  max-width: 28em;
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+}

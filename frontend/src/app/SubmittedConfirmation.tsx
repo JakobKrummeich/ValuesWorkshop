@@ -3,6 +3,7 @@
 import type { MessageKey } from "../domain/i18n/messages";
 import { focusOnMount } from "./focusOnMount";
 import { useTranslation } from "./i18n/useTranslation";
+import { ScreenCopy } from "./ScreenCopy";
 import styles from "./SubmittedConfirmation.module.css";
 
 export function SubmittedConfirmation({
@@ -38,8 +39,7 @@ export function SubmittedConfirmation({
           <path d="m6 12.5 4 4 8-9" />
         </svg>
       </span>
-      <h2 className={styles.heading}>{translate(heading)}</h2>
-      <p className={styles.body}>{translate(body)}</p>
+      <ScreenCopy heading={translate(heading)} body={translate(body)} />
     </div>
   );
 }
