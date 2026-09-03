@@ -35,17 +35,16 @@ function model(
   overrides: Partial<FacilitatorGroupWorkScreenModel> = {},
 ): FacilitatorGroupWorkScreenModel {
   return {
-    groups: [
+    rows: [
       {
         name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
         members: [
           { participantId: "p1", displayName: "Alice" },
           { participantId: "p2", displayName: "Bob" },
         ],
-        assignedValues: [],
         scribeParticipantId: "p1",
         workStatus: GroupWorkStatus.Editing,
-        actionCountPerValue: { trust: 2, courage: 1 },
+        actionCount: 3,
       },
     ],
     reassignScribe: jest.fn(),
@@ -87,6 +86,38 @@ describe("FacilitatorGroupWorkScreen", () => {
 
     expect(screen.getByTestId("group-status-otter")).toHaveTextContent(
       "Editing",
+    );
+  });
+
+  it("shows the submitted status badge", () => {
+    const editing = model();
+    screenHook.mockReturnValue({
+      ...editing,
+      rows: editing.rows.map((row) => ({
+        ...row,
+        workStatus: GroupWorkStatus.Submitted,
+      })),
+    });
+
+    render(<FacilitatorGroupWorkScreen state={state()} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("group-status-otter")).toHaveTextContent(
+      "Submitted",
+    );
+  });
+
+  it("preselects the current scribe", () => {
+    screenHook.mockReturnValue(model());
+
+    render(<FacilitatorGroupWorkScreen state={state()} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("scribe-select-otter")).toHaveValue("p1");
+    expect(screen.getByTestId("scribe-select-otter")).toHaveAccessibleName(
+      "Scribe",
     );
   });
 

@@ -58,6 +58,60 @@ function state(
 }
 
 describe("useFacilitatorGroupWorkScreen", () => {
+  it("sums the action counts of every value into one count per group row", () => {
+    mockDependencies();
+    const groups: FacilitatorGroupWorkState["groups"] = [
+      {
+        name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+        members: [{ participantId: "p1", displayName: "Alice" }],
+        assignedValues: [],
+        scribeParticipantId: "p1",
+        workStatus: GroupWorkStatus.Editing,
+        actionCountPerValue: { trust: 2, courage: 1 },
+      },
+      {
+        name: { animalId: "fuchs", text: { de: "Fuchs", en: "Fox" } },
+        members: [{ participantId: "p3", displayName: "Cleo" }],
+        assignedValues: [],
+        scribeParticipantId: "p3",
+        workStatus: GroupWorkStatus.Submitted,
+        actionCountPerValue: {},
+      },
+    ];
+    const { result } = renderHook(() =>
+      useFacilitatorGroupWorkScreen(state(groups)),
+    );
+
+    expect(
+      result.current.rows.map((row) => [
+        row.name.animalId,
+        row.actionCount,
+        row.workStatus,
+      ]),
+    ).toEqual([
+      ["otter", 3, GroupWorkStatus.Editing],
+      ["fuchs", 0, GroupWorkStatus.Submitted],
+    ]);
+  });
+
+  it("treats a group without work status or counts as editing with no actions", () => {
+    mockDependencies();
+    const groups = [
+      {
+        name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },
+        members: [{ participantId: "p1", displayName: "Alice" }],
+        assignedValues: [],
+      },
+    ];
+    const { result } = renderHook(() =>
+      useFacilitatorGroupWorkScreen(state(groups)),
+    );
+
+    expect(result.current.rows[0]?.actionCount).toBe(0);
+    expect(result.current.rows[0]?.workStatus).toBe(GroupWorkStatus.Editing);
+    expect(result.current.rows[0]?.scribeParticipantId).toBe("");
+  });
+
   it("sends reassignScribe through the port", () => {
     const reassignScribe = mockDependencies();
     const groups = [
