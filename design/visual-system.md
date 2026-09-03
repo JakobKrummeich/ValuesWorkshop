@@ -269,8 +269,8 @@ in a centred 34em column, chips/cards in two columns where they fit.
    sliding in staggered. P: aurora "Listen to the groups" / "{group} is
    presenting {value}." (own group: "Your group is up!"). L: position line,
    action rows with inline ✎ editors, "Next value" pine button.
-8. **Vote** — W: "Voting ongoing…" display + line + anonymous counter "19 of
-   30 voted" with the ambient breathing. P: header "Your votes" + pips, cards
+8. **Vote** — W: "Voting ongoing…" display + body copy over the aurora
+   (no voted counter — the presenter state carries no count). P: header "Your votes" + pips, cards
    with the action ledger (all actions, left-aligned) and the vote control,
    CTA "2 votes left" → "Submit 5 votes"; submitted → check screen "Your votes
    are counted — secret and anonymous." L: round line, progress bar, "Close
