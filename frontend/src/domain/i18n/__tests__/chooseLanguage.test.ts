@@ -10,6 +10,10 @@ describe("choosing the language of a request", () => {
     expect(chooseLanguage(undefined, "en-GB,en;q=0.9")).toBe(Language.English);
   });
 
+  it("reads a regional tag behind a space as its base language", () => {
+    expect(chooseLanguage(undefined, "fr-FR, en-GB")).toBe(Language.English);
+  });
+
   it("ignores unsupported browser preferences", () => {
     expect(chooseLanguage(undefined, "fr-FR,fr;q=0.9,en;q=0.8")).toBe(
       Language.English,

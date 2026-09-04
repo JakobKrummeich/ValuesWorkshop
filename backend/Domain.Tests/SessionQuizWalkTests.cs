@@ -49,13 +49,31 @@ public class SessionQuizWalkTests
     [Fact]
     public void Nothing_can_be_revealed_outside_the_quiz_phase()
     {
-        var session = TestSessions.InPhase(
-            new SessionIdentity(Guid.NewGuid()),
-            Phase.ValueSelection,
-            QuizProgress.Restore(4, true, true, [])
-        );
+        var session = OutsideTheQuizPhase(QuizProgress.Restore(0, false, false, []));
 
         Should.Throw<WrongPhaseException>(() => session.RevealAnswer());
+
+        session.Quiz.IsRevealed.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void No_learning_text_is_shown_outside_the_quiz_phase()
+    {
+        var session = OutsideTheQuizPhase(QuizProgress.Restore(0, true, false, []));
+
+        Should.Throw<WrongPhaseException>(() => session.ShowLearningText());
+
+        session.Quiz.IsLearningTextShown.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void No_question_is_posed_outside_the_quiz_phase()
+    {
+        var session = OutsideTheQuizPhase(QuizProgress.Restore(0, true, true, []));
+
+        Should.Throw<WrongPhaseException>(() => session.PoseNextQuestion());
+
+        session.Quiz.CurrentQuestionIndex.ShouldBe(0);
     }
 
     [Fact]
@@ -125,5 +143,14 @@ public class SessionQuizWalkTests
     private static Session QuizSession(QuizProgress quiz)
     {
         return TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Quiz, quiz);
+    }
+
+    private static Session OutsideTheQuizPhase(QuizProgress quiz)
+    {
+        return TestSessions.InPhase(
+            new SessionIdentity(Guid.NewGuid()),
+            Phase.ValueSelection,
+            quiz
+        );
     }
 }

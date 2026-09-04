@@ -360,6 +360,23 @@ public class FacilitatorWorkshopStateMapperTests
     }
 
     [Fact]
+    public void A_closed_round_that_filled_every_place_reports_no_tie_at_all()
+    {
+        var session = SessionFixtures.InPhase(
+            Phase.FinalVoting,
+            formation: SessionFixtures.TwoGroups(),
+            voting: TestVoting.AfterLocking(
+                TestValueIds.Numbered(1, VotingRounds.RequiredWinningValueCount)
+            )
+        );
+
+        var view = Map(session).ShouldBeOfType<FacilitatorFinalVotingState>().Voting;
+
+        view.ClosedRoundTallies.ShouldNotBeNull();
+        view.TiedValueIds.ShouldBeNull();
+    }
+
+    [Fact]
     public void A_running_tiebreak_still_shows_the_last_closed_rounds_tallies()
     {
         var session = SessionFixtures.InPhase(
