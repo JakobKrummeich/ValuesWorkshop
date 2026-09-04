@@ -377,11 +377,19 @@ the facilitator, `participantCount` for participant and presenter.
 | 5 GroupFormation | `formation` | `selection`, `formation` | `selection`, `formation` |
 | 6 GroupWork | `ownGroup?` | `groups` | `groups` |
 | 7 ValuePresentation | `ownGroup?`, `presentation` | `groups`, `presentation` | `groups`, `presentation` |
-| 8 FinalVoting | `voting` | `voting` | `voting` |
-| 9 FinalPresentation | `conclusion` | `conclusion` | `conclusion` |
+| 8 FinalVoting | `ownGroup?`, `voting` | `voting` | `voting` |
+| 9 FinalPresentation | `ownGroup?`, `conclusion` | `conclusion` | `conclusion` |
 
 `ownGroup?` is the one genuinely optional block: a participant who has not
 been placed in a group yet has none. `groups` is a list and is never null.
+
+The participant's `ownGroup` is also the one block that deliberately outlives
+its own phase: from the formation on, every participant state names the group
+the caller belongs to, because the phone wears that group's animal — its glyph
+and its hue — right through the finale, and a phone that reloads mid-vote must
+find the group in the state rather than in a memory the reload threw away. The
+group-work data inside the block (`isCallerScribe`, `scribeName`, `workStatus`,
+`actions`) still lives in phase 6 alone.
 
 Phase 5 carries neither directly. It carries `formation`, a **nested
 sub-state union** tagged by `subState` — same mechanism as the phase
