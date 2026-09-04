@@ -21,3 +21,18 @@
   font-size: var(--text-small);
   text-align: center;
 }
+
+.paper {
+  gap: var(--space-gutter);
+  padding: var(--space-gutter);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.paper .heading,
+.paper .emptyNote,
+.paper .hiddenValuesHint {
+  text-align: left;
+}

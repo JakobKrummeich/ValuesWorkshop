@@ -15,7 +15,7 @@ export function FacilitatorGroupFormationScreen({
 }) {
   if (formation.subState === FormationSubState.Forming) {
     return (
-      <section className={styles.screen}>
+      <section className={`${styles.screen} ${styles.forming}`}>
         <FormationProgress progress={formation.progress} />
       </section>
     );

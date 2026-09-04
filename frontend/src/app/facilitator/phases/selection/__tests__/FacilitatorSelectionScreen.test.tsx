@@ -54,6 +54,31 @@ describe("facilitator selection screen", () => {
     );
   });
 
+  it("fills the ring with the submitted share", () => {
+    render(<FacilitatorSelectionScreen state={state(2)} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("selection-progress")).toHaveAttribute(
+      "aria-valuenow",
+      "67",
+    );
+  });
+
+  it("keeps the ring empty while nobody could submit yet", () => {
+    const nobody = state(0);
+    nobody.roster = { participants: [], participantCount: 0 };
+
+    render(<FacilitatorSelectionScreen state={nobody} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("selection-progress")).toHaveAttribute(
+      "aria-valuenow",
+      "0",
+    );
+  });
+
   it("reports a complete submission round", () => {
     render(<FacilitatorSelectionScreen state={state(3)} />, {
       wrapper: languageWrapper(),

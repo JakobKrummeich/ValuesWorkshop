@@ -55,8 +55,8 @@
 .topValue .bar {
   background: linear-gradient(
     90deg,
-    var(--color-accent-deep),
-    var(--color-accent)
+    var(--color-primary-strong),
+    var(--color-primary)
   );
 }
 

@@ -10,16 +10,23 @@ import { useTranslation } from "./i18n/useTranslation";
 import { SelectionResultsChart } from "./SelectionResultsChart";
 import styles from "./SelectionResultsView.module.css";
 
+export enum SelectionResultsViewVariant {
+  Wall = "wall",
+  Paper = "paper",
+}
+
 export function SelectionResultsView({
   selection,
+  variant,
 }: {
   selection: SelectionResultsSource;
+  variant: SelectionResultsViewVariant;
 }) {
   const { translate } = useTranslation();
   const chart = deriveSelectionResultsChart(selection);
 
   return (
-    <div className={styles.results}>
+    <div className={`${styles.results} ${styles[variant]}`}>
       <Eyebrow className={styles.heading} testId="results-heading">
         {translate(MessageKey.SelectionResultsHeading)}
       </Eyebrow>

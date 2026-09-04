@@ -8,7 +8,9 @@ import {
 } from "../chrome/ConnectionStatus";
 import { PhaseStepper, PhaseStepperVariant } from "../chrome/PhaseStepper";
 import { Wordmark, WordmarkSize } from "../chrome/Wordmark";
+import { Eyebrow, EyebrowTone } from "../Eyebrow";
 import { LanguageSwitcher } from "../i18n/LanguageSwitcher";
+import { AdvanceGuard } from "./AdvanceGuard";
 import { AdvancePhaseButton } from "./AdvancePhaseButton";
 import styles from "./FacilitatorShell.module.css";
 import { useFacilitatorShell } from "./useFacilitatorShell";
@@ -20,8 +22,15 @@ export function FacilitatorShell({
   sessionStatePort: FacilitatorSessionStatePort;
   children: ReactNode;
 }) {
-  const { phase, heading, title, participantsLabel, participantCount } =
-    useFacilitatorShell(sessionStatePort);
+  const {
+    phase,
+    heading,
+    title,
+    sessionCodeLabel,
+    sessionCode,
+    participantsLabel,
+    participantCount,
+  } = useFacilitatorShell(sessionStatePort);
 
   return (
     <div className={styles.shell}>
@@ -33,8 +42,20 @@ export function FacilitatorShell({
           variant={PhaseStepperVariant.Sidebar}
         />
         <dl className={styles.meta}>
-          <dt className={styles.eyebrow}>{participantsLabel}</dt>
-          <dd className={styles.numeral}>{participantCount}</dd>
+          {sessionCode !== null && (
+            <div className={styles.metaEntry}>
+              <dt>
+                <Eyebrow tone={EyebrowTone.Muted}>{sessionCodeLabel}</Eyebrow>
+              </dt>
+              <dd className={styles.sessionCode}>{sessionCode}</dd>
+            </div>
+          )}
+          <div className={styles.metaEntry}>
+            <dt>
+              <Eyebrow tone={EyebrowTone.Muted}>{participantsLabel}</Eyebrow>
+            </dt>
+            <dd className={styles.numeral}>{participantCount}</dd>
+          </div>
         </dl>
         <div className={styles.tools}>
           <ConnectionStatus
@@ -49,6 +70,7 @@ export function FacilitatorShell({
         {children}
       </main>
       <footer className={styles.bottomBar}>
+        <AdvanceGuard />
         <AdvancePhaseButton />
       </footer>
     </div>

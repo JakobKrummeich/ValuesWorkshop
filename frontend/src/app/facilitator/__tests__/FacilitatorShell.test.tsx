@@ -12,6 +12,9 @@ jest.mock("../useFacilitatorShell", () => ({
 jest.mock("../AdvancePhaseButton", () => ({
   AdvancePhaseButton: () => <button type="button">advance</button>,
 }));
+jest.mock("../AdvanceGuard", () => ({
+  AdvanceGuard: () => <p>guard</p>,
+}));
 
 const shell = useFacilitatorShell as jest.MockedFunction<
   typeof useFacilitatorShell
@@ -22,15 +25,21 @@ const port = {
   connectionState: of(ConnectionState.Connected),
 };
 
+function shellResult(sessionCode: string | null) {
+  return {
+    phase: Phase.GroupWork,
+    heading: "Facilitator",
+    title: "Group work",
+    sessionCodeLabel: "Session",
+    sessionCode,
+    participantsLabel: "Participants",
+    participantCount: "12",
+  };
+}
+
 describe("facilitator shell", () => {
   beforeEach(() => {
-    shell.mockReturnValue({
-      phase: Phase.GroupWork,
-      heading: "Facilitator",
-      title: "Group work",
-      participantsLabel: "Participants",
-      participantCount: "12",
-    });
+    shell.mockReturnValue(shellResult("3f2a9c1b"));
   });
 
   it("frames the phase content with sidebar, title and bottom bar", () => {
@@ -44,12 +53,13 @@ describe("facilitator shell", () => {
     screen.getByRole("heading", { level: 1, name: "Group work" });
     screen.getByRole("heading", { level: 2, name: "Facilitator" });
     screen.getByText("phase content");
+    screen.getByText("guard");
     screen.getByRole("button", { name: "advance" });
     expect(screen.getByTestId("phase")).toHaveTextContent("Phase 6");
     expect(screen.getByTestId("connection")).toHaveTextContent("Connected");
   });
 
-  it("shows the participant count next to its label", () => {
+  it("shows the session code and the participant count next to their labels", () => {
     render(
       <FacilitatorShell sessionStatePort={port}>
         <p>phase content</p>
@@ -57,7 +67,25 @@ describe("facilitator shell", () => {
       { wrapper: languageWrapper() },
     );
 
-    expect(screen.getByRole("term")).toHaveTextContent("Participants");
-    expect(screen.getByRole("definition")).toHaveTextContent("12");
+    const [sessionLabel, participantsLabel] = screen.getAllByRole("term");
+    const [sessionCode, participantCount] = screen.getAllByRole("definition");
+    expect(sessionLabel).toHaveTextContent("Session");
+    expect(sessionCode).toHaveTextContent("3f2a9c1b");
+    expect(participantsLabel).toHaveTextContent("Participants");
+    expect(participantCount).toHaveTextContent("12");
+  });
+
+  it("leaves the session code out while the link carries none", () => {
+    shell.mockReturnValue(shellResult(null));
+
+    render(
+      <FacilitatorShell sessionStatePort={port}>
+        <p>phase content</p>
+      </FacilitatorShell>,
+      { wrapper: languageWrapper() },
+    );
+
+    expect(screen.getAllByRole("term")).toHaveLength(1);
+    expect(screen.queryByText("Session")).not.toBeInTheDocument();
   });
 });

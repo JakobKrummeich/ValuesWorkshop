@@ -1,7 +1,10 @@
 "use client";
 
 import type { FacilitatorSelectionResultsState } from "../../../../domain/workshopState";
-import { SelectionResultsView } from "../../../SelectionResultsView";
+import {
+  SelectionResultsView,
+  SelectionResultsViewVariant,
+} from "../../../SelectionResultsView";
 import styles from "./FacilitatorSelectionResultsScreen.module.css";
 
 export function FacilitatorSelectionResultsScreen({
@@ -11,7 +14,10 @@ export function FacilitatorSelectionResultsScreen({
 }) {
   return (
     <section className={styles.screen}>
-      <SelectionResultsView selection={state.selection} />
+      <SelectionResultsView
+        selection={state.selection}
+        variant={SelectionResultsViewVariant.Paper}
+      />
     </section>
   );
 }

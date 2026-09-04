@@ -66,6 +66,8 @@ const rosterParticipantSchema = z.object({
   displayName: z.string(),
 });
 
+export type RosterParticipant = z.infer<typeof rosterParticipantSchema>;
+
 export const rosterViewSchema = z.object({
   participants: z.array(rosterParticipantSchema),
   participantCount: z.int(),

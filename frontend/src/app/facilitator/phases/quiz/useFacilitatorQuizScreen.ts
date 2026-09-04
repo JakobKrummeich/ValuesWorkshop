@@ -1,12 +1,17 @@
 "use client";
 
 import { useCallback } from "react";
+import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { IntentResult } from "../../../../domain/intentResult";
 import type { FacilitatorQuizControlPort } from "../../../../domain/ports/facilitator/quizControlPort";
 import type { FacilitatorQuizState } from "../../../../domain/workshopState";
-import { FacilitatorIntent } from "../../../../domain/workshopState";
+import {
+  FacilitatorIntent,
+  QuizSubState,
+} from "../../../../domain/workshopState";
 import type { Single } from "../../../../shared/reactiveTypes";
+import { answerLetterOf } from "../../../answerLetter";
 import { useIntentSender } from "../../../useIntentSender";
 import { useFacilitatorDependencies } from "../../dependencies";
 
@@ -39,8 +44,18 @@ export interface QuizControl {
   send: () => void;
 }
 
+export interface FacilitatorQuizAnswer {
+  letter: string;
+  text: LocalizedText;
+  voteCount: number;
+  widthFraction: number;
+  isCorrect: boolean;
+}
+
 export interface FacilitatorQuizScreenModel {
   questionNumber: number;
+  answers: FacilitatorQuizAnswer[];
+  isRevealed: boolean;
   quizControl: QuizControl | null;
   isSending: boolean;
   rejectionMessage: MessageKey | null;
@@ -51,6 +66,7 @@ export function useFacilitatorQuizScreen(
 ): FacilitatorQuizScreenModel {
   const { quizControlPort } = useFacilitatorDependencies();
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
+  const quiz = state.quiz;
 
   const enabledAction =
     quizControlActions.find((action) =>
@@ -64,8 +80,21 @@ export function useFacilitatorQuizScreen(
     }
   }, [invokeEnabledAction, quizControlPort, sendIntent]);
 
+  const strongestTally = Math.max(...quiz.answerTallies, 0);
+
   return {
-    questionNumber: state.quiz.questionIndex + 1,
+    questionNumber: quiz.questionIndex + 1,
+    answers: quiz.answers.map((text, answerIndex) => ({
+      letter: answerLetterOf(answerIndex),
+      text,
+      voteCount: quiz.answerTallies[answerIndex],
+      widthFraction:
+        strongestTally === 0
+          ? 0
+          : quiz.answerTallies[answerIndex] / strongestTally,
+      isCorrect: answerIndex === quiz.correctAnswerIndex,
+    })),
+    isRevealed: quiz.subState !== QuizSubState.Answering,
     quizControl:
       enabledAction === null ? null : { label: enabledAction.label, send },
     isSending,

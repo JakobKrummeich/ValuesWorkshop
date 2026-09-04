@@ -3,13 +3,13 @@
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantFinalVotingState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { Pips } from "../../../Pips";
 import { SubmittedConfirmation } from "../../../SubmittedConfirmation";
 import { ActionBar } from "../../ActionBar";
 import { CallToAction } from "../../CallToAction";
 import styles from "./ParticipantFinalVotingScreen.module.css";
 import { useParticipantFinalVotingScreen } from "./useParticipantFinalVotingScreen";
 import { VoteCard } from "./VoteCard";
-import { VotePips } from "./VotePips";
 
 export function ParticipantFinalVotingScreen({
   state,
@@ -46,7 +46,7 @@ export function ParticipantFinalVotingScreen({
         <h2 className={styles.heading}>
           {translate(MessageKey.FinalVotingYourVotes)}
         </h2>
-        <VotePips used={usedVotes} total={allotment} />
+        <Pips filled={usedVotes} total={allotment} testId="vote-pips" />
         <p className="visuallyHidden" data-testid="votes-used">
           {translate(MessageKey.FinalVotingVotesUsed, {
             used: usedVotes,

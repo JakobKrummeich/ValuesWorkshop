@@ -25,6 +25,7 @@ function model(
     roundNumber: 1,
     votedCount: 24,
     participantCount: 30,
+    votedFraction: 0.8,
     isRoundOpen: true,
     isCloseVotingEnabled: true,
     isStartTiebreakEnabled: false,
@@ -49,6 +50,10 @@ describe("facilitator final voting screen", () => {
     expect(screen.getByTestId("voted-count")).toHaveTextContent(
       "Round 1 · voted: 24/30",
     );
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "80",
+    );
     expect(screen.getByTestId("close-voting-button")).toBeEnabled();
     expect(
       screen.queryByTestId("closed-round-tallies"),
@@ -67,11 +72,15 @@ describe("facilitator final voting screen", () => {
             valueId: "wert-2",
             text: { de: "Wert 2", en: "Value 2" },
             voteCount: 9,
+            voteCountKey: MessageKey.VoteCount,
+            share: 1,
           },
           {
             valueId: "wert-1",
             text: { de: "Wert 1", en: "Value 1" },
             voteCount: 3,
+            voteCountKey: MessageKey.VoteCount,
+            share: 3 / 9,
           },
         ],
         tie: {
@@ -80,6 +89,7 @@ describe("facilitator final voting screen", () => {
             { de: "Wert 3", en: "Value 3" },
           ],
           voteCount: 3,
+          voteCountKey: MessageKey.VoteCount,
         },
       }),
     );
@@ -97,11 +107,49 @@ describe("facilitator final voting screen", () => {
     expect(screen.getByTestId("start-tiebreak-button")).toBeEnabled();
   });
 
+  it("words a single vote in the singular", () => {
+    screenHook.mockReturnValue(
+      model({
+        isRoundOpen: false,
+        tallies: [
+          {
+            valueId: "wert-1",
+            text: { de: "Wert 1", en: "Value 1" },
+            voteCount: 1,
+            voteCountKey: MessageKey.VoteCountSingle,
+            share: 1,
+          },
+        ],
+        tie: {
+          values: [
+            { de: "Wert 1", en: "Value 1" },
+            { de: "Wert 2", en: "Value 2" },
+          ],
+          voteCount: 1,
+          voteCountKey: MessageKey.VoteCountSingle,
+        },
+      }),
+    );
+
+    render(<FacilitatorFinalVotingScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("tally-wert-1")).toHaveTextContent("1 vote");
+    expect(screen.getByTestId("tie-callout")).toHaveTextContent(
+      "Tie: Value 1 = Value 2 (1 vote)",
+    );
+  });
+
   it("disables the controls while a send is in flight", () => {
     screenHook.mockReturnValue(
       model({
         isSending: true,
-        tie: { values: [{ de: "Wert 1", en: "Value 1" }], voteCount: 3 },
+        tie: {
+          values: [{ de: "Wert 1", en: "Value 1" }],
+          voteCount: 3,
+          voteCountKey: MessageKey.VoteCount,
+        },
         isStartTiebreakEnabled: true,
       }),
     );

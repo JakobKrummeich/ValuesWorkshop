@@ -50,7 +50,10 @@ function withQuizControl(overrides: Partial<FacilitatorQuizControlPort> = {}) {
   return quizControl;
 }
 
-function quizState(enabledIntents: FacilitatorIntent[]): FacilitatorQuizState {
+function quizState(
+  enabledIntents: FacilitatorIntent[],
+  subState = QuizSubState.Answering,
+): FacilitatorQuizState {
   return {
     phase: Phase.Quiz,
     revision: 7,
@@ -59,7 +62,7 @@ function quizState(enabledIntents: FacilitatorIntent[]): FacilitatorQuizState {
     quiz: {
       questionIndex: 1,
       questionCount: 3,
-      subState: QuizSubState.Answering,
+      subState,
       question: { de: "Wie viele?", en: "How many?" },
       answers: [
         { de: "Eins", en: "One" },
@@ -83,6 +86,66 @@ describe("facilitator quiz screen logic", () => {
     );
 
     expect(result.current.questionNumber).toBe(2);
+  });
+
+  it("letters the answers and scales their bars to the strongest tally", () => {
+    withQuizControl();
+
+    const { result } = renderHook(() =>
+      useFacilitatorQuizScreen(quizState([FacilitatorIntent.RevealAnswer])),
+    );
+
+    expect(result.current.answers).toEqual([
+      {
+        letter: "A",
+        text: { de: "Eins", en: "One" },
+        voteCount: 2,
+        widthFraction: 1,
+        isCorrect: true,
+      },
+      {
+        letter: "B",
+        text: { de: "Zwei", en: "Two" },
+        voteCount: 1,
+        widthFraction: 0.5,
+        isCorrect: false,
+      },
+      {
+        letter: "C",
+        text: { de: "Drei", en: "Three" },
+        voteCount: 0,
+        widthFraction: 0,
+        isCorrect: false,
+      },
+    ]);
+  });
+
+  it("keeps every bar empty while nobody has answered", () => {
+    withQuizControl();
+    const state = quizState([FacilitatorIntent.RevealAnswer]);
+    state.quiz.answerTallies = [0, 0, 0];
+
+    const { result } = renderHook(() => useFacilitatorQuizScreen(state));
+
+    expect(
+      result.current.answers.map((answer) => answer.widthFraction),
+    ).toEqual([0, 0, 0]);
+  });
+
+  it("knows whether the answer is revealed to the room", () => {
+    withQuizControl();
+
+    const answering = renderHook(() =>
+      useFacilitatorQuizScreen(quizState([FacilitatorIntent.RevealAnswer])),
+    );
+    const revealed = renderHook(() =>
+      useFacilitatorQuizScreen(
+        quizState([FacilitatorIntent.ShowLearningText], QuizSubState.Revealed),
+      ),
+    );
+
+    expect(answering.result.current.isRevealed).toBe(false);
+    expect(revealed.result.current.isRevealed).toBe(true);
   });
 
   it.each([

@@ -1,19 +1,27 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { MessageKey } from "../../../../domain/i18n/messages";
 import {
   GroupWorkStatus,
   type FacilitatorGroupWorkState,
-  type FacilitatorGroupWorkGroups,
+  type GroupName,
+  type RosterParticipant,
 } from "../../../../domain/workshopState";
 import { useIntentSender } from "../../../useIntentSender";
 import { useFacilitatorDependencies } from "../../dependencies";
 
+export interface FacilitatorGroupWorkRow {
+  name: GroupName;
+  members: RosterParticipant[];
+  scribeParticipantId: string;
+  workStatus: GroupWorkStatus;
+  actionCount: number;
+}
+
 export interface FacilitatorGroupWorkScreenModel {
-  groups: FacilitatorGroupWorkGroups;
+  rows: FacilitatorGroupWorkRow[];
   reassignScribe: (participantId: string) => void;
-  allSubmitted: boolean;
   isSending: boolean;
   rejectionMessage: MessageKey | null;
 }
@@ -24,8 +32,19 @@ export function useFacilitatorGroupWorkScreen(
   const { groupWorkControlPort } = useFacilitatorDependencies();
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
 
-  const allSubmitted = state.groups.every(
-    (group) => group.workStatus === GroupWorkStatus.Submitted,
+  const rows = useMemo(
+    () =>
+      state.groups.map((group): FacilitatorGroupWorkRow => ({
+        name: group.name,
+        members: group.members,
+        scribeParticipantId: group.scribeParticipantId ?? "",
+        workStatus: group.workStatus ?? GroupWorkStatus.Editing,
+        actionCount: Object.values(group.actionCountPerValue ?? {}).reduce(
+          (sum, count) => sum + count,
+          0,
+        ),
+      })),
+    [state.groups],
   );
 
   const reassignScribe = useCallback(
@@ -36,9 +55,8 @@ export function useFacilitatorGroupWorkScreen(
   );
 
   return {
-    groups: state.groups,
+    rows,
     reassignScribe,
-    allSubmitted,
     isSending,
     rejectionMessage,
   };

@@ -43,7 +43,7 @@ function revealedWinner(
     text: { de: `Wert ${place}`, en: `Value ${place}` },
     place,
     voteCount: 10 - place,
-    voteCountKey: MessageKey.FinalPresentationVoteCount,
+    voteCountKey: MessageKey.VoteCount,
     actions: [`Action for value ${place}`],
     ...overrides,
   };

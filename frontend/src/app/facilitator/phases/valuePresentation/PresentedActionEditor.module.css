@@ -1,15 +1,64 @@
-.input {
-  width: 100%;
-  padding: var(--space-gap);
-  font-size: var(--text-body);
-  font-family: var(--font-sans);
-  color: var(--color-text);
-  background: var(--color-surface);
-  border: var(--border-hairline) solid var(--color-border);
-  border-radius: var(--radius-sm);
+.editor {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
 }
 
-.input:focus {
-  border-color: var(--color-primary);
-  outline: none;
+.input {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-tight) calc(var(--space-gutter) * 2) var(--space-tight)
+    var(--space-gap);
+  border: var(--border-hairline) solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    background-color var(--motion-fast) var(--ease-out);
+}
+
+.pencil {
+  position: absolute;
+  right: var(--space-gap);
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+  line-height: var(--leading-tight);
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-out);
+  pointer-events: none;
+}
+
+.input:focus-visible {
+  border-color: var(--color-accent);
+  outline: var(--border-ring) solid var(--color-accent);
+  outline-offset: 0.125em;
+  background: var(--color-surface);
+}
+
+.input:hover {
+  border-color: var(--color-border);
+  background: var(--color-bg-alt);
+}
+
+.editor:hover .pencil,
+.input:focus-visible + .pencil {
+  opacity: 1;
+}
+
+.input:focus-visible + .pencil {
+  color: var(--color-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input,
+  .pencil {
+    transition: none;
+  }
 }

@@ -1,73 +1,33 @@
 .quiz {
   display: flex;
   flex-direction: column;
-  gap: var(--space-gap);
-  padding: var(--space-gutter);
-}
-
-.answeredCount {
-  color: var(--color-accent);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
+  gap: var(--space-gutter);
+  width: 100%;
+  max-width: 56rem;
 }
 
 .answers {
   display: flex;
   flex-direction: column;
-  gap: var(--space-tight);
+  gap: var(--space-gap);
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
-.answer {
-  display: flex;
-  gap: var(--space-gap);
-  align-items: baseline;
-  padding: var(--space-tight) var(--space-gap);
-  border: var(--border-hairline) solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-}
-
-.correct {
-  border-color: var(--color-success);
-}
-
-.answerText {
-  flex: 1;
-  color: var(--color-text);
-  font-size: var(--text-body);
-}
-
-.correctMarker {
-  color: var(--color-success);
-  font-size: var(--text-small);
-  font-weight: var(--weight-bold);
-}
-
-.tally {
-  color: var(--color-text-muted);
+.answeredCount {
+  margin: 0;
+  color: var(--color-accent);
   font-size: var(--text-small);
   font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-black);
+  line-height: var(--leading-tight);
 }
 
-.controlButton {
-  align-self: flex-start;
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-gap);
+  align-items: center;
   min-height: var(--control-height);
-  padding: var(--space-tight) var(--space-gutter);
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--color-accent);
-  color: var(--color-on-primary);
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-}
-
-.controlButton:disabled {
-  background: var(--color-text-muted);
-}
-
-.rejection {
-  color: var(--color-danger);
-  font-family: var(--font-sans);
-  font-size: var(--text-small);
 }

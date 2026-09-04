@@ -5,6 +5,7 @@ import type { MessageKey } from "../../../../domain/i18n/messages";
 import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import type { ParticipantQuizView } from "../../../../domain/workshopState";
 import { QuizSubState } from "../../../../domain/workshopState";
+import { answerLetterOf } from "../../../answerLetter";
 import { useIntentSender } from "../../../useIntentSender";
 import { useParticipantDependencies } from "../../dependencies";
 
@@ -43,12 +44,6 @@ export interface ParticipantQuizScreenModel {
 interface Pick {
   questionIndex: number;
   answerIndex: number;
-}
-
-const firstLetterCode = "A".charCodeAt(0);
-
-export function answerLetterOf(answerIndex: number): string {
-  return String.fromCharCode(firstLetterCode + answerIndex);
 }
 
 export function useParticipantQuizScreen(

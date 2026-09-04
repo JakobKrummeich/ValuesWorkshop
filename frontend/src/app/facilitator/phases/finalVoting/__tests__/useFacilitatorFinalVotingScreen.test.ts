@@ -92,11 +92,27 @@ describe("facilitator final voting screen logic", () => {
     expect(result.current.roundNumber).toBe(1);
     expect(result.current.votedCount).toBe(12);
     expect(result.current.participantCount).toBe(30);
+    expect(result.current.votedFraction).toBeCloseTo(0.4);
     expect(result.current.isRoundOpen).toBe(true);
     expect(result.current.isCloseVotingEnabled).toBe(true);
     expect(result.current.isStartTiebreakEnabled).toBe(false);
     expect(result.current.tallies).toBeNull();
     expect(result.current.tie).toBeNull();
+  });
+
+  it("reports no progress while nobody can vote yet", () => {
+    withVotingControl({
+      closeVoting: () => NEVER,
+      startTiebreakRound: () => NEVER,
+    });
+
+    const { result } = renderHook(() =>
+      useFacilitatorFinalVotingScreen(
+        votingState(votingView({ votedCount: 0, participantCount: 0 })),
+      ),
+    );
+
+    expect(result.current.votedFraction).toBe(0);
   });
 
   it("disables the close while the wire does not offer it", () => {
@@ -134,16 +150,22 @@ describe("facilitator final voting screen logic", () => {
         valueId: "wert-2",
         text: { de: "Wert 2", en: "Value 2" },
         voteCount: 9,
+        voteCountKey: MessageKey.VoteCount,
+        share: 1,
       },
       {
         valueId: "wert-1",
         text: { de: "Wert 1", en: "Value 1" },
         voteCount: 3,
+        voteCountKey: MessageKey.VoteCount,
+        share: 3 / 9,
       },
       {
         valueId: "wert-3",
         text: { de: "Wert 3", en: "Value 3" },
         voteCount: 3,
+        voteCountKey: MessageKey.VoteCount,
+        share: 3 / 9,
       },
     ]);
   });
@@ -170,6 +192,8 @@ describe("facilitator final voting screen logic", () => {
         valueId: "unknown",
         text: { de: "unknown", en: "unknown" },
         voteCount: 1,
+        voteCountKey: MessageKey.VoteCountSingle,
+        share: 1,
       },
     ]);
   });
@@ -199,8 +223,31 @@ describe("facilitator final voting screen logic", () => {
         { de: "Wert 3", en: "Value 3" },
       ],
       voteCount: 3,
+      voteCountKey: MessageKey.VoteCount,
     });
     expect(result.current.isStartTiebreakEnabled).toBe(true);
+  });
+
+  it("keeps a zero share for an all-zero closed round", () => {
+    withVotingControl({
+      closeVoting: () => NEVER,
+      startTiebreakRound: () => NEVER,
+    });
+
+    const { result } = renderHook(() =>
+      useFacilitatorFinalVotingScreen(
+        votingState(
+          votingView({
+            isRoundOpen: false,
+            closedRoundTallies: { "wert-1": 0, "wert-2": 0 },
+            tiedValueIds: ["wert-1", "wert-2"],
+          }),
+        ),
+      ),
+    );
+
+    expect(result.current.tallies?.map((tally) => tally.share)).toEqual([0, 0]);
+    expect(result.current.tie?.voteCountKey).toBe(MessageKey.VoteCount);
   });
 
   it("closes the voting through the port", () => {

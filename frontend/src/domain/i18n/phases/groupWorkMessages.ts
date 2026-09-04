@@ -65,9 +65,4 @@ export const groupWorkMessages = {
     [Language.German]: "Status",
     [Language.English]: "Status",
   },
-  [MessageKey.GroupWorkAllGroupsMustSubmit]: {
-    [Language.German]:
-      "Alle Gruppen müssen ihr Ergebnis abgeben, bevor die Phase weitergeht.",
-    [Language.English]: "All groups must submit their result before advancing.",
-  },
 } as const satisfies Partial<Readonly<Record<MessageKey, Message>>>;

@@ -3,6 +3,7 @@
 import { MessageKey } from "../../domain/i18n/messages";
 import type { FacilitatorSessionCreationPort } from "../../domain/ports/facilitator/sessionCreationPort";
 import { maximumSessionNameLength } from "../../domain/sessionCreation";
+import { Wordmark, WordmarkSize } from "../chrome/Wordmark";
 import { LanguageSwitcher } from "../i18n/LanguageSwitcher";
 import { useTranslation } from "../i18n/useTranslation";
 import styles from "./OpenSessionForm.module.css";
@@ -27,7 +28,10 @@ export function OpenSessionForm({
   return (
     <div className={styles.screen}>
       <section className={styles.card}>
-        <LanguageSwitcher />
+        <header className={styles.brandRow}>
+          <Wordmark size={WordmarkSize.Regular} />
+          <LanguageSwitcher />
+        </header>
         <h1 className={styles.title}>
           {translate(MessageKey.OpenSessionTitle)}
         </h1>
@@ -66,19 +70,17 @@ export function OpenSessionForm({
               {translate(error.key, error.params)}
             </p>
           )}
-          <div className={styles.actions}>
-            <button
-              type="submit"
-              className={styles.submit}
-              disabled={isSubmitting}
-            >
-              {translate(
-                isSubmitting
-                  ? MessageKey.OpenSessionSubmitting
-                  : MessageKey.OpenSessionSubmit,
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            className={styles.submit}
+            disabled={isSubmitting}
+          >
+            {translate(
+              isSubmitting
+                ? MessageKey.OpenSessionSubmitting
+                : MessageKey.OpenSessionSubmit,
+            )}
+          </button>
         </form>
       </section>
     </div>

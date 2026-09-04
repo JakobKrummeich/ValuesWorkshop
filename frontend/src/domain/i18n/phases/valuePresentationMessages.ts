@@ -23,4 +23,14 @@ export const valuePresentationMessages = {
     [Language.German]: "Nächster Wert",
     [Language.English]: "Next value",
   },
+  [MessageKey.ValuePresentationActionWording]: {
+    [Language.German]: "Wortlaut der Aktion",
+    [Language.English]: "Action wording",
+  },
+  [MessageKey.ValuePresentationEditHint]: {
+    [Language.German]:
+      "Wortlaut direkt in der Zeile korrigieren – Enter speichert, Escape verwirft.",
+    [Language.English]:
+      "Correct the wording right in the row – Enter saves, Escape reverts.",
+  },
 } as const satisfies Partial<Readonly<Record<MessageKey, Message>>>;

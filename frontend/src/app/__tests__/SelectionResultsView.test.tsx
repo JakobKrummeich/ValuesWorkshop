@@ -2,7 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { Language } from "../../domain/i18n/language";
 import type { SelectionResultsSource } from "../../domain/selectionResults";
 import { languageWrapper } from "../../testing/languageWrapper";
-import { SelectionResultsView } from "../SelectionResultsView";
+import {
+  SelectionResultsView,
+  SelectionResultsViewVariant,
+} from "../SelectionResultsView";
 
 function source(): SelectionResultsSource {
   return {
@@ -33,9 +36,15 @@ function wideSource(): SelectionResultsSource {
 
 describe("selection results view", () => {
   it("shows the heading in English", () => {
-    render(<SelectionResultsView selection={source()} />, {
-      wrapper: languageWrapper(),
-    });
+    render(
+      <SelectionResultsView
+        selection={source()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      {
+        wrapper: languageWrapper(),
+      },
+    );
 
     expect(screen.getByTestId("results-heading")).toHaveTextContent(
       "Your top values",
@@ -43,9 +52,15 @@ describe("selection results view", () => {
   });
 
   it("shows the heading in German", () => {
-    render(<SelectionResultsView selection={source()} />, {
-      wrapper: languageWrapper(Language.German),
-    });
+    render(
+      <SelectionResultsView
+        selection={source()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      {
+        wrapper: languageWrapper(Language.German),
+      },
+    );
 
     expect(screen.getByTestId("results-heading")).toHaveTextContent(
       "Eure Top-Werte",
@@ -53,9 +68,15 @@ describe("selection results view", () => {
   });
 
   it("lists the selected values by count with their labels", () => {
-    render(<SelectionResultsView selection={source()} />, {
-      wrapper: languageWrapper(),
-    });
+    render(
+      <SelectionResultsView
+        selection={source()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      {
+        wrapper: languageWrapper(),
+      },
+    );
 
     const rows = screen.getAllByTestId(/^result-row-/);
 
@@ -70,9 +91,15 @@ describe("selection results view", () => {
   });
 
   it("labels the values in German", () => {
-    render(<SelectionResultsView selection={source()} />, {
-      wrapper: languageWrapper(Language.German),
-    });
+    render(
+      <SelectionResultsView
+        selection={source()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      {
+        wrapper: languageWrapper(Language.German),
+      },
+    );
 
     expect(screen.getByTestId("result-row-trust")).toHaveTextContent(
       "Vertrauen",
@@ -80,9 +107,15 @@ describe("selection results view", () => {
   });
 
   it("highlights exactly the top values", () => {
-    render(<SelectionResultsView selection={source()} />, {
-      wrapper: languageWrapper(),
-    });
+    render(
+      <SelectionResultsView
+        selection={source()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      {
+        wrapper: languageWrapper(),
+      },
+    );
 
     expect(screen.getByTestId("result-row-trust")).toHaveAttribute(
       "data-top-value",
@@ -99,9 +132,15 @@ describe("selection results view", () => {
   });
 
   it("sizes the bars against the most-selected value", () => {
-    render(<SelectionResultsView selection={source()} />, {
-      wrapper: languageWrapper(),
-    });
+    render(
+      <SelectionResultsView
+        selection={source()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      {
+        wrapper: languageWrapper(),
+      },
+    );
 
     expect(screen.getByTestId("result-bar-trust")).toHaveStyle(
       "--bar-fraction: 1",
@@ -112,9 +151,13 @@ describe("selection results view", () => {
   });
 
   it("hints at the values hidden below the cutoff", () => {
-    render(<SelectionResultsView selection={wideSource()} />, {
-      wrapper: languageWrapper(),
-    });
+    render(
+      <SelectionResultsView
+        selection={wideSource()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      { wrapper: languageWrapper() },
+    );
 
     expect(screen.getAllByTestId(/^result-row-/)).toHaveLength(20);
     expect(screen.getByTestId("hidden-values-hint")).toHaveTextContent(
@@ -123,9 +166,13 @@ describe("selection results view", () => {
   });
 
   it("hints in German", () => {
-    render(<SelectionResultsView selection={wideSource()} />, {
-      wrapper: languageWrapper(Language.German),
-    });
+    render(
+      <SelectionResultsView
+        selection={wideSource()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      { wrapper: languageWrapper(Language.German) },
+    );
 
     expect(screen.getByTestId("hidden-values-hint")).toHaveTextContent(
       "und 4 weitere",
@@ -133,9 +180,15 @@ describe("selection results view", () => {
   });
 
   it("omits the hint when every selected value is shown", () => {
-    render(<SelectionResultsView selection={source()} />, {
-      wrapper: languageWrapper(),
-    });
+    render(
+      <SelectionResultsView
+        selection={source()}
+        variant={SelectionResultsViewVariant.Wall}
+      />,
+      {
+        wrapper: languageWrapper(),
+      },
+    );
 
     expect(screen.queryByTestId("hidden-values-hint")).not.toBeInTheDocument();
   });
@@ -148,6 +201,7 @@ describe("selection results view", () => {
           selectionTallies: {},
           topValueIds: [],
         }}
+        variant={SelectionResultsViewVariant.Wall}
       />,
       { wrapper: languageWrapper() },
     );
@@ -166,6 +220,7 @@ describe("selection results view", () => {
           selectionTallies: {},
           topValueIds: [],
         }}
+        variant={SelectionResultsViewVariant.Wall}
       />,
       { wrapper: languageWrapper(Language.German) },
     );

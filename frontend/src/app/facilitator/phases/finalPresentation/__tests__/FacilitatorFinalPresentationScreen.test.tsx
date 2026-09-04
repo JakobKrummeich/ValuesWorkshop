@@ -46,6 +46,12 @@ describe("facilitator final presentation screen", () => {
     expect(screen.getByTestId("revealed-count")).toHaveTextContent(
       "Revealed: 2 of 5",
     );
+    expect(screen.getByTestId("reveal-pips").children).toHaveLength(5);
+    expect(
+      screen
+        .getByTestId("reveal-pips")
+        .querySelectorAll('[data-filled="true"]'),
+    ).toHaveLength(2);
     expect(screen.getByTestId("reveal-next-button")).toBeEnabled();
     expect(screen.queryByTestId("concluded-note")).not.toBeInTheDocument();
   });

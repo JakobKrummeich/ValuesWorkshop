@@ -2,7 +2,11 @@
 
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { FacilitatorFinalPresentationState } from "../../../../domain/workshopState";
+import { CheckMark } from "../../../CheckMark";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { Pips } from "../../../Pips";
+import { ControlButton } from "../../ControlButton";
+import { IntentRejection } from "../../IntentRejection";
 import styles from "./FacilitatorFinalPresentationScreen.module.css";
 import { useFacilitatorFinalPresentationScreen } from "./useFacilitatorFinalPresentationScreen";
 
@@ -33,27 +37,27 @@ export function FacilitatorFinalPresentationScreen({
           total: winnerCount,
         })}
       </p>
+      <Pips filled={revealedCount} total={winnerCount} testId="reveal-pips" />
       {!isConcluded && (
-        <button
-          type="button"
-          className={styles.controlButton}
-          data-testid="reveal-next-button"
-          disabled={isSending || !isRevealNextEnabled}
+        <ControlButton
+          testId="reveal-next-button"
+          isDisabled={isSending || !isRevealNextEnabled}
           onClick={revealNextValue}
         >
           {translate(MessageKey.FinalPresentationRevealNext)}
-        </button>
+        </ControlButton>
       )}
       {isConcluded && (
-        <p className={styles.concludedNote} data-testid="concluded-note">
-          {translate(MessageKey.FinalPresentationConcluded)}
-        </p>
+        <div className={styles.concluded}>
+          <span className={styles.concludedMark}>
+            <CheckMark />
+          </span>
+          <p className={styles.concludedNote} data-testid="concluded-note">
+            {translate(MessageKey.FinalPresentationConcluded)}
+          </p>
+        </div>
       )}
-      {rejectionMessage !== null && (
-        <p className={styles.rejection} role="status">
-          {translate(rejectionMessage)}
-        </p>
-      )}
+      <IntentRejection message={rejectionMessage} />
     </section>
   );
 }

@@ -25,8 +25,8 @@
   flex: none;
   width: 0.85em;
   height: 0.85em;
-  color: var(--color-accent);
+  color: var(--color-brand-mark);
   filter: drop-shadow(
-    0 0 0.35em color-mix(in srgb, var(--color-accent) 45%, transparent)
+    0 0 0.35em color-mix(in srgb, var(--color-brand-mark) 45%, transparent)
   );
 }
