@@ -93,6 +93,7 @@ public sealed record ParticipantValuePresentationState(
 public sealed record ParticipantFinalVotingState(
     long Revision,
     int ParticipantCount,
+    OwnGroupView? OwnGroup,
     ParticipantVotingView Voting
 ) : ParticipantWorkshopState(Revision, ParticipantCount)
 {
@@ -103,6 +104,7 @@ public sealed record ParticipantFinalVotingState(
 public sealed record ParticipantFinalPresentationState(
     long Revision,
     int ParticipantCount,
+    OwnGroupView? OwnGroup,
     ParticipantConclusionView Conclusion
 ) : ParticipantWorkshopState(Revision, ParticipantCount)
 {
