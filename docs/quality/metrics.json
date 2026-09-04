@@ -1,0 +1,559 @@
+{
+  "generatedAt": "2026-09-04T14:58:23.680Z",
+  "commit": {
+    "sha": "c351da0dde76570630ab259ba4ee89d66e0aa404",
+    "shortSha": "c351da0",
+    "committedAt": "2026-09-04T14:58:22+00:00",
+    "subject": "Measure the repository's quality with one command instead of claiming it"
+  },
+  "enforcedLimits": {
+    "frontendComplexity": 7,
+    "frontendProductionFileLines": 300,
+    "frontendTestFileLines": 600,
+    "frontendLineCoverage": 80,
+    "backendComplexity": 7,
+    "backendProductionFileLines": 300,
+    "backendTestFileLines": 600,
+    "backendLineCoverage": 80,
+    "duplicationPercentage": 2,
+    "duplicationMinimumTokens": 50
+  },
+  "size": {
+    "commands": [
+      "git ls-files"
+    ],
+    "files": 1115,
+    "productionLines": 50635,
+    "testLines": 40859,
+    "totalLines": 91494,
+    "areas": [
+      {
+        "area": "backend",
+        "files": 334,
+        "productionLines": 8649,
+        "testLines": 18196,
+        "totalLines": 26845
+      },
+      {
+        "area": "contract",
+        "files": 41,
+        "productionLines": 2830,
+        "testLines": 0,
+        "totalLines": 2830
+      },
+      {
+        "area": "design",
+        "files": 8,
+        "productionLines": 3222,
+        "testLines": 0,
+        "totalLines": 3222
+      },
+      {
+        "area": "docs",
+        "files": 1,
+        "productionLines": 394,
+        "testLines": 0,
+        "totalLines": 394
+      },
+      {
+        "area": "e2e",
+        "files": 22,
+        "productionLines": 0,
+        "testLines": 3488,
+        "totalLines": 3488
+      },
+      {
+        "area": "frontend/src",
+        "files": 503,
+        "productionLines": 15843,
+        "testLines": 16457,
+        "totalLines": 32300
+      },
+      {
+        "area": "other",
+        "files": 55,
+        "productionLines": 4542,
+        "testLines": 0,
+        "totalLines": 4542
+      },
+      {
+        "area": "scripts",
+        "files": 92,
+        "productionLines": 4813,
+        "testLines": 2718,
+        "totalLines": 7531
+      },
+      {
+        "area": "tasks",
+        "files": 59,
+        "productionLines": 10342,
+        "testLines": 0,
+        "totalLines": 10342
+      }
+    ],
+    "filesByExtension": [
+      {
+        "extension": "cs",
+        "files": 306
+      },
+      {
+        "extension": "ts",
+        "files": 259
+      },
+      {
+        "extension": "tsx",
+        "files": 190
+      },
+      {
+        "extension": "css",
+        "files": 89
+      },
+      {
+        "extension": "md",
+        "files": 70
+      },
+      {
+        "extension": "json",
+        "files": 62
+      },
+      {
+        "extension": "mts",
+        "files": 45
+      },
+      {
+        "extension": "html",
+        "files": 19
+      },
+      {
+        "extension": "none",
+        "files": 19
+      },
+      {
+        "extension": "txt",
+        "files": 16
+      },
+      {
+        "extension": "csproj",
+        "files": 11
+      },
+      {
+        "extension": "sh",
+        "files": 6
+      },
+      {
+        "extension": "mjs",
+        "files": 4
+      },
+      {
+        "extension": "yml",
+        "files": 3
+      },
+      {
+        "extension": "cjs",
+        "files": 2
+      },
+      {
+        "extension": "dockerignore",
+        "files": 2
+      },
+      {
+        "extension": "sln",
+        "files": 2
+      },
+      {
+        "extension": "yaml",
+        "files": 2
+      },
+      {
+        "extension": "development",
+        "files": 1
+      },
+      {
+        "extension": "js",
+        "files": 1
+      },
+      {
+        "extension": "patch",
+        "files": 1
+      },
+      {
+        "extension": "props",
+        "files": 1
+      },
+      {
+        "extension": "slnf",
+        "files": 1
+      },
+      {
+        "extension": "sql",
+        "files": 1
+      },
+      {
+        "extension": "test",
+        "files": 1
+      },
+      {
+        "extension": "toml",
+        "files": 1
+      }
+    ],
+    "longestFiles": [
+      {
+        "side": "backend",
+        "kind": "production",
+        "path": "backend/Domain/Session.cs",
+        "lineCount": 262
+      },
+      {
+        "side": "backend",
+        "kind": "test",
+        "path": "backend/Adapters.Tests/SqliteSessionRepositoryTests.cs",
+        "lineCount": 590
+      },
+      {
+        "side": "frontend",
+        "kind": "production",
+        "path": "frontend/src/domain/workshopStateBlocks.ts",
+        "lineCount": 290
+      },
+      {
+        "side": "frontend",
+        "kind": "test",
+        "path": "frontend/src/domain/__tests__/participantWorkshopState.test.ts",
+        "lineCount": 448
+      }
+    ]
+  },
+  "tests": {
+    "commands": [
+      "pnpm --dir frontend test --json --outputFile=<tmp>/jest-report.json --coverageReporters=json-summary --coverageDirectory=<tmp>/coverage",
+      "scripts/test-backend-with-coverage.sh",
+      "npx playwright test --list --config playwright.config.ts"
+    ],
+    "totalTests": 2166,
+    "frontend": {
+      "suites": 183,
+      "tests": 1172,
+      "passed": 1172,
+      "failed": 0,
+      "skipped": 0,
+      "lineCoverage": 95,
+      "branchCoverage": 92.46,
+      "coveredLines": 2702,
+      "coverableLines": 2844
+    },
+    "backend": {
+      "assemblies": [
+        {
+          "assembly": "ValuesWorkshop.Adapters.Tests.dll",
+          "failed": 0,
+          "passed": 220,
+          "skipped": 0,
+          "total": 220
+        },
+        {
+          "assembly": "ValuesWorkshop.Application.Tests.dll",
+          "failed": 0,
+          "passed": 275,
+          "skipped": 0,
+          "total": 275
+        },
+        {
+          "assembly": "ValuesWorkshop.Domain.Tests.dll",
+          "failed": 0,
+          "passed": 308,
+          "skipped": 0,
+          "total": 308
+        },
+        {
+          "assembly": "ValuesWorkshop.Host.Tests.dll",
+          "failed": 0,
+          "passed": 98,
+          "skipped": 0,
+          "total": 98
+        }
+      ],
+      "tests": 901,
+      "passed": 901,
+      "failed": 0,
+      "skipped": 0,
+      "lineCoverage": 98.7,
+      "branchCoverage": 93.9,
+      "coveredLines": 9693,
+      "coverableLines": 9817
+    },
+    "endToEnd": {
+      "tests": 93,
+      "files": 9
+    }
+  },
+  "complexity": {
+    "commands": [
+      "npx eslint --format json --rule \"{\\\"complexity\\\":[\\\"error\\\",0]}\"",
+      "dotnet build backend/ValuesWorkshop.All.sln"
+    ],
+    "frontend": {
+      "functions": 3256,
+      "maximum": 7,
+      "mean": 1.19,
+      "otherRuleFindings": 0,
+      "distribution": [
+        {
+          "complexity": 1,
+          "functions": 2879
+        },
+        {
+          "complexity": 2,
+          "functions": 242
+        },
+        {
+          "complexity": 3,
+          "functions": 76
+        },
+        {
+          "complexity": 4,
+          "functions": 37
+        },
+        {
+          "complexity": 5,
+          "functions": 13
+        },
+        {
+          "complexity": 6,
+          "functions": 8
+        },
+        {
+          "complexity": 7,
+          "functions": 1
+        }
+      ],
+      "mostComplex": [
+        {
+          "path": "frontend/src/app/participant/phases/groupWork/GroupWorkCard.tsx",
+          "line": 13,
+          "name": "Function 'GroupWorkCard'",
+          "complexity": 7
+        },
+        {
+          "path": "frontend/scripts/generatePhasesModule.mts",
+          "line": 55,
+          "name": "Function 'runPhaseEnumCodegen'",
+          "complexity": 6
+        },
+        {
+          "path": "frontend/src/app/facilitator/advanceGuard.ts",
+          "line": 16,
+          "name": "Function 'advanceGuardMessageOf'",
+          "complexity": 6
+        },
+        {
+          "path": "frontend/src/app/facilitator/phases/finalVoting/FacilitatorFinalVotingScreen.tsx",
+          "line": 14,
+          "name": "Function 'FacilitatorFinalVotingScreen'",
+          "complexity": 6
+        },
+        {
+          "path": "frontend/src/app/facilitator/useFacilitatorShell.ts",
+          "line": 23,
+          "name": "Function 'useFacilitatorShell'",
+          "complexity": 6
+        }
+      ]
+    },
+    "backendAnalyzerDiagnostics": 0,
+    "longestFiles": [
+      {
+        "side": "backend",
+        "kind": "production",
+        "path": "backend/Domain/Session.cs",
+        "lineCount": 262
+      },
+      {
+        "side": "backend",
+        "kind": "test",
+        "path": "backend/Adapters.Tests/SqliteSessionRepositoryTests.cs",
+        "lineCount": 590
+      },
+      {
+        "side": "frontend",
+        "kind": "production",
+        "path": "frontend/src/domain/workshopStateBlocks.ts",
+        "lineCount": 290
+      },
+      {
+        "side": "frontend",
+        "kind": "test",
+        "path": "frontend/src/domain/__tests__/participantWorkshopState.test.ts",
+        "lineCount": 448
+      }
+    ]
+  },
+  "duplication": {
+    "commands": [
+      "pnpm -w jscpd --reporters json --output <tmp>/jscpd"
+    ],
+    "sources": 603,
+    "lines": 24449,
+    "tokens": 192120,
+    "clones": 3,
+    "duplicatedLines": 28,
+    "duplicatedTokens": 257,
+    "duplicatedLinePercentage": 0.11,
+    "duplicatedTokenPercentage": 0.13,
+    "largestClones": [
+      {
+        "format": "tsx",
+        "lines": 8,
+        "tokens": 87,
+        "firstPath": "frontend/src/adapters/WorkshopRecordDocument.tsx",
+        "secondPath": "frontend/src/adapters/WorkshopRecordDocument.tsx"
+      },
+      {
+        "format": "css",
+        "lines": 10,
+        "tokens": 86,
+        "firstPath": "frontend/src/app/facilitator/AdvancePhaseButton.module.css",
+        "secondPath": "frontend/src/app/facilitator/OpenSessionForm.module.css"
+      },
+      {
+        "format": "css",
+        "lines": 13,
+        "tokens": 84,
+        "firstPath": "frontend/src/app/presenter/phases/finalPresentation/WinnerReveal.module.css",
+        "secondPath": "frontend/src/app/presenter/phases/valuePresentation/PresentedValueView.module.css"
+      }
+    ]
+  },
+  "architecture": {
+    "commands": [
+      "npx depcruise src --config .dependency-cruiser.cjs --output-type json",
+      "npx depcruise src --config .dependency-cruiser.cjs --output-type json --metrics"
+    ],
+    "frontend": {
+      "modules": 516,
+      "dependencies": 1829,
+      "rules": 14,
+      "violations": 0,
+      "circularDependencies": 0
+    },
+    "folderInstability": [
+      {
+        "folder": "src/domain",
+        "afferentCouplings": 505,
+        "efferentCouplings": 21,
+        "instability": 0.04
+      },
+      {
+        "folder": "src/domain/ports",
+        "afferentCouplings": 56,
+        "efferentCouplings": 27,
+        "instability": 0.33
+      },
+      {
+        "folder": "src/adapters",
+        "afferentCouplings": 43,
+        "efferentCouplings": 122,
+        "instability": 0.74
+      },
+      {
+        "folder": "src/shared",
+        "afferentCouplings": 48,
+        "efferentCouplings": 3,
+        "instability": 0.06
+      },
+      {
+        "folder": "src/app",
+        "afferentCouplings": 1,
+        "efferentCouplings": 820,
+        "instability": 1
+      }
+    ],
+    "backendRules": 8,
+    "backendRuleNames": [
+      "Domain depends on no other ValuesWorkshop layer",
+      "Application depends only on Domain",
+      "Adapters Persistence depends only on Application and Domain",
+      "Adapters Web depends only on Application and Domain",
+      "No class has more than 12 public methods",
+      "No cyclic dependencies between assemblies",
+      "Host is the executable composition root",
+      "Only the CpSat adapter references OrTools"
+    ]
+  },
+  "designSystem": {
+    "commands": [
+      "git ls-files"
+    ],
+    "customProperties": 171,
+    "tokenFiles": [
+      {
+        "path": "frontend/src/app/facilitator/tokens.facilitator.css",
+        "customProperties": 52
+      },
+      {
+        "path": "frontend/src/app/participant/tokens.participant.css",
+        "customProperties": 52
+      },
+      {
+        "path": "frontend/src/app/presenter/tokens.presenter.css",
+        "customProperties": 52
+      },
+      {
+        "path": "frontend/src/app/tokens.css",
+        "customProperties": 171
+      }
+    ],
+    "cssModules": 83,
+    "contrastAssertions": 69
+  },
+  "contract": {
+    "commands": [
+      "git ls-files"
+    ],
+    "fixtures": 38,
+    "fixtureGroups": [
+      {
+        "role": "facilitator",
+        "fixtures": 12
+      },
+      {
+        "role": "participant",
+        "fixtures": 14
+      },
+      {
+        "role": "presenter",
+        "fixtures": 12
+      }
+    ],
+    "frontendAssertions": 41,
+    "backendTestMethods": 2
+  },
+  "security": {
+    "commands": [
+      "pnpm --dir frontend audit:check",
+      "scripts/check-backend-vulnerabilities.sh"
+    ],
+    "frontend": {
+      "exitCode": 0,
+      "findings": 0,
+      "summary": "No known vulnerabilities of high severity or above"
+    },
+    "backend": {
+      "exitCode": 0,
+      "findings": 0,
+      "summary": "No vulnerable packages across 11 scanned projects"
+    }
+  },
+  "process": {
+    "commands": [
+      "git rev-list --count c351da0dde76570630ab259ba4ee89d66e0aa404",
+      "git rev-list --count \"--grep=^Merge pull request\" c351da0dde76570630ab259ba4ee89d66e0aa404",
+      "git log --max-parents=0 --format=%cI c351da0dde76570630ab259ba4ee89d66e0aa404",
+      "git shortlog --summary --numbered c351da0dde76570630ab259ba4ee89d66e0aa404"
+    ],
+    "commits": 802,
+    "mergedPullRequests": 66,
+    "firstCommitDate": "2026-07-19T17:25:51+00:00",
+    "contributors": 4
+  }
+}
