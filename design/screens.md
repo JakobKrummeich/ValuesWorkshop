@@ -25,7 +25,7 @@ they fire. "Mirror" = passive copy of the presenter content, phone-sized.
 |---|---|---|---|
 | **0 · before** | Session open form (session name + facilitator passphrase). **OpenSession** | — intentionally empty — | QR scan → sign-in (skipped if already signed in) → lobby. **JoinSession** fires implicitly on arrival; no form, no button. |
 | **1 Join** | Live roster (names, count). **AdvancePhase** | Large QR invitation + live names of joined participants | Lobby: "you're in", waiting notice, participant count |
-| **2 Quiz** | Current question with answer tally and answered-count; one morphing sub-control button. **RevealAnswer**, **ShowLearningText**, **PoseNextQuestion**, **AdvancePhase** (disabled until the fifth question's learning text was shown) | Question + three answer cards (two top, one centered below), live bars under each card scaled relative to the max tally; correct card highlighted after reveal; learning text on a centered card | Three answer buttons while the question is open. **ChooseQuizAnswer**; after picking: own-answer confirmation ("Your answer: X") until the next question — no correct-answer display, no learning text on the device; whoever never picked gets the waiting screen from the reveal on, never the question with dead buttons |
+| **2 Quiz** | Current question with answer tally and answered-count; one morphing sub-control button. **RevealAnswer**, **ShowLearningText**, **PoseNextQuestion**, **AdvancePhase** (disabled until the fifth question's learning text was shown) | Question + three answer cards (two top, one centered below), live bars under each card scaled relative to the max tally; correct card highlighted after reveal; learning text on a centered card | Three lettered answer buttons (pick highlights, no immediate submit); sticky CTA "Lock in answer A" sends **ChooseQuizAnswer** once a pick is confirmed; after locking in: own-answer confirmation ("Your answer: X") until the next question — no correct-answer display, no learning text on the device; whoever never picked gets the waiting screen from the reveal on, never the question with dead buttons |
 | **3 Value selection** | Submission progress count. **AdvancePhase** | Prompt + submission progress | Values grid (~50), pick exactly ten. **SubmitValueSelection** (enabled at 10/10); after submit: "submission successful" confirmation replacing the grid |
 | **4 Selection results** | Top-values bar chart (same as presenter). **AdvancePhase** · System: DetermineTopValues on entry | Bar chart of the 20 most-selected values in two columns (ranks 1–10 left, 11–20 right), label + count + bar ∝ selections (most-selected = full width); top set color-highlighted (tie at 10th → 11+ highlighted); "and x more" hint below the cutoff; zero submissions → empty-state note | Calm waiting screen (aurora motif with phase-aware copy) — attention goes to the presenter wall; no tallies, no chart |
 | **5 Group formation** | Progress bar while forming (T19b), then all groups: names, members, assigned values. **AdvancePhase** (disabled until the groups stand) · System: FormGroups when the 3 s window is over | Server-driven 3 s progress bar while forming (T19b), then paginated 3×2 group cards mirroring the participant card (name, member chips, value chips); cycles every 7 s, static single page when all groups fit | Server-driven 3 s progress bar while forming (T19b), then own group card: animal name, member chips grouped top-left, value chips grouped bottom-right — one color for all member chips, another for all value chips, no section labels, no icon |
@@ -47,7 +47,7 @@ presenter × phase 0 (no session exists to show yet).
 | AdvancePhase | Facilitator | Facilitator · control bar "Advance" button (every phase; per-phase disable guards) |
 | JoinSession | Participant | Participant · implicit on QR-scan arrival (no element) |
 | PoseNextQuestion | Facilitator | Facilitator · quiz morphing button, "Next question" state |
-| ChooseQuizAnswer | Participant | Participant · quiz answer button A/B/C |
+| ChooseQuizAnswer | Participant | Participant · quiz sticky CTA "Lock in answer" (after picking A/B/C) |
 | RevealAnswer | Facilitator | Facilitator · quiz morphing button, "Reveal answer" state |
 | ShowLearningText | Facilitator | Facilitator · quiz morphing button, "Show learning text" state |
 | SubmitValueSelection | Participant | Participant · selection grid, "Submit selection" button |
@@ -166,7 +166,7 @@ appointed on entry to phase 6.
 │ values at work is…?  │
 │                      │
 │ ┌──────────────────┐ │
-│ │ A  Answer text   │ │  → ChooseQuizAnswer
+│ │ A  Answer text   │ │  ← pick (highlight)
 │ └──────────────────┘ │
 │ ┌──────────────────┐ │
 │ │ B  Answer text   │ │
@@ -175,7 +175,11 @@ appointed on entry to phase 6.
 │ │ C  Answer text   │ │
 │ └──────────────────┘ │
 │                      │
-│ (after pick: own-    │
+│ ┌──────────────────┐ │
+│ │ Lock in answer A │ │  → ChooseQuizAnswer
+│ └──────────────────┘ │
+│                      │
+│ (after lock-in: own- │
 │  answer confirmation │
 │  "Your answer: X" —  │
 │  no reveal, no       │
