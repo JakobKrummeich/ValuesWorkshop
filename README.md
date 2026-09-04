@@ -8,6 +8,13 @@ steers the nine phases from a laptop. Every result is persisted; a server
 restart mid-workshop loses nothing. The workshop ends with a downloadable,
 anonymous PDF record. See `SPEC.md` for the product spec.
 
+![A workshop running end to end: the projector wall, the facilitator laptop and a participant phone move together through joining, the quiz, value selection, group work, voting and the winner reveal](docs/media/demo.gif)
+
+The animation is the whole 77-second demo film at 12 frames per second.
+The full-resolution recording is [`docs/media/demo.mp4`](docs/media/demo.mp4)
+— 1920×1080, 30 fps, silent. GitHub does not play a repository-hosted MP4
+inline, so that link downloads the file.
+
 | Phase | What happens |
 |---|---|
 | 1 Join | Participants scan the QR code on the wall and sign in |
@@ -24,7 +31,7 @@ anonymous PDF record. See `SPEC.md` for the product spec.
 
 | Presenter wall — winner reveal | Facilitator — group work | Participant — final vote |
 |---|---|---|
-| ![Presenter wall revealing the third-placed value with its action](docs/media/presenter-final-presentation.png) | ![Facilitator table with scribes and submission status per group](docs/media/facilitator-group-work.png) | ![Participant phone spending votes on values and their actions](docs/media/participant-final-voting.png) |
+| ![Presenter wall revealing the winning value and its action](docs/media/presenter-final-presentation.png) | ![Facilitator table with scribes and submission status per group](docs/media/facilitator-group-work.png) | ![Participant phone spending votes on values and their actions](docs/media/participant-final-voting.png) |
 
 The screenshots come out of `pnpm demo:media`: a Playwright script
 (`scripts/demoMedia/`) that drives an eight-person workshop against the
@@ -32,6 +39,17 @@ running dev compose stack and saves the three images into `docs/media/`. It
 needs `pnpm install` at the repository root plus `pnpm exec playwright
 install chromium`, and it leaves that workshop behind in the `vw-data`
 volume.
+
+`pnpm demo:video` (`scripts/demoVideo/`) drives the same eight-person
+workshop and turns it into the film above, in four steps: Playwright records
+the wall, the laptop and one phone while noting when each scene starts, ffmpeg
+splits the recordings into frames, Playwright composes every film frame on an
+HTML stage that puts the phone and the laptop into device frames and adds the
+caption, and ffmpeg encodes the MP4 and the GIF into `docs/media/`. It needs
+the same setup as `pnpm demo:media` plus Docker, which is where ffmpeg comes
+from — nothing is installed on the host. The run takes around ten minutes and
+keeps its intermediate frames in `/tmp/valuesWorkshopDemoVideo`. Neither
+script runs in CI; both are local, on purpose.
 
 ## Run the demo
 
@@ -78,8 +96,8 @@ also drops the database volume so the next run starts clean.
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
 | `design/` | Architecture, domain model, persistence, protocol, state machine, screens, visual system |
-| `docs/` | Architecture reviews (ADR-style proposals); `docs/media/` holds the README screenshots |
-| `scripts/` | CI gate scripts and the `demoMedia/` screenshot capture (`pnpm demo:media`) |
+| `docs/` | Architecture reviews (ADR-style proposals); `docs/media/` holds the README screenshots and the demo film |
+| `scripts/` | CI gate scripts, the `demoMedia/` screenshot capture (`pnpm demo:media`) and the `demoVideo/` film pipeline (`pnpm demo:video`), both sharing the workshop drive in `demoWorkshop/` |
 | `tasks/` | Plan, backlog, per-task mini-specs |
 
 ## Commands

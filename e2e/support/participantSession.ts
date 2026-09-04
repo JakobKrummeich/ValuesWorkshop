@@ -7,6 +7,15 @@ export type ParticipantSession = {
   page: Page;
 };
 
+export async function joinParticipantOn(
+  page: Page,
+  sessionIdentity: string,
+  accountName: string,
+): Promise<void> {
+  await page.goto(`/participant?sessionIdentity=${sessionIdentity}`);
+  await signInThroughOidcProvider(page, accountName);
+}
+
 export async function openParticipantSession(
   browser: Browser,
   sessionIdentity: string,
@@ -15,8 +24,7 @@ export async function openParticipantSession(
   const context = await browser.newContext({ viewport: PHONE_VIEWPORT });
   const page = await context.newPage();
 
-  await page.goto(`/participant?sessionIdentity=${sessionIdentity}`);
-  await signInThroughOidcProvider(page, accountName);
+  await joinParticipantOn(page, sessionIdentity, accountName);
 
   return { context, page };
 }

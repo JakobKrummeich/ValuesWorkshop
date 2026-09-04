@@ -696,18 +696,21 @@ rounds) · design: `design/visual-system.md`.
 **Description:** Frontend-only redesign ("Lichtung": night wall + phone,
 paper laptop, Fraunces + Manrope, animal glyphs, motion system) and a ≈ 75 s
 showcase video embedded in the README. Five stacked PRs.
-- [ ] 29a Foundation — tokens v2, fonts, motion, chrome (wordmark, stepper,
+- [x] 29a Foundation — tokens v2, fonts, motion, chrome (wordmark, stepper,
   shells, sidebar, bottom bar), phase-name i18n, presenter language switcher
   removed (`?language=`), shared components (animal card + glyphs, aurora
   waiting screen, action ledger, chips, counter, ring, bars, confetti,
   count-up), contrast guard test
-- [ ] 29b Wall — 9 presenter screens, phase transitions, reveal
+- [x] 29b Wall — 9 presenter screens, phase transitions, reveal
   choreographies, finale composition + podium + confetti
-- [ ] 29c Phone — 9 participant screens, vote control, chips, concluded bloom
-- [ ] 29d Laptop — 9 facilitator screens, open-session form, tables
-- [ ] 29e Video — capture + stage + encode pipeline, `docs/media/demo.{mp4,gif}`,
+- [x] 29c Phone — 9 participant screens, vote control, chips, concluded bloom
+- [x] 29d Laptop — 9 facilitator screens, open-session form, tables
+- [x] 29e Video — capture + stage + encode pipeline, `docs/media/demo.{mp4,gif}`,
   README embed, regenerated screenshots
 **Acceptance criteria:** every screen matches `design/visual-system.md`; no
 clipped text, overlaps, or missing gaps at the listed viewports; all gates
-green; e2e untouched except the presenter locale test.
+green; the e2e assertions keep covering the same behaviour — specs and
+helpers follow the redesign where it changed a contract (wall language via
+`?language=`, the two-step quiz answer, the missing-session copy) and the
+shared helpers stay the single way to drive a workshop.
 **Dependencies:** Checkpoint F. **Size:** XL
