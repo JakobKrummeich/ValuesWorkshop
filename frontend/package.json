@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "pnpm phases:check && eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && depcruise src --config .dependency-cruiser.cjs && (pnpm audit --audit-level=high || echo 'pnpm audit failed (network issue?) — skipping')",
+    "lint": "pnpm phases:check && eslint && stylelint \"src/**/*.css\" && prettier --check . && pnpm typecheck && depcruise src --config .dependency-cruiser.cjs && pnpm audit --audit-level=high",
     "test": "jest --coverage",
     "phases:check": "node scripts/generatePhasesModule.mts --check",
     "phases:generate": "node scripts/generatePhasesModule.mts --write",
