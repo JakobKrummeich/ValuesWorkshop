@@ -4,9 +4,9 @@ Every number on this page is read back from a tool run, and the commands that pr
 
 | the report describes |  |
 | --- | --- |
-| commit | `6a2f35f` — Record how the two diagram slices landed and tick off the slices that shipped |
-| committed | 2026-09-04T17:12:03+00:00 |
-| report generated | 2026-09-04T17:12:12.030Z |
+| commit | `bad7697` — Record how the property and accessibility slices landed and tick them off |
+| committed | 2026-09-04T18:10:30+00:00 |
+| report generated | 2026-09-04T18:10:33.844Z |
 
 ## Size
 
@@ -18,23 +18,23 @@ Line counts cover every tracked text file except binary assets and generated one
 
 | area | files | production lines | test lines | total lines |
 | --- | ---: | ---: | ---: | ---: |
-| backend | 338 | 8,793 | 18,395 | 27,188 |
+| backend | 347 | 8,793 | 19,429 | 28,222 |
 | contract | 41 | 2,830 | 0 | 2,830 |
 | design | 8 | 3,222 | 0 | 3,222 |
 | docs | 1 | 394 | 0 | 394 |
-| e2e | 22 | 0 | 3,488 | 3,488 |
-| frontend/src | 503 | 15,843 | 16,457 | 32,300 |
-| other | 55 | 4,543 | 0 | 4,543 |
+| e2e | 23 | 0 | 3,593 | 3,593 |
+| frontend/src | 509 | 15,874 | 16,898 | 32,772 |
+| other | 55 | 4,545 | 0 | 4,545 |
 | scripts | 104 | 5,474 | 3,157 | 8,631 |
-| tasks | 59 | 10,346 | 0 | 10,346 |
-| **repository** | **1,131** | **51,445** | **41,497** | **92,942** |
+| tasks | 59 | 10,365 | 0 | 10,365 |
+| **repository** | **1,147** | **51,497** | **43,077** | **94,574** |
 
 | extension | files |
 | --- | ---: |
-| `.cs` | 310 |
-| `.ts` | 259 |
+| `.cs` | 319 |
+| `.ts` | 265 |
 | `.tsx` | 190 |
-| `.css` | 89 |
+| `.css` | 90 |
 | `.md` | 70 |
 | `.json` | 63 |
 | `.mts` | 55 |
@@ -54,19 +54,19 @@ Produced by:
 
 | suite | tests | line coverage | enforced minimum | branch coverage |
 | --- | ---: | ---: | ---: | ---: |
-| jest — frontend units, hooks and components | 1,199 | 94.8% | at least 80% | 92.42% |
-| xunit — backend domain, application, adapters and host | 905 | 98.7% | at least 80% | 93.7% |
+| jest — frontend units, hooks and components | 1,236 | 94.8% | at least 80% | 92.41% |
+| xunit — backend domain, application, adapters and host | 930 | 98.6% | at least 80% | 93.2% |
 | Playwright — end to end through the browser | 93 | — | — | — |
-| **total** | **2,197** |  |  |  |
+| **total** | **2,259** |  |  |  |
 
-Coverage is measured over 2,863 of 3,020 frontend lines and 9,792 of 9,916 backend lines. The end-to-end suite is listed, never run, by this report.
+Coverage is measured over 2,865 of 3,022 frontend lines and 9,866 of 9,996 backend lines. The end-to-end suite is listed, never run, by this report.
 
 | backend test assembly | tests |
 | --- | ---: |
 | `ValuesWorkshop.Adapters.Tests.dll` | 224 |
-| `ValuesWorkshop.Application.Tests.dll` | 275 |
-| `ValuesWorkshop.Domain.Tests.dll` | 308 |
-| `ValuesWorkshop.Host.Tests.dll` | 98 |
+| `ValuesWorkshop.Application.Tests.dll` | 277 |
+| `ValuesWorkshop.Domain.Tests.dll` | 327 |
+| `ValuesWorkshop.Host.Tests.dll` | 102 |
 
 ## Complexity
 
@@ -78,7 +78,7 @@ Produced by:
 | measure | frontend | backend |
 | --- | ---: | ---: |
 | enforced cyclomatic complexity cap | at most 7 (eslint `complexity`) | at most 7 (analyzer VW1001) |
-| functions measured | 3,383 | — |
+| functions measured | 3,467 | — |
 | highest complexity found | 7 | — |
 | mean complexity | 1.18 | — |
 | file-length and other rule findings | 0 | 0 |
@@ -87,10 +87,10 @@ The backend cap is enforced by the VW1001 analyzer at build time with warnings a
 
 | cyclomatic complexity | frontend functions |
 | ---: | ---: |
-| 1 | 2,991 |
-| 2 | 254 |
-| 3 | 78 |
-| 4 | 37 |
+| 1 | 3,067 |
+| 2 | 258 |
+| 3 | 80 |
+| 4 | 39 |
 | 5 | 13 |
 | 6 | 9 |
 | 7 | 1 |
@@ -118,13 +118,13 @@ Produced by:
 
 | measure | value | enforced limit |
 | --- | ---: | ---: |
-| duplicated lines | 28 of 24,594 |  |
+| duplicated lines | 28 of 24,732 |  |
 | duplicated line share | 0.11% | at most 2% |
-| duplicated tokens | 257 of 193,226 |  |
+| duplicated tokens | 257 of 194,228 |  |
 | duplicated token share | 0.13% |  |
 | clones found | 3 |  |
 | detection window | 50 tokens |  |
-| sources scanned | 605 |  |
+| sources scanned | 608 |  |
 
 | largest clone | tokens | lines |
 | --- | ---: | ---: |
@@ -141,8 +141,8 @@ Produced by:
 
 | measure | value |
 | --- | ---: |
-| frontend modules cruised | 516 |
-| frontend dependencies cruised | 1,829 |
+| frontend modules cruised | 523 |
+| frontend dependencies cruised | 1,841 |
 | dependency-cruiser rules enforced | 14 |
 | dependency-cruiser violations | 0 |
 | modules on a dependency cycle | 0 |
@@ -152,11 +152,11 @@ Instability is dependency-cruiser's own measure: outgoing dependencies over all 
 
 | folder | incoming | outgoing | instability |
 | --- | ---: | ---: | ---: |
-| `src/domain` | 505 | 21 | 0.04 |
+| `src/domain` | 505 | 25 | 0.05 |
 | `src/domain/ports` | 56 | 27 | 0.33 |
 | `src/adapters` | 43 | 122 | 0.74 |
 | `src/shared` | 48 | 3 | 0.06 |
-| `src/app` | 1 | 820 | 1.00 |
+| `src/app` | 1 | 821 | 1.00 |
 
 | ArchUnitNET rule asserted on the backend |
 | --- |
@@ -177,16 +177,16 @@ Produced by:
 
 | measure | value |
 | --- | ---: |
-| distinct design tokens | 171 |
-| co-located CSS modules | 83 |
-| contrast assertions over the token layers | 69 |
+| distinct design tokens | 173 |
+| co-located CSS modules | 84 |
+| contrast assertions over the token layers | 84 |
 
 | token layer | custom properties |
 | --- | ---: |
-| `frontend/src/app/facilitator/tokens.facilitator.css` | 52 |
-| `frontend/src/app/participant/tokens.participant.css` | 52 |
-| `frontend/src/app/presenter/tokens.presenter.css` | 52 |
-| `frontend/src/app/tokens.css` | 171 |
+| `frontend/src/app/facilitator/tokens.facilitator.css` | 53 |
+| `frontend/src/app/participant/tokens.participant.css` | 53 |
+| `frontend/src/app/presenter/tokens.presenter.css` | 53 |
+| `frontend/src/app/tokens.css` | 173 |
 
 ## Wire contract
 
@@ -222,16 +222,16 @@ Produced by:
 
 Produced by:
 
-- `git rev-list --count 6a2f35f48f59a0cd32244ad105427ace20dbc516`
-- `git rev-list --count "--grep=^Merge pull request" 6a2f35f48f59a0cd32244ad105427ace20dbc516`
-- `git log --max-parents=0 --format=%cI 6a2f35f48f59a0cd32244ad105427ace20dbc516`
-- `git shortlog --summary --numbered 6a2f35f48f59a0cd32244ad105427ace20dbc516`
+- `git rev-list --count bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
+- `git rev-list --count "--grep=^Merge pull request" bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
+- `git log --max-parents=0 --format=%cI bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
+- `git shortlog --summary --numbered bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
 
 The history is counted at the commit this report describes, not at the branch tip, so regenerating the report does not move its own numbers.
 
 | measure | value |
 | --- | ---: |
-| commits | 811 |
+| commits | 816 |
 | merge commits from pull requests | 67 |
 | first commit | 2026-07-19T17:25:51+00:00 |
 | contributors | 4 |

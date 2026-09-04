@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-04T17:12:12.030Z",
+  "generatedAt": "2026-09-04T18:10:33.844Z",
   "commit": {
-    "sha": "6a2f35f48f59a0cd32244ad105427ace20dbc516",
-    "shortSha": "6a2f35f",
-    "committedAt": "2026-09-04T17:12:03+00:00",
-    "subject": "Record how the two diagram slices landed and tick off the slices that shipped"
+    "sha": "bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f",
+    "shortSha": "bad7697",
+    "committedAt": "2026-09-04T18:10:30+00:00",
+    "subject": "Record how the property and accessibility slices landed and tick them off"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -22,17 +22,17 @@
     "commands": [
       "git ls-files"
     ],
-    "files": 1131,
-    "productionLines": 51445,
-    "testLines": 41497,
-    "totalLines": 92942,
+    "files": 1147,
+    "productionLines": 51497,
+    "testLines": 43077,
+    "totalLines": 94574,
     "areas": [
       {
         "area": "backend",
-        "files": 338,
+        "files": 347,
         "productionLines": 8793,
-        "testLines": 18395,
-        "totalLines": 27188
+        "testLines": 19429,
+        "totalLines": 28222
       },
       {
         "area": "contract",
@@ -57,24 +57,24 @@
       },
       {
         "area": "e2e",
-        "files": 22,
+        "files": 23,
         "productionLines": 0,
-        "testLines": 3488,
-        "totalLines": 3488
+        "testLines": 3593,
+        "totalLines": 3593
       },
       {
         "area": "frontend/src",
-        "files": 503,
-        "productionLines": 15843,
-        "testLines": 16457,
-        "totalLines": 32300
+        "files": 509,
+        "productionLines": 15874,
+        "testLines": 16898,
+        "totalLines": 32772
       },
       {
         "area": "other",
         "files": 55,
-        "productionLines": 4543,
+        "productionLines": 4545,
         "testLines": 0,
-        "totalLines": 4543
+        "totalLines": 4545
       },
       {
         "area": "scripts",
@@ -86,19 +86,19 @@
       {
         "area": "tasks",
         "files": 59,
-        "productionLines": 10346,
+        "productionLines": 10365,
         "testLines": 0,
-        "totalLines": 10346
+        "totalLines": 10365
       }
     ],
     "filesByExtension": [
       {
         "extension": "cs",
-        "files": 310
+        "files": 319
       },
       {
         "extension": "ts",
-        "files": 259
+        "files": 265
       },
       {
         "extension": "tsx",
@@ -106,7 +106,7 @@
       },
       {
         "extension": "css",
-        "files": 89
+        "files": 90
       },
       {
         "extension": "md",
@@ -230,17 +230,17 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2197,
+    "totalTests": 2259,
     "frontend": {
-      "suites": 187,
-      "tests": 1199,
-      "passed": 1199,
+      "suites": 192,
+      "tests": 1236,
+      "passed": 1236,
       "failed": 0,
       "skipped": 0,
       "lineCoverage": 94.8,
-      "branchCoverage": 92.42,
-      "coveredLines": 2863,
-      "coverableLines": 3020
+      "branchCoverage": 92.41,
+      "coveredLines": 2865,
+      "coverableLines": 3022
     },
     "backend": {
       "assemblies": [
@@ -254,33 +254,33 @@
         {
           "assembly": "ValuesWorkshop.Application.Tests.dll",
           "failed": 0,
-          "passed": 275,
+          "passed": 277,
           "skipped": 0,
-          "total": 275
+          "total": 277
         },
         {
           "assembly": "ValuesWorkshop.Domain.Tests.dll",
           "failed": 0,
-          "passed": 308,
+          "passed": 327,
           "skipped": 0,
-          "total": 308
+          "total": 327
         },
         {
           "assembly": "ValuesWorkshop.Host.Tests.dll",
           "failed": 0,
-          "passed": 98,
+          "passed": 102,
           "skipped": 0,
-          "total": 98
+          "total": 102
         }
       ],
-      "tests": 905,
-      "passed": 905,
+      "tests": 930,
+      "passed": 930,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 98.7,
-      "branchCoverage": 93.7,
-      "coveredLines": 9792,
-      "coverableLines": 9916
+      "lineCoverage": 98.6,
+      "branchCoverage": 93.2,
+      "coveredLines": 9866,
+      "coverableLines": 9996
     },
     "endToEnd": {
       "tests": 93,
@@ -293,26 +293,26 @@
       "dotnet build backend/ValuesWorkshop.All.sln"
     ],
     "frontend": {
-      "functions": 3383,
+      "functions": 3467,
       "maximum": 7,
       "mean": 1.18,
       "otherRuleFindings": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 2991
+          "functions": 3067
         },
         {
           "complexity": 2,
-          "functions": 254
+          "functions": 258
         },
         {
           "complexity": 3,
-          "functions": 78
+          "functions": 80
         },
         {
           "complexity": 4,
-          "functions": 37
+          "functions": 39
         },
         {
           "complexity": 5,
@@ -392,9 +392,9 @@
     "commands": [
       "pnpm -w jscpd --reporters json --output <tmp>/jscpd"
     ],
-    "sources": 605,
-    "lines": 24594,
-    "tokens": 193226,
+    "sources": 608,
+    "lines": 24732,
+    "tokens": 194228,
     "clones": 3,
     "duplicatedLines": 28,
     "duplicatedTokens": 257,
@@ -430,8 +430,8 @@
       "npx depcruise src --config .dependency-cruiser.cjs --output-type json --metrics"
     ],
     "frontend": {
-      "modules": 516,
-      "dependencies": 1829,
+      "modules": 523,
+      "dependencies": 1841,
       "rules": 14,
       "violations": 0,
       "circularDependencies": 0
@@ -440,8 +440,8 @@
       {
         "folder": "src/domain",
         "afferentCouplings": 505,
-        "efferentCouplings": 21,
-        "instability": 0.04
+        "efferentCouplings": 25,
+        "instability": 0.05
       },
       {
         "folder": "src/domain/ports",
@@ -464,7 +464,7 @@
       {
         "folder": "src/app",
         "afferentCouplings": 1,
-        "efferentCouplings": 820,
+        "efferentCouplings": 821,
         "instability": 1
       }
     ],
@@ -484,27 +484,27 @@
     "commands": [
       "git ls-files"
     ],
-    "customProperties": 171,
+    "customProperties": 173,
     "tokenFiles": [
       {
         "path": "frontend/src/app/facilitator/tokens.facilitator.css",
-        "customProperties": 52
+        "customProperties": 53
       },
       {
         "path": "frontend/src/app/participant/tokens.participant.css",
-        "customProperties": 52
+        "customProperties": 53
       },
       {
         "path": "frontend/src/app/presenter/tokens.presenter.css",
-        "customProperties": 52
+        "customProperties": 53
       },
       {
         "path": "frontend/src/app/tokens.css",
-        "customProperties": 171
+        "customProperties": 173
       }
     ],
-    "cssModules": 83,
-    "contrastAssertions": 69
+    "cssModules": 84,
+    "contrastAssertions": 84
   },
   "contract": {
     "commands": [
@@ -546,12 +546,12 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count 6a2f35f48f59a0cd32244ad105427ace20dbc516",
-      "git rev-list --count \"--grep=^Merge pull request\" 6a2f35f48f59a0cd32244ad105427ace20dbc516",
-      "git log --max-parents=0 --format=%cI 6a2f35f48f59a0cd32244ad105427ace20dbc516",
-      "git shortlog --summary --numbered 6a2f35f48f59a0cd32244ad105427ace20dbc516"
+      "git rev-list --count bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f",
+      "git rev-list --count \"--grep=^Merge pull request\" bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f",
+      "git log --max-parents=0 --format=%cI bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f",
+      "git shortlog --summary --numbered bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f"
     ],
-    "commits": 811,
+    "commits": 816,
     "mergedPullRequests": 67,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4
