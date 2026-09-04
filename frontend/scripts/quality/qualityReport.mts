@@ -8,6 +8,7 @@ import type {
   FolderInstability,
   ModuleGraphMetrics,
 } from "./architectureReports.mts";
+import type { MutationRecord } from "./mutation/mutationRecord.mts";
 import type { ProcessMetrics } from "./processHistory.mts";
 import type { SizeMetrics, LongestFile } from "./sizeScan.mts";
 import type { VulnerabilityScanResult } from "./securityScans.mts";
@@ -75,6 +76,7 @@ export interface QualityReport {
   designSystem: MetricGroup<DesignSystemMetrics>;
   contract: MetricGroup<ContractMetrics>;
   security: MetricGroup<SecurityGroupMetrics>;
+  mutation: MutationRecord;
   process: MetricGroup<ProcessMetrics>;
 }
 

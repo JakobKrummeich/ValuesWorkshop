@@ -165,6 +165,30 @@ const report: QualityReport = {
     frontend: { exitCode: 0, findings: 0, summary: "No known vulnerabilities" },
     backend: { exitCode: 0, findings: 0, summary: "No vulnerable packages" },
   },
+  mutation: {
+    frontend: {
+      tool: "StrykerJS 10.0.0",
+      command: "pnpm mutation:frontend",
+      commit: "fd3cb1bee884e8679c0de08042e0da7c724593c0",
+      measuredAt: "2026-09-04T12:00:00.000Z",
+      score: 81.25,
+      killed: 1300,
+      survived: 280,
+      timeout: 12,
+      noCoverage: 8,
+    },
+    backend: {
+      tool: "Stryker.NET 4.16.0",
+      command: "pnpm mutation:backend",
+      commit: "fd3cb1bee884e8679c0de08042e0da7c724593c0",
+      measuredAt: "2026-09-04T13:00:00.000Z",
+      score: 75.41,
+      killed: 46,
+      survived: 13,
+      timeout: 0,
+      noCoverage: 2,
+    },
+  },
   process: {
     commands: ["git rev-list --count HEAD"],
     commits: 800,
@@ -195,6 +219,7 @@ describe("renderMetricsMarkdown", () => {
       "## Architecture",
       "## Design system",
       "## Wire contract",
+      "## Mutation testing",
       "## Security",
       "## Process",
     ]);
@@ -219,6 +244,42 @@ describe("renderMetricsMarkdown", () => {
   it("groups thousands so the totals stay readable", () => {
     expect(markdown).toContain("2,057");
     expect(markdown).toContain("192,120");
+  });
+
+  it("reports the mutation score against the commit it was measured at", () => {
+    expect(markdown).toContain("| frontend | StrykerJS 10.0.0 | 81.25% |");
+    expect(markdown).toContain("| backend | Stryker.NET 4.16.0 | 75.41% |");
+    expect(markdown).toContain(
+      "The frontend score was measured at `fd3cb1b`, the commit this report describes.",
+    );
+  });
+
+  it("says plainly that a mutation score describes another commit", () => {
+    const stale = renderMetricsMarkdown({
+      ...report,
+      mutation: {
+        ...report.mutation,
+        backend: {
+          ...report.mutation.backend!,
+          commit: "9b1c0f4a2d6e8c0b4a2d6e8c0b4a2d6e8c0b4a2d",
+        },
+      },
+    });
+    expect(stale).toContain(
+      "The backend score was measured at `9b1c0f4`, not at `fd3cb1b` — the commit this report describes — so it does not describe the code as it stands.",
+    );
+  });
+
+  it("says plainly that a side was never measured", () => {
+    const unmeasured = renderMetricsMarkdown({ ...report, mutation: {} });
+    expect(unmeasured).toContain(
+      "No frontend run is recorded, so the frontend score is absent rather than zero.",
+    );
+    expect(unmeasured).toContain(
+      "No backend run is recorded, so the backend score is absent rather than zero.",
+    );
+    expect(unmeasured).toContain("- `pnpm mutation:frontend`");
+    expect(unmeasured).not.toContain("| mutation score |");
   });
 
   it("ends in a single newline", () => {

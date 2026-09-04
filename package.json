@@ -3,6 +3,9 @@
   "scripts": {
     "jscpd": "jscpd",
     "quality:report": "pnpm --dir frontend quality:report",
+    "mutation": "pnpm mutation:frontend && pnpm mutation:backend",
+    "mutation:frontend": "pnpm --dir frontend mutation:frontend",
+    "mutation:backend": "pnpm --dir frontend mutation:backend",
     "demo:media": "playwright test --config playwright.demoMedia.config.ts",
     "demo:video": "playwright test --config playwright.demoVideo.config.ts"
   },

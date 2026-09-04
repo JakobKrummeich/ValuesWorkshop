@@ -9,6 +9,7 @@ import {
   collectSecurity,
   collectTests,
 } from "./collectGateMetrics.mts";
+import { readMutationRecord } from "./mutation/readMutationRecord.mts";
 import {
   collectCommitStamp,
   collectContract,
@@ -50,6 +51,7 @@ export function collectQualityMetrics(
       testsInFile(jestTests, frontendContractTest),
     ),
     security: collectSecurity(context),
+    mutation: readMutationRecord(context.repositoryRoot),
     process: collectProcess(context, commit),
   };
 }

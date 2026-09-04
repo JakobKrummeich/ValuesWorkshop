@@ -1,0 +1,96 @@
+name: Mutation testing
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+
+      - name: pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store/v10
+          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Mutation testing (StrykerJS)
+        run: pnpm mutation:frontend
+
+      - name: Mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report-frontend
+          path: |
+            reports/mutation/frontend
+            docs/quality/mutation.json
+          retention-days: 14
+
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+
+      - name: pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store/v10
+          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.x
+          dotnet-quality: preview
+
+      - name: NuGet cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-
+
+      - run: dotnet restore backend/ValuesWorkshop.All.sln
+      - run: dotnet tool restore
+
+      - name: Mutation testing (Stryker.NET)
+        run: pnpm mutation:backend
+
+      - name: Mutation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-report-backend
+          path: |
+            reports/mutation/backend/reports
+            docs/quality/mutation.json
+          retention-days: 14

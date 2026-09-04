@@ -5,6 +5,7 @@ import {
   securitySection,
   testsSection,
 } from "./metricsGateSections.mts";
+import { mutationSection } from "./metricsMutationSection.mts";
 import {
   contractSection,
   designSystemSection,
@@ -24,6 +25,7 @@ export function renderMetricsMarkdown(report: QualityReport): string {
     architectureSection(report),
     designSystemSection(report),
     contractSection(report),
+    mutationSection(report),
     securitySection(report),
     processSection(report),
   ].join("\n\n")}\n`;
