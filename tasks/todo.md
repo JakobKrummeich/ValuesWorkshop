@@ -729,8 +729,8 @@ SBOM, and hotspot analysis over the git history.
 - [x] 30b Repo, frontend and backend diagrams + drift gate
 - [x] 30c Database ER diagram from the EF model + drift gate
 - [ ] 30d README `## Engineering` section + badges
-- [ ] 30e Property-based tests (FsCheck + fast-check)
-- [ ] 30f Accessibility gate (axe-core in the e2e)
+- [x] 30e Property-based tests (FsCheck + fast-check)
+- [x] 30f Accessibility gate (axe-core in the e2e)
 - [ ] 30g Mutation testing (Stryker.NET + StrykerJS)
 - [ ] 30h Supply chain: CodeQL, CycloneDX SBOM, osv-scanner
 - [ ] 30i Hotspot analysis (churn × complexity)

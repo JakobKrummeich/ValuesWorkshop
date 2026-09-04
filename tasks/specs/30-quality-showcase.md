@@ -97,7 +97,7 @@ new kind of evidence. Ordered by what they would prove about this repo:
 | --- | --- | --- |
 | **Mutation testing** — Stryker.NET + StrykerJS | that the 38 k lines of tests actually kill bugs, not just execute lines; a mutation score is the honest version of a coverage badge | slow (tens of minutes per side); run nightly or on demand, not per PR |
 | **Property-based tests** — FsCheck (BE) + fast-check (FE) | see the explainer below: the domain invariants hold for *generated* inputs, not just for the examples someone thought of | small; a handful of properties next to the example tests |
-| **Accessibility gate** — axe-core inside the Playwright e2e | the three shells are actually usable: contrast, roles, focus order, live regions — the design system already guards contrast, this guards the rest | small; one assertion per screen in the existing e2e |
+| **Accessibility gate** — axe-core inside the Playwright e2e | the three shells are actually usable: contrast, roles, focus order, live regions — the design system already guards contrast, this guards the rest | small; one assertion per screen in the existing e2e — landed in 30f, see below |
 | **Visual regression** — Playwright screenshot diffs over all 27 screens | that a CSS change cannot silently wreck a screen; the redesign would have been caught by it twice | medium; needs stable seeds and a baseline set (~30 PNGs) |
 | **Bundle budget** — Next build stats + size-limit | the phone stays light: first-load JS per route against a budget that fails the build | small |
 | **Load smoke** — k6 or bombardier against the hub | the SignalR fan-out holds a real room: 200 participants, p95 broadcast latency, memory flat over a full workshop | medium; needs a scripted room and a machine to trust the numbers |
@@ -133,6 +133,25 @@ The CP-SAT group solver is the strongest case: a constraint solver is precisely
 the kind of code where a random sweep finds the edge case nobody wrote a test
 for. FsCheck is the C# library for this, fast-check the TypeScript one; both run
 inside the existing test suites and add seconds, not minutes.
+
+In 30e that landed as 25 FsCheck properties over group sizing, the selection
+round, the voting rounds, phase progression under generated intent sequences and
+the CP-SAT solver, plus 22 fast-check properties over the frontend's own
+derivations — the selection chart, the presentation position, the group
+formation view, the plural message key and the action slab scale. Backend
+generators live in `backend/TestSupport/WorkshopGenerators.cs`; the solver
+properties run at a lowered `MaxTest` because each case calls a real solve. The
+whole sweep adds about 11 s to the backend suite and under a second to jest.
+
+### How the accessibility gate landed
+
+30f scans all three shells in every phase of the restart-recovery walkthrough,
+plus the lobby wall, the session-less wall and the two refused-facilitator
+screens, against the WCAG 2.0/2.1 A and AA rule tags. Serious and critical
+violations fail the run; no rule is excluded and no violation is suppressed. The
+first run found six real defects — a moss ramp that only reached 3.5:1 on white,
+a status pill whose pulse animation sampled at 2.03:1, a tablist wrapped in list
+items, and three unnamed progress bars — and all six were fixed in the product.
 
 My recommendation: **mutation testing, property-based tests, the accessibility
 gate and CodeQL** — each proves something the current gates cannot, and none of
