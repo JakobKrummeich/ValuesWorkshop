@@ -4,9 +4,9 @@ Every number on this page is read back from a tool run, and the commands that pr
 
 | the report describes |  |
 | --- | --- |
-| commit | `c351da0` — Measure the repository's quality with one command instead of claiming it |
-| committed | 2026-09-04T14:58:22+00:00 |
-| report generated | 2026-09-04T14:58:23.680Z |
+| commit | `ec389b0` — Emit the database diagram from the EF Core model rather than from a drawing of it |
+| committed | 2026-09-04T16:57:32+00:00 |
+| report generated | 2026-09-04T16:57:38.499Z |
 
 ## Size
 
@@ -18,29 +18,29 @@ Line counts cover every tracked text file except binary assets and generated one
 
 | area | files | production lines | test lines | total lines |
 | --- | ---: | ---: | ---: | ---: |
-| backend | 334 | 8,649 | 18,196 | 26,845 |
+| backend | 338 | 8,793 | 18,395 | 27,188 |
 | contract | 41 | 2,830 | 0 | 2,830 |
 | design | 8 | 3,222 | 0 | 3,222 |
 | docs | 1 | 394 | 0 | 394 |
 | e2e | 22 | 0 | 3,488 | 3,488 |
 | frontend/src | 503 | 15,843 | 16,457 | 32,300 |
-| other | 55 | 4,542 | 0 | 4,542 |
-| scripts | 92 | 4,813 | 2,718 | 7,531 |
+| other | 55 | 4,543 | 0 | 4,543 |
+| scripts | 104 | 5,474 | 3,157 | 8,631 |
 | tasks | 59 | 10,342 | 0 | 10,342 |
-| **repository** | **1,115** | **50,635** | **40,859** | **91,494** |
+| **repository** | **1,131** | **51,441** | **41,497** | **92,938** |
 
 | extension | files |
 | --- | ---: |
-| `.cs` | 306 |
+| `.cs` | 310 |
 | `.ts` | 259 |
 | `.tsx` | 190 |
 | `.css` | 89 |
 | `.md` | 70 |
-| `.json` | 62 |
-| `.mts` | 45 |
+| `.json` | 63 |
+| `.mts` | 55 |
 | `.html` | 19 |
 | without an extension | 19 |
-| `.txt` | 16 |
+| `.txt` | 17 |
 | `.csproj` | 11 |
 | `.sh` | 6 |
 
@@ -54,16 +54,16 @@ Produced by:
 
 | suite | tests | line coverage | enforced minimum | branch coverage |
 | --- | ---: | ---: | ---: | ---: |
-| jest — frontend units, hooks and components | 1,172 | 95% | at least 80% | 92.46% |
-| xunit — backend domain, application, adapters and host | 901 | 98.7% | at least 80% | 93.9% |
+| jest — frontend units, hooks and components | 1,199 | 94.8% | at least 80% | 92.42% |
+| xunit — backend domain, application, adapters and host | 905 | 98.7% | at least 80% | 93.7% |
 | Playwright — end to end through the browser | 93 | — | — | — |
-| **total** | **2,166** |  |  |  |
+| **total** | **2,197** |  |  |  |
 
-Coverage is measured over 2,702 of 2,844 frontend lines and 9,693 of 9,817 backend lines. The end-to-end suite is listed, never run, by this report.
+Coverage is measured over 2,863 of 3,020 frontend lines and 9,792 of 9,916 backend lines. The end-to-end suite is listed, never run, by this report.
 
 | backend test assembly | tests |
 | --- | ---: |
-| `ValuesWorkshop.Adapters.Tests.dll` | 220 |
+| `ValuesWorkshop.Adapters.Tests.dll` | 224 |
 | `ValuesWorkshop.Application.Tests.dll` | 275 |
 | `ValuesWorkshop.Domain.Tests.dll` | 308 |
 | `ValuesWorkshop.Host.Tests.dll` | 98 |
@@ -78,30 +78,30 @@ Produced by:
 | measure | frontend | backend |
 | --- | ---: | ---: |
 | enforced cyclomatic complexity cap | at most 7 (eslint `complexity`) | at most 7 (analyzer VW1001) |
-| functions measured | 3,256 | — |
+| functions measured | 3,383 | — |
 | highest complexity found | 7 | — |
-| mean complexity | 1.19 | — |
+| mean complexity | 1.18 | — |
 | file-length and other rule findings | 0 | 0 |
 
 The backend cap is enforced by the VW1001 analyzer at build time with warnings as errors, so a passing build is the measurement: every method is inside the cap. The frontend is measured function by function by re-running eslint with the cap lowered to zero, which turns every function into a reported finding.
 
 | cyclomatic complexity | frontend functions |
 | ---: | ---: |
-| 1 | 2,879 |
-| 2 | 242 |
-| 3 | 76 |
+| 1 | 2,991 |
+| 2 | 254 |
+| 3 | 78 |
 | 4 | 37 |
 | 5 | 13 |
-| 6 | 8 |
+| 6 | 9 |
 | 7 | 1 |
 
 | most complex frontend functions | file | complexity |
 | --- | --- | ---: |
 | Function 'GroupWorkCard' | `frontend/src/app/participant/phases/groupWork/GroupWorkCard.tsx:13` | 7 |
 | Function 'runPhaseEnumCodegen' | `frontend/scripts/generatePhasesModule.mts:55` | 6 |
+| Function 'foldFolderEdges' | `frontend/scripts/quality/frontendModulesDiagram.mts:61` | 6 |
 | Function 'advanceGuardMessageOf' | `frontend/src/app/facilitator/advanceGuard.ts:16` | 6 |
 | Function 'FacilitatorFinalVotingScreen' | `frontend/src/app/facilitator/phases/finalVoting/FacilitatorFinalVotingScreen.tsx:14` | 6 |
-| Function 'useFacilitatorShell' | `frontend/src/app/facilitator/useFacilitatorShell.ts:23` | 6 |
 
 | side | kind | longest file | lines | enforced cap |
 | --- | --- | --- | ---: | --- |
@@ -118,13 +118,13 @@ Produced by:
 
 | measure | value | enforced limit |
 | --- | ---: | ---: |
-| duplicated lines | 28 of 24,449 |  |
+| duplicated lines | 28 of 24,594 |  |
 | duplicated line share | 0.11% | at most 2% |
-| duplicated tokens | 257 of 192,120 |  |
+| duplicated tokens | 257 of 193,226 |  |
 | duplicated token share | 0.13% |  |
 | clones found | 3 |  |
 | detection window | 50 tokens |  |
-| sources scanned | 603 |  |
+| sources scanned | 605 |  |
 
 | largest clone | tokens | lines |
 | --- | ---: | ---: |
@@ -222,16 +222,16 @@ Produced by:
 
 Produced by:
 
-- `git rev-list --count c351da0dde76570630ab259ba4ee89d66e0aa404`
-- `git rev-list --count "--grep=^Merge pull request" c351da0dde76570630ab259ba4ee89d66e0aa404`
-- `git log --max-parents=0 --format=%cI c351da0dde76570630ab259ba4ee89d66e0aa404`
-- `git shortlog --summary --numbered c351da0dde76570630ab259ba4ee89d66e0aa404`
+- `git rev-list --count ec389b06b0655b299dd1139f7f77310341fbb605`
+- `git rev-list --count "--grep=^Merge pull request" ec389b06b0655b299dd1139f7f77310341fbb605`
+- `git log --max-parents=0 --format=%cI ec389b06b0655b299dd1139f7f77310341fbb605`
+- `git shortlog --summary --numbered ec389b06b0655b299dd1139f7f77310341fbb605`
 
 The history is counted at the commit this report describes, not at the branch tip, so regenerating the report does not move its own numbers.
 
 | measure | value |
 | --- | ---: |
-| commits | 802 |
-| merge commits from pull requests | 66 |
+| commits | 807 |
+| merge commits from pull requests | 67 |
 | first commit | 2026-07-19T17:25:51+00:00 |
 | contributors | 4 |

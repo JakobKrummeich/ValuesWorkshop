@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-04T14:58:23.680Z",
+  "generatedAt": "2026-09-04T16:57:38.499Z",
   "commit": {
-    "sha": "c351da0dde76570630ab259ba4ee89d66e0aa404",
-    "shortSha": "c351da0",
-    "committedAt": "2026-09-04T14:58:22+00:00",
-    "subject": "Measure the repository's quality with one command instead of claiming it"
+    "sha": "ec389b06b0655b299dd1139f7f77310341fbb605",
+    "shortSha": "ec389b0",
+    "committedAt": "2026-09-04T16:57:32+00:00",
+    "subject": "Emit the database diagram from the EF Core model rather than from a drawing of it"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -22,17 +22,17 @@
     "commands": [
       "git ls-files"
     ],
-    "files": 1115,
-    "productionLines": 50635,
-    "testLines": 40859,
-    "totalLines": 91494,
+    "files": 1131,
+    "productionLines": 51441,
+    "testLines": 41497,
+    "totalLines": 92938,
     "areas": [
       {
         "area": "backend",
-        "files": 334,
-        "productionLines": 8649,
-        "testLines": 18196,
-        "totalLines": 26845
+        "files": 338,
+        "productionLines": 8793,
+        "testLines": 18395,
+        "totalLines": 27188
       },
       {
         "area": "contract",
@@ -72,16 +72,16 @@
       {
         "area": "other",
         "files": 55,
-        "productionLines": 4542,
+        "productionLines": 4543,
         "testLines": 0,
-        "totalLines": 4542
+        "totalLines": 4543
       },
       {
         "area": "scripts",
-        "files": 92,
-        "productionLines": 4813,
-        "testLines": 2718,
-        "totalLines": 7531
+        "files": 104,
+        "productionLines": 5474,
+        "testLines": 3157,
+        "totalLines": 8631
       },
       {
         "area": "tasks",
@@ -94,7 +94,7 @@
     "filesByExtension": [
       {
         "extension": "cs",
-        "files": 306
+        "files": 310
       },
       {
         "extension": "ts",
@@ -114,11 +114,11 @@
       },
       {
         "extension": "json",
-        "files": 62
+        "files": 63
       },
       {
         "extension": "mts",
-        "files": 45
+        "files": 55
       },
       {
         "extension": "html",
@@ -130,7 +130,7 @@
       },
       {
         "extension": "txt",
-        "files": 16
+        "files": 17
       },
       {
         "extension": "csproj",
@@ -230,26 +230,26 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2166,
+    "totalTests": 2197,
     "frontend": {
-      "suites": 183,
-      "tests": 1172,
-      "passed": 1172,
+      "suites": 187,
+      "tests": 1199,
+      "passed": 1199,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 95,
-      "branchCoverage": 92.46,
-      "coveredLines": 2702,
-      "coverableLines": 2844
+      "lineCoverage": 94.8,
+      "branchCoverage": 92.42,
+      "coveredLines": 2863,
+      "coverableLines": 3020
     },
     "backend": {
       "assemblies": [
         {
           "assembly": "ValuesWorkshop.Adapters.Tests.dll",
           "failed": 0,
-          "passed": 220,
+          "passed": 224,
           "skipped": 0,
-          "total": 220
+          "total": 224
         },
         {
           "assembly": "ValuesWorkshop.Application.Tests.dll",
@@ -273,14 +273,14 @@
           "total": 98
         }
       ],
-      "tests": 901,
-      "passed": 901,
+      "tests": 905,
+      "passed": 905,
       "failed": 0,
       "skipped": 0,
       "lineCoverage": 98.7,
-      "branchCoverage": 93.9,
-      "coveredLines": 9693,
-      "coverableLines": 9817
+      "branchCoverage": 93.7,
+      "coveredLines": 9792,
+      "coverableLines": 9916
     },
     "endToEnd": {
       "tests": 93,
@@ -293,22 +293,22 @@
       "dotnet build backend/ValuesWorkshop.All.sln"
     ],
     "frontend": {
-      "functions": 3256,
+      "functions": 3383,
       "maximum": 7,
-      "mean": 1.19,
+      "mean": 1.18,
       "otherRuleFindings": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 2879
+          "functions": 2991
         },
         {
           "complexity": 2,
-          "functions": 242
+          "functions": 254
         },
         {
           "complexity": 3,
-          "functions": 76
+          "functions": 78
         },
         {
           "complexity": 4,
@@ -320,7 +320,7 @@
         },
         {
           "complexity": 6,
-          "functions": 8
+          "functions": 9
         },
         {
           "complexity": 7,
@@ -341,6 +341,12 @@
           "complexity": 6
         },
         {
+          "path": "frontend/scripts/quality/frontendModulesDiagram.mts",
+          "line": 61,
+          "name": "Function 'foldFolderEdges'",
+          "complexity": 6
+        },
+        {
           "path": "frontend/src/app/facilitator/advanceGuard.ts",
           "line": 16,
           "name": "Function 'advanceGuardMessageOf'",
@@ -350,12 +356,6 @@
           "path": "frontend/src/app/facilitator/phases/finalVoting/FacilitatorFinalVotingScreen.tsx",
           "line": 14,
           "name": "Function 'FacilitatorFinalVotingScreen'",
-          "complexity": 6
-        },
-        {
-          "path": "frontend/src/app/facilitator/useFacilitatorShell.ts",
-          "line": 23,
-          "name": "Function 'useFacilitatorShell'",
           "complexity": 6
         }
       ]
@@ -392,9 +392,9 @@
     "commands": [
       "pnpm -w jscpd --reporters json --output <tmp>/jscpd"
     ],
-    "sources": 603,
-    "lines": 24449,
-    "tokens": 192120,
+    "sources": 605,
+    "lines": 24594,
+    "tokens": 193226,
     "clones": 3,
     "duplicatedLines": 28,
     "duplicatedTokens": 257,
@@ -546,13 +546,13 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count c351da0dde76570630ab259ba4ee89d66e0aa404",
-      "git rev-list --count \"--grep=^Merge pull request\" c351da0dde76570630ab259ba4ee89d66e0aa404",
-      "git log --max-parents=0 --format=%cI c351da0dde76570630ab259ba4ee89d66e0aa404",
-      "git shortlog --summary --numbered c351da0dde76570630ab259ba4ee89d66e0aa404"
+      "git rev-list --count ec389b06b0655b299dd1139f7f77310341fbb605",
+      "git rev-list --count \"--grep=^Merge pull request\" ec389b06b0655b299dd1139f7f77310341fbb605",
+      "git log --max-parents=0 --format=%cI ec389b06b0655b299dd1139f7f77310341fbb605",
+      "git shortlog --summary --numbered ec389b06b0655b299dd1139f7f77310341fbb605"
     ],
-    "commits": 802,
-    "mergedPullRequests": 66,
+    "commits": 807,
+    "mergedPullRequests": 67,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4
   }
