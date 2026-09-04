@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en" data-theme="emerald">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Task 30 — engineering showcase spec review</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/daisyui.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@5.5.19/themes.css" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.2.4/dist/index.global.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :where(.grid, .flex) > * { min-width: 0; }
+  :where(p, h1, h2, h3, h4, li, td, th) { overflow-wrap: anywhere; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .mermaid { display: flex; justify-content: center; }
+  .mermaid svg { max-width: 100%; }
+  code { font-size: 0.9em; }
+  :not(pre) > code { background: var(--color-base-300); padding: 0.1em 0.35em; border-radius: 0.3em; }
+</style>
+</head>
+<body class="bg-base-200 text-base-content">
+<div class="mx-auto max-w-5xl px-4 py-10">
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <span class="badge badge-primary">Task 30</span>
+    <span class="badge badge-outline">tasks/specs/30-quality-showcase.md</span>
+    <span class="badge badge-warning">spec review before any code</span>
+  </div>
+  <div class="alert alert-info mb-6"><span>
+    A mini-spec for showing this repo&rsquo;s engineering in the README: measured
+    numbers and generated diagrams, nothing hand-maintained. Annotate anything you
+    want changed, answer the three questions at the bottom, and approve when it reads right.
+  </span></div>
+
+<!-- markdown-body:start -->
+<!-- markdown-body:end -->
+
+  <div class="card bg-base-100 border border-base-300 mt-10">
+    <div class="card-body gap-4">
+      <h2 class="card-title">1 &middot; How much goes in the README?</h2>
+      <div class="flex flex-wrap gap-2">
+        <span class="btn btn-success" data-lavish-action
+          onclick="window.lavish.queuePrompt('README scope: headline table plus the three architecture diagrams inline, full metrics table stays in docs/quality/metrics.md.', { tag: 'decision', text: 'Headline table + diagrams inline' })">Headline + diagrams</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('README scope: put the full metrics table inline in the README, not only the headline numbers.', { tag: 'decision', text: 'Full metrics table inline' })">Full table inline</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('README scope: keep the README short - link to docs/quality/ instead of embedding diagrams.', { tag: 'decision', text: 'Keep README short, link out' })">Short, link out</span>
+      </div>
+
+      <h2 class="card-title mt-4">2 &middot; Badges at the top?</h2>
+      <div class="flex flex-wrap gap-2">
+        <span class="btn btn-success" data-lavish-action
+          onclick="window.lavish.queuePrompt('Badges: yes, add shields.io badges (CI status, coverage, complexity cap, duplication) at the top of the README.', { tag: 'decision', text: 'Add badges' })">Add badges</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Badges: no badges, keep the README prose and tables only.', { tag: 'decision', text: 'No badges' })">No badges</span>
+      </div>
+
+      <h2 class="card-title mt-4">3 &middot; Where does the database diagram live?</h2>
+      <div class="flex flex-wrap gap-2">
+        <span class="btn btn-success" data-lavish-action
+          onclick="window.lavish.queuePrompt('ER diagram lives in docs/quality/database.mmd, embedded in the README.', { tag: 'decision', text: 'docs/quality/database.mmd' })">docs/quality</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('ER diagram lives in design/persistence.md next to the persistence design, and the README embeds it from there.', { tag: 'decision', text: 'design/persistence.md' })">design/persistence.md</span>
+      </div>
+      <h2 class="card-title mt-4">4 &middot; Extra tooling &mdash; click every one you want in</h2>
+      <div class="flex flex-wrap gap-2">
+        <span class="btn btn-success" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add the recommended tooling bundle: mutation testing (Stryker.NET + StrykerJS), property-based tests (FsCheck + fast-check), an axe-core accessibility gate in the e2e, and CodeQL.', { tag: 'decision', text: 'Recommended bundle: mutation + property-based + a11y + CodeQL' })">Recommended bundle</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add mutation testing (Stryker.NET for the backend, StrykerJS for the frontend), reported as a mutation score.', { tag: 'decision', text: 'Mutation testing' })">Mutation testing</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add property-based tests for the domain invariants (FsCheck on the backend, fast-check on the frontend).', { tag: 'decision', text: 'Property-based tests' })">Property-based tests</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add an accessibility gate: axe-core assertions inside the Playwright e2e for every screen.', { tag: 'decision', text: 'Accessibility gate' })">Accessibility gate</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add visual regression testing: Playwright screenshot diffs over all screens with a checked-in baseline.', { tag: 'decision', text: 'Visual regression' })">Visual regression</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add a bundle budget: Next build stats plus size-limit, failing the build when first-load JS exceeds the budget.', { tag: 'decision', text: 'Bundle budget' })">Bundle budget</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add a load smoke test against the SignalR hub (k6 or bombardier): 200 participants, p95 broadcast latency, memory over a full workshop.', { tag: 'decision', text: 'Load smoke test' })">Load smoke</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add CodeQL security analysis for both languages as a GitHub workflow.', { tag: 'decision', text: 'CodeQL' })">CodeQL</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add an SBOM (CycloneDX) plus osv-scanner supply-chain scanning.', { tag: 'decision', text: 'SBOM + OSV' })">SBOM + OSV</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add dead-code detection with knip on the frontend.', { tag: 'decision', text: 'knip dead-code detection' })">Dead code (knip)</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add hotspot analysis over the git history (code-maat style: churn x complexity) as a README picture.', { tag: 'decision', text: 'Hotspot analysis' })">Hotspots</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('Add process metrics from git and the GitHub API: PR cycle time, CI duration, first-try pass rate, flake rate.', { tag: 'decision', text: 'Process metrics' })">Process metrics</span>
+        <span class="btn btn-outline" data-lavish-action
+          onclick="window.lavish.queuePrompt('No extra tooling: keep Task 30 to reporting what the existing gates already know.', { tag: 'decision', text: 'No extra tooling' })">None, keep it lean</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 rounded-box border border-base-300 bg-base-100 p-4 mt-10">
+    <div>
+      <div class="font-bold">Spec approved?</div>
+      <div class="text-sm opacity-70">Then I break it into the four slices and start with 30a.</div>
+    </div>
+    <span class="btn btn-primary" data-lavish-action
+      onclick="window.lavish.queuePrompt('Task 30 spec approved. Break it into the slices and start building.', { tag: 'approval', text: 'Approve Task 30 spec' })">
+      Approve spec
+    </span>
+  </div>
+</div>
+<script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+
+      const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const paint = document.createElement("canvas").getContext("2d");
+      function toRgba(color) {
+        paint.clearRect(0, 0, 1, 1);
+        paint.fillStyle = "#000";
+        paint.fillStyle = color;
+        paint.fillRect(0, 0, 1, 1);
+        return paint.getImageData(0, 0, 1, 1).data;
+      }
+      function compositeRgba(foreground, background) {
+        const foregroundAlpha = foreground[3] / 255;
+        const backgroundAlpha = background[3] / 255;
+        const alpha = foregroundAlpha + backgroundAlpha * (1 - foregroundAlpha);
+        if (alpha === 0) return [0, 0, 0, 0];
+        return [
+          (foreground[0] * foregroundAlpha + background[0] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[1] * foregroundAlpha + background[1] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          (foreground[2] * foregroundAlpha + background[2] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+          alpha * 255,
+        ];
+      }
+      function pageIsDark() {
+        const root = document.documentElement;
+        const rootBackground = toRgba(getComputedStyle(root).backgroundColor);
+        const bodyBackground = document.body ? toRgba(getComputedStyle(document.body).backgroundColor) : [0, 0, 0, 0];
+        const [r, g, b, a] = compositeRgba(bodyBackground, rootBackground);
+        if (a > 0) return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.5;
+        return darkQuery.matches;
+      }
+
+      const diagrams = [...document.querySelectorAll(".mermaid")].map((el) => ({ el, src: el.textContent }));
+      let applied;
+      let rendering = false;
+      let queued = false;
+      function queueRender() {
+        queued = true;
+        if (rendering) return;
+        void render();
+      }
+      async function render() {
+        rendering = true;
+        try {
+          while (queued) {
+            queued = false;
+            const theme = pageIsDark() ? "dark" : "default";
+            if (theme === applied) continue;
+            mermaid.initialize({ startOnLoad: false, theme, securityLevel: "strict" });
+            for (const { el, src } of diagrams) {
+              el.removeAttribute("data-processed");
+              el.textContent = src;
+            }
+            try {
+              await mermaid.run({ nodes: diagrams.map((d) => d.el) });
+            } catch (error) {
+              console.error("Mermaid diagram render failed:", error);
+              return;
+            }
+            applied = theme;
+          }
+        } finally {
+          rendering = false;
+          if (queued) queueRender();
+        }
+      }
+      if (document.readyState === "complete") queueRender();
+      else window.addEventListener("load", queueRender, { once: true });
+      const themeObserver = new MutationObserver(queueRender);
+      for (const el of [document.documentElement, document.body]) {
+        if (!el) continue;
+        themeObserver.observe(el, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+      }
+      darkQuery.addEventListener("change", queueRender);
+    </script>
+</body>
+</html>
