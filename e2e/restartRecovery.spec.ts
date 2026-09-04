@@ -660,6 +660,9 @@ test.describe.serial("restart recovery across the workshop", () => {
     await expect(
       reopenedParticipantPage.getByTestId("workshop-concluded"),
     ).toBeVisible({ timeout: 15_000 });
+    await expect(
+      reopenedParticipantPage.getByTestId("workshop-concluded"),
+    ).toHaveAttribute("data-animal", groupAnimalId);
 
     const downloadPromise = reopenedParticipantPage.waitForEvent("download");
     await reopenedParticipantPage

@@ -10,7 +10,6 @@ import { ScreenCopy } from "../../../ScreenCopy";
 import { WaitingScreen } from "../../../WaitingScreen";
 import { ActionBar } from "../../ActionBar";
 import { CallToAction } from "../../CallToAction";
-import { useRememberedOwnGroup } from "../../OwnGroupMemoryProvider";
 import styles from "./ParticipantFinalPresentationScreen.module.css";
 import { useParticipantFinalPresentationScreen } from "./useParticipantFinalPresentationScreen";
 
@@ -20,8 +19,7 @@ export function ParticipantFinalPresentationScreen({
   state: ParticipantFinalPresentationState;
 }) {
   const { translate } = useTranslation();
-  const model = useParticipantFinalPresentationScreen(state.conclusion);
-  const ownGroup = useRememberedOwnGroup();
+  const model = useParticipantFinalPresentationScreen(state);
 
   if (!model.isConcluded) {
     return (
@@ -36,14 +34,14 @@ export function ParticipantFinalPresentationScreen({
     <section
       className={styles.screen}
       data-testid="workshop-concluded"
-      data-animal={ownGroup?.animalId}
+      data-animal={model.ownAnimalId}
     >
       <Confetti />
       <span className={styles.glyph} data-testid="conclusion-glyph">
-        {ownGroup === null ? (
+        {model.ownAnimalId === null ? (
           <BrandMark />
         ) : (
-          <AnimalGlyph animalId={ownGroup.animalId} />
+          <AnimalGlyph animalId={model.ownAnimalId} />
         )}
       </span>
       <ScreenCopy

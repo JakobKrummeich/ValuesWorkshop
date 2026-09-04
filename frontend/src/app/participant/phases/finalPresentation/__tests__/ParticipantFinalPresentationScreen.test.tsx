@@ -3,27 +3,16 @@ import { MessageKey } from "../../../../../domain/i18n/messages";
 import { Phase } from "../../../../../domain/phases";
 import type { ParticipantFinalPresentationState } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
-import { useRememberedOwnGroup } from "../../../OwnGroupMemoryProvider";
 import { ParticipantFinalPresentationScreen } from "../ParticipantFinalPresentationScreen";
 import { useParticipantFinalPresentationScreen } from "../useParticipantFinalPresentationScreen";
 
 jest.mock("../useParticipantFinalPresentationScreen", () => ({
   useParticipantFinalPresentationScreen: jest.fn(),
 }));
-jest.mock("../../../OwnGroupMemoryProvider", () => ({
-  useRememberedOwnGroup: jest.fn(),
-}));
 
 const screenHook = useParticipantFinalPresentationScreen as jest.MockedFunction<
   typeof useParticipantFinalPresentationScreen
 >;
-const rememberedOwnGroup = useRememberedOwnGroup as jest.MockedFunction<
-  typeof useRememberedOwnGroup
->;
-
-beforeEach(() => {
-  rememberedOwnGroup.mockReturnValue(null);
-});
 
 const state = {
   phase: Phase.FinalPresentation,
@@ -34,6 +23,7 @@ const state = {
 
 function concludedModel(
   overrides: Partial<{
+    ownAnimalId: string | null;
     isDownloading: boolean;
     downloadFailedMessage: MessageKey | null;
     downloadRecord: () => void;
@@ -41,6 +31,7 @@ function concludedModel(
 ) {
   return {
     isConcluded: true as const,
+    ownAnimalId: null,
     isDownloading: false,
     downloadFailedMessage: null,
     downloadRecord: jest.fn(),
@@ -82,11 +73,7 @@ describe("participant final presentation screen", () => {
   });
 
   it("blooms the own group's glyph in its hue with confetti", () => {
-    screenHook.mockReturnValue(concludedModel());
-    rememberedOwnGroup.mockReturnValue({
-      animalId: "fuchs",
-      text: { de: "Fuchs", en: "Fox" },
-    });
+    screenHook.mockReturnValue(concludedModel({ ownAnimalId: "fuchs" }));
 
     const { container } = render(
       <ParticipantFinalPresentationScreen state={state} />,

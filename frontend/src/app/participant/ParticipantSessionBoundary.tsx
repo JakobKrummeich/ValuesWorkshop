@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { createParticipantSession } from "../../adapters/workshopSessions";
 import { SessionBoundary } from "../SessionBoundary";
 import { ParticipantDependencyProvider } from "./dependencies";
-import { OwnGroupMemoryProvider } from "./OwnGroupMemoryProvider";
 
 export function ParticipantSessionBoundary({
   children,
@@ -23,9 +22,7 @@ export function ParticipantSessionBoundary({
             votingPort: session.votingPort,
           }}
         >
-          <OwnGroupMemoryProvider sessionStatePort={session.sessionStatePort}>
-            {children}
-          </OwnGroupMemoryProvider>
+          {children}
         </ParticipantDependencyProvider>
       )}
     </SessionBoundary>
