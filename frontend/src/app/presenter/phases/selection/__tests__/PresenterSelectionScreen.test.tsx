@@ -62,6 +62,9 @@ describe("presenter selection screen", () => {
       "aria-valuenow",
       "100",
     );
+    expect(screen.getByRole("progressbar")).toHaveAccessibleName(
+      "30 of 30 have submitted",
+    );
   });
 
   it("speaks German when German is chosen", () => {

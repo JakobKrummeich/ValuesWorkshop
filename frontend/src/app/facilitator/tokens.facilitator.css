@@ -30,9 +30,10 @@
     transparent
   );
   --color-on-accent: var(--base-white);
-  --color-highlight: var(--base-moss-500);
+  --color-highlight: var(--base-moss-700);
   --color-eyebrow: var(--base-pine-700);
-  --color-success: var(--base-moss-500);
+  --color-success: var(--base-moss-700);
+  --color-success-soft: var(--base-moss-100);
   --color-danger: var(--base-clay-600);
   --color-danger-soft: var(--base-clay-100);
   --color-scrim: var(--base-paper-scrim);

@@ -33,6 +33,10 @@ export function PresenterSelectionScreen({
       <div
         className={styles.track}
         role="progressbar"
+        aria-label={translate(MessageKey.SelectionSubmittedCount, {
+          submitted: submittedCount,
+          total: participantCount,
+        })}
         aria-valuenow={Math.round(progressFraction * 100)}
         aria-valuemin={0}
         aria-valuemax={100}

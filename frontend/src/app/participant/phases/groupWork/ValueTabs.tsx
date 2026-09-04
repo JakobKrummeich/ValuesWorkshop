@@ -17,21 +17,20 @@ export function ValueTabs({
   const { language } = useTranslation();
 
   return (
-    <ul className={styles.tabs} role="tablist" data-testid="value-tabs">
+    <div className={styles.tabs} role="tablist" data-testid="value-tabs">
       {values.map((value) => (
-        <li key={value.valueId}>
-          <button
-            type="button"
-            role="tab"
-            className={styles.tab}
-            aria-selected={value.valueId === selectedValueId}
-            data-testid={`value-tab-${value.valueId}`}
-            onClick={() => onSelect(value.valueId)}
-          >
-            {localizedText(language, value.text)}
-          </button>
-        </li>
+        <button
+          key={value.valueId}
+          type="button"
+          role="tab"
+          className={styles.tab}
+          aria-selected={value.valueId === selectedValueId}
+          data-testid={`value-tab-${value.valueId}`}
+          onClick={() => onSelect(value.valueId)}
+        >
+          {localizedText(language, value.text)}
+        </button>
       ))}
-    </ul>
+    </div>
   );
 }

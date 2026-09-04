@@ -6,9 +6,7 @@
 
 .progress {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-gap);
-  align-items: center;
+  justify-content: center;
   width: 100%;
 }
 
@@ -45,14 +43,6 @@
   font-variant-numeric: tabular-nums;
   font-weight: var(--weight-semibold);
   line-height: var(--leading-display);
-}
-
-.label {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--text-body);
-  line-height: var(--leading-tight);
-  text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {

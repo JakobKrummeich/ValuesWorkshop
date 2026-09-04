@@ -63,6 +63,9 @@ describe("facilitator selection screen", () => {
       "aria-valuenow",
       "67",
     );
+    expect(screen.getByRole("progressbar")).toHaveAccessibleName(
+      "2 of 3 have submitted",
+    );
   });
 
   it("keeps the ring empty while nobody could submit yet", () => {
