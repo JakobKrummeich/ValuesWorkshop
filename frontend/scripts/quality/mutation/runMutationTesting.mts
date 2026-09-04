@@ -43,6 +43,8 @@ function pinnedStrykerNetVersion(repositoryRoot: string): string {
   return `Stryker.NET ${manifest.tools["dotnet-stryker"].version}`;
 }
 
+const nextJestTestEnvironment = { NODE_ENV: "test" };
+
 const runners: Record<MutationSide, MutationRunner> = {
   [MutationSide.Frontend]: {
     reportPath: "reports/mutation/frontend/report.json",
@@ -52,6 +54,7 @@ const runners: Record<MutationSide, MutationRunner> = {
         command: "npx",
         args: ["stryker", "run"],
         cwd: resolve(repositoryRoot, "frontend"),
+        environment: nextJestTestEnvironment,
       }),
   },
   [MutationSide.Backend]: {
