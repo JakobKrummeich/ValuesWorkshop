@@ -70,12 +70,12 @@ export function foldFolderEdges(reportJson: string): FolderEdge[] {
     )) {
       const to = folderOf(dependency.resolved);
       if (from !== undefined && to !== undefined && from !== to) {
-        edges.add(`${from}\u0000${to}`);
+        edges.add(`${from} ${to}`);
       }
     }
   }
   return [...edges].sort().map((edge) => {
-    const [from, to] = edge.split("\u0000");
+    const [from, to] = edge.split(" ");
     return { from, to };
   });
 }

@@ -4,7 +4,7 @@ import { generateStructuralDiagrams } from "../quality/structuralDiagrams.mts";
 
 const repositoryRoot = resolve(__dirname, "../../..");
 
-describe("the checked-in diagrams", () => {
+describe("the checked-in diagrams the frontend generates", () => {
   const diagrams = generateStructuralDiagrams({
     repositoryRoot,
     frontendDirectory: resolve(repositoryRoot, "frontend"),

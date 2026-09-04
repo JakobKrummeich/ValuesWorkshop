@@ -77,13 +77,13 @@ internal static class DatabaseDiagram
         [
             PrimaryKeyOf(entityType).Properties.Contains(property) ? "PK" : "",
             entityType.GetForeignKeys().Any(key => key.Properties.Contains(property)) ? "FK" : "",
-            IsUniqueOnItsOwn(entityType, property) ? "UK" : "",
+            IsPartOfUniqueKey(entityType, property) ? "UK" : "",
         ];
 
         return string.Join(", ", markers.Where(marker => marker.Length > 0));
     }
 
-    private static bool IsUniqueOnItsOwn(IEntityType entityType, IProperty property)
+    private static bool IsPartOfUniqueKey(IEntityType entityType, IProperty property)
     {
         var alternateKeys = entityType
             .GetKeys()
