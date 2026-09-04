@@ -8,6 +8,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import type { RepositoryLocations } from "./collectionContext.mts";
 import { collectQualityMetrics } from "./collectQualityMetrics.mts";
 import { renderMetricsMarkdown } from "./metricsMarkdown.mts";
 import {
@@ -15,6 +16,7 @@ import {
   resolveGeneratedAt,
   type QualityReport,
 } from "./qualityReport.mts";
+import { generateStructuralDiagrams } from "./structuralDiagrams.mts";
 
 export const metricsJsonPath = "docs/quality/metrics.json";
 export const metricsMarkdownPath = "docs/quality/metrics.md";
@@ -28,17 +30,30 @@ function readIfPresent(path: string): string | undefined {
   return existsSync(path) ? readFileSync(path, "utf8") : undefined;
 }
 
-function measure(repositoryRoot: string, now: string): QualityReport {
+function write(repositoryRoot: string, path: string, content: string): void {
+  const file = resolve(repositoryRoot, path);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, content);
+}
+
+function writeDiagrams(locations: RepositoryLocations): string[] {
+  const diagrams = generateStructuralDiagrams(locations);
+  for (const diagram of diagrams) {
+    write(locations.repositoryRoot, diagram.path, diagram.mermaid);
+  }
+  return diagrams.map((diagram) => diagram.path);
+}
+
+function measure(locations: RepositoryLocations, now: string): QualityReport {
   const temporaryDirectory = mkdtempSync(join(tmpdir(), "quality-report-"));
   try {
     const collected = collectQualityMetrics({
-      repositoryRoot,
-      frontendDirectory: resolve(repositoryRoot, "frontend"),
+      ...locations,
       temporaryDirectory,
     });
     return {
       generatedAt: resolveGeneratedAt(
-        readIfPresent(resolve(repositoryRoot, metricsJsonPath)),
+        readIfPresent(resolve(locations.repositoryRoot, metricsJsonPath)),
         collected.commit.sha,
         now,
       ),
@@ -54,19 +69,19 @@ export function writeQualityReport(
   now: string,
 ): QualityReportOutcome {
   try {
-    const report = measure(repositoryRoot, now);
-    const jsonFile = resolve(repositoryRoot, metricsJsonPath);
-    mkdirSync(dirname(jsonFile), { recursive: true });
-    writeFileSync(jsonFile, renderQualityReportJson(report));
-    writeFileSync(
-      resolve(repositoryRoot, metricsMarkdownPath),
-      renderMetricsMarkdown(report),
-    );
+    const locations = {
+      repositoryRoot,
+      frontendDirectory: resolve(repositoryRoot, "frontend"),
+    };
+    const diagrams = writeDiagrams(locations);
+    const report = measure(locations, now);
+    write(repositoryRoot, metricsJsonPath, renderQualityReportJson(report));
+    write(repositoryRoot, metricsMarkdownPath, renderMetricsMarkdown(report));
     return {
       exitCode: 0,
       report: [
         `Measured ${report.commit.shortSha} — ${report.commit.subject}`,
-        `Wrote ${metricsJsonPath} and ${metricsMarkdownPath}`,
+        `Wrote ${[metricsJsonPath, metricsMarkdownPath, ...diagrams].join(", ")}`,
       ].join("\n"),
     };
   } catch (error) {

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
+  dependencyCruiserArguments,
   parseFolderInstability,
   parseModuleGraph,
   readableRuleName,
@@ -57,15 +58,6 @@ const instabilityFolders = [
 const backendArchitectureTests = [
   "backend/Domain.Tests/ArchitectureTests.cs",
   "backend/Host.Tests/ArchitectureTests.cs",
-];
-
-const dependencyCruiserArguments = [
-  "depcruise",
-  "src",
-  "--config",
-  ".dependency-cruiser.cjs",
-  "--output-type",
-  "json",
 ];
 
 export function collectTests(context: CollectionContext): TestsCollection {

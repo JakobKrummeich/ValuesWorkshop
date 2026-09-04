@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const dependencyCruiserArguments = [
+  "depcruise",
+  "src",
+  "--config",
+  ".dependency-cruiser.cjs",
+  "--output-type",
+  "json",
+];
+
 export interface ModuleGraphMetrics {
   modules: number;
   dependencies: number;
