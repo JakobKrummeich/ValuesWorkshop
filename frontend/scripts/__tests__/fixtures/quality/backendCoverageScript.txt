@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+THRESHOLD=80
+RESULTS_DIR="backend/TestResults"
+
+rm -rf "$RESULTS_DIR"
+
+dotnet test backend/ValuesWorkshop.Tests.slnf \
+  --collect:"XPlat Code Coverage" \
+  --results-directory "$RESULTS_DIR" \
+  -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.ExcludeByFile="**/Program.cs"

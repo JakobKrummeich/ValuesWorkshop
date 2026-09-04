@@ -1,0 +1,5 @@
+Passed!  - Failed:     0, Passed:   275, Skipped:     0, Total:   275, Duration: 853 ms - ValuesWorkshop.Application.Tests.dll (net10.0)
+Passed!  - Failed:     0, Passed:   308, Skipped:     0, Total:   308, Duration: 1 s - ValuesWorkshop.Domain.Tests.dll (net10.0)
+Passed!  - Failed:     0, Passed:   220, Skipped:     0, Total:   220, Duration: 5 s - ValuesWorkshop.Adapters.Tests.dll (net10.0)
+Passed!  - Failed:     0, Passed:    98, Skipped:     0, Total:    98, Duration: 8 s - ValuesWorkshop.Host.Tests.dll (net10.0)
+Line coverage: 98.7% (threshold: 80%)

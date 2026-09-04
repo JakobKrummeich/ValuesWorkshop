@@ -1,0 +1,30 @@
+import {
+  architectureSection,
+  complexitySection,
+  duplicationSection,
+  securitySection,
+  testsSection,
+} from "./metricsGateSections.mts";
+import {
+  contractSection,
+  designSystemSection,
+  header,
+  processSection,
+  sizeSection,
+} from "./metricsSourceSections.mts";
+import type { QualityReport } from "./qualityReport.mts";
+
+export function renderMetricsMarkdown(report: QualityReport): string {
+  return `${[
+    header(report),
+    sizeSection(report),
+    testsSection(report),
+    complexitySection(report),
+    duplicationSection(report),
+    architectureSection(report),
+    designSystemSection(report),
+    contractSection(report),
+    securitySection(report),
+    processSection(report),
+  ].join("\n\n")}\n`;
+}

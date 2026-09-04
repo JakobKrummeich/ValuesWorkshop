@@ -1,0 +1,73 @@
+{
+  "numFailedTestSuites": 0,
+  "numFailedTests": 0,
+  "numPassedTestSuites": 167,
+  "numPassedTests": 1063,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "numTotalTestSuites": 167,
+  "numTotalTests": 1063,
+  "success": true,
+  "testResults": [
+    {
+      "name": "/home/dev/ValuesWorkshop/frontend/src/domain/__tests__/wireContract.test.ts",
+      "status": "passed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["the participant wire state"],
+          "fullName": "the participant wire state parses the finalPresentationConcluded sample the backend serializes",
+          "status": "passed",
+          "title": "parses the finalPresentationConcluded sample the backend serializes"
+        },
+        {
+          "ancestorTitles": ["the participant wire state"],
+          "fullName": "the participant wire state parses the finalPresentationRevealing sample the backend serializes",
+          "status": "passed",
+          "title": "parses the finalPresentationRevealing sample the backend serializes"
+        },
+        {
+          "ancestorTitles": ["the participant wire state"],
+          "fullName": "the participant wire state parses the finalVoting sample the backend serializes",
+          "status": "passed",
+          "title": "parses the finalVoting sample the backend serializes"
+        }
+      ]
+    },
+    {
+      "name": "/home/dev/ValuesWorkshop/frontend/src/app/__tests__/tokensContrast.test.ts",
+      "status": "passed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["presenter/tokens.presenter.css"],
+          "fullName": "presenter/tokens.presenter.css reads --color-text on --color-bg at AA",
+          "status": "passed",
+          "title": "reads --color-text on --color-bg at AA"
+        },
+        {
+          "ancestorTitles": ["presenter/tokens.presenter.css"],
+          "fullName": "presenter/tokens.presenter.css reads --color-text on --color-bg-alt at AA",
+          "status": "passed",
+          "title": "reads --color-text on --color-bg-alt at AA"
+        },
+        {
+          "ancestorTitles": ["presenter/tokens.presenter.css"],
+          "fullName": "presenter/tokens.presenter.css reads --color-text on --color-surface at AA",
+          "status": "passed",
+          "title": "reads --color-text on --color-surface at AA"
+        }
+      ]
+    },
+    {
+      "name": "/home/dev/ValuesWorkshop/frontend/src/domain/__tests__/participantWorkshopState.test.ts",
+      "status": "passed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["participant workshop state schema"],
+          "fullName": "participant workshop state schema accepts a join state that carries the caller's own display name",
+          "status": "passed",
+          "title": "accepts a join state that carries the caller's own display name"
+        }
+      ]
+    }
+  ]
+}

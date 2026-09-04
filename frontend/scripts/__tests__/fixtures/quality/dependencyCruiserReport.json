@@ -1,0 +1,108 @@
+{
+  "modules": [
+    {
+      "source": "src/adapters/WorkshopRecordDocument.tsx",
+      "dependencies": [
+        {
+          "resolved": "src/domain/workshopRecordModel.ts",
+          "valid": true,
+          "circular": false
+        },
+        {
+          "resolved": "../node_modules/.pnpm/@react-pdf+renderer@4.9.0_react@19.2.4/node_modules/@react-pdf/renderer/lib/react-pdf.js",
+          "valid": true,
+          "circular": false
+        }
+      ],
+      "valid": true
+    },
+    {
+      "source": "../node_modules/.pnpm/@react-pdf+renderer@4.9.0_react@19.2.4/node_modules/@react-pdf/renderer/lib/react-pdf.js",
+      "dependencies": [],
+      "valid": true
+    }
+  ],
+  "summary": {
+    "violations": [],
+    "error": 0,
+    "warn": 0,
+    "info": 0,
+    "ignore": 0,
+    "totalCruised": 516,
+    "totalDependenciesCruised": 1829,
+    "ruleSetUsed": {
+      "forbidden": [
+        {
+          "name": "domain-must-not-import-adapters",
+          "severity": "error",
+          "comment": "domain/ is pure — it must not import from adapters/"
+        },
+        {
+          "name": "domain-must-not-import-app",
+          "severity": "error",
+          "comment": "domain/ is pure — it must not import from app/"
+        },
+        {
+          "name": "adapters-must-not-import-app",
+          "severity": "error",
+          "comment": "adapters/ implements ports from domain/ — it must not import from app/"
+        },
+        {
+          "name": "facilitator-must-not-import-participant",
+          "severity": "error",
+          "comment": "Screen groups must not import each other"
+        },
+        {
+          "name": "facilitator-must-not-import-presenter",
+          "severity": "error",
+          "comment": "Screen groups must not import each other"
+        },
+        {
+          "name": "participant-must-not-import-facilitator",
+          "severity": "error",
+          "comment": "Screen groups must not import each other"
+        },
+        {
+          "name": "participant-must-not-import-presenter",
+          "severity": "error",
+          "comment": "Screen groups must not import each other"
+        },
+        {
+          "name": "presenter-must-not-import-facilitator",
+          "severity": "error",
+          "comment": "Screen groups must not import each other"
+        },
+        {
+          "name": "presenter-must-not-import-participant",
+          "severity": "error",
+          "comment": "Screen groups must not import each other"
+        },
+        {
+          "name": "shared-must-not-import-adapters",
+          "severity": "error",
+          "comment": "shared/ is pure utilities — it must not import from adapters/"
+        },
+        {
+          "name": "shared-must-not-import-app",
+          "severity": "error",
+          "comment": "shared/ is pure utilities — it must not import from app/"
+        },
+        {
+          "name": "shared-must-not-import-domain",
+          "severity": "error",
+          "comment": "shared/ is pure utilities — it must not import from domain/"
+        },
+        {
+          "name": "production-must-not-import-testing",
+          "severity": "error",
+          "comment": "src/testing/ is test-only scaffolding and reads from disk — production modules must not import it"
+        },
+        {
+          "name": "no-circular",
+          "severity": "error",
+          "comment": "No circular dependencies anywhere"
+        }
+      ]
+    }
+  }
+}

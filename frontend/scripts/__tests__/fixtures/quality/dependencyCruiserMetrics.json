@@ -1,0 +1,44 @@
+{
+  "folders": [
+    {
+      "name": "src",
+      "afferentCouplings": 0,
+      "efferentCouplings": 282,
+      "instability": 1
+    },
+    {
+      "name": "src/adapters",
+      "afferentCouplings": 43,
+      "efferentCouplings": 122,
+      "instability": 0.7393939393939394
+    },
+    {
+      "name": "src/domain",
+      "afferentCouplings": 505,
+      "efferentCouplings": 21,
+      "instability": 0.039923954372623575
+    },
+    {
+      "name": "src/domain/i18n",
+      "afferentCouplings": 199,
+      "efferentCouplings": 6,
+      "instability": 0.02926829268292683
+    },
+    {
+      "name": "src/domain/i18n/phases",
+      "afferentCouplings": 18,
+      "efferentCouplings": 27,
+      "instability": 0.6
+    },
+    {
+      "name": "src/adapters/__tests__",
+      "afferentCouplings": 0,
+      "efferentCouplings": 92,
+      "instability": 1
+    }
+  ],
+  "summary": {
+    "violations": [],
+    "error": 0
+  }
+}

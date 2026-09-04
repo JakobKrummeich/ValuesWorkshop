@@ -1,5 +1,8 @@
 import { spawn } from "node:child_process";
 
+export const noKnownVulnerabilitiesReport =
+  "No known vulnerabilities of high severity or above";
+
 export interface AuditRunResult {
   exitCode: number;
   stdout: string;
@@ -57,7 +60,7 @@ export async function auditDependencies({
     if (outcome.kind === "clean") {
       return {
         exitCode: 0,
-        report: "No known vulnerabilities of high severity or above",
+        report: noKnownVulnerabilitiesReport,
       };
     }
     if (outcome.kind === "vulnerabilities") {

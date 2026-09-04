@@ -11,6 +11,7 @@
     "audit:check": "node scripts/auditDependencies.mts",
     "phases:check": "node scripts/generatePhasesModule.mts --check",
     "phases:generate": "node scripts/generatePhasesModule.mts --write",
+    "quality:report": "node scripts/quality/writeQualityReport.mts",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
     "typecheck": "tsc --noEmit && tsc --noEmit --project scripts"

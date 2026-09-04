@@ -1,0 +1,10 @@
+Listing tests:
+  [chromium] › auth.spec.ts:8:7 › OIDC authentication › facilitator page redirects to OIDC login
+  [chromium] › auth.spec.ts:14:7 › OIDC authentication › participant page redirects to OIDC login
+  [chromium] › auth.spec.ts:20:7 › OIDC authentication › presenter page loads without auth redirect
+  [chromium] › auth.spec.ts:29:7 › OIDC authentication › scripted login against dev provider reaches facilitator page
+  [chromium] › auth.spec.ts:37:7 › OIDC authentication › backend health endpoint accessible without auth
+  [chromium] › auth.spec.ts:45:7 › OIDC authentication › backend rejects unauthenticated request to API route
+  [chromium] › joinPhase.spec.ts:47:7 › phase 1 join › the presenter invites with a QR code and an empty lobby
+  [chromium] › workshopAtScale.spec.ts:832:7 › a workshop at scale with thirty participants › a participant downloads the workshop record as an anonymous PDF
+Total: 93 tests in 9 files

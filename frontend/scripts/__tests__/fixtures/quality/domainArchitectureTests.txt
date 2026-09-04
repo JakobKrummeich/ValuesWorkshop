@@ -1,0 +1,71 @@
+        .As("Adapters.Web");
+
+    private static readonly IObjectProvider<IType> HostLayer = Types()
+        .That()
+        .ResideInAssembly(typeof(ValuesWorkshop.Host.AssemblyMarker).Assembly)
+        .As("Host");
+
+    [Fact]
+    public void Domain_depends_on_no_other_ValuesWorkshop_layer()
+    {
+        Types()
+            .That()
+            .Are(DomainLayer)
+            .Should()
+            .NotDependOnAny(ApplicationLayer)
+            .AndShould()
+            .NotDependOnAny(AdaptersPersistenceLayer)
+            .AndShould()
+            .NotDependOnAny(AdaptersWebLayer)
+            .AndShould()
+            .NotDependOnAny(HostLayer)
+            .Check(Arch);
+    }
+
+    [Fact]
+    public void Application_depends_only_on_Domain()
+    {
+        Types()
+            .That()
+            .Are(ApplicationLayer)
+            .Should()
+            .NotDependOnAny(AdaptersPersistenceLayer)
+            .AndShould()
+            .NotDependOnAny(AdaptersWebLayer)
+            .AndShould()
+            .NotDependOnAny(HostLayer)
+            .Check(Arch);
+    }
+
+    [Fact]
+    public void Adapters_Persistence_depends_only_on_Application_and_Domain()
+    {
+        Types()
+            .That()
+            .Are(AdaptersPersistenceLayer)
+            .Should()
+            .NotDependOnAny(AdaptersWebLayer)
+            .AndShould()
+            .NotDependOnAny(HostLayer)
+            .Check(Arch);
+    }
+
+    [Fact]
+    public void Adapters_Web_depends_only_on_Application_and_Domain()
+    {
+        Types()
+            .That()
+            .Are(AdaptersWebLayer)
+            .Should()
+            .NotDependOnAny(AdaptersPersistenceLayer)
+            .AndShould()
+            .NotDependOnAny(HostLayer)
+            .Check(Arch);
+    }
+
+    [Fact]
+    public void No_class_has_more_than_12_public_methods()
+    {
+        var allClasses = Classes()
+            .That()
+            .Are(DomainLayer)
