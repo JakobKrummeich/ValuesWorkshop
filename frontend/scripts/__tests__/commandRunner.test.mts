@@ -3,6 +3,7 @@ import {
   redactTemporaryPaths,
   runCommand,
   runCommandExpecting,
+  runCommandStreamingOutput,
 } from "../quality/commandRunner.mts";
 
 const here = { cwd: process.cwd() };
@@ -48,6 +49,38 @@ describe("runCommand", () => {
         [0, 1],
       ).exitCode,
     ).toBe(1);
+  });
+});
+
+describe("runCommandStreamingOutput", () => {
+  it("lets a command that succeeds print for itself", () => {
+    expect(() =>
+      runCommandStreamingOutput({
+        command: "node",
+        args: ["-e", "process.stdout.write('progress')"],
+        ...here,
+      }),
+    ).not.toThrow();
+  });
+
+  it("fails loudly when the command fails", () => {
+    expect(() =>
+      runCommandStreamingOutput({
+        command: "node",
+        args: ["-e", "process.exit(3)"],
+        ...here,
+      }),
+    ).toThrow("exited with 3; it printed the reason above");
+  });
+
+  it("fails loudly when the command cannot be started at all", () => {
+    expect(() =>
+      runCommandStreamingOutput({
+        command: "no-such-tool-here",
+        args: [],
+        ...here,
+      }),
+    ).toThrow("could not be started");
   });
 });
 

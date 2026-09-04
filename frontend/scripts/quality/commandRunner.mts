@@ -67,6 +67,27 @@ export function runCommand(specification: CommandSpecification): CommandResult {
   return runCommandExpecting(specification, [0]);
 }
 
+export function runCommandStreamingOutput(
+  specification: CommandSpecification,
+): void {
+  const commandLine = commandLineOf(specification.command, specification.args);
+  const finished = spawnSync(specification.command, [...specification.args], {
+    cwd: specification.cwd,
+    env: { ...process.env, ...specification.environment },
+    stdio: "inherit",
+  });
+  if (finished.error) {
+    throw new Error(
+      `\`${commandLine}\` could not be started: ${finished.error.message}`,
+    );
+  }
+  if (finished.status !== 0) {
+    throw new Error(
+      `\`${commandLine}\` exited with ${finished.status ?? 1}; it printed the reason above.`,
+    );
+  }
+}
+
 export function redactTemporaryPaths(
   commandLine: string,
   temporaryDirectory: string,

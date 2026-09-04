@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { z } from "zod";
-import { runCommand, type CommandResult } from "../commandRunner.mts";
+import { runCommand, runCommandStreamingOutput } from "../commandRunner.mts";
 import {
   MutationSide,
   mutationCommands,
@@ -15,7 +15,7 @@ import { readMutationRecord } from "./readMutationRecord.mts";
 interface MutationRunner {
   reportPath: string;
   tool: (repositoryRoot: string) => string;
-  run: (repositoryRoot: string) => CommandResult;
+  run: (repositoryRoot: string) => void;
 }
 
 function readJson(repositoryRoot: string, path: string): unknown {
@@ -48,7 +48,7 @@ const runners: Record<MutationSide, MutationRunner> = {
     reportPath: "reports/mutation/frontend/report.json",
     tool: installedStrykerJsVersion,
     run: (repositoryRoot) =>
-      runCommand({
+      runCommandStreamingOutput({
         command: "npx",
         args: ["stryker", "run"],
         cwd: resolve(repositoryRoot, "frontend"),
@@ -58,7 +58,7 @@ const runners: Record<MutationSide, MutationRunner> = {
     reportPath: "reports/mutation/backend/reports/mutation-report.json",
     tool: pinnedStrykerNetVersion,
     run: (repositoryRoot) =>
-      runCommand({
+      runCommandStreamingOutput({
         command: "dotnet",
         args: [
           "dotnet-stryker",

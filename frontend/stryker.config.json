@@ -6,6 +6,7 @@
   "jest": {
     "projectType": "custom",
     "configFile": "jest.config.mjs",
+    "config": { "testPathIgnorePatterns": ["<rootDir>/scripts/"] },
     "enableFindRelatedTests": true
   },
   "coverageAnalysis": "perTest",
@@ -29,6 +30,7 @@
   ],
   "concurrency": 4,
   "timeoutMS": 60000,
+  "inPlace": true,
   "tempDirName": "../reports/mutation/frontend-sandbox",
   "cleanTempDir": true,
   "reporters": ["progress", "html", "json"],
