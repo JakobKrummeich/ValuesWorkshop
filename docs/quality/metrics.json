@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-04T16:57:38.499Z",
+  "generatedAt": "2026-09-04T17:03:43.593Z",
   "commit": {
-    "sha": "ec389b06b0655b299dd1139f7f77310341fbb605",
-    "shortSha": "ec389b0",
-    "committedAt": "2026-09-04T16:57:32+00:00",
-    "subject": "Emit the database diagram from the EF Core model rather than from a drawing of it"
+    "sha": "2ed46d9c808d094afaaa3fb8834852c7f1891b95",
+    "shortSha": "2ed46d9",
+    "committedAt": "2026-09-04T17:03:02+00:00",
+    "subject": "Say what the code does: no null-byte keys, no name that promises a single-column unique key"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -546,12 +546,12 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count ec389b06b0655b299dd1139f7f77310341fbb605",
-      "git rev-list --count \"--grep=^Merge pull request\" ec389b06b0655b299dd1139f7f77310341fbb605",
-      "git log --max-parents=0 --format=%cI ec389b06b0655b299dd1139f7f77310341fbb605",
-      "git shortlog --summary --numbered ec389b06b0655b299dd1139f7f77310341fbb605"
+      "git rev-list --count 2ed46d9c808d094afaaa3fb8834852c7f1891b95",
+      "git rev-list --count \"--grep=^Merge pull request\" 2ed46d9c808d094afaaa3fb8834852c7f1891b95",
+      "git log --max-parents=0 --format=%cI 2ed46d9c808d094afaaa3fb8834852c7f1891b95",
+      "git shortlog --summary --numbered 2ed46d9c808d094afaaa3fb8834852c7f1891b95"
     ],
-    "commits": 807,
+    "commits": 809,
     "mergedPullRequests": 67,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4

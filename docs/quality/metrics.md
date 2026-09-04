@@ -4,9 +4,9 @@ Every number on this page is read back from a tool run, and the commands that pr
 
 | the report describes |  |
 | --- | --- |
-| commit | `ec389b0` — Emit the database diagram from the EF Core model rather than from a drawing of it |
-| committed | 2026-09-04T16:57:32+00:00 |
-| report generated | 2026-09-04T16:57:38.499Z |
+| commit | `2ed46d9` — Say what the code does: no null-byte keys, no name that promises a single-column unique key |
+| committed | 2026-09-04T17:03:02+00:00 |
+| report generated | 2026-09-04T17:03:43.593Z |
 
 ## Size
 
@@ -222,16 +222,16 @@ Produced by:
 
 Produced by:
 
-- `git rev-list --count ec389b06b0655b299dd1139f7f77310341fbb605`
-- `git rev-list --count "--grep=^Merge pull request" ec389b06b0655b299dd1139f7f77310341fbb605`
-- `git log --max-parents=0 --format=%cI ec389b06b0655b299dd1139f7f77310341fbb605`
-- `git shortlog --summary --numbered ec389b06b0655b299dd1139f7f77310341fbb605`
+- `git rev-list --count 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
+- `git rev-list --count "--grep=^Merge pull request" 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
+- `git log --max-parents=0 --format=%cI 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
+- `git shortlog --summary --numbered 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
 
 The history is counted at the commit this report describes, not at the branch tip, so regenerating the report does not move its own numbers.
 
 | measure | value |
 | --- | ---: |
-| commits | 807 |
+| commits | 809 |
 | merge commits from pull requests | 67 |
 | first commit | 2026-07-19T17:25:51+00:00 |
 | contributors | 4 |
