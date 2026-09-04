@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import type { RepositoryLocations } from "./collectionContext.mts";
 import { collectQualityMetrics } from "./collectQualityMetrics.mts";
+import { writeDatabaseDiagram } from "./databaseDiagram.mts";
 import { renderMetricsMarkdown } from "./metricsMarkdown.mts";
 import {
   renderQualityReportJson,
@@ -41,7 +42,10 @@ function writeDiagrams(locations: RepositoryLocations): string[] {
   for (const diagram of diagrams) {
     write(locations.repositoryRoot, diagram.path, diagram.mermaid);
   }
-  return diagrams.map((diagram) => diagram.path);
+  return [
+    ...diagrams.map((diagram) => diagram.path),
+    writeDatabaseDiagram(locations),
+  ];
 }
 
 function measure(locations: RepositoryLocations, now: string): QualityReport {

@@ -4,6 +4,7 @@ export interface CommandSpecification {
   command: string;
   args: readonly string[];
   cwd: string;
+  environment?: Readonly<Record<string, string>>;
 }
 
 export interface CommandResult {
@@ -37,6 +38,7 @@ export function runCommandExpecting(
   const finished = spawnSync(specification.command, [...specification.args], {
     cwd: specification.cwd,
     encoding: "utf8",
+    env: { ...process.env, ...specification.environment },
     maxBuffer: outputLimitInBytes,
   });
   if (finished.error) {
