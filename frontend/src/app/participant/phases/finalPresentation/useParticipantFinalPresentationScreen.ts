@@ -6,20 +6,21 @@ import { downloadBlob } from "../../../../adapters/fileDownload";
 import { renderWorkshopRecordPdf } from "../../../../adapters/workshopRecordPdf";
 import { MessageKey } from "../../../../domain/i18n/messages";
 import { buildWorkshopRecord } from "../../../../domain/workshopRecordModel";
-import type { ParticipantConclusionView } from "../../../../domain/workshopState";
+import type { ParticipantFinalPresentationState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 
 export type ParticipantFinalPresentationModel =
   | { isConcluded: false }
   | {
       isConcluded: true;
+      ownAnimalId: string | null;
       isDownloading: boolean;
       downloadFailedMessage: MessageKey | null;
       downloadRecord: () => void;
     };
 
 export function useParticipantFinalPresentationScreen(
-  conclusion: ParticipantConclusionView,
+  state: ParticipantFinalPresentationState,
 ): ParticipantFinalPresentationModel {
   const { language, translate } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -28,11 +29,11 @@ export function useParticipantFinalPresentationScreen(
   const subscriptionRef = useRef<Subscription | null>(null);
   useEffect(() => () => subscriptionRef.current?.unsubscribe(), []);
 
-  if (!conclusion.isConcluded) {
+  if (!state.conclusion.isConcluded) {
     return { isConcluded: false };
   }
 
-  const { record } = conclusion;
+  const { record } = state.conclusion;
 
   const downloadRecord = () => {
     if (isDownloading) {
@@ -59,6 +60,7 @@ export function useParticipantFinalPresentationScreen(
 
   return {
     isConcluded: true,
+    ownAnimalId: state.ownGroup?.name.animalId ?? null,
     isDownloading,
     downloadFailedMessage,
     downloadRecord,

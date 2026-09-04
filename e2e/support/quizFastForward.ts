@@ -16,6 +16,14 @@ export function answerButton(page: Page, answerIndex: number): Locator {
   return page.getByTestId(`answer-button-${answerIndex}`);
 }
 
+export async function chooseAnswer(
+  page: Page,
+  answerIndex: number,
+): Promise<void> {
+  await answerButton(page, answerIndex).click();
+  await page.getByTestId("lock-in-answer-button").click();
+}
+
 export async function expectQuestionHeading(
   pages: readonly Page[],
   questionNumber: number,
@@ -74,10 +82,7 @@ export async function fastForwardQuizQuestions(
     questionNumber <= QUIZ_QUESTION_COUNT;
     questionNumber += 1
   ) {
-    await answerButton(
-      answeringParticipantPage,
-      FAST_FORWARD_ANSWER_INDEX,
-    ).click();
+    await chooseAnswer(answeringParticipantPage, FAST_FORWARD_ANSWER_INDEX);
     await expect(
       facilitatorPage.getByTestId(`answer-tally-${FAST_FORWARD_ANSWER_INDEX}`),
     ).toHaveText("Votes: 1");

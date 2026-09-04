@@ -1,4 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { Language } from "../../../../../domain/i18n/language";
+import { MessageKey } from "../../../../../domain/i18n/messages";
 import {
   GroupWorkStatus,
   type OwnGroupView,
@@ -67,7 +69,7 @@ describe("GroupWorkCard", () => {
     expect(screen.getAllByTestId("group-work-member")).toHaveLength(2);
   });
 
-  it("shows the scribe label", () => {
+  it("names the scribe and tells the scribe it is them", () => {
     screenHook.mockReturnValue(model());
 
     render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
@@ -75,7 +77,50 @@ describe("GroupWorkCard", () => {
     });
 
     expect(screen.getByTestId("group-work-scribe")).toHaveTextContent(
-      "Scribe: Alice",
+      "Scribe: Alice (you)",
+    );
+  });
+
+  it("names the scribe plainly for the other members", () => {
+    screenHook.mockReturnValue(model({ isCallerScribe: false }));
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("group-work-scribe")).toHaveTextContent(
+      /^Scribe: Alice$/,
+    );
+  });
+
+  it("colours the card in the animal hue", () => {
+    screenHook.mockReturnValue(model());
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("group-work-card")).toHaveAttribute(
+      "data-animal",
+      "otter",
+    );
+  });
+
+  it("shows the work status as a pill", () => {
+    screenHook.mockReturnValue(model());
+
+    render(
+      <GroupWorkCard
+        ownGroup={{
+          ...ownGroupFixture,
+          workStatus: GroupWorkStatus.Submitted,
+        }}
+      />,
+      { wrapper: languageWrapper() },
+    );
+
+    expect(screen.getByTestId("group-work-status")).toHaveTextContent(
+      /^Submitted$/,
     );
   });
 
@@ -125,6 +170,27 @@ describe("GroupWorkCard", () => {
     expect(screen.getByTestId("remove-action-a1")).toBeInTheDocument();
   });
 
+  it("forwards the scribe's typing to the hook", () => {
+    const editActionText = jest.fn();
+    screenHook.mockReturnValue(
+      model({
+        editActionText,
+        actionsForSelectedValue: [
+          { actionId: "a1", valueId: "trust", text: "Talk", sortOrder: 0 },
+        ],
+      }),
+    );
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+    fireEvent.change(screen.getByTestId("action-input-a1"), {
+      target: { value: "Talk openly" },
+    });
+
+    expect(editActionText).toHaveBeenCalledWith("a1", "Talk openly");
+  });
+
   it("shows read-only text for non-scribe", () => {
     screenHook.mockReturnValue(
       model({
@@ -144,6 +210,48 @@ describe("GroupWorkCard", () => {
     expect(screen.queryByTestId("add-action-button")).not.toBeInTheDocument();
   });
 
+  it("tells the other members when nothing has been written yet", () => {
+    screenHook.mockReturnValue(model({ isCallerScribe: false }));
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("group-work-empty")).toHaveTextContent(
+      "No actions yet.",
+    );
+  });
+
+  it("keeps the empty note away from the scribe, who has the add button", () => {
+    screenHook.mockReturnValue(model());
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.queryByTestId("group-work-empty")).not.toBeInTheDocument();
+    expect(screen.getByTestId("add-action-button")).toBeInTheDocument();
+  });
+
+  it("labels the remove control for screen readers", () => {
+    const removeAction = jest.fn();
+    screenHook.mockReturnValue(
+      model({
+        removeAction,
+        actionsForSelectedValue: [
+          { actionId: "a1", valueId: "trust", text: "Talk", sortOrder: 0 },
+        ],
+      }),
+    );
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Remove" }));
+
+    expect(removeAction).toHaveBeenCalledWith("a1");
+  });
+
   it("shows submit button with disabled hint when cannot submit", () => {
     screenHook.mockReturnValue(model({ canSubmit: false }));
 
@@ -152,7 +260,39 @@ describe("GroupWorkCard", () => {
     });
 
     expect(screen.getByTestId("submit-group-work-button")).toBeDisabled();
-    expect(screen.getByTestId("submit-disabled-hint")).toBeInTheDocument();
+    expect(screen.getByTestId("submit-group-work-button")).toHaveTextContent(
+      "Submit result",
+    );
+    expect(screen.getByTestId("submit-disabled-hint")).toHaveTextContent(
+      "Every assigned value needs at least one action with text.",
+    );
+  });
+
+  it("drops the hint once the result can be submitted", () => {
+    screenHook.mockReturnValue(model({ canSubmit: true }));
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("submit-group-work-button")).toBeEnabled();
+    expect(
+      screen.queryByTestId("submit-disabled-hint"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the rejection message", () => {
+    screenHook.mockReturnValue(
+      model({ rejectionMessage: MessageKey.IntentMalformedPayload }),
+    );
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "That request was malformed.",
+    );
   });
 
   it("shows reopen button when submitted", () => {
@@ -178,5 +318,41 @@ describe("GroupWorkCard", () => {
     fireEvent.click(screen.getByTestId("add-action-button"));
 
     expect(addAction).toHaveBeenCalled();
+  });
+
+  it("speaks German when German is chosen", () => {
+    screenHook.mockReturnValue(model({ isSubmitted: true }));
+
+    render(
+      <GroupWorkCard
+        ownGroup={{
+          ...ownGroupFixture,
+          workStatus: GroupWorkStatus.Submitted,
+        }}
+      />,
+      { wrapper: languageWrapper(Language.German) },
+    );
+
+    expect(screen.getByTestId("group-work-scribe")).toHaveTextContent(
+      "Schreiber/in: Alice (du)",
+    );
+    expect(screen.getByTestId("reopen-button")).toHaveTextContent(
+      "Ergebnis zurücknehmen",
+    );
+    expect(screen.getByTestId("group-work-status")).toHaveTextContent(
+      "Abgegeben",
+    );
+  });
+
+  it("speaks German on the empty note too", () => {
+    screenHook.mockReturnValue(model({ isCallerScribe: false }));
+
+    render(<GroupWorkCard ownGroup={ownGroupFixture} />, {
+      wrapper: languageWrapper(Language.German),
+    });
+
+    expect(screen.getByTestId("group-work-empty")).toHaveTextContent(
+      "Noch keine Aktionen.",
+    );
   });
 });

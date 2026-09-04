@@ -2,8 +2,7 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-gap);
-  padding: var(--space-gutter);
+  gap: var(--space-gutter);
 }
 
 .answers {
@@ -13,24 +12,87 @@
 }
 
 .answer {
+  display: flex;
+  gap: var(--space-gap);
+  align-items: center;
   min-height: var(--control-height);
-  padding: var(--space-tight) var(--space-gutter);
+  padding: var(--space-gap) var(--space-gutter);
   border: var(--border-hairline) solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
   text-align: left;
+  transition:
+    border-color var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-fast) var(--ease-out),
+    transform var(--motion-fast) var(--ease-spring);
 }
 
 .answer:disabled {
-  background: var(--color-bg);
   color: var(--color-text-muted);
 }
 
+.answer:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.letter {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2em;
+  height: 2em;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-strong);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  transition:
+    background var(--motion-fast) var(--ease-out),
+    color var(--motion-fast) var(--ease-out);
+}
+
+.answerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.picked {
+  border-color: var(--color-accent);
+  outline: var(--border-ring) solid var(--color-accent);
+  outline-offset: 0;
+  box-shadow: var(--shadow-glow-accent);
+}
+
+.picked:focus-visible {
+  outline-color: var(--color-highlight);
+  outline-offset: var(--border-ring);
+}
+
+.picked .letter {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
 .rejection {
+  margin: 0;
   color: var(--color-danger);
   font-family: var(--font-sans);
   font-size: var(--text-small);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .answer,
+  .letter {
+    transition: none;
+  }
+
+  .answer:active:not(:disabled) {
+    transform: none;
+  }
 }

@@ -2,7 +2,9 @@
 
 import { MessageKey } from "../../../../domain/i18n/messages";
 import type { ParticipantJoinState } from "../../../../domain/workshopState";
+import { Counter, CounterSize, CounterVariant } from "../../../Counter";
 import { useTranslation } from "../../../i18n/useTranslation";
+import { WaitingScreen } from "../../../WaitingScreen";
 import styles from "./ParticipantJoinScreen.module.css";
 
 export function ParticipantJoinScreen({
@@ -13,18 +15,25 @@ export function ParticipantJoinScreen({
   const { translate } = useTranslation();
 
   return (
-    <section className={styles.lobby}>
-      <p className={styles.welcome} data-testid="own-display-name">
-        {translate(MessageKey.JoinYouAreIn, { name: state.ownDisplayName })}
-      </p>
-      <p className={styles.waiting}>
-        {translate(MessageKey.JoinWaitingForStart)}
-      </p>
-      <p className={styles.count} data-testid="participant-count">
+    <WaitingScreen
+      heading={MessageKey.JoinYouAreIn}
+      headingParameters={{ name: state.ownDisplayName }}
+      headingTestId="own-display-name"
+      body={MessageKey.JoinWaitingForStart}
+    >
+      <p className="visuallyHidden" data-testid="participant-count">
         {translate(MessageKey.JoinParticipantCount, {
           count: state.participantCount,
         })}
       </p>
-    </section>
+      <div className={styles.counter}>
+        <Counter
+          value={state.participantCount}
+          suffix={translate(MessageKey.JoinJoined)}
+          variant={CounterVariant.Phone}
+          size={CounterSize.Giant}
+        />
+      </div>
+    </WaitingScreen>
   );
 }

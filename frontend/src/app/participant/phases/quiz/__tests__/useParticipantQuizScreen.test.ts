@@ -10,6 +10,7 @@ import { useParticipantDependencies } from "../../../dependencies";
 import {
   QuizScreenKind,
   useParticipantQuizScreen,
+  type ParticipantQuizScreenView,
 } from "../useParticipantQuizScreen";
 
 jest.mock("../../../dependencies", () => ({
@@ -63,6 +64,24 @@ function quizView(
 
 const accepted: IntentResult = { isAccepted: true, code: null, detail: null };
 
+function answering(
+  pickedAnswerIndex: number | null,
+  isAnswerable = true,
+): ParticipantQuizScreenView {
+  return {
+    kind: QuizScreenKind.Answering,
+    answers: answers.map((text, index) => ({
+      index,
+      letter: "ABC"[index],
+      text,
+      isPicked: index === pickedAnswerIndex,
+    })),
+    pickedLetter: pickedAnswerIndex === null ? null : "ABC"[pickedAnswerIndex],
+    canLockIn: pickedAnswerIndex !== null && isAnswerable,
+    isAnswerable,
+  };
+}
+
 describe("participant quiz screen logic", () => {
   it("numbers the question for humans", () => {
     withChooseAnswer(() => NEVER);
@@ -72,39 +91,62 @@ describe("participant quiz screen logic", () => {
     expect(result.current.questionNumber).toBe(2);
   });
 
-  it("offers all answers while nothing is cast", () => {
+  it("offers all lettered answers with nothing picked and no way to lock in", () => {
     withChooseAnswer(() => NEVER);
 
     const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
 
-    expect(result.current.view).toEqual({
-      kind: QuizScreenKind.Answering,
-      answers,
-      isAnswerable: true,
-    });
+    expect(result.current.view).toEqual(answering(null));
   });
 
-  it("casts the chosen answer for the posed question", () => {
+  it("marks the picked answer and offers to lock it in", () => {
+    withChooseAnswer(() => NEVER);
+    const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
+
+    act(() => result.current.pickAnswer(2));
+
+    expect(result.current.view).toEqual(answering(2));
+  });
+
+  it("lets the participant change the pick before locking in", () => {
+    withChooseAnswer(() => NEVER);
+    const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
+
+    act(() => result.current.pickAnswer(2));
+    act(() => result.current.pickAnswer(0));
+
+    expect(result.current.view).toEqual(answering(0));
+  });
+
+  it("casts the picked answer for the posed question on lock-in", () => {
     const chooseAnswer = jest.fn(() => of(accepted));
     withChooseAnswer(chooseAnswer);
     const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
 
-    act(() => result.current.chooseAnswer(2));
+    act(() => result.current.pickAnswer(2));
+    act(() => result.current.lockInAnswer());
 
     expect(chooseAnswer).toHaveBeenCalledWith(1, 2);
+  });
+
+  it("casts nothing while no answer is picked", () => {
+    const chooseAnswer = jest.fn(() => of(accepted));
+    withChooseAnswer(chooseAnswer);
+    const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
+
+    act(() => result.current.lockInAnswer());
+
+    expect(chooseAnswer).not.toHaveBeenCalled();
   });
 
   it("locks the answers while the cast is in flight", () => {
     withChooseAnswer(() => NEVER);
     const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
 
-    act(() => result.current.chooseAnswer(0));
+    act(() => result.current.pickAnswer(0));
+    act(() => result.current.lockInAnswer());
 
-    expect(result.current.view).toEqual({
-      kind: QuizScreenKind.Answering,
-      answers,
-      isAnswerable: false,
-    });
+    expect(result.current.view).toEqual(answering(0, false));
   });
 
   it("confirms the own answer once cast", () => {
@@ -149,28 +191,18 @@ describe("participant quiz screen logic", () => {
     },
   );
 
-  it("returns to the answer buttons when the next question is posed", () => {
+  it("returns to unpicked answers when the next question is posed", () => {
     withChooseAnswer(() => NEVER);
     const { result, rerender } = renderHook(
       ({ quiz }: { quiz: ParticipantQuizView }) =>
         useParticipantQuizScreen(quiz),
-      {
-        initialProps: {
-          quiz: quizView({
-            subState: QuizSubState.LearningTextShown,
-            ownAnswerIndex: 0,
-          }),
-        },
-      },
+      { initialProps: { quiz: quizView() } },
     );
+    act(() => result.current.pickAnswer(1));
 
     rerender({ quiz: quizView({ questionIndex: 2 }) });
 
-    expect(result.current.view).toEqual({
-      kind: QuizScreenKind.Answering,
-      answers,
-      isAnswerable: true,
-    });
+    expect(result.current.view).toEqual(answering(null));
   });
 
   it("reopens the answers with a message when the cast is rejected", () => {
@@ -183,23 +215,21 @@ describe("participant quiz screen logic", () => {
     );
     const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
 
-    act(() => result.current.chooseAnswer(1));
+    act(() => result.current.pickAnswer(1));
+    act(() => result.current.lockInAnswer());
 
     expect(result.current.rejectionMessage).toBe(
       MessageKey.IntentInvariantViolated,
     );
-    expect(result.current.view).toEqual({
-      kind: QuizScreenKind.Answering,
-      answers,
-      isAnswerable: true,
-    });
+    expect(result.current.view).toEqual(answering(1));
   });
 
   it("shows a transport failure as a generic failure message", () => {
     withChooseAnswer(() => throwError(() => new Error("connection is closed")));
     const { result } = renderHook(() => useParticipantQuizScreen(quizView()));
 
-    act(() => result.current.chooseAnswer(1));
+    act(() => result.current.pickAnswer(1));
+    act(() => result.current.lockInAnswer());
 
     expect(result.current.rejectionMessage).toBe(MessageKey.IntentFailed);
   });

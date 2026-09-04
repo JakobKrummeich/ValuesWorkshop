@@ -22,6 +22,7 @@ import { participantAccounts } from "./support/participantAccounts";
 import {
   advancePhaseButton,
   answerButton,
+  chooseAnswer,
   clickThroughQuestionControls,
   expectQuestionHeading,
   fastForwardQuizQuestions,
@@ -166,7 +167,7 @@ test.describe.serial("restart recovery across the workshop", () => {
     await advancePhaseButton(facilitatorPage).click();
     await expectQuestionHeading(everyRolePage(), 1);
 
-    await answerButton(participantPages[0], 0).click();
+    await chooseAnswer(participantPages[0], 0);
 
     await expect(facilitatorPage.getByTestId("answer-tally-0")).toHaveText(
       "Votes: 1",
@@ -659,6 +660,9 @@ test.describe.serial("restart recovery across the workshop", () => {
     await expect(
       reopenedParticipantPage.getByTestId("workshop-concluded"),
     ).toBeVisible({ timeout: 15_000 });
+    await expect(
+      reopenedParticipantPage.getByTestId("workshop-concluded"),
+    ).toHaveAttribute("data-animal", groupAnimalId);
 
     const downloadPromise = reopenedParticipantPage.waitForEvent("download");
     await reopenedParticipantPage

@@ -55,6 +55,7 @@ function model(
       chip({ valueId: value.valueId, text: value.text }),
     ),
     selectedCount: 0,
+    remainingCount: 10,
     isSubmitted: false,
     canSubmit: false,
     isConfirming: false,
@@ -103,6 +104,33 @@ describe("participant selection screen", () => {
     });
 
     expect(screen.getByTestId("submit-selection-button")).toBeDisabled();
+    expect(screen.getByTestId("submit-selection-button")).toHaveTextContent(
+      "Submit selection",
+    );
+  });
+
+  it("hints how many picks are missing beside the submit button", () => {
+    screenHook.mockReturnValue(model({ selectedCount: 7, remainingCount: 3 }));
+
+    render(<ParticipantSelectionScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("selection-hint")).toHaveTextContent(
+      "Pick 3 more",
+    );
+  });
+
+  it("drops the hint once all ten are picked", () => {
+    screenHook.mockReturnValue(
+      model({ selectedCount: 10, remainingCount: 0, canSubmit: true }),
+    );
+
+    render(<ParticipantSelectionScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.queryByTestId("selection-hint")).not.toBeInTheDocument();
   });
 
   it("requests confirmation when the enabled submit button is pressed", () => {
@@ -186,7 +214,7 @@ describe("participant selection screen", () => {
   });
 
   it("speaks German when German is chosen", () => {
-    screenHook.mockReturnValue(model({ selectedCount: 7 }));
+    screenHook.mockReturnValue(model({ selectedCount: 7, remainingCount: 3 }));
 
     render(<ParticipantSelectionScreen state={state} />, {
       wrapper: languageWrapper(Language.German),
@@ -195,6 +223,9 @@ describe("participant selection screen", () => {
     screen.getByText("Wähle genau 10 Werte");
     expect(screen.getByTestId("selected-count")).toHaveTextContent(
       "Ausgewählt: 7/10",
+    );
+    expect(screen.getByTestId("selection-hint")).toHaveTextContent(
+      "Noch 3 wählen",
     );
   });
 });

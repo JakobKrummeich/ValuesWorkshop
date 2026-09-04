@@ -7,6 +7,18 @@ export const finalVotingMessages = {
     [Language.German]: "Deine Stimmen: {used}/{total} vergeben",
     [Language.English]: "Your votes: {used}/{total} used",
   },
+  [MessageKey.FinalVotingYourVotes]: {
+    [Language.German]: "Deine Stimmen",
+    [Language.English]: "Your votes",
+  },
+  [MessageKey.FinalVotingVotesLeft]: {
+    [Language.German]: "Noch {count} Stimmen",
+    [Language.English]: "{count} votes left",
+  },
+  [MessageKey.FinalVotingVoteLeftSingle]: {
+    [Language.German]: "Noch 1 Stimme",
+    [Language.English]: "1 vote left",
+  },
   [MessageKey.FinalVotingAddVote]: {
     [Language.German]: "Stimme für {value} hinzufügen",
     [Language.English]: "Add a vote for {value}",

@@ -102,11 +102,13 @@ export const participantWorkshopStateSchema = z.discriminatedUnion("phase", [
   z.object({
     phase: z.literal(Phase.FinalVoting),
     ...participantEnvelope,
+    ownGroup: ownGroupViewSchema.nullable(),
     voting: participantVotingViewSchema,
   }),
   z.object({
     phase: z.literal(Phase.FinalPresentation),
     ...participantEnvelope,
+    ownGroup: ownGroupViewSchema.nullable(),
     conclusion: participantConclusionViewSchema,
   }),
 ]);

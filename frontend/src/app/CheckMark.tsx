@@ -12,7 +12,7 @@ export function CheckMark({ className }: { className?: string }) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      <path d="M3 8.5l3.2 3L13 4.5" />
+      <path d="M3 8.5l3.2 3L13 4.5" pathLength={1} />
     </svg>
   );
 }

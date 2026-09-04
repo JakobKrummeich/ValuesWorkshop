@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { MessageKey } from "../../../../domain/i18n/messages";
 import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import type { ParticipantQuizView } from "../../../../domain/workshopState";
@@ -14,10 +14,19 @@ export enum QuizScreenKind {
   Waiting = "waiting",
 }
 
+export interface QuizAnswerOption {
+  index: number;
+  letter: string;
+  text: LocalizedText;
+  isPicked: boolean;
+}
+
 export type ParticipantQuizScreenView =
   | {
       kind: QuizScreenKind.Answering;
-      answers: LocalizedText[];
+      answers: QuizAnswerOption[];
+      pickedLetter: string | null;
+      canLockIn: boolean;
       isAnswerable: boolean;
     }
   | { kind: QuizScreenKind.OwnAnswer; ownAnswer: LocalizedText }
@@ -26,8 +35,20 @@ export type ParticipantQuizScreenView =
 export interface ParticipantQuizScreenModel {
   questionNumber: number;
   view: ParticipantQuizScreenView;
-  chooseAnswer: (answerIndex: number) => void;
+  pickAnswer: (answerIndex: number) => void;
+  lockInAnswer: () => void;
   rejectionMessage: MessageKey | null;
+}
+
+interface Pick {
+  questionIndex: number;
+  answerIndex: number;
+}
+
+const firstLetterCode = "A".charCodeAt(0);
+
+export function answerLetterOf(answerIndex: number): string {
+  return String.fromCharCode(firstLetterCode + answerIndex);
 }
 
 export function useParticipantQuizScreen(
@@ -35,25 +56,37 @@ export function useParticipantQuizScreen(
 ): ParticipantQuizScreenModel {
   const { quizPort } = useParticipantDependencies();
   const { isSending, rejectionMessage, sendIntent } = useIntentSender();
+  const [pick, setPick] = useState<Pick | null>(null);
   const questionIndex = quiz.questionIndex;
+  const pickedAnswerIndex =
+    pick !== null && pick.questionIndex === questionIndex
+      ? pick.answerIndex
+      : null;
 
-  const chooseAnswer = useCallback(
-    (answerIndex: number) => {
-      sendIntent(quizPort.chooseAnswer(questionIndex, answerIndex));
-    },
-    [quizPort, questionIndex, sendIntent],
+  const pickAnswer = useCallback(
+    (answerIndex: number) => setPick({ questionIndex, answerIndex }),
+    [questionIndex],
   );
+
+  const lockInAnswer = useCallback(() => {
+    if (pickedAnswerIndex === null || isSending) {
+      return;
+    }
+    sendIntent(quizPort.chooseAnswer(questionIndex, pickedAnswerIndex));
+  }, [pickedAnswerIndex, isSending, sendIntent, quizPort, questionIndex]);
 
   return {
     questionNumber: questionIndex + 1,
-    view: screenView(quiz, isSending),
-    chooseAnswer,
+    view: screenView(quiz, pickedAnswerIndex, isSending),
+    pickAnswer,
+    lockInAnswer,
     rejectionMessage,
   };
 }
 
 function screenView(
   quiz: ParticipantQuizView,
+  pickedAnswerIndex: number | null,
   isSending: boolean,
 ): ParticipantQuizScreenView {
   if (quiz.ownAnswerIndex !== null) {
@@ -67,7 +100,15 @@ function screenView(
   }
   return {
     kind: QuizScreenKind.Answering,
-    answers: quiz.answers,
+    answers: quiz.answers.map((text, index) => ({
+      index,
+      letter: answerLetterOf(index),
+      text,
+      isPicked: index === pickedAnswerIndex,
+    })),
+    pickedLetter:
+      pickedAnswerIndex === null ? null : answerLetterOf(pickedAnswerIndex),
+    canLockIn: pickedAnswerIndex !== null && !isSending,
     isAnswerable: !isSending,
   };
 }

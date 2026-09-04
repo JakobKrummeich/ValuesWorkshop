@@ -1,57 +1,64 @@
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-tight);
-  padding: var(--space-gap);
-  border: var(--border-hairline);
-  border-radius: var(--radius-md);
+  gap: var(--space-gap);
+  padding: var(--space-gutter);
+  isolation: isolate;
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-lg);
   background: var(--color-surface);
+  transition:
+    border-color var(--motion-base) var(--ease-out),
+    box-shadow var(--motion-base) var(--ease-out);
+}
+
+.voted {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-glow-accent);
+}
+
+.ping {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border: var(--border-rule) solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  animation: ping var(--motion-slow) var(--ease-out) forwards;
+  pointer-events: none;
 }
 
 .valueName {
-  color: var(--color-text);
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-}
-
-.actions {
   margin: 0;
-  padding-left: var(--space-gap);
-  color: var(--color-text-muted);
-  font-size: var(--text-small);
-  line-height: var(--leading-normal);
+  color: var(--color-text);
+  font-size: var(--text-heading);
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
 }
 
-.stepper {
+.control {
   display: flex;
-  align-items: center;
-  gap: var(--space-gap);
-  align-self: flex-end;
+  justify-content: flex-end;
 }
 
-.stepButton {
-  width: var(--control-height);
-  min-height: var(--control-height);
-  border: var(--border-hairline);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
+@keyframes ping {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.08);
+  }
 }
 
-.stepButton:disabled {
-  color: var(--color-text-muted);
-  background: var(--color-bg);
-}
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
 
-.voteCount {
-  min-width: 2ch;
-  color: var(--color-text);
-  font-size: var(--text-body);
-  font-weight: var(--weight-bold);
-  font-variant-numeric: tabular-nums;
-  text-align: center;
+  .ping {
+    display: none;
+  }
 }

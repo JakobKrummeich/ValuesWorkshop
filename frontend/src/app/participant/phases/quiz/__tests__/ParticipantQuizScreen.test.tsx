@@ -10,6 +10,7 @@ import {
   QuizScreenKind,
   useParticipantQuizScreen,
   type ParticipantQuizScreenModel,
+  type ParticipantQuizScreenView,
 } from "../useParticipantQuizScreen";
 
 jest.mock("../useParticipantQuizScreen", () => ({
@@ -39,19 +40,32 @@ const state: ParticipantQuizState = {
   },
 };
 
-const answeringView = {
-  kind: QuizScreenKind.Answering,
-  answers: state.quiz.answers,
-  isAnswerable: true,
-} as const;
+function answeringView(
+  pickedAnswerIndex: number | null,
+  isAnswerable = true,
+): ParticipantQuizScreenView {
+  return {
+    kind: QuizScreenKind.Answering,
+    answers: state.quiz.answers.map((text, index) => ({
+      index,
+      letter: "ABC"[index],
+      text,
+      isPicked: index === pickedAnswerIndex,
+    })),
+    pickedLetter: pickedAnswerIndex === null ? null : "ABC"[pickedAnswerIndex],
+    canLockIn: pickedAnswerIndex !== null && isAnswerable,
+    isAnswerable,
+  };
+}
 
 function model(
   overrides: Partial<ParticipantQuizScreenModel> = {},
 ): ParticipantQuizScreenModel {
   return {
     questionNumber: 2,
-    view: answeringView,
-    chooseAnswer: jest.fn(),
+    view: answeringView(null),
+    pickAnswer: jest.fn(),
+    lockInAnswer: jest.fn(),
     rejectionMessage: null,
     ...overrides,
   };
@@ -75,28 +89,51 @@ describe("participant quiz screen", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("casts the tapped answer", () => {
-    const chooseAnswer = jest.fn();
-    screenHook.mockReturnValue(model({ chooseAnswer }));
+  it("picks the tapped answer and asks to pick before it can lock in", () => {
+    const pickAnswer = jest.fn();
+    screenHook.mockReturnValue(model({ pickAnswer }));
 
     render(<ParticipantQuizScreen state={state} />, {
       wrapper: languageWrapper(),
     });
     fireEvent.click(screen.getByTestId("answer-button-1"));
 
-    expect(chooseAnswer).toHaveBeenCalledWith(1);
+    expect(pickAnswer).toHaveBeenCalledWith(1);
+    expect(screen.getByTestId("lock-in-answer-button")).toHaveTextContent(
+      "Pick an answer",
+    );
+    expect(screen.getByTestId("lock-in-answer-button")).toBeDisabled();
+  });
+
+  it("locks in the picked answer by its letter", () => {
+    const lockInAnswer = jest.fn();
+    screenHook.mockReturnValue(model({ view: answeringView(1), lockInAnswer }));
+
+    render(<ParticipantQuizScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("answer-button-1")).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByTestId("answer-button-0")).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Lock in answer B" }));
+    expect(lockInAnswer).toHaveBeenCalledTimes(1);
   });
 
   it("locks the answer buttons when answering is closed", () => {
-    screenHook.mockReturnValue(
-      model({ view: { ...answeringView, isAnswerable: false } }),
-    );
+    screenHook.mockReturnValue(model({ view: answeringView(0, false) }));
 
     render(<ParticipantQuizScreen state={state} />, {
       wrapper: languageWrapper(),
     });
 
     expect(screen.getByTestId("answer-button-0")).toBeDisabled();
+    expect(screen.getByTestId("lock-in-answer-button")).toBeDisabled();
   });
 
   it("replaces the answer buttons with the own-answer confirmation once cast", () => {
@@ -118,6 +155,7 @@ describe("participant quiz screen", () => {
     );
     expect(screen.getByTestId("own-answer-text")).toHaveTextContent("Two");
     expect(screen.queryByTestId("answer-button-0")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("lock-in-answer-button")).toBeNull();
     expect(screen.queryByTestId("learning-text")).not.toBeInTheDocument();
   });
 
@@ -161,5 +199,8 @@ describe("participant quiz screen", () => {
       "Frage 2 von 3",
     );
     expect(screen.getByTestId("answer-button-1")).toHaveTextContent("Zwei");
+    expect(screen.getByTestId("lock-in-answer-button")).toHaveTextContent(
+      "Wähle eine Antwort",
+    );
   });
 });

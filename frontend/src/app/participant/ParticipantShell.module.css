@@ -1,7 +1,8 @@
 .shell {
   display: grid;
   flex: 1;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100%;
   min-height: 0;
   background: var(--color-bg);
   color: var(--color-text);
@@ -9,19 +10,23 @@
 
 .header {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--space-gap);
-  align-items: flex-start;
-  justify-content: space-between;
   padding: var(--space-gap) var(--space-gutter);
   border-bottom: var(--border-hairline) solid var(--color-border);
   background: var(--color-bg-alt);
 }
 
-.tools {
+.brandRow,
+.phaseRow {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-tight);
+  gap: var(--space-gap);
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.phaseRow {
   align-items: flex-end;
 }
 
@@ -32,4 +37,24 @@
   min-height: 0;
   padding: var(--space-gutter);
   overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.footer {
+  padding: var(--space-gap) var(--space-gutter)
+    calc(var(--space-gap) + env(safe-area-inset-bottom));
+  border-top: var(--border-hairline) solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.footer:empty {
+  display: none;
+}
+
+@media (width >= 56rem) {
+  .shell {
+    max-width: 34em;
+    margin-inline: auto;
+    border-inline: var(--border-hairline) solid var(--color-border);
+  }
 }

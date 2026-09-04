@@ -2,7 +2,8 @@
 
 import { MessageKey } from "../../../../domain/i18n/messages";
 import { useTranslation } from "../../../i18n/useTranslation";
-import styles from "./GroupWorkCard.module.css";
+import { ActionBar } from "../../ActionBar";
+import { CallToAction, CallToActionVariant } from "../../CallToAction";
 
 export function GroupWorkControls({
   isSubmitted,
@@ -21,36 +22,35 @@ export function GroupWorkControls({
 
   if (isSubmitted) {
     return (
-      <div className={styles.controls}>
-        <button
-          type="button"
-          className={styles.reopenButton}
-          data-testid="reopen-button"
-          onClick={onReopen}
+      <ActionBar>
+        <CallToAction
+          variant={CallToActionVariant.Ghost}
+          testId="reopen-button"
           disabled={isSending}
+          onClick={onReopen}
         >
           {translate(MessageKey.GroupWorkReopen)}
-        </button>
-      </div>
+        </CallToAction>
+      </ActionBar>
     );
   }
 
   return (
-    <div className={styles.controls}>
-      <button
-        type="button"
-        className={styles.submitButton}
-        data-testid="submit-group-work-button"
+    <ActionBar
+      hint={
+        canSubmit || isSending
+          ? undefined
+          : translate(MessageKey.GroupWorkSubmitDisabledHint)
+      }
+      hintTestId="submit-disabled-hint"
+    >
+      <CallToAction
+        testId="submit-group-work-button"
         disabled={!canSubmit || isSending}
         onClick={onSubmit}
       >
         {translate(MessageKey.GroupWorkSubmit)}
-      </button>
-      {!canSubmit && (
-        <p className={styles.disabledHint} data-testid="submit-disabled-hint">
-          {translate(MessageKey.GroupWorkSubmitDisabledHint)}
-        </p>
-      )}
-    </div>
+      </CallToAction>
+    </ActionBar>
   );
 }

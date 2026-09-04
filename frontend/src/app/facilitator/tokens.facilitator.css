@@ -2,6 +2,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
   background: var(--color-bg);
   color: var(--color-text);
 
@@ -74,4 +75,5 @@
   --space-gutter: var(--base-space-16);
 
   --control-height: 40px;
+  --control-height-compact: 32px;
 }

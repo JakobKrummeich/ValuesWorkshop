@@ -110,7 +110,7 @@ describe("facilitator screen group", () => {
       );
     });
 
-    screen.getByRole("heading", { name: "ValuesWorkshop · Open a session" });
+    screen.getByRole("heading", { name: "Values Workshop · Open a session" });
     screen.getByLabelText("Facilitator passphrase");
     expect(createSession).not.toHaveBeenCalled();
     expect(screen.queryByText(/no workshop session/i)).not.toBeInTheDocument();

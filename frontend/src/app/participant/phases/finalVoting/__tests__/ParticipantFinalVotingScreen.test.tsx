@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { Language } from "../../../../../domain/i18n/language";
 import { MessageKey } from "../../../../../domain/i18n/messages";
 import { Phase } from "../../../../../domain/phases";
 import type { ParticipantFinalVotingState } from "../../../../../domain/workshopState";
@@ -36,13 +37,14 @@ function model(
       {
         valueId: "wert-1",
         text: { de: "Wert 1", en: "Value 1" },
-        actions: ["We start meetings on time"],
+        actions: [{ id: "0", text: "We start meetings on time" }],
         voteCount: 2,
         canAdd: true,
         canRemove: true,
       },
     ],
     usedVotes: 2,
+    remainingVotes: 3,
     allotment: 5,
     canSubmit: false,
     addVote: jest.fn(),
@@ -72,6 +74,47 @@ describe("participant final voting screen", () => {
     expect(screen.getByTestId("submit-votes-button")).toHaveTextContent(
       "Submit 5 votes",
     );
+    expect(screen.getByTestId("votes-left-hint")).toHaveTextContent(
+      "3 votes left",
+    );
+  });
+
+  it("heads the ballot with one pip per vote, filled as they are used", () => {
+    screenHook.mockReturnValue(model());
+
+    render(<ParticipantFinalVotingScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    screen.getByRole("heading", { name: "Your votes" });
+    expect(screen.getByTestId("vote-pips").children).toHaveLength(5);
+    expect(
+      screen.getByTestId("vote-pips").querySelectorAll('[data-filled="true"]'),
+    ).toHaveLength(2);
+  });
+
+  it("hints the last vote in the singular", () => {
+    screenHook.mockReturnValue(model({ usedVotes: 4, remainingVotes: 1 }));
+
+    render(<ParticipantFinalVotingScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("votes-left-hint")).toHaveTextContent(
+      "1 vote left",
+    );
+  });
+
+  it("drops the hint once every vote is placed", () => {
+    screenHook.mockReturnValue(
+      model({ usedVotes: 5, remainingVotes: 0, canSubmit: true }),
+    );
+
+    render(<ParticipantFinalVotingScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.queryByTestId("votes-left-hint")).not.toBeInTheDocument();
   });
 
   it("labels the submission for a single-vote round", () => {
@@ -119,5 +162,21 @@ describe("participant final voting screen", () => {
       screen.getByTestId("votes-submitted-confirmation"),
     ).toHaveTextContent("Votes submitted successfully");
     expect(screen.queryByTestId("votes-used")).not.toBeInTheDocument();
+  });
+
+  it("speaks German when German is chosen", () => {
+    screenHook.mockReturnValue(model());
+
+    render(<ParticipantFinalVotingScreen state={state} />, {
+      wrapper: languageWrapper(Language.German),
+    });
+
+    screen.getByRole("heading", { name: "Deine Stimmen" });
+    expect(screen.getByTestId("votes-used")).toHaveTextContent(
+      "Deine Stimmen: 2/5 vergeben",
+    );
+    expect(screen.getByTestId("votes-left-hint")).toHaveTextContent(
+      "Noch 3 Stimmen",
+    );
   });
 });

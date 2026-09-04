@@ -182,6 +182,7 @@
   --space-gutter: var(--base-space-16);
 
   --control-height: 48px;
+  --control-height-compact: 44px;
   --border-hairline: var(--base-border-hairline);
   --border-ring: var(--base-border-ring);
   --border-rule: var(--base-border-rule);

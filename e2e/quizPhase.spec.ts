@@ -1,15 +1,11 @@
-import {
-  test,
-  expect,
-  type BrowserContext,
-  type Page,
-} from "@playwright/test";
+import { test, expect, type BrowserContext, type Page } from "@playwright/test";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
 import { openSignedIn, signInThroughOidcProvider } from "./support/oidcLogin";
 import { isPageStillMarked, markPage } from "./support/pageMarker";
 import {
   advancePhaseButton,
   answerButton,
+  chooseAnswer,
   expectQuestionHeading,
   fastForwardQuizQuestions,
   quizControlButton,
@@ -118,7 +114,7 @@ test.describe.serial("phase 2 quiz", () => {
     await markPage(facilitatorPage);
     await markPage(presenterPage);
 
-    await answerButton(alicePage, CORRECT_ANSWER_INDEX).click();
+    await chooseAnswer(alicePage, CORRECT_ANSWER_INDEX);
 
     await expect(facilitatorPage.getByTestId("answer-tally-0")).toHaveText(
       "Votes: 1",
@@ -128,8 +124,8 @@ test.describe.serial("phase 2 quiz", () => {
     );
     await expect(presenterPage.getByTestId("answer-votes-0")).toHaveText("1");
 
-    await answerButton(bobPage, WRONG_ANSWER_INDEX).click();
-    await answerButton(charliePage, CORRECT_ANSWER_INDEX).click();
+    await chooseAnswer(bobPage, WRONG_ANSWER_INDEX);
+    await chooseAnswer(charliePage, CORRECT_ANSWER_INDEX);
 
     await expect(facilitatorPage.getByTestId("answer-tally-0")).toHaveText(
       "Votes: 2",
@@ -158,7 +154,9 @@ test.describe.serial("phase 2 quiz", () => {
   });
 
   test("a participant who voted sees the own-answer confirmation instead of the buttons", async () => {
-    await expect(alicePage.getByTestId("own-answer-confirmation")).toBeVisible();
+    await expect(
+      alicePage.getByTestId("own-answer-confirmation"),
+    ).toBeVisible();
     await expect(alicePage.getByTestId("own-answer-text")).toHaveText(
       CORRECT_ANSWER_TEXT,
     );
@@ -213,7 +211,9 @@ test.describe.serial("phase 2 quiz", () => {
       FIRST_LEARNING_TEXT,
     );
     await expect(alicePage.getByTestId("learning-text")).toHaveCount(0);
-    await expect(alicePage.getByTestId("own-answer-confirmation")).toBeVisible();
+    await expect(
+      alicePage.getByTestId("own-answer-confirmation"),
+    ).toBeVisible();
     await expect(advancePhaseButton(facilitatorPage)).toBeDisabled();
   });
 
@@ -245,8 +245,8 @@ test.describe.serial("phase 2 quiz", () => {
   });
 
   test("a participant who never answered sees the waiting screen after the reveal", async () => {
-    await answerButton(alicePage, CORRECT_ANSWER_INDEX).click();
-    await answerButton(bobPage, WRONG_ANSWER_INDEX).click();
+    await chooseAnswer(alicePage, CORRECT_ANSWER_INDEX);
+    await chooseAnswer(bobPage, WRONG_ANSWER_INDEX);
     await expect(facilitatorPage.getByTestId("answered-count")).toHaveText(
       "2 of 3 have answered",
     );
@@ -262,7 +262,9 @@ test.describe.serial("phase 2 quiz", () => {
     await expect(
       charliePage.getByTestId("own-answer-confirmation"),
     ).toHaveCount(0);
-    await expect(alicePage.getByTestId("own-answer-confirmation")).toBeVisible();
+    await expect(
+      alicePage.getByTestId("own-answer-confirmation"),
+    ).toBeVisible();
   });
 
   test("the next question brings the silent participant back to the answers", async () => {

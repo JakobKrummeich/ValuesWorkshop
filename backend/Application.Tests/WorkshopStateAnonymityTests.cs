@@ -21,6 +21,12 @@ public class WorkshopStateAnonymityTests
         ParticipantIdentifyingPathsOf(typeof(ParticipantWorkshopState))
             .ShouldBe(
                 [
+                    "ParticipantFinalPresentationState.OwnGroup.Actions[].ActionId",
+                    "ParticipantFinalPresentationState.OwnGroup.MemberDisplayNames[]",
+                    "ParticipantFinalPresentationState.OwnGroup.ScribeName",
+                    "ParticipantFinalVotingState.OwnGroup.Actions[].ActionId",
+                    "ParticipantFinalVotingState.OwnGroup.MemberDisplayNames[]",
+                    "ParticipantFinalVotingState.OwnGroup.ScribeName",
                     "ParticipantGroupFormationState.Formation.OwnGroup.Actions[].ActionId",
                     "ParticipantGroupFormationState.Formation.OwnGroup.MemberDisplayNames[]",
                     "ParticipantGroupFormationState.Formation.OwnGroup.ScribeName",

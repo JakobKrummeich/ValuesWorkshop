@@ -23,6 +23,7 @@ const state = {
 
 function concludedModel(
   overrides: Partial<{
+    ownAnimalId: string | null;
     isDownloading: boolean;
     downloadFailedMessage: MessageKey | null;
     downloadRecord: () => void;
@@ -30,6 +31,7 @@ function concludedModel(
 ) {
   return {
     isConcluded: true as const,
+    ownAnimalId: null,
     isDownloading: false,
     downloadFailedMessage: null,
     downloadRecord: jest.fn(),
@@ -68,6 +70,39 @@ describe("participant final presentation screen", () => {
       "Download workshop record (PDF)",
     );
     expect(screen.queryByTestId("waiting-screen")).not.toBeInTheDocument();
+  });
+
+  it("blooms the own group's glyph in its hue with confetti", () => {
+    screenHook.mockReturnValue(concludedModel({ ownAnimalId: "fuchs" }));
+
+    const { container } = render(
+      <ParticipantFinalPresentationScreen state={state} />,
+      { wrapper: languageWrapper() },
+    );
+
+    expect(screen.getByTestId("workshop-concluded")).toHaveAttribute(
+      "data-animal",
+      "fuchs",
+    );
+    expect(
+      screen.getByTestId("conclusion-glyph").querySelector("svg"),
+    ).toHaveAttribute("viewBox", "0 0 32 32");
+    expect(container.querySelectorAll("[data-hue]").length).toBeGreaterThan(0);
+  });
+
+  it("falls back to the brand mark when the own group is unknown", () => {
+    screenHook.mockReturnValue(concludedModel());
+
+    render(<ParticipantFinalPresentationScreen state={state} />, {
+      wrapper: languageWrapper(),
+    });
+
+    expect(screen.getByTestId("workshop-concluded")).not.toHaveAttribute(
+      "data-animal",
+    );
+    expect(
+      screen.getByTestId("conclusion-glyph").querySelector("svg"),
+    ).toHaveAttribute("viewBox", "0 0 24 24");
   });
 
   it("starts the download on click", () => {

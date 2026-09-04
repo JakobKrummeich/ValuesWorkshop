@@ -6,6 +6,8 @@ import type { ParticipantQuizState } from "../../../../domain/workshopState";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { QuizQuestion } from "../../../QuizQuestion";
 import { WaitingScreen } from "../../../WaitingScreen";
+import { ActionBar } from "../../ActionBar";
+import { CallToAction } from "../../CallToAction";
 import styles from "./ParticipantQuizScreen.module.css";
 import { QuizAnswerConfirmation } from "./QuizAnswerConfirmation";
 import {
@@ -19,7 +21,7 @@ export function ParticipantQuizScreen({
   state: ParticipantQuizState;
 }) {
   const { language, translate } = useTranslation();
-  const { questionNumber, view, chooseAnswer, rejectionMessage } =
+  const { questionNumber, view, pickAnswer, lockInAnswer, rejectionMessage } =
     useParticipantQuizScreen(state.quiz);
 
   if (view.kind === QuizScreenKind.Waiting) {
@@ -35,16 +37,24 @@ export function ParticipantQuizScreen({
       />
       {view.kind === QuizScreenKind.Answering ? (
         <div className={styles.answers}>
-          {view.answers.map((answer, answerIndex) => (
+          {view.answers.map((answer) => (
             <button
-              key={answerIndex}
+              key={answer.index}
               type="button"
-              className={styles.answer}
-              data-testid={`answer-button-${answerIndex}`}
+              className={`${styles.answer} ${
+                answer.isPicked ? styles.picked : ""
+              }`}
+              data-testid={`answer-button-${answer.index}`}
+              aria-pressed={answer.isPicked}
               disabled={!view.isAnswerable}
-              onClick={() => chooseAnswer(answerIndex)}
+              onClick={() => pickAnswer(answer.index)}
             >
-              {localizedText(language, answer)}
+              <span className={styles.letter} aria-hidden="true">
+                {answer.letter}
+              </span>
+              <span className={styles.answerText}>
+                {localizedText(language, answer.text)}
+              </span>
             </button>
           ))}
         </div>
@@ -55,6 +65,21 @@ export function ParticipantQuizScreen({
         <p className={styles.rejection} role="status">
           {translate(rejectionMessage)}
         </p>
+      )}
+      {view.kind === QuizScreenKind.Answering && (
+        <ActionBar>
+          <CallToAction
+            testId="lock-in-answer-button"
+            disabled={!view.canLockIn}
+            onClick={lockInAnswer}
+          >
+            {view.pickedLetter === null
+              ? translate(MessageKey.QuizPickAnswer)
+              : translate(MessageKey.QuizLockInAnswer, {
+                  letter: view.pickedLetter,
+                })}
+          </CallToAction>
+        </ActionBar>
       )}
     </section>
   );

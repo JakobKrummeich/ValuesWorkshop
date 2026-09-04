@@ -1,8 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const HTTP_UNAUTHORIZED = 401;
-const MISSING_SESSION_TEXT =
-  "This link carries no workshop session. Please scan the QR code again.";
+const MISSING_SESSION_TEXT = "Please scan the QR code on the wall again.";
 
 test.describe("live workshop state", () => {
   test("presenter link without a session identity explains the missing session", async ({

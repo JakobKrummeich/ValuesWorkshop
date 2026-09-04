@@ -1,17 +1,17 @@
 "use client";
 
-import { MessageKey } from "../../../../domain/i18n/messages";
-import { GroupWorkStatus } from "../../../../domain/workshopState";
-import { CheckMark } from "../../../CheckMark";
-import { useTranslation } from "../../../i18n/useTranslation";
+import { MessageKey } from "../domain/i18n/messages";
+import { GroupWorkStatus } from "../domain/workshopState";
+import { CheckMark } from "./CheckMark";
 import styles from "./GroupWorkStatusPill.module.css";
+import { useTranslation } from "./i18n/useTranslation";
 
 export function GroupWorkStatusPill({
-  animalId,
   workStatus,
+  testId,
 }: {
-  animalId: string;
   workStatus: GroupWorkStatus;
+  testId: string;
 }) {
   const { translate } = useTranslation();
   const isSubmitted = workStatus === GroupWorkStatus.Submitted;
@@ -21,7 +21,7 @@ export function GroupWorkStatusPill({
       className={`${styles.pill} ${
         isSubmitted ? styles.submitted : styles.editing
       }`}
-      data-testid={`presenter-group-status-${animalId}`}
+      data-testid={testId}
     >
       {isSubmitted && <CheckMark />}
       {translate(

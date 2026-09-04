@@ -4,6 +4,10 @@ import { Phase } from "../../../../../domain/phases";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { ParticipantJoinScreen } from "../ParticipantJoinScreen";
 
+jest.mock("../../../../useCountUp", () => ({
+  useCountUp: (target: number) => target,
+}));
+
 const state = {
   revision: 3,
   phase: Phase.Join,
@@ -12,21 +16,28 @@ const state = {
 } as const;
 
 describe("participant join screen", () => {
-  it("confirms the name the workshop knows the participant by", () => {
+  it("welcomes the participant by name over the aurora", () => {
     render(<ParticipantJoinScreen state={state} />, {
       wrapper: languageWrapper(),
     });
 
-    screen.getByText("Ada Lovelace", { exact: false });
+    expect(screen.getByTestId("own-display-name")).toHaveTextContent(
+      "You are in, Ada Lovelace.",
+    );
     screen.getByText("Waiting for the workshop to start", { exact: false });
+    screen.getByTestId("waiting-screen");
   });
 
-  it("shows how many people have joined so far", () => {
+  it("counts how many people have joined so far", () => {
     render(<ParticipantJoinScreen state={state} />, {
       wrapper: languageWrapper(),
     });
 
-    screen.getByText("Participants: 7");
+    expect(screen.getByTestId("participant-count")).toHaveTextContent(
+      "Participants: 7",
+    );
+    screen.getByText("7");
+    screen.getByText("joined");
   });
 
   it("speaks German when German is chosen", () => {
@@ -35,5 +46,6 @@ describe("participant join screen", () => {
     });
 
     screen.getByText("Teilnehmende: 7");
+    screen.getByText("dabei");
   });
 });

@@ -4,7 +4,12 @@ import { downloadBlob } from "../../../../../adapters/fileDownload";
 import { renderWorkshopRecordPdf } from "../../../../../adapters/workshopRecordPdf";
 import { Language } from "../../../../../domain/i18n/language";
 import { MessageKey } from "../../../../../domain/i18n/messages";
-import type { ParticipantConclusionView } from "../../../../../domain/workshopState";
+import { Phase } from "../../../../../domain/phases";
+import type {
+  OwnGroupView,
+  ParticipantConclusionView,
+  ParticipantFinalPresentationState,
+} from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { useParticipantFinalPresentationScreen } from "../useParticipantFinalPresentationScreen";
 
@@ -52,13 +57,33 @@ function concludedView(): ParticipantConclusionView {
   };
 }
 
+const fox: OwnGroupView = {
+  name: { animalId: "fuchs", text: { de: "Fuchs", en: "Fox" } },
+  memberDisplayNames: ["Ada"],
+  assignedValues: [],
+};
+
+function stateOf(
+  conclusion: ParticipantConclusionView,
+  ownGroup: OwnGroupView | null = null,
+): ParticipantFinalPresentationState {
+  return {
+    phase: Phase.FinalPresentation,
+    revision: 1,
+    participantCount: 4,
+    ownGroup,
+    conclusion,
+  };
+}
+
 function renderScreenHook(
   conclusion: ParticipantConclusionView,
   language: Language = Language.English,
 ) {
-  return renderHook(() => useParticipantFinalPresentationScreen(conclusion), {
-    wrapper: languageWrapper(language),
-  });
+  return renderHook(
+    () => useParticipantFinalPresentationScreen(stateOf(conclusion)),
+    { wrapper: languageWrapper(language) },
+  );
 }
 
 describe("participant final presentation screen logic", () => {
@@ -83,6 +108,28 @@ describe("participant final presentation screen logic", () => {
     }
     expect(result.current.isDownloading).toBe(false);
     expect(result.current.downloadFailedMessage).toBeNull();
+  });
+
+  it("names the animal of the group the state still puts the caller in", () => {
+    const { result } = renderHook(
+      () =>
+        useParticipantFinalPresentationScreen(stateOf(concludedView(), fox)),
+      { wrapper: languageWrapper() },
+    );
+
+    if (!result.current.isConcluded) {
+      throw new Error("expected the concluded model");
+    }
+    expect(result.current.ownAnimalId).toBe("fuchs");
+  });
+
+  it("names no animal for a participant the formation left without a group", () => {
+    const { result } = renderScreenHook(concludedView());
+
+    if (!result.current.isConcluded) {
+      throw new Error("expected the concluded model");
+    }
+    expect(result.current.ownAnimalId).toBeNull();
   });
 
   it("downloads the rendered record under the translated file name", () => {

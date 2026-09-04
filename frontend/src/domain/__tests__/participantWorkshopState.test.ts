@@ -362,6 +362,7 @@ describe("participant workshop state schema", () => {
       revision: 12,
       phase: 8,
       participantCount: 9,
+      ownGroup: null,
       voting: {
         roundNumber: 1,
         allotment: 5,
@@ -390,6 +391,7 @@ describe("participant workshop state schema", () => {
       "We start meetings on time",
     ]);
     expect(state.voting.hasVotedThisRound).toBe(false);
+    expect(state.ownGroup).toBeNull();
   });
 
   it("rejects a final-voting state whose eligible value carries no actions list", () => {

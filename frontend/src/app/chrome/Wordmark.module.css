@@ -21,6 +21,7 @@
 }
 
 .mark {
+  display: flex;
   flex: none;
   width: 0.85em;
   height: 0.85em;

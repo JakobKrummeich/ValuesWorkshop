@@ -109,6 +109,18 @@ describe("participant selection screen logic", () => {
     expect(result.current.chips[3].isSelected).toBe(true);
   });
 
+  it("counts down how many picks are still missing", () => {
+    withSubmitSelection(() => NEVER);
+    const { result } = renderSelection();
+    expect(result.current.remainingCount).toBe(10);
+
+    selectAll(result, firstTenValueIds.slice(0, 7));
+    expect(result.current.remainingCount).toBe(3);
+
+    selectAll(result, firstTenValueIds.slice(7));
+    expect(result.current.remainingCount).toBe(0);
+  });
+
   it("deselects a value on the second toggle", () => {
     withSubmitSelection(() => NEVER);
     const { result } = renderSelection();

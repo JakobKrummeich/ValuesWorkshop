@@ -7,7 +7,10 @@ function card(overrides: Partial<VoteCardModel> = {}): VoteCardModel {
   return {
     valueId: "wert-1",
     text: { de: "Wert 1", en: "Value 1" },
-    actions: ["We start meetings on time", "We share mistakes openly"],
+    actions: [
+      { id: "0", text: "We start meetings on time" },
+      { id: "1", text: "We share mistakes openly" },
+    ],
     voteCount: 2,
     canAdd: true,
     canRemove: true,
@@ -40,6 +43,30 @@ describe("vote card", () => {
 
     expect(onAdd).toHaveBeenCalledWith("wert-1");
     expect(onRemove).toHaveBeenCalledWith("wert-1");
+  });
+
+  it("marks a card that holds votes and pings when a vote lands", () => {
+    const { rerender } = render(
+      <VoteCard
+        card={card({ voteCount: 0, canRemove: false })}
+        onAdd={jest.fn()}
+        onRemove={jest.fn()}
+      />,
+      { wrapper: languageWrapper() },
+    );
+    expect(screen.getByTestId("vote-card-wert-1")).not.toHaveClass("voted");
+    expect(screen.queryByTestId("vote-ping-wert-1")).not.toBeInTheDocument();
+
+    rerender(
+      <VoteCard
+        card={card({ voteCount: 1 })}
+        onAdd={jest.fn()}
+        onRemove={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId("vote-card-wert-1")).toHaveClass("voted");
+    expect(screen.getByTestId("vote-ping-wert-1")).toBeInTheDocument();
   });
 
   it("disables the steppers when the hook forbids them", () => {

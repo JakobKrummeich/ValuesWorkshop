@@ -57,11 +57,13 @@ export const generalMessages = {
     [Language.German]: "Sprache",
     [Language.English]: "Language",
   },
+  [MessageKey.MissingSessionHeading]: {
+    [Language.German]: "Kein Workshop in diesem Link",
+    [Language.English]: "No session in this link",
+  },
   [MessageKey.MissingSession]: {
-    [Language.German]:
-      "Dieser Link enthält keinen Workshop. Bitte den QR-Code erneut scannen.",
-    [Language.English]:
-      "This link carries no workshop session. Please scan the QR code again.",
+    [Language.German]: "Bitte den QR-Code an der Wand erneut scannen.",
+    [Language.English]: "Please scan the QR code on the wall again.",
   },
   [MessageKey.SessionPhase]: {
     [Language.German]: "Phase {phase}",
@@ -144,8 +146,8 @@ export const generalMessages = {
     [Language.English]: "The winners are about to be revealed.",
   },
   [MessageKey.OpenSessionTitle]: {
-    [Language.German]: "ValuesWorkshop · Workshop eröffnen",
-    [Language.English]: "ValuesWorkshop · Open a session",
+    [Language.German]: "Values Workshop · Workshop eröffnen",
+    [Language.English]: "Values Workshop · Open a session",
   },
   [MessageKey.OpenSessionName]: {
     [Language.German]: "Workshop-Name",

@@ -54,6 +54,13 @@ describe("participant group formation screen", () => {
     );
   });
 
+  it("frames the card as the own group and sends the members to find each other", () => {
+    renderScreen(formed());
+
+    screen.getByText("Your group");
+    screen.getByText("Find each other in the room.");
+  });
+
   it("speaks German when German is chosen", () => {
     renderScreen(formed(), Language.German);
 
@@ -61,6 +68,8 @@ describe("participant group formation screen", () => {
     expect(screen.getByTestId("group-value-trust")).toHaveTextContent(
       "Vertrauen",
     );
+    screen.getByText("Deine Gruppe");
+    screen.getByText("Findet euch im Raum zusammen.");
   });
 
   it("runs the bar at the emitted progress while the formation runs", () => {

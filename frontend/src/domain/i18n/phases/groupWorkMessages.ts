@@ -7,6 +7,10 @@ export const groupWorkMessages = {
     [Language.German]: "Schreiber/in: {name}",
     [Language.English]: "Scribe: {name}",
   },
+  [MessageKey.GroupWorkScribeIsYou]: {
+    [Language.German]: "Schreiber/in: {name} (du)",
+    [Language.English]: "Scribe: {name} (you)",
+  },
   [MessageKey.GroupWorkAddAction]: {
     [Language.German]: "Aktion hinzufügen",
     [Language.English]: "Add action",
@@ -18,6 +22,10 @@ export const groupWorkMessages = {
   [MessageKey.GroupWorkActionPlaceholder]: {
     [Language.German]: "Aktion beschreiben\u2026",
     [Language.English]: "Describe an action\u2026",
+  },
+  [MessageKey.GroupWorkNoActionsYet]: {
+    [Language.German]: "Noch keine Aktionen.",
+    [Language.English]: "No actions yet.",
   },
   [MessageKey.GroupWorkSubmit]: {
     [Language.German]: "Ergebnis abgeben",
