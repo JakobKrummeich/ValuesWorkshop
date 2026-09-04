@@ -13,6 +13,9 @@ dotnet build backend/ValuesWorkshop.sln
 echo "=== BE format check ==="
 dotnet csharpier check backend/
 
+echo "=== FE vulnerabilities ==="
+pnpm --dir frontend audit:check
+
 echo "=== BE vulnerabilities ==="
 scripts/check-backend-vulnerabilities.sh
 
