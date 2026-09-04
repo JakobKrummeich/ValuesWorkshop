@@ -1,0 +1,64 @@
+.names {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: var(--space-tight);
+  place-content: flex-start center;
+  width: 100%;
+  max-width: 44em;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-body);
+}
+
+.name {
+  padding: calc(var(--space-tight) * 0.4) var(--space-tight);
+  border: var(--border-hairline) solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  white-space: nowrap;
+  animation: pop var(--motion-base) var(--ease-spring) backwards;
+  animation-delay: calc(var(--index, 0) * var(--motion-stagger));
+  transition:
+    color var(--motion-slow) var(--ease-out),
+    border-color var(--motion-slow) var(--ease-out),
+    box-shadow var(--motion-slow) var(--ease-out);
+}
+
+.newest {
+  border-color: var(--color-highlight);
+  color: var(--color-highlight);
+  box-shadow: var(--shadow-glow-highlight);
+  animation-delay: 0s;
+}
+
+.more {
+  border-style: dashed;
+  color: var(--color-text-muted);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body);
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .name {
+    animation: none;
+    transition: none;
+  }
+}

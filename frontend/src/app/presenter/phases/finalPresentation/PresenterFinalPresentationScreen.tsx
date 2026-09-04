@@ -24,5 +24,5 @@ export function PresenterFinalPresentationScreen({
     return <WinnerReveal key={model.winner.place} winner={model.winner} />;
   }
 
-  return <WinnerOverview winners={model.winners} />;
+  return <WinnerOverview podium={model.podium} runnersUp={model.runnersUp} />;
 }

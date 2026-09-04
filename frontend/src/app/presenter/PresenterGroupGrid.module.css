@@ -1,0 +1,33 @@
+.grid {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.page {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-gap);
+  place-content: center;
+  animation: slide var(--motion-slow) var(--ease-out) backwards;
+}
+
+.page > * {
+  flex: 0 0 min(31%, 34rem);
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page {
+    animation: none;
+  }
+}

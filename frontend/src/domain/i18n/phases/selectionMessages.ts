@@ -47,4 +47,8 @@ export const selectionMessages = {
     [Language.German]: "{submitted} von {total} haben abgegeben",
     [Language.English]: "{submitted} of {total} have submitted",
   },
+  [MessageKey.SelectionSubmittedOfTotal]: {
+    [Language.German]: "von {total} haben abgegeben",
+    [Language.English]: "of {total} have submitted",
+  },
 } as const satisfies Partial<Readonly<Record<MessageKey, Message>>>;

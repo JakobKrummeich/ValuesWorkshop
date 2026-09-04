@@ -17,19 +17,19 @@
   content: "";
   background:
     radial-gradient(
-      45% 40% at 15% 25%,
-      color-mix(in srgb, var(--color-glow-1) 28%, transparent),
-      transparent 65%
+      38% 34% at 16% 28%,
+      color-mix(in srgb, var(--color-glow-1) 44%, transparent),
+      transparent 70%
     ),
     radial-gradient(
-      40% 40% at 88% 80%,
-      color-mix(in srgb, var(--color-glow-2) 22%, transparent),
-      transparent 65%
+      36% 36% at 86% 78%,
+      color-mix(in srgb, var(--color-glow-2) 36%, transparent),
+      transparent 70%
     ),
     radial-gradient(
-      35% 35% at 70% 10%,
-      color-mix(in srgb, var(--color-glow-3) 16%, transparent),
-      transparent 65%
+      30% 30% at 68% 12%,
+      color-mix(in srgb, var(--color-glow-3) 28%, transparent),
+      transparent 70%
     );
   animation: drift 60s var(--ease-in-out) infinite alternate;
   pointer-events: none;

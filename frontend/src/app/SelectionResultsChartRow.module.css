@@ -22,7 +22,7 @@
 }
 
 .track {
-  height: var(--control-height);
+  height: 1.15em;
   overflow: hidden;
   border-radius: var(--radius-full);
   background: var(--color-surface-strong);

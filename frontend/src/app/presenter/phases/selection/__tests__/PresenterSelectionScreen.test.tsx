@@ -47,13 +47,20 @@ describe("presenter selection screen", () => {
     );
   });
 
-  it("reports a complete submission round", () => {
+  it("reports a complete submission round with a full bar", () => {
     render(<PresenterSelectionScreen state={state(30)} />, {
       wrapper: languageWrapper(),
     });
 
     expect(screen.getByTestId("submitted-count")).toHaveTextContent(
       "30 of 30 have submitted",
+    );
+    expect(screen.getByTestId("selection-progress-bar")).toHaveStyle({
+      "--progress": "1",
+    });
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "100",
     );
   });
 

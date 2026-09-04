@@ -55,7 +55,7 @@ function renderScreen(
   formation: PresenterFormationView,
   currentPageGroups: PresenterGroups = groups,
 ) {
-  screenHook.mockReturnValue({ currentPageGroups });
+  screenHook.mockReturnValue({ pageIndex: 0, currentPageGroups });
 
   return render(<PresenterGroupFormationScreen state={state(formation)} />, {
     wrapper: languageWrapper(),

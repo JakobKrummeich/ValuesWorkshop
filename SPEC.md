@@ -22,28 +22,29 @@ verified by a multi-client Playwright e2e test.
 
 ## Tech Stack
 
-| Concern | Choice |
-|---|---|
-| Frontend | Next.js (React, TypeScript strict) |
-| Backend | C# ASP.NET Core |
-| Persistence | SQLite — full session state, exact resume after restart |
-| Real-time | SignalR (WebSockets), server-authoritative state |
-| Auth | OIDC. Prod: Azure AD. Dev/e2e: local `oidc-provider` (npm) instance |
-| Optimization | Google OR-Tools CP-SAT (C# bindings) for group/value assignment |
-| PDF | Client-side: `@react-pdf/renderer` |
-| Unit tests FE | Jest |
-| Unit tests BE | xUnit |
-| E2E | Playwright, multi-browser-context (facilitator + presenter + N participants) |
-| Styling | Plain CSS with design tokens, token usage enforced by stylelint |
-| i18n | de + en |
-| Architecture | Hexagonal (ports & adapters) in FE and BE, enforced by arch tests: ArchUnitNET (BE), dependency-cruiser (FE) |
+| Concern       | Choice                                                                                                                                                                                                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Frontend      | Next.js (React, TypeScript strict)                                                                                                                                                                                                                                                                     |
+| Backend       | C# ASP.NET Core                                                                                                                                                                                                                                                                                        |
+| Persistence   | SQLite — full session state, exact resume after restart                                                                                                                                                                                                                                                |
+| Real-time     | SignalR (WebSockets), server-authoritative state                                                                                                                                                                                                                                                       |
+| Auth          | OIDC. Prod: Azure AD. Dev/e2e: local `oidc-provider` (npm) instance                                                                                                                                                                                                                                    |
+| Optimization  | Google OR-Tools CP-SAT (C# bindings) for group/value assignment                                                                                                                                                                                                                                        |
+| PDF           | Client-side: `@react-pdf/renderer`                                                                                                                                                                                                                                                                     |
+| Unit tests FE | Jest                                                                                                                                                                                                                                                                                                   |
+| Unit tests BE | xUnit                                                                                                                                                                                                                                                                                                  |
+| E2E           | Playwright, multi-browser-context (facilitator + presenter + N participants)                                                                                                                                                                                                                           |
+| Styling       | Plain CSS with design tokens, token usage enforced by stylelint                                                                                                                                                                                                                                        |
+| i18n          | de + en                                                                                                                                                                                                                                                                                                |
+| Architecture  | Hexagonal (ports & adapters) in FE and BE, enforced by arch tests: ArchUnitNET (BE), dependency-cruiser (FE)                                                                                                                                                                                           |
 | Quality gates | Cyclomatic complexity: eslint `complexity` (FE), CA1502 as error (BE). Duplication: jscpd threshold over FE+BE. Formatting: Prettier check (TS/CSS), CSharpier check (C#). Unit coverage: ≥ 80 % lines, FE (Jest `coverageThreshold`) and BE (coverlet threshold) each — hard gate. All deterministic. |
-| CI/CD | GitHub Actions on PRs to `main`: build, unit tests, lint, arch tests, complexity, duplication, coverage (≥ 80 % lines FE+BE), e2e. `main` protected — merge only on green pipeline. |
-| Deploy | Local only: one-command `docker compose up` with seeded demo content (bilingual values/quiz/animals catalogs, 31 dev OIDC accounts); the facilitator opens the session in the UI. No public deploy. README gets screenshots of all three screens. |
+| CI/CD         | GitHub Actions on PRs to `main`: build, unit tests, lint, arch tests, complexity, duplication, coverage (≥ 80 % lines FE+BE), e2e. `main` protected — merge only on green pipeline.                                                                                                                    |
+| Deploy        | Local only: one-command `docker compose up` with seeded demo content (bilingual values/quiz/animals catalogs, 31 dev OIDC accounts); the facilitator opens the session in the UI. No public deploy. README gets screenshots of all three screens.                                                      |
 
 ## Domain Model
 
 ### Sessions
+
 - Multiple sessions supported; every participant joins a specific `sessionId`.
 - Only the facilitator can create sessions; creation requires a facilitator
   password set on the server (participants never have it).
@@ -54,6 +55,7 @@ verified by a multi-client Playwright e2e test.
 - Exact per-session state persisted on disk; full recovery after restart.
 
 ### Content
+
 - Values catalog (~50 values) and quiz content (questions, answers, learning
   texts): server config / JSON. Not editable per session.
 
@@ -96,11 +98,11 @@ verified by a multi-client Playwright e2e test.
 
 ## Screens
 
-| Screen | Traits |
-|---|---|
+| Screen      | Traits                                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Facilitator | Laptop. High information density, full session control, phase advancement, sub-controls, scribe reassignment, session creation (password-gated). |
-| Presenter | Beamer, fullscreen, zero interactivity, unauthenticated. QR code, live charts, group presentations, final results. |
-| Participant | Portrait mobile-first, easy interactivity; must also render well on landscape laptop screens. |
+| Presenter   | Beamer, fullscreen, zero interactivity, unauthenticated. QR code, live charts, group presentations, final results.                               |
+| Participant | Portrait mobile-first, easy interactivity; must also render well on landscape laptop screens.                                                    |
 
 Participant attention rule: the participant device never mirrors presenter or
 beamer content. Whenever a participant has no pending input, their device
@@ -209,9 +211,12 @@ tasks/             → plan.md, todo.md (spec-driven workflow)
       arch, complexity, duplication, coverage ≥ 80 % lines FE+BE, e2e);
       `main` merge blocked unless green — `.github/workflows/ci.yml` job
       `ci`: FE lint (eslint `complexity` 7, stylelint, Prettier, tsc,
-      dependency-cruiser, audit), FE build, Jest with coverage threshold,
+      dependency-cruiser), FE build, Jest with coverage threshold,
       BE build with analyzers (VW1001 complexity, ArchUnitNET in tests),
-      CSharpier, coverlet threshold, vulnerability scan, jscpd; job `e2e`:
+      CSharpier, coverlet threshold, FE and BE vulnerability scans, jscpd;
+      the FE scan (`pnpm --dir frontend audit:check`) is its own step so an
+      unreachable npm advisory registry reads as an unaudited tree rather
+      than a lint failure, and it never passes on a registry error; job `e2e`:
       `scripts/ci-e2e.sh`. `scripts/ci-lint.sh` and `scripts/ci-test.sh`
       mirror them locally. The `main` ruleset requires a pull request with
       one approval and the `ci` status check, strict (up to date with

@@ -87,6 +87,7 @@ describe("useFacilitatorValuePresentationScreen", () => {
       kind: PresentationPositionKind.PresentedValue,
       animalId: "otter",
       groupName: { de: "Otter", en: "Otter" },
+      valueId: "wert-1",
       valueName: { de: "Vertrauen", en: "Trust" },
       actions: [{ actionId: "action-1", text: "We ask" }],
     });

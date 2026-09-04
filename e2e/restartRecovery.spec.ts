@@ -239,7 +239,9 @@ test.describe.serial("restart recovery across the workshop", () => {
     );
 
     await expect(presenterPage.getByTestId("learning-text")).toBeVisible();
-    await expect(presenterPage.locator('[class*="correctBar"]')).toHaveCount(1);
+    await expect(
+      presenterPage.getByTestId("learning-correct-answer"),
+    ).toBeVisible();
   });
 
   test("every participant submits ten values", async () => {

@@ -39,6 +39,31 @@ describe("action ledger", () => {
     expect(items[1]).toHaveStyle({ "--index": "1" });
   });
 
+  it("sizes the slabs to the amount of text they carry", () => {
+    const { container } = render(
+      <ActionLedger
+        actions={Array.from({ length: 5 }, (unused, index) => ({
+          id: `a${index}`,
+          text: "x".repeat(199),
+        }))}
+        variant={ActionLedgerVariant.Slabs}
+      />,
+    );
+
+    const scale = Number(
+      container.querySelector("ul")?.style.getPropertyValue("--slab-scale"),
+    );
+    expect(scale).toBeLessThan(1);
+  });
+
+  it("leaves the rows at their fixed size", () => {
+    const { container } = render(
+      <ActionLedger actions={actions} variant={ActionLedgerVariant.Rows} />,
+    );
+
+    expect(container.querySelector("ul")).not.toHaveAttribute("style");
+  });
+
   it("renders an empty list for no actions", () => {
     const { container } = render(
       <ActionLedger actions={[]} variant={ActionLedgerVariant.Rows} />,

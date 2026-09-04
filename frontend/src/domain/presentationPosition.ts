@@ -21,6 +21,7 @@ export type PresentationPosition<TAction> =
       kind: PresentationPositionKind.PresentedValue;
       animalId: string;
       groupName: LocalizedText;
+      valueId: string;
       valueName: LocalizedText;
       actions: TAction[];
     };
@@ -59,6 +60,7 @@ export function presentationPositionOf<TAction>(
     kind: PresentationPositionKind.PresentedValue,
     animalId: presentingGroup.name.animalId,
     groupName: presentingGroup.name.text,
+    valueId: presentedValue.valueId,
     valueName: presentedValue.text,
     actions: presentation.presentedActions,
   };

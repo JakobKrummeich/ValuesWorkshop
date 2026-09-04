@@ -1,0 +1,22 @@
+.eyebrow {
+  margin: 0;
+  color: var(--color-eyebrow);
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  font-weight: var(--weight-black);
+  letter-spacing: var(--tracking-eyebrow);
+  line-height: var(--leading-tight);
+  text-transform: uppercase;
+}
+
+.accent {
+  color: var(--color-accent);
+}
+
+.animal {
+  color: var(--color-animal);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}

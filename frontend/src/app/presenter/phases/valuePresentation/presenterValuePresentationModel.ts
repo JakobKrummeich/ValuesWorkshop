@@ -1,5 +1,3 @@
-"use client";
-
 import {
   presentationPositionOf,
   type PresentationPosition,
@@ -10,7 +8,7 @@ export type PresenterPresentationPosition = PresentationPosition<{
   text: string;
 }>;
 
-export function usePresenterValuePresentationScreen(
+export function presenterValuePresentationModelOf(
   state: PresenterValuePresentationState,
 ): PresenterPresentationPosition | null {
   return presentationPositionOf(state.groups, state.presentation);

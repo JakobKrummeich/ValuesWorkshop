@@ -5,19 +5,16 @@ import {
   type PresenterGroupWorkState,
 } from "../../../../../domain/workshopState";
 import { languageWrapper } from "../../../../../testing/languageWrapper";
+import { type GroupPages, useGroupPages } from "../../../useGroupPages";
 import { PresenterGroupWorkScreen } from "../PresenterGroupWorkScreen";
-import {
-  usePresenterGroupWorkScreen,
-  type PresenterGroupWorkScreenModel,
-} from "../usePresenterGroupWorkScreen";
 
-jest.mock("../usePresenterGroupWorkScreen", () => ({
-  ...jest.requireActual("../usePresenterGroupWorkScreen"),
-  usePresenterGroupWorkScreen: jest.fn(),
+jest.mock("../../../useGroupPages", () => ({
+  ...jest.requireActual("../../../useGroupPages"),
+  useGroupPages: jest.fn(),
 }));
 
-const screenHook = usePresenterGroupWorkScreen as jest.MockedFunction<
-  typeof usePresenterGroupWorkScreen
+const screenHook = useGroupPages as jest.MockedFunction<
+  typeof useGroupPages<PresenterGroupWorkState["groups"][number]>
 >;
 
 function state(): PresenterGroupWorkState {
@@ -29,10 +26,11 @@ function state(): PresenterGroupWorkState {
   };
 }
 
-function model(
-  overrides: Partial<PresenterGroupWorkScreenModel> = {},
-): PresenterGroupWorkScreenModel {
+type GroupWorkPages = GroupPages<PresenterGroupWorkState["groups"][number]>;
+
+function model(overrides: Partial<GroupWorkPages> = {}): GroupWorkPages {
   return {
+    pageIndex: 0,
     currentPageGroups: [
       {
         name: { animalId: "otter", text: { de: "Otter", en: "Otter" } },

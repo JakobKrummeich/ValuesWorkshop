@@ -1,0 +1,69 @@
+.intro {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-gap);
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  text-align: center;
+  animation: slide var(--motion-slow) var(--ease-out) backwards;
+}
+
+.glyph {
+  color: var(--color-animal);
+  font-size: var(--text-numeral);
+  filter: drop-shadow(0 0 var(--glow-radius) var(--color-animal));
+}
+
+.glyph path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw var(--motion-reveal) var(--ease-out) forwards;
+  animation-delay: var(--motion-base);
+}
+
+.glyph circle {
+  animation: appear var(--motion-base) var(--ease-out) backwards;
+  animation-delay: calc(var(--motion-base) + var(--motion-reveal));
+}
+
+.groupName {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro,
+  .glyph circle {
+    animation: none;
+  }
+
+  .glyph path {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+}

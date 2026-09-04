@@ -5,20 +5,25 @@ import { ConnectionStatusVariant } from "../chrome/ConnectionStatus";
 import { PhaseStepperVariant } from "../chrome/PhaseStepper";
 import { PhaseStepState } from "../chrome/usePhaseStepper";
 import { WordmarkSize } from "../chrome/Wordmark";
-import { CounterVariant } from "../Counter";
+import { CounterSize, CounterVariant } from "../Counter";
+import { EyebrowTone } from "../Eyebrow";
 import { GroupCardVariant } from "../GroupCard";
+import { AnswerBarEmphasis } from "../presenter/phases/quiz/presenterQuizScreenModel";
 
 const variantModules: ReadonlyArray<
   [moduleFile: string, variants: Readonly<Record<string, string>>]
 > = [
   ["ActionLedger.module.css", ActionLedgerVariant],
+  ["Counter.module.css", CounterSize],
   ["Counter.module.css", CounterVariant],
+  ["Eyebrow.module.css", EyebrowTone],
   ["GroupCard.module.css", GroupCardVariant],
   ["chrome/ConnectionStatus.module.css", ConnectionStatusVariant],
   ["chrome/PhaseStepMarker.module.css", PhaseStepState],
   ["chrome/PhaseStepper.module.css", PhaseStepperVariant],
   ["chrome/PhaseStepper.module.css", PhaseStepState],
   ["chrome/Wordmark.module.css", WordmarkSize],
+  ["presenter/phases/quiz/QuizAnswerRow.module.css", AnswerBarEmphasis],
 ];
 
 function classNamesOf(moduleFile: string): ReadonlySet<string> {

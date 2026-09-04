@@ -1,5 +1,6 @@
 import { cssCustomProperty } from "../shared/cssCustomProperty";
 import styles from "./ActionLedger.module.css";
+import { actionSlabScaleOf } from "./actionSlabScale";
 
 export enum ActionLedgerVariant {
   Rows = "rows",
@@ -22,11 +23,20 @@ export function ActionLedger({
   stagger?: boolean;
   actionTestId?: string;
 }) {
+  const slabScale =
+    variant === ActionLedgerVariant.Slabs
+      ? cssCustomProperty(
+          "--slab-scale",
+          actionSlabScaleOf(actions.map((action) => action.text)),
+        )
+      : undefined;
+
   return (
     <ul
       className={`${styles.ledger} ${styles[variant]} ${
         stagger ? styles.staggered : ""
       }`}
+      style={slabScale}
     >
       {actions.map((action, index) => (
         <li

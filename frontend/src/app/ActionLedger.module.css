@@ -36,15 +36,21 @@
 }
 
 .slabs {
-  gap: var(--space-tight);
+  --slab-gap: 0.4em;
+  --slab-inset: 0.5em;
+
+  gap: var(--slab-gap);
+  font-size: calc(var(--text-heading) * var(--slab-scale, 1));
 }
 
 .slabs .action {
-  padding: var(--space-tight) var(--space-gap);
+  gap: var(--slab-inset);
+  padding: var(--slab-inset) calc(var(--slab-inset) * 1.25);
   border: var(--border-hairline) solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-surface);
-  font-size: var(--text-action);
+  box-shadow: var(--shadow-card);
+  font-size: inherit;
   font-weight: var(--weight-bold);
 }
 

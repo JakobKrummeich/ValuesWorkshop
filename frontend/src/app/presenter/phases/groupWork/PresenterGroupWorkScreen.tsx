@@ -1,53 +1,32 @@
 "use client";
 
-import { MessageKey } from "../../../../domain/i18n/messages";
-import {
-  GroupWorkStatus,
-  type PresenterGroupWorkState,
-} from "../../../../domain/workshopState";
-import { useTranslation } from "../../../i18n/useTranslation";
-import { GroupCard, GroupCardVariant } from "../../../GroupCard";
+import type { PresenterGroupWorkState } from "../../../../domain/workshopState";
+import { PresenterGroupGrid } from "../../PresenterGroupGrid";
+import { useGroupPages } from "../../useGroupPages";
+import { GroupWorkStatusPill } from "./GroupWorkStatusPill";
 import styles from "./PresenterGroupWorkScreen.module.css";
-import { usePresenterGroupWorkScreen } from "./usePresenterGroupWorkScreen";
 
 export function PresenterGroupWorkScreen({
   state,
 }: {
   state: PresenterGroupWorkState;
 }) {
-  const { translate } = useTranslation();
-  const { currentPageGroups } = usePresenterGroupWorkScreen(state.groups);
+  const { pageIndex, currentPageGroups } = useGroupPages(state.groups);
 
   return (
     <section className={styles.screen}>
-      <div className={styles.grid}>
-        {currentPageGroups.map((group, index) => (
-          <GroupCard
-            key={group.name.animalId}
-            name={group.name}
-            memberDisplayNames={group.memberDisplayNames}
-            assignedValues={group.assignedValues}
-            variant={GroupCardVariant.Wall}
-            index={index}
-            status={
-              group.workStatus === undefined ? undefined : (
-                <span
-                  className={`${styles.statusBadge} ${
-                    group.workStatus === GroupWorkStatus.Submitted
-                      ? styles.statusSubmitted
-                      : styles.statusEditing
-                  }`}
-                  data-testid={`presenter-group-status-${group.name.animalId}`}
-                >
-                  {group.workStatus === GroupWorkStatus.Submitted
-                    ? translate(MessageKey.GroupWorkStatusSubmitted)
-                    : translate(MessageKey.GroupWorkStatusEditing)}
-                </span>
-              )
-            }
-          />
-        ))}
-      </div>
+      <PresenterGroupGrid
+        pageIndex={pageIndex}
+        groups={currentPageGroups}
+        statusOf={(group) =>
+          group.workStatus === undefined ? undefined : (
+            <GroupWorkStatusPill
+              animalId={group.name.animalId}
+              workStatus={group.workStatus}
+            />
+          )
+        }
+      />
     </section>
   );
 }

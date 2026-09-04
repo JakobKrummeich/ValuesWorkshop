@@ -65,6 +65,9 @@ jobs:
       - name: BE test + coverage
         run: scripts/test-backend-with-coverage.sh
 
+      - name: FE vulnerability check
+        run: pnpm --dir frontend audit:check
+
       - name: BE vulnerability check
         run: scripts/check-backend-vulnerabilities.sh
 

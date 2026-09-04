@@ -5,7 +5,7 @@ import {
   type PresenterGroupFormationState,
 } from "../../../../domain/workshopState";
 import { FormationProgress } from "../../../FormationProgress";
-import { GroupCard, GroupCardVariant } from "../../../GroupCard";
+import { PresenterGroupGrid } from "../../PresenterGroupGrid";
 import styles from "./PresenterGroupFormationScreen.module.css";
 import { usePresenterGroupFormationScreen } from "./usePresenterGroupFormationScreen";
 
@@ -14,11 +14,12 @@ export function PresenterGroupFormationScreen({
 }: {
   state: PresenterGroupFormationState;
 }) {
-  const { currentPageGroups } = usePresenterGroupFormationScreen(formation);
+  const { pageIndex, currentPageGroups } =
+    usePresenterGroupFormationScreen(formation);
 
   if (formation.subState === FormationSubState.Forming) {
     return (
-      <section className={styles.screen}>
+      <section className={styles.forming}>
         <FormationProgress progress={formation.progress} />
       </section>
     );
@@ -26,18 +27,7 @@ export function PresenterGroupFormationScreen({
 
   return (
     <section className={styles.screen}>
-      <div className={styles.grid}>
-        {currentPageGroups.map((group, index) => (
-          <GroupCard
-            key={group.name.animalId}
-            name={group.name}
-            memberDisplayNames={group.memberDisplayNames}
-            assignedValues={group.assignedValues}
-            variant={GroupCardVariant.Wall}
-            index={index}
-          />
-        ))}
-      </div>
+      <PresenterGroupGrid pageIndex={pageIndex} groups={currentPageGroups} />
     </section>
   );
 }

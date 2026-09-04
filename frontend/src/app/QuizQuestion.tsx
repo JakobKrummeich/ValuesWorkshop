@@ -5,6 +5,7 @@ import {
   type LocalizedText,
 } from "../domain/i18n/localizedText";
 import { MessageKey } from "../domain/i18n/messages";
+import { Eyebrow } from "./Eyebrow";
 import { useTranslation } from "./i18n/useTranslation";
 import styles from "./QuizQuestion.module.css";
 
@@ -21,12 +22,12 @@ export function QuizQuestion({
 
   return (
     <header className={styles.header}>
-      <h2 className={styles.heading} data-testid="question-heading">
+      <Eyebrow testId="question-heading">
         {translate(MessageKey.QuizQuestionHeading, {
           n: questionNumber,
           total: questionCount,
         })}
-      </h2>
+      </Eyebrow>
       <p className={styles.question} data-testid="question-text">
         {localizedText(language, question)}
       </p>

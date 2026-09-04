@@ -1,0 +1,57 @@
+.screen {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-gutter);
+  align-items: center;
+  min-height: 0;
+  animation: slide var(--motion-slow) var(--ease-out) backwards;
+}
+
+.context {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap);
+  align-items: flex-start;
+  min-width: 0;
+  text-align: left;
+}
+
+.glyph {
+  color: var(--color-animal);
+  font-size: var(--text-counter);
+  filter: drop-shadow(0 0 var(--glow-radius) var(--color-animal));
+  animation: bloom var(--motion-slow) var(--ease-spring) backwards;
+}
+
+.valueName {
+  margin: 0;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: var(--text-action);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-display);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen,
+  .glyph {
+    animation: none;
+  }
+}

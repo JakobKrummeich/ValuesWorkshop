@@ -204,3 +204,35 @@
   --ease-spring: var(--base-ease-spring);
   --ease-in-out: var(--base-ease-in-out);
 }
+
+[data-animal="otter"] {
+  --color-animal: var(--color-animal-otter);
+}
+
+[data-animal="fuchs"] {
+  --color-animal: var(--color-animal-fuchs);
+}
+
+[data-animal="eule"] {
+  --color-animal: var(--color-animal-eule);
+}
+
+[data-animal="igel"] {
+  --color-animal: var(--color-animal-igel);
+}
+
+[data-animal="dachs"] {
+  --color-animal: var(--color-animal-dachs);
+}
+
+[data-animal="luchs"] {
+  --color-animal: var(--color-animal-luchs);
+}
+
+[data-animal="biber"] {
+  --color-animal: var(--color-animal-biber);
+}
+
+[data-animal="marder"] {
+  --color-animal: var(--color-animal-marder);
+}

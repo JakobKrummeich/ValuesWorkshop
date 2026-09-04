@@ -12,6 +12,7 @@ export function PresenterFinalVotingScreen() {
       className={styles.screen}
       data-testid="presenter-final-voting-screen"
     >
+      <span className={styles.halo} aria-hidden="true" />
       <h2 className={styles.heading}>
         {translate(MessageKey.FinalVotingOngoingHeading)}
       </h2>
