@@ -5,7 +5,7 @@ import { focusOnMount } from "../../../focusOnMount";
 import { useTranslation } from "../../../i18n/useTranslation";
 import { CallToAction, CallToActionVariant } from "../../CallToAction";
 import styles from "./SelectionConfirmDialog.module.css";
-import { useSelectionConfirmDialog } from "./useSelectionConfirmDialog";
+import { selectionConfirmDialogBehaviorOf } from "./selectionConfirmDialogBehavior";
 
 export function SelectionConfirmDialog({
   onCancel,
@@ -15,7 +15,7 @@ export function SelectionConfirmDialog({
   onConfirm: () => void;
 }) {
   const { translate } = useTranslation();
-  const { trapKeyboardFocus } = useSelectionConfirmDialog(onCancel);
+  const { trapKeyboardFocus } = selectionConfirmDialogBehaviorOf(onCancel);
 
   return (
     <div className={styles.backdrop}>

@@ -1,12 +1,10 @@
-"use client";
-
 import type { KeyboardEvent } from "react";
 
 export interface SelectionConfirmDialogBehavior {
   trapKeyboardFocus: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
 
-export function useSelectionConfirmDialog(
+export function selectionConfirmDialogBehaviorOf(
   onCancel: () => void,
 ): SelectionConfirmDialogBehavior {
   return {
