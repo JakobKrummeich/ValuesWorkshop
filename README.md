@@ -96,7 +96,7 @@ also drops the database volume so the next run starts clean.
 | `config/` | Workshop content: `values.json`, `quiz.json`, `animals.json` (all texts `de` + `en`) |
 | `devtools/oidc/` | Local OIDC provider for development (`node devtools/oidc`) |
 | `design/` | Architecture, domain model, persistence, protocol, state machine, screens, visual system |
-| `docs/` | Architecture reviews (ADR-style proposals); `docs/media/` holds the README screenshots and the demo film |
+| `docs/` | Architecture reviews (ADR-style proposals); `docs/media/` holds the README screenshots and the demo film; `docs/quality/` holds the measured-quality report |
 | `scripts/` | CI gate scripts, the `demoMedia/` screenshot capture (`pnpm demo:media`) and the `demoVideo/` film pipeline (`pnpm demo:video`), both sharing the workshop drive in `demoWorkshop/` |
 | `tasks/` | Plan, backlog, per-task mini-specs |
 
@@ -112,6 +112,7 @@ scripts/verify-startup.sh                  # native start + health check gate
 scripts/ci-lint.sh                         # all lint gates
 scripts/ci-test.sh                         # all test gates, e2e included
 scripts/ci-e2e.sh                          # compose stack + Playwright, standalone
+pnpm quality:report                        # regenerate docs/quality/ from tool output
 ```
 
 ## End-to-end tests

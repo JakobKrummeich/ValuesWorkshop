@@ -1,0 +1,20 @@
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace ValuesWorkshop.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
+{
+    public const string DiagnosticId = "VW1001";
+    private const int Threshold = 7;
+
+    private static readonly DiagnosticDescriptor Rule = new(
+        DiagnosticId,
+        "Method too complex",
+        "'{0}' has cyclomatic complexity {1} (max {2})",
+        "Maintainability",
+        DiagnosticSeverity.Error,

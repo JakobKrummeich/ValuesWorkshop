@@ -1,0 +1,26 @@
+        };
+
+    public static TheoryData<string> ScenarioNames =>
+        [.. WireStateFixtures.All.Select(scenario => scenario.Name)];
+
+    [Theory]
+    [MemberData(nameof(ScenarioNames))]
+    public void The_checked_in_state_corpus_matches_the_mappers(string scenarioName)
+    {
+        var scenario = WireStateFixtures.All.Single(candidate => candidate.Name == scenarioName);
+
+        foreach (var (role, state) in StatesOf(scenario))
+        {
+            WireContract.ShouldMatchCheckedInFile(
+                JsonSerializer.Serialize(WireContract.WireFormOf(state), WireContract.Json),
+                StateDirectory,
+                role,
+                $"{scenarioName}.json"
+            );
+        }
+    }
+
+    [Fact]
+    public void The_state_corpus_holds_nothing_but_the_fixtures()
+    {
+        var expected = WireStateFixtures

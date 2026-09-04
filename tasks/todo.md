@@ -714,3 +714,28 @@ helpers follow the redesign where it changed a contract (wall language via
 `?language=`, the two-step quiz answer, the missing-session copy) and the
 shared helpers stay the single way to drive a workshop.
 **Dependencies:** Checkpoint F. **Size:** XL
+
+## Phase 9 — Engineering showcase (Task 30)
+
+### Task 30: Measured quality + generated diagrams
+**Spec:** `tasks/specs/30-quality-showcase.md` (approved via Lavish).
+**Description:** Show the repo's engineering with numbers the tools produce and
+diagrams generated from the code: a metrics report, repo/frontend/backend
+architecture graphs, an ER diagram emitted from the EF Core model, a README
+`## Engineering` section with badges, plus the tooling the user picked —
+property-based tests, an accessibility gate, mutation testing, CodeQL and an
+SBOM, and hotspot analysis over the git history.
+- [ ] 30a Metrics collector + `docs/quality/metrics.md`
+- [ ] 30b Repo, frontend and backend diagrams + drift gate
+- [ ] 30c Database ER diagram from the EF model + drift gate
+- [ ] 30d README `## Engineering` section + badges
+- [ ] 30e Property-based tests (FsCheck + fast-check)
+- [ ] 30f Accessibility gate (axe-core in the e2e)
+- [ ] 30g Mutation testing (Stryker.NET + StrykerJS)
+- [ ] 30h Supply chain: CodeQL, CycloneDX SBOM, osv-scanner
+- [ ] 30i Hotspot analysis (churn × complexity)
+**Acceptance criteria:** `pnpm quality:report` regenerates every artifact and is
+idempotent; no number or diagram is hand-maintained; the drift gate fails when
+the schema, a project reference or a module edge changes without regeneration;
+all existing gates stay green.
+**Dependencies:** 29. **Size:** L

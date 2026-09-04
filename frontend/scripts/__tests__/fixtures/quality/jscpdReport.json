@@ -1,0 +1,63 @@
+{
+  "statistics": {
+    "total": {
+      "lines": 24449,
+      "tokens": 192120,
+      "sources": 603,
+      "clones": 3,
+      "duplicatedLines": 28,
+      "duplicatedTokens": 257,
+      "percentage": 0.11,
+      "percentageTokens": 0.13,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    },
+    "formats": {
+      "csharp": {
+        "total": {
+          "lines": 8080,
+          "tokens": 61656,
+          "sources": 169,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "json": {
+        "total": {
+          "lines": 37,
+          "tokens": 196,
+          "sources": 3,
+          "clones": 0,
+          "duplicatedLines": 0,
+          "duplicatedTokens": 0,
+          "percentage": 0,
+          "percentageTokens": 0,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    }
+  },
+  "duplicates": [
+    {
+      "format": "css",
+      "lines": 13,
+      "tokens": 84,
+      "firstFile": {
+        "name": "/home/dev/ValuesWorkshop/frontend/src/app/presenter/phases/finalPresentation/WinnerReveal.module.css",
+        "start": 50,
+        "end": 62
+      },
+      "secondFile": {
+        "name": "/home/dev/ValuesWorkshop/frontend/src/app/presenter/phases/valuePresentation/PresentedValueView.module.css",
+        "start": 24,
+        "end": 36
+      }
+    }
+  ]
+}

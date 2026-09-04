@@ -1,0 +1,20 @@
+using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+namespace ValuesWorkshop.Analyzers;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+public sealed class FileLengthAnalyzer : DiagnosticAnalyzer
+{
+    public const string DiagnosticId = "VW1002";
+    private const int MaxLines = 300;
+    private const int MaxLinesTests = 600;
+
+    private static readonly DiagnosticDescriptor Rule = new(
+        DiagnosticId,
+        "File too long",
+        "'{0}' has {1} lines (max {2})",
+        "Maintainability",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true

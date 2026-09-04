@@ -1,0 +1,86 @@
+{
+  "total": {
+    "lines": {
+      "total": 2314,
+      "covered": 2257,
+      "skipped": 0,
+      "pct": 97.53
+    },
+    "statements": {
+      "total": 2417,
+      "covered": 2354,
+      "skipped": 0,
+      "pct": 97.39
+    },
+    "functions": {
+      "total": 608,
+      "covered": 590,
+      "skipped": 0,
+      "pct": 97.03
+    },
+    "branches": {
+      "total": 641,
+      "covered": 600,
+      "skipped": 0,
+      "pct": 93.6
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "/home/dev/ValuesWorkshop/frontend/scripts/auditDependencies.ts": {
+    "lines": {
+      "total": 43,
+      "covered": 25,
+      "skipped": 0,
+      "pct": 58.13
+    },
+    "functions": {
+      "total": 12,
+      "covered": 4,
+      "skipped": 0,
+      "pct": 33.33
+    },
+    "statements": {
+      "total": 45,
+      "covered": 26,
+      "skipped": 0,
+      "pct": 57.77
+    },
+    "branches": {
+      "total": 21,
+      "covered": 15,
+      "skipped": 0,
+      "pct": 71.42
+    }
+  },
+  "/home/dev/ValuesWorkshop/frontend/scripts/generatePhasesModule.ts": {
+    "lines": {
+      "total": 25,
+      "covered": 19,
+      "skipped": 0,
+      "pct": 76
+    },
+    "functions": {
+      "total": 5,
+      "covered": 4,
+      "skipped": 0,
+      "pct": 80
+    },
+    "statements": {
+      "total": 25,
+      "covered": 19,
+      "skipped": 0,
+      "pct": 76
+    },
+    "branches": {
+      "total": 16,
+      "covered": 12,
+      "skipped": 0,
+      "pct": 75
+    }
+  }
+}

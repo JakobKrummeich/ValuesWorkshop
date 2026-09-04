@@ -1,0 +1,113 @@
+[
+  {
+    "filePath": "/home/dev/ValuesWorkshop/frontend/scripts/generatePhasesModule.mts",
+    "messages": [
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Function 'check' has a complexity of 2. Maximum allowed is 0.",
+        "line": 23,
+        "column": 1,
+        "nodeType": "FunctionDeclaration",
+        "messageId": "complex",
+        "endLine": 23,
+        "endColumn": 15
+      },
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Function 'write' has a complexity of 1. Maximum allowed is 0.",
+        "line": 44,
+        "column": 1,
+        "nodeType": "FunctionDeclaration",
+        "messageId": "complex",
+        "endLine": 44,
+        "endColumn": 15
+      },
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Function 'runPhaseEnumCodegen' has a complexity of 6. Maximum allowed is 0.",
+        "line": 55,
+        "column": 8,
+        "nodeType": "FunctionDeclaration",
+        "messageId": "complex",
+        "endLine": 55,
+        "endColumn": 36
+      },
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Function 'repositoryFiles' has a complexity of 1. Maximum allowed is 0.",
+        "line": 77,
+        "column": 1,
+        "nodeType": "FunctionDeclaration",
+        "messageId": "complex",
+        "endLine": 77,
+        "endColumn": 25
+      },
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Function 'isInvokedAsScript' has a complexity of 3. Maximum allowed is 0.",
+        "line": 85,
+        "column": 1,
+        "nodeType": "FunctionDeclaration",
+        "messageId": "complex",
+        "endLine": 85,
+        "endColumn": 27
+      }
+    ],
+    "errorCount": 5
+  },
+  {
+    "filePath": "/home/dev/ValuesWorkshop/frontend/src/app/facilitator/advanceGuard.ts",
+    "messages": [
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Function 'advanceGuardMessageOf' has a complexity of 6. Maximum allowed is 0.",
+        "line": 16,
+        "column": 8,
+        "nodeType": "FunctionDeclaration",
+        "messageId": "complex",
+        "endLine": 16,
+        "endColumn": 38
+      }
+    ],
+    "errorCount": 1
+  },
+  {
+    "filePath": "/home/dev/ValuesWorkshop/frontend/jest.config.mjs",
+    "messages": [
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Async function 'jestConfig' has a complexity of 2. Maximum allowed is 0.",
+        "line": 20,
+        "column": 16,
+        "nodeType": "FunctionDeclaration",
+        "messageId": "complex",
+        "endLine": 20,
+        "endColumn": 41
+      },
+      {
+        "ruleId": "complexity",
+        "severity": 2,
+        "message": "Arrow function has a complexity of 1. Maximum allowed is 0.",
+        "line": 22,
+        "column": 73,
+        "nodeType": "ArrowFunctionExpression",
+        "messageId": "complex",
+        "endLine": 22,
+        "endColumn": 75
+      }
+    ],
+    "errorCount": 2
+  },
+  {
+    "filePath": "/home/dev/ValuesWorkshop/frontend/.dependency-cruiser.cjs",
+    "messages": [],
+    "errorCount": 0
+  }
+]
