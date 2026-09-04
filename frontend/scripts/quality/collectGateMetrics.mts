@@ -29,12 +29,16 @@ import {
   type ComplexityGroupMetrics,
   type MetricGroup,
   type SecurityGroupMetrics,
+  type SupplyChainMetrics,
   type TestsMetrics,
 } from "./qualityReport.mts";
 import {
   summarizeBackendVulnerabilityScan,
+  summarizeDependencyAdvisoryScan,
   summarizeFrontendVulnerabilityScan,
 } from "./securityScans.mts";
+import { countComponents } from "./supplyChain/billsOfMaterials.mts";
+import { describedBillsOfMaterials } from "./supplyChain/writeBillsOfMaterials.mts";
 import type { SizeMetrics } from "./sizeScan.mts";
 import {
   parseBackendTestOutput,
@@ -231,5 +235,20 @@ export function collectSecurity(
       backend.exitCode,
       backend.stdout,
     ),
+  };
+}
+
+export function collectSupplyChain(
+  context: CollectionContext,
+): MetricGroup<SupplyChainMetrics> {
+  const generate = runInRepository(context, "pnpm", ["run", "sbom"]);
+  const scan = runInRepository(context, "pnpm", ["run", "advisories:scan"]);
+  return {
+    commands: recorded(context, generate, scan),
+    billsOfMaterials: describedBillsOfMaterials.map((bill) => ({
+      ...bill,
+      components: countComponents(readRepositoryFile(context, bill.path)),
+    })),
+    advisories: summarizeDependencyAdvisoryScan(scan.exitCode, scan.stdout),
   };
 }

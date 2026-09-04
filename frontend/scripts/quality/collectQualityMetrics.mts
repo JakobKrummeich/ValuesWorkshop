@@ -7,6 +7,7 @@ import {
   collectComplexity,
   collectDuplication,
   collectSecurity,
+  collectSupplyChain,
   collectTests,
 } from "./collectGateMetrics.mts";
 import { readMutationRecord } from "./mutation/readMutationRecord.mts";
@@ -51,6 +52,7 @@ export function collectQualityMetrics(
       testsInFile(jestTests, frontendContractTest),
     ),
     security: collectSecurity(context),
+    supplyChain: collectSupplyChain(context),
     mutation: readMutationRecord(context.repositoryRoot),
     process: collectProcess(context, commit),
   };

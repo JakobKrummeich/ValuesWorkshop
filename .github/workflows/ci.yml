@@ -71,6 +71,15 @@ jobs:
       - name: BE vulnerability check
         run: scripts/check-backend-vulnerabilities.sh
 
+      - name: osv-scanner cache
+        uses: actions/cache@v4
+        with:
+          path: .tools/osv-scanner
+          key: osv-scanner-${{ hashFiles('scripts/install-osv-scanner.sh') }}
+
+      - name: Dependency advisory check (osv-scanner)
+        run: pnpm run advisories:scan
+
       - name: Duplication check (jscpd)
         run: pnpm -w jscpd
 

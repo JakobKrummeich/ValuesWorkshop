@@ -19,5 +19,8 @@ pnpm --dir frontend audit:check
 echo "=== BE vulnerabilities ==="
 scripts/check-backend-vulnerabilities.sh
 
+echo "=== Dependency advisories (osv-scanner over lockfile and SBOMs) ==="
+pnpm run advisories:scan
+
 echo "=== Duplication (both) ==="
 pnpm -w jscpd

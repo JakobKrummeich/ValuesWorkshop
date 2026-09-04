@@ -72,6 +72,10 @@ Run all quality gates locally using the same commands CI uses:
 - `./scripts/test-backend-with-coverage.sh` — BE test + coverage gate standalone
 - `pnpm --dir frontend audit:check` — FE vulnerability scan standalone
 - `./scripts/check-backend-vulnerabilities.sh` — BE vulnerability scan standalone
+- `pnpm run advisories:scan` — osv-scanner over the lockfile and the SBOMs
+- `pnpm run sbom` — regenerate `docs/quality/sbom/`
+- `pnpm mutation` — mutation testing on both sides; far too slow for CI, runs
+  nightly and on demand
 
 ## User review — always Lavish
 

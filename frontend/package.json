@@ -12,6 +12,8 @@
     "phases:check": "node scripts/generatePhasesModule.mts --check",
     "phases:generate": "node scripts/generatePhasesModule.mts --write",
     "quality:report": "node scripts/quality/writeQualityReport.mts",
+    "sbom": "node scripts/quality/supplyChain/writeBillsOfMaterials.mts",
+    "advisories:scan": "node scripts/quality/supplyChain/scanDependencyAdvisories.mts",
     "mutation:frontend": "node scripts/quality/mutation/runMutationTesting.mts frontend",
     "mutation:backend": "node scripts/quality/mutation/runMutationTesting.mts backend",
     "fmt": "prettier --write .",

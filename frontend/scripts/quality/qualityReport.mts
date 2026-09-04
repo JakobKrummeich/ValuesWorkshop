@@ -12,6 +12,7 @@ import type { MutationRecord } from "./mutation/mutationRecord.mts";
 import type { ProcessMetrics } from "./processHistory.mts";
 import type { SizeMetrics, LongestFile } from "./sizeScan.mts";
 import type { VulnerabilityScanResult } from "./securityScans.mts";
+import type { WrittenBillOfMaterials } from "./supplyChain/writeBillsOfMaterials.mts";
 import type {
   BackendAssemblyTests,
   EndToEndTestCounts,
@@ -62,6 +63,11 @@ export interface SecurityGroupMetrics {
   backend: VulnerabilityScanResult;
 }
 
+export interface SupplyChainMetrics {
+  billsOfMaterials: WrittenBillOfMaterials[];
+  advisories: VulnerabilityScanResult;
+}
+
 export type CollectedMetrics = Omit<QualityReport, "generatedAt">;
 
 export interface QualityReport {
@@ -76,6 +82,7 @@ export interface QualityReport {
   designSystem: MetricGroup<DesignSystemMetrics>;
   contract: MetricGroup<ContractMetrics>;
   security: MetricGroup<SecurityGroupMetrics>;
+  supplyChain: MetricGroup<SupplyChainMetrics>;
   mutation: MutationRecord;
   process: MetricGroup<ProcessMetrics>;
 }

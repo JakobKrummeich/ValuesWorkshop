@@ -3,6 +3,7 @@ import {
   complexitySection,
   duplicationSection,
   securitySection,
+  supplyChainSection,
   testsSection,
 } from "./metricsGateSections.mts";
 import { mutationSection } from "./metricsMutationSection.mts";
@@ -27,6 +28,7 @@ export function renderMetricsMarkdown(report: QualityReport): string {
     contractSection(report),
     mutationSection(report),
     securitySection(report),
+    supplyChainSection(report),
     processSection(report),
   ].join("\n\n")}\n`;
 }

@@ -2,8 +2,10 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   summarizeBackendVulnerabilityScan,
+  summarizeDependencyAdvisoryScan,
   summarizeFrontendVulnerabilityScan,
 } from "../quality/securityScans.mts";
+import { noKnownAdvisoriesReport } from "../quality/supplyChain/advisoryScan.mts";
 
 const fixture = (name: string) =>
   readFileSync(join(__dirname, "fixtures/quality", name), "utf8");
@@ -39,6 +41,44 @@ describe("summarizeFrontendVulnerabilityScan", () => {
     expect(() => summarizeFrontendVulnerabilityScan(1, "ECONNREFUSED")).toThrow(
       "neither a clean report nor an advisory report",
     );
+  });
+});
+
+describe("summarizeDependencyAdvisoryScan", () => {
+  it("reports a clean advisory scan as no findings", () => {
+    expect(
+      summarizeDependencyAdvisoryScan(0, `${noKnownAdvisoriesReport}\n`),
+    ).toEqual({
+      exitCode: 0,
+      findings: 0,
+      summary: noKnownAdvisoriesReport,
+    });
+  });
+
+  it("counts the distinct advisories the scanner reported", () => {
+    const report = JSON.stringify({
+      results: [
+        {
+          packages: [
+            { groups: [{ ids: ["GHSA-one"] }, { ids: ["GHSA-two"] }] },
+            { groups: [{ ids: ["GHSA-two"] }] },
+          ],
+        },
+      ],
+    });
+    expect(
+      summarizeDependencyAdvisoryScan(1, `Known advisories found:\n${report}`),
+    ).toEqual({
+      exitCode: 1,
+      findings: 2,
+      summary: "2 advisories across 2 packages",
+    });
+  });
+
+  it("refuses output that is neither a clean report nor a scan result", () => {
+    expect(() =>
+      summarizeDependencyAdvisoryScan(1, "connection refused"),
+    ).toThrow("neither a clean report nor a scan result");
   });
 });
 

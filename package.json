@@ -3,6 +3,8 @@
   "scripts": {
     "jscpd": "jscpd",
     "quality:report": "pnpm --dir frontend quality:report",
+    "sbom": "pnpm --dir frontend run sbom",
+    "advisories:scan": "pnpm --dir frontend run advisories:scan",
     "mutation": "pnpm mutation:frontend && pnpm mutation:backend",
     "mutation:frontend": "pnpm --dir frontend mutation:frontend",
     "mutation:backend": "pnpm --dir frontend mutation:backend",

@@ -1,4 +1,16 @@
+import { z } from "zod";
 import { noKnownVulnerabilitiesReport } from "../auditDependencies.mts";
+import { noKnownAdvisoriesReport } from "./supplyChain/advisoryScan.mts";
+
+const advisoryScanResultSchema = z.object({
+  results: z.array(
+    z.object({
+      packages: z.array(
+        z.object({ groups: z.array(z.object({ ids: z.array(z.string()) })) }),
+      ),
+    }),
+  ),
+});
 
 export interface VulnerabilityScanResult {
   exitCode: number;
@@ -37,6 +49,43 @@ export function summarizeFrontendVulnerabilityScan(
     exitCode,
     findings,
     summary: `${findings} advisories of high severity or above`,
+  };
+}
+
+function countScannedAdvisories(output: string): {
+  advisories: number;
+  packages: number;
+} {
+  const start = output.indexOf("{");
+  if (start < 0) {
+    throw new Error(
+      `The dependency advisory scan produced neither a clean report nor a scan result:\n${output}`,
+    );
+  }
+  const scanned = advisoryScanResultSchema.parse(
+    JSON.parse(output.slice(start)),
+  );
+  const packages = scanned.results.flatMap((result) => result.packages);
+  return {
+    packages: packages.length,
+    advisories: new Set(
+      packages.flatMap((entry) => entry.groups.flatMap((group) => group.ids)),
+    ).size,
+  };
+}
+
+export function summarizeDependencyAdvisoryScan(
+  exitCode: number,
+  output: string,
+): VulnerabilityScanResult {
+  if (output.includes(noKnownAdvisoriesReport)) {
+    return { exitCode, findings: 0, summary: noKnownAdvisoriesReport };
+  }
+  const counted = countScannedAdvisories(output);
+  return {
+    exitCode,
+    findings: counted.advisories,
+    summary: `${counted.advisories} advisories across ${counted.packages} packages`,
   };
 }
 

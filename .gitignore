@@ -9,4 +9,5 @@ coverage.json
 **/data/*.db
 test-results/
 reports/
+.tools/
 StrykerOutput/

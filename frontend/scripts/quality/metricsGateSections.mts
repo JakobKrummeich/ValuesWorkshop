@@ -188,3 +188,31 @@ export function securitySection(report: QualityReport): string {
     ),
   ]);
 }
+
+export function supplyChainSection(report: QualityReport): string {
+  const advisories = report.supplyChain.advisories;
+  return section("Supply chain", report.supplyChain.commands, [
+    markdownTable(
+      ["bill of materials", "describes", "components"],
+      [left, left, right],
+      report.supplyChain.billsOfMaterials.map((bill) => [
+        `\`${bill.path}\``,
+        bill.describes,
+        formatCount(bill.components),
+      ]),
+    ),
+    "The bills of materials are CycloneDX documents emitted by the generators and then stripped of the serial number, the run timestamp and the annotation that restates it, so regenerating them against an unchanged dependency set leaves no diff.",
+    markdownTable(
+      ["scan", "findings", "exit code", "reported"],
+      [left, right, right, left],
+      [
+        [
+          "osv-scanner over `pnpm-lock.yaml` and both bills of materials",
+          formatCount(advisories.findings),
+          formatCount(advisories.exitCode),
+          advisories.summary,
+        ],
+      ],
+    ),
+  ]);
+}

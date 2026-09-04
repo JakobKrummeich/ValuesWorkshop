@@ -165,6 +165,22 @@ const report: QualityReport = {
     frontend: { exitCode: 0, findings: 0, summary: "No known vulnerabilities" },
     backend: { exitCode: 0, findings: 0, summary: "No vulnerable packages" },
   },
+  supplyChain: {
+    commands: ["pnpm sbom", "pnpm advisories:scan"],
+    billsOfMaterials: [
+      {
+        path: "docs/quality/sbom/frontend.cdx.json",
+        describes: "frontend runtime dependencies of the pnpm workspace",
+        components: 32,
+      },
+      {
+        path: "docs/quality/sbom/backend.cdx.json",
+        describes: "backend runtime packages of the .NET solution",
+        components: 67,
+      },
+    ],
+    advisories: { exitCode: 0, findings: 0, summary: "No known advisories" },
+  },
   mutation: {
     frontend: {
       tool: "StrykerJS 10.0.0",
@@ -221,6 +237,7 @@ describe("renderMetricsMarkdown", () => {
       "## Wire contract",
       "## Mutation testing",
       "## Security",
+      "## Supply chain",
       "## Process",
     ]);
     expect(markdown.split("Produced by:")).toHaveLength(groups.length + 1);
@@ -280,6 +297,15 @@ describe("renderMetricsMarkdown", () => {
     );
     expect(unmeasured).toContain("- `pnpm mutation:frontend`");
     expect(unmeasured).not.toContain("| mutation score |");
+  });
+
+  it("counts the components of every bill of materials", () => {
+    expect(markdown).toContain(
+      "| `docs/quality/sbom/frontend.cdx.json` | frontend runtime dependencies of the pnpm workspace | 32 |",
+    );
+    expect(markdown).toContain(
+      "osv-scanner over `pnpm-lock.yaml` and both bills of materials | 0 | 0 | No known advisories |",
+    );
   });
 
   it("ends in a single newline", () => {
