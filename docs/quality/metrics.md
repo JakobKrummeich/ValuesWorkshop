@@ -4,9 +4,9 @@ Every number on this page is read back from a tool run, and the commands that pr
 
 | the report describes |  |
 | --- | --- |
-| commit | `2ed46d9` — Say what the code does: no null-byte keys, no name that promises a single-column unique key |
-| committed | 2026-09-04T17:03:02+00:00 |
-| report generated | 2026-09-04T17:03:43.593Z |
+| commit | `6a2f35f` — Record how the two diagram slices landed and tick off the slices that shipped |
+| committed | 2026-09-04T17:12:03+00:00 |
+| report generated | 2026-09-04T17:12:12.030Z |
 
 ## Size
 
@@ -26,8 +26,8 @@ Line counts cover every tracked text file except binary assets and generated one
 | frontend/src | 503 | 15,843 | 16,457 | 32,300 |
 | other | 55 | 4,543 | 0 | 4,543 |
 | scripts | 104 | 5,474 | 3,157 | 8,631 |
-| tasks | 59 | 10,342 | 0 | 10,342 |
-| **repository** | **1,131** | **51,441** | **41,497** | **92,938** |
+| tasks | 59 | 10,346 | 0 | 10,346 |
+| **repository** | **1,131** | **51,445** | **41,497** | **92,942** |
 
 | extension | files |
 | --- | ---: |
@@ -222,16 +222,16 @@ Produced by:
 
 Produced by:
 
-- `git rev-list --count 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
-- `git rev-list --count "--grep=^Merge pull request" 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
-- `git log --max-parents=0 --format=%cI 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
-- `git shortlog --summary --numbered 2ed46d9c808d094afaaa3fb8834852c7f1891b95`
+- `git rev-list --count 6a2f35f48f59a0cd32244ad105427ace20dbc516`
+- `git rev-list --count "--grep=^Merge pull request" 6a2f35f48f59a0cd32244ad105427ace20dbc516`
+- `git log --max-parents=0 --format=%cI 6a2f35f48f59a0cd32244ad105427ace20dbc516`
+- `git shortlog --summary --numbered 6a2f35f48f59a0cd32244ad105427ace20dbc516`
 
 The history is counted at the commit this report describes, not at the branch tip, so regenerating the report does not move its own numbers.
 
 | measure | value |
 | --- | ---: |
-| commits | 809 |
+| commits | 811 |
 | merge commits from pull requests | 67 |
 | first commit | 2026-07-19T17:25:51+00:00 |
 | contributors | 4 |
