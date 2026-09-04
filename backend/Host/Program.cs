@@ -68,34 +68,28 @@ builder.Services.AddSingleton<PresenterWorkshopStateMapper>();
 builder.Services.AddSingleton<WorkshopStateCache>();
 builder.Services.AddSingleton<SessionConnectionRegistry>();
 builder.Services.AddSingleton<RoleStateDispatcher>();
+
+// The key strings and the fallbacks are the deployment contract documented in
+// README.md; DeployedLoopIntervalsTests pins both, because a mistyped key would
+// otherwise leave the loop running on its fallback without a word.
+TimeSpan ConfiguredInterval(string key, double fallbackMilliseconds)
+{
+    return TimeSpan.FromMilliseconds(
+        builder.Configuration[key] is { } milliseconds
+            ? double.Parse(milliseconds, CultureInfo.InvariantCulture)
+            : fallbackMilliseconds
+    );
+}
+
 builder.Services.AddSingleton(
-    new StateResendInterval(
-        TimeSpan.FromMilliseconds(
-            double.Parse(
-                builder.Configuration["STATE_RESEND_INTERVAL_MS"] ?? "500",
-                CultureInfo.InvariantCulture
-            )
-        )
-    )
+    new StateResendInterval(ConfiguredInterval("STATE_RESEND_INTERVAL_MS", 500))
 );
 builder.Services.AddSingleton(
-    new GroupFormationTickInterval(
-        TimeSpan.FromMilliseconds(
-            double.Parse(
-                builder.Configuration["GROUP_FORMATION_TICK_INTERVAL_MS"] ?? "50",
-                CultureInfo.InvariantCulture
-            )
-        )
-    )
+    new GroupFormationTickInterval(ConfiguredInterval("GROUP_FORMATION_TICK_INTERVAL_MS", 50))
 );
 builder.Services.AddSingleton(
     new GroupFormationDiscoveryInterval(
-        TimeSpan.FromMilliseconds(
-            double.Parse(
-                builder.Configuration["GROUP_FORMATION_DISCOVERY_INTERVAL_MS"] ?? "250",
-                CultureInfo.InvariantCulture
-            )
-        )
+        ConfiguredInterval("GROUP_FORMATION_DISCOVERY_INTERVAL_MS", 250)
     )
 );
 builder.Services.AddHostedService<StateResendService>();
