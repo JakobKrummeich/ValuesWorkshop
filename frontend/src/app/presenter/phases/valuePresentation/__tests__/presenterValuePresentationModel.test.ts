@@ -2,7 +2,7 @@ import { renderHook } from "@testing-library/react";
 import { Phase } from "../../../../../domain/phases";
 import type { PresenterValuePresentationState } from "../../../../../domain/workshopState";
 import { PresentationPositionKind } from "../../../../../domain/presentationPosition";
-import { usePresenterValuePresentationScreen } from "../usePresenterValuePresentationScreen";
+import { presenterValuePresentationModelOf } from "../presenterValuePresentationModel";
 
 function state(
   presentation: PresenterValuePresentationState["presentation"],
@@ -27,10 +27,10 @@ function state(
   };
 }
 
-describe("usePresenterValuePresentationScreen", () => {
+describe("presenterValuePresentationModelOf", () => {
   it("shows the group intro while no value is presented", () => {
     const { result } = renderHook(() =>
-      usePresenterValuePresentationScreen(
+      presenterValuePresentationModelOf(
         state({
           presentingGroupName: "otter",
           presentedValueId: null,
@@ -48,7 +48,7 @@ describe("usePresenterValuePresentationScreen", () => {
 
   it("shows the presented value with its action texts", () => {
     const { result } = renderHook(() =>
-      usePresenterValuePresentationScreen(
+      presenterValuePresentationModelOf(
         state({
           presentingGroupName: "otter",
           presentedValueId: "wert-1",
@@ -69,7 +69,7 @@ describe("usePresenterValuePresentationScreen", () => {
 
   it("shows nothing while no group is presenting", () => {
     const { result } = renderHook(() =>
-      usePresenterValuePresentationScreen(
+      presenterValuePresentationModelOf(
         state({
           presentingGroupName: null,
           presentedValueId: null,
@@ -83,7 +83,7 @@ describe("usePresenterValuePresentationScreen", () => {
 
   it("shows nothing when the presented value is not among the groups values", () => {
     const { result } = renderHook(() =>
-      usePresenterValuePresentationScreen(
+      presenterValuePresentationModelOf(
         state({
           presentingGroupName: "otter",
           presentedValueId: "wert-99",

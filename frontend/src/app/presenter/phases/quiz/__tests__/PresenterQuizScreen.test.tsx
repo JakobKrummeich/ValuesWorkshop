@@ -10,16 +10,16 @@ import {
   type PresenterQuizBar,
   type PresenterQuizScreenModel,
   QuizWallView,
-  usePresenterQuizScreen,
-} from "../usePresenterQuizScreen";
+  presenterQuizScreenModelOf,
+} from "../presenterQuizScreenModel";
 
-jest.mock("../usePresenterQuizScreen", () => ({
-  ...jest.requireActual("../usePresenterQuizScreen"),
-  usePresenterQuizScreen: jest.fn(),
+jest.mock("../presenterQuizScreenModel", () => ({
+  ...jest.requireActual("../presenterQuizScreenModel"),
+  presenterQuizScreenModelOf: jest.fn(),
 }));
 
-const screenHook = usePresenterQuizScreen as jest.MockedFunction<
-  typeof usePresenterQuizScreen
+const screenHook = presenterQuizScreenModelOf as jest.MockedFunction<
+  typeof presenterQuizScreenModelOf
 >;
 
 const state: PresenterQuizState = {

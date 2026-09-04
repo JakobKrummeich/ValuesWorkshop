@@ -1,5 +1,3 @@
-"use client";
-
 import type { PresenterSelectionState } from "../../../../domain/workshopState";
 
 export interface PresenterSelectionScreenModel {
@@ -8,7 +6,7 @@ export interface PresenterSelectionScreenModel {
   progressFraction: number;
 }
 
-export function usePresenterSelectionScreen(
+export function presenterSelectionScreenModelOf(
   state: PresenterSelectionState,
 ): PresenterSelectionScreenModel {
   const { submittedCount } = state.selection;

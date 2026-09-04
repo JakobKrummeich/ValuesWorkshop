@@ -4,14 +4,14 @@ import { PresentationPositionKind } from "../../../../domain/presentationPositio
 import type { PresenterValuePresentationState } from "../../../../domain/workshopState";
 import { GroupIntroView } from "./GroupIntroView";
 import { PresentedValueView } from "./PresentedValueView";
-import { usePresenterValuePresentationScreen } from "./usePresenterValuePresentationScreen";
+import { presenterValuePresentationModelOf } from "./presenterValuePresentationModel";
 
 export function PresenterValuePresentationScreen({
   state,
 }: {
   state: PresenterValuePresentationState;
 }) {
-  const position = usePresenterValuePresentationScreen(state);
+  const position = presenterValuePresentationModelOf(state);
 
   if (position === null) {
     return null;

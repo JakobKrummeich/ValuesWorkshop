@@ -3,10 +3,13 @@
 import type { PresenterQuizState } from "../../../../domain/workshopState";
 import { QuizLearningView } from "./QuizLearningView";
 import { QuizTallyView } from "./QuizTallyView";
-import { QuizWallView, usePresenterQuizScreen } from "./usePresenterQuizScreen";
+import {
+  QuizWallView,
+  presenterQuizScreenModelOf,
+} from "./presenterQuizScreenModel";
 
 export function PresenterQuizScreen({ state }: { state: PresenterQuizState }) {
-  const model = usePresenterQuizScreen(state.quiz);
+  const model = presenterQuizScreenModelOf(state.quiz);
 
   if (model.view === QuizWallView.LearningText) {
     return (

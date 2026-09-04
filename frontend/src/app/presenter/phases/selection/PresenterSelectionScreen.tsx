@@ -7,7 +7,7 @@ import { Counter, CounterSize, CounterVariant } from "../../../Counter";
 import { Eyebrow } from "../../../Eyebrow";
 import { useTranslation } from "../../../i18n/useTranslation";
 import styles from "./PresenterSelectionScreen.module.css";
-import { usePresenterSelectionScreen } from "./usePresenterSelectionScreen";
+import { presenterSelectionScreenModelOf } from "./presenterSelectionScreenModel";
 
 export function PresenterSelectionScreen({
   state,
@@ -16,7 +16,7 @@ export function PresenterSelectionScreen({
 }) {
   const { translate } = useTranslation();
   const { submittedCount, participantCount, progressFraction } =
-    usePresenterSelectionScreen(state);
+    presenterSelectionScreenModelOf(state);
 
   return (
     <section className={styles.screen}>

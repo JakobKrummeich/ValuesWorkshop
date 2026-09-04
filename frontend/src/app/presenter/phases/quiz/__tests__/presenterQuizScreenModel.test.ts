@@ -4,8 +4,8 @@ import { QuizSubState } from "../../../../../domain/workshopState";
 import {
   AnswerBarEmphasis,
   QuizWallView,
-  usePresenterQuizScreen,
-} from "../usePresenterQuizScreen";
+  presenterQuizScreenModelOf,
+} from "../presenterQuizScreenModel";
 
 function quizView(
   overrides: Partial<PresenterQuizView> = {},
@@ -26,7 +26,7 @@ function quizView(
 }
 
 function tallyOf(view: PresenterQuizView) {
-  const { result } = renderHook(() => usePresenterQuizScreen(view));
+  const { result } = renderHook(() => presenterQuizScreenModelOf(view));
   if (result.current.view !== QuizWallView.Tally) {
     throw new Error("Expected the tally view");
   }
@@ -81,7 +81,7 @@ describe("presenter quiz screen logic", () => {
 
   it("gives the learning text its own view together with the correct answer", () => {
     const { result } = renderHook(() =>
-      usePresenterQuizScreen(
+      presenterQuizScreenModelOf(
         quizView({
           subState: QuizSubState.LearningTextShown,
           correctAnswerIndex: 1,

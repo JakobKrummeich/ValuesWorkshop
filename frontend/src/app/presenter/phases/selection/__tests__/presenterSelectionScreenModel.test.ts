@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { Phase } from "../../../../../domain/phases";
 import type { PresenterSelectionState } from "../../../../../domain/workshopState";
-import { usePresenterSelectionScreen } from "../usePresenterSelectionScreen";
+import { presenterSelectionScreenModelOf } from "../presenterSelectionScreenModel";
 
 function state(
   submittedCount: number,
@@ -18,7 +18,7 @@ function state(
 describe("presenter selection screen logic", () => {
   it("relates the submissions to the participants", () => {
     const { result } = renderHook(() =>
-      usePresenterSelectionScreen(state(21, 30)),
+      presenterSelectionScreenModelOf(state(21, 30)),
     );
 
     expect(result.current).toEqual({
@@ -30,7 +30,7 @@ describe("presenter selection screen logic", () => {
 
   it("shows no progress while nobody is in the room", () => {
     const { result } = renderHook(() =>
-      usePresenterSelectionScreen(state(0, 0)),
+      presenterSelectionScreenModelOf(state(0, 0)),
     );
 
     expect(result.current.progressFraction).toBe(0);
@@ -38,7 +38,7 @@ describe("presenter selection screen logic", () => {
 
   it("never runs past a full bar", () => {
     const { result } = renderHook(() =>
-      usePresenterSelectionScreen(state(4, 3)),
+      presenterSelectionScreenModelOf(state(4, 3)),
     );
 
     expect(result.current.progressFraction).toBe(1);

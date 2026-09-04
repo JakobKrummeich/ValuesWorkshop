@@ -9,7 +9,7 @@ import styles from "./QuizAnswerRow.module.css";
 import {
   AnswerBarEmphasis,
   type PresenterQuizBar,
-} from "./usePresenterQuizScreen";
+} from "./presenterQuizScreenModel";
 
 export function QuizAnswerRow({
   answerIndex,

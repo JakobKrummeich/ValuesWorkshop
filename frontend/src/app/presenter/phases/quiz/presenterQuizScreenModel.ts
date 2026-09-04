@@ -1,5 +1,3 @@
-"use client";
-
 import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import type { PresenterQuizView } from "../../../../domain/workshopState";
 
@@ -45,7 +43,7 @@ function emphasisOf(
     : AnswerBarEmphasis.Dimmed;
 }
 
-export function usePresenterQuizScreen(
+export function presenterQuizScreenModelOf(
   quiz: PresenterQuizView,
 ): PresenterQuizScreenModel {
   if (

@@ -7,16 +7,16 @@ import { languageWrapper } from "../../../../../testing/languageWrapper";
 import { PresenterValuePresentationScreen } from "../PresenterValuePresentationScreen";
 import {
   type PresenterPresentationPosition,
-  usePresenterValuePresentationScreen,
-} from "../usePresenterValuePresentationScreen";
+  presenterValuePresentationModelOf,
+} from "../presenterValuePresentationModel";
 
-jest.mock("../usePresenterValuePresentationScreen", () => ({
-  ...jest.requireActual("../usePresenterValuePresentationScreen"),
-  usePresenterValuePresentationScreen: jest.fn(),
+jest.mock("../presenterValuePresentationModel", () => ({
+  ...jest.requireActual("../presenterValuePresentationModel"),
+  presenterValuePresentationModelOf: jest.fn(),
 }));
 
-const screenHook = usePresenterValuePresentationScreen as jest.MockedFunction<
-  typeof usePresenterValuePresentationScreen
+const screenHook = presenterValuePresentationModelOf as jest.MockedFunction<
+  typeof presenterValuePresentationModelOf
 >;
 
 function state(): PresenterValuePresentationState {

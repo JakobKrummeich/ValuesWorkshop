@@ -8,7 +8,7 @@ import { WordmarkSize } from "../chrome/Wordmark";
 import { CounterSize, CounterVariant } from "../Counter";
 import { EyebrowTone } from "../Eyebrow";
 import { GroupCardVariant } from "../GroupCard";
-import { AnswerBarEmphasis } from "../presenter/phases/quiz/usePresenterQuizScreen";
+import { AnswerBarEmphasis } from "../presenter/phases/quiz/presenterQuizScreenModel";
 
 const variantModules: ReadonlyArray<
   [moduleFile: string, variants: Readonly<Record<string, string>>]

@@ -4,7 +4,7 @@ import type { LocalizedText } from "../../../../domain/i18n/localizedText";
 import { QuizQuestion } from "../../../QuizQuestion";
 import { QuizAnswerRow } from "./QuizAnswerRow";
 import styles from "./QuizTallyView.module.css";
-import type { PresenterQuizBar } from "./usePresenterQuizScreen";
+import type { PresenterQuizBar } from "./presenterQuizScreenModel";
 
 export function QuizTallyView({
   questionNumber,
