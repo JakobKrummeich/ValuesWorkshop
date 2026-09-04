@@ -13,60 +13,7 @@ internal sealed class FakeSessionRepository(Func<Session?> load) : ISessionRepos
 
     internal static FakeSessionRepository Holding(Session session)
     {
-        return new FakeSessionRepository(() => SnapshotOf(session));
-    }
-
-    private static Session SnapshotOf(Session session)
-    {
-        return Session.Restore(
-            session.Identity,
-            session.Facilitator,
-            session.Name,
-            Roster.Restore(session.Roster.Participants),
-            PhaseProgress.Restore(session.PhaseProgress.CurrentPhase),
-            QuizProgress.Restore(
-                session.Quiz.CurrentQuestionIndex,
-                session.Quiz.IsRevealed,
-                session.Quiz.IsLearningTextShown,
-                session.Quiz.CastAnswers
-            ),
-            SelectionRound.Restore(session.Selection.SelectedValues, session.Selection.TopValues),
-            FormationRecord.Restore(
-                session.Formation.IsFormed,
-                session.Formation.Groups.Select(SnapshotOf)
-            ),
-            PresentationWalk.Restore(
-                session.Presentation.PresentingGroup,
-                session.Presentation.PresentedValue,
-                session.Presentation.ShownValueCount
-            ),
-            VotingRounds.Restore(
-                [.. session.Voting.ClosedRounds],
-                session.Voting.RoundOpen
-                    ? new OpenVotingRound(
-                        session.Voting.RoundNumber,
-                        session.Voting.Allotment,
-                        session.Voting.EligibleValues,
-                        session.Voting.OpenRoundTallies,
-                        session.Voting.OpenRoundVotedParticipants
-                    )
-                    : null
-            ),
-            WinnerReveal.Restore(session.Reveal.RevealedCount),
-            session.Revision
-        );
-    }
-
-    private static Group SnapshotOf(Group group)
-    {
-        return Group.Restore(
-            group.Name,
-            [.. group.Members],
-            [.. group.AssignedValues],
-            group.Scribe,
-            group.IsSubmitted,
-            [.. group.Actions]
-        );
+        return new FakeSessionRepository(() => SessionSnapshots.Of(session));
     }
 
     internal static FakeSessionRepository Empty()
