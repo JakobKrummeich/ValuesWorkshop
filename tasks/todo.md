@@ -725,9 +725,9 @@ architecture graphs, an ER diagram emitted from the EF Core model, a README
 `## Engineering` section with badges, plus the tooling the user picked —
 property-based tests, an accessibility gate, mutation testing, CodeQL and an
 SBOM, and hotspot analysis over the git history.
-- [ ] 30a Metrics collector + `docs/quality/metrics.md`
-- [ ] 30b Repo, frontend and backend diagrams + drift gate
-- [ ] 30c Database ER diagram from the EF model + drift gate
+- [x] 30a Metrics collector + `docs/quality/metrics.md`
+- [x] 30b Repo, frontend and backend diagrams + drift gate
+- [x] 30c Database ER diagram from the EF model + drift gate
 - [ ] 30d README `## Engineering` section + badges
 - [ ] 30e Property-based tests (FsCheck + fast-check)
 - [ ] 30f Accessibility gate (axe-core in the e2e)

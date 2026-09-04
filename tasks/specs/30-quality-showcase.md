@@ -64,9 +64,11 @@ date it describes:
 
 - `repo-structure.mmd` — the repo's top-level map: which directory holds what
   and which ones the build gates read.
-- `frontend-modules.mmd` — folder-level dependency graph of `frontend/src`
-  from dependency-cruiser's mermaid reporter, showing the hexagon:
-  `app/*` → `domain`/`adapters`, the three screen groups mutually isolated.
+- `frontend-modules.mmd` — folder-level dependency graph of `frontend/src`,
+  showing the hexagon: `app/*` → `domain`/`adapters`, the three screen groups
+  mutually isolated. Built in 30b by folding dependency-cruiser's JSON report
+  onto the architectural folders rather than by its mermaid reporter, which
+  draws all 516 modules one by one.
 - `backend-layers.mmd` — project graph parsed from the `.csproj` references:
   `Domain ← Application ← Adapters.* ← Host`, with the analyzer project wired
   into every one of them.
@@ -74,10 +76,12 @@ date it describes:
   and relations, emitted from the EF Core model itself (`IModel`), so it is
   the schema the application actually runs against, not a drawing of it.
 
-**Drift gate:** a test regenerates `database.mmd`, `backend-layers.mmd` and
-`frontend-modules.mmd` and fails when the checked-in file differs, with the
-same `CONTRACT_WRITE=1`-style refresh path the wire fixtures already use.
-`metrics.md` is not gated.
+**Drift gate:** a test regenerates every diagram and fails when the checked-in
+file differs, with the same `CONTRACT_WRITE=1`-style refresh path the wire
+fixtures already use. In 30b/30c that landed as a jest test for the three
+diagrams the frontend generates and an `Adapters.Tests` test, writing under
+`DIAGRAM_WRITE=1`, for the one the EF Core model emits. `metrics.md` is not
+gated.
 
 **README:** a new `## Engineering` section between "Screenshots" and "Run the
 demo" — the headline numbers as a short table, the three architecture
