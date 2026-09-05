@@ -3,7 +3,8 @@
 Audit result: parity is already machine-enforced — `Message =
 Record<Language, string>` and `messages: Record<MessageKey, Message>` make
 tsc (FE build gate) fail on any missing key or missing language;
-`translate.test.ts` guards non-empty texts, catalog mirror, and duplicates;
+`translate.test.ts` guards non-empty texts, catalog mirror, duplicates, and
+cross-language parameter parity;
 backend config loaders refuse blank locales at startup. Wire content flows
 through `translate()`/`localizedText()` everywhere; rejections travel as
 codes. What is actually missing:
