@@ -39,6 +39,13 @@ export const sampleQualityReport: QualityReport = {
         testLines: 14000,
         totalLines: 26000,
       },
+      {
+        area: RepositoryArea.FrontendSource,
+        files: 509,
+        productionLines: 15874,
+        testLines: 16898,
+        totalLines: 32772,
+      },
     ],
     filesByExtension: [{ extension: "cs", files: 321 }],
     longestFiles: [],
@@ -102,6 +109,12 @@ export const sampleQualityReport: QualityReport = {
         kind: SourceKind.Production,
         path: "backend/Domain/Session.cs",
         lineCount: 289,
+      },
+      {
+        side: RepositorySide.Frontend,
+        kind: SourceKind.Production,
+        path: "frontend/src/domain/workshopStateBlocks.ts",
+        lineCount: 290,
       },
       {
         side: RepositorySide.Frontend,

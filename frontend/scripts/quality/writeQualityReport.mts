@@ -16,6 +16,7 @@ import {
   renderHotspotsDiagram,
 } from "./hotspots/hotspotsDiagram.mts";
 import { renderMetricsMarkdown } from "./metricsMarkdown.mts";
+import { readmePath, renderReadme } from "./readmeEngineering.mts";
 import {
   renderQualityReportJson,
   resolveGeneratedAt,
@@ -59,6 +60,22 @@ function hotspotsDiagram(report: QualityReport): GeneratedDiagram {
   };
 }
 
+function writeReport(
+  repositoryRoot: string,
+  report: QualityReport,
+  readmeDiagrams: readonly GeneratedDiagram[],
+): string[] {
+  write(repositoryRoot, metricsJsonPath, renderQualityReportJson(report));
+  write(repositoryRoot, metricsMarkdownPath, renderMetricsMarkdown(report));
+  const readme = readFileSync(resolve(repositoryRoot, readmePath), "utf8");
+  write(
+    repositoryRoot,
+    readmePath,
+    renderReadme(readme, report, readmeDiagrams),
+  );
+  return [metricsJsonPath, metricsMarkdownPath, readmePath];
+}
+
 function measure(locations: RepositoryLocations, now: string): QualityReport {
   const temporaryDirectory = mkdtempSync(join(tmpdir(), "quality-report-"));
   try {
@@ -94,14 +111,16 @@ export function writeQualityReport(
       writeDatabaseDiagram(locations),
     ];
     const report = measure(locations, now);
-    written.push(writeDiagram(locations, hotspotsDiagram(report)));
-    write(repositoryRoot, metricsJsonPath, renderQualityReportJson(report));
-    write(repositoryRoot, metricsMarkdownPath, renderMetricsMarkdown(report));
+    const hotspots = hotspotsDiagram(report);
+    written.push(
+      writeDiagram(locations, hotspots),
+      ...writeReport(repositoryRoot, report, [...structuralDiagrams, hotspots]),
+    );
     return {
       exitCode: 0,
       report: [
         `Measured ${report.commit.shortSha} — ${report.commit.subject}`,
-        `Wrote ${[metricsJsonPath, metricsMarkdownPath, ...written].join(", ")}`,
+        `Wrote ${written.join(", ")}`,
       ].join("\n"),
     };
   } catch (error) {

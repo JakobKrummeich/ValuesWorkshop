@@ -11,6 +11,7 @@ import {
   type DesignSystemMetrics,
 } from "./designSystemScan.mts";
 import { readEnforcedLimits, type EnforcedLimits } from "./enforcedLimits.mts";
+import { withoutMarkedRegions } from "./markedRegion.mts";
 import {
   summarizeProcessHistory,
   type ProcessMetrics,
@@ -75,7 +76,9 @@ export function collectSize(
     .filter(isMeasuredPath)
     .map((path) => ({
       path,
-      lineCount: countLines(readRepositoryFile(context, path)),
+      lineCount: countLines(
+        withoutMarkedRegions(readRepositoryFile(context, path)),
+      ),
     }));
   return {
     commands: recorded(context, tracked.listing),

@@ -3,6 +3,9 @@ interface RegionBounds {
   contentEnd: number;
 }
 
+const anyRegion =
+  /<!-- quality:([\w:-]+):start -->[\s\S]*?<!-- quality:\1:end -->\n?/g;
+
 function countOccurrences(document: string, marker: string): number {
   return document.split(marker).length - 1;
 }
@@ -48,4 +51,8 @@ export function readMarkedRegion(document: string, name: string): string {
     .slice(bounds.contentStart, bounds.contentEnd)
     .replace(/^\n/, "")
     .replace(/\n$/, "");
+}
+
+export function withoutMarkedRegions(document: string): string {
+  return document.replace(anyRegion, "");
 }

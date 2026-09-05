@@ -1,6 +1,7 @@
 import {
   readMarkedRegion,
   replaceMarkedRegion,
+  withoutMarkedRegions,
 } from "../quality/markedRegion.mts";
 
 const readme = [
@@ -92,5 +93,19 @@ describe("readMarkedRegion", () => {
         "diagram:hotspots",
       ),
     ).toBe(content);
+  });
+});
+
+describe("withoutMarkedRegions", () => {
+  it("keeps the hand-written lines and drops every generated region with its markers", () => {
+    expect(withoutMarkedRegions(readme)).toBe(
+      ["# Title", "", "", "Prose that stays.", "", ""].join("\n"),
+    );
+  });
+
+  it("leaves a document without regions untouched", () => {
+    expect(withoutMarkedRegions("# Title\n\nProse.\n")).toBe(
+      "# Title\n\nProse.\n",
+    );
   });
 });
