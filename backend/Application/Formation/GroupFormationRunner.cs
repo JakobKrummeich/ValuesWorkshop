@@ -169,13 +169,11 @@ public sealed class GroupFormationRunner(
         try
         {
             if (
-                groupSolverPort.Solve(request, cancellationToken) is GroupSolverOutcome.Assigned
-                {
-                    Assignment: var solved
-                }
+                groupSolverPort.Solve(request, cancellationToken)
+                is GroupSolverOutcome.Assigned assigned
             )
             {
-                assignment = solved;
+                assignment = assigned.Assignment;
             }
         }
         catch (Exception exception)

@@ -740,7 +740,7 @@ the schema, a project reference or a module edge changes without regeneration;
 all existing gates stay green.
 **Dependencies:** 29. **Size:** L
 
-## Phase 10 — Fallout (Task 31)
+## Phase 10 — Solver determinism (Task 31)
 
 ### Task 31: Work-bounded group solve + incumbent hand-over
 **Spec:** `tasks/specs/31-cpsat-work-bounded-solve.md` (decision + spec via
