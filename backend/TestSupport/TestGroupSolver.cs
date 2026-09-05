@@ -4,10 +4,15 @@ namespace ValuesWorkshop.TestSupport;
 
 public sealed class TestGroupSolver : IGroupSolver
 {
-    public GroupFormationResult Solve(
+    public GroupSolverOutcome Solve(
         GroupFormationRequest request,
         CancellationToken cancellationToken
     )
+    {
+        return new GroupSolverOutcome.Assigned(AssignmentFor(request));
+    }
+
+    public static GroupFormationResult AssignmentFor(GroupFormationRequest request)
     {
         var memberCounts = GroupSizing.ParticipantCountsPerGroup(request.Participants.Count);
         var valueCounts = GroupSizing.ValueCountsPerGroup(

@@ -17,20 +17,48 @@ const STANDARDS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
 const SETTLE_LIMIT_MILLISECONDS = 3_000;
 
+const QUIET_PERIOD_MILLISECONDS = 100;
+
 async function settleEntranceAnimations(page: Page): Promise<void> {
-  await page.evaluate(async (settleLimit) => {
-    const finite = document
-      .getAnimations()
-      .filter(
-        (animation) =>
-          animation.effect?.getTiming().iterations !== Number.POSITIVE_INFINITY,
-      )
-      .map((animation) => animation.finished.catch(() => undefined));
-    await Promise.race([
-      Promise.all(finite),
-      new Promise((settle) => setTimeout(settle, settleLimit)),
-    ]);
-  }, SETTLE_LIMIT_MILLISECONDS);
+  await page.evaluate(
+    async ({ settleLimit, quietPeriod }) => {
+      const runningFiniteAnimations = () =>
+        document
+          .getAnimations()
+          .filter(
+            (animation) =>
+              animation.playState === "running" &&
+              animation.effect?.getTiming().iterations !==
+                Number.POSITIVE_INFINITY,
+          );
+      const pause = (milliseconds: number) =>
+        new Promise((resume) => setTimeout(resume, milliseconds));
+      const deadline = performance.now() + settleLimit;
+
+      while (performance.now() < deadline) {
+        const running = runningFiniteAnimations();
+        if (running.length === 0) {
+          await pause(quietPeriod);
+          if (runningFiniteAnimations().length === 0) {
+            return;
+          }
+          continue;
+        }
+        await Promise.race([
+          Promise.all(
+            running.map((animation) =>
+              animation.finished.catch(() => undefined),
+            ),
+          ),
+          pause(deadline - performance.now()),
+        ]);
+      }
+    },
+    {
+      settleLimit: SETTLE_LIMIT_MILLISECONDS,
+      quietPeriod: QUIET_PERIOD_MILLISECONDS,
+    },
+  );
 }
 
 function describeViolation(violation: Violation): string {

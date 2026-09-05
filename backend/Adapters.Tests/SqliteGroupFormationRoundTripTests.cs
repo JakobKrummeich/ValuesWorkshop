@@ -135,7 +135,7 @@ public sealed class SqliteGroupFormationRoundTripTests : IAsyncLifetime, IDispos
         session.AdvancePhase();
         session.AdvancePhase();
         session.FormGroups(
-            new TestGroupSolver().Solve(GroupFormationRequest.For(session), CancellationToken.None),
+            TestGroupSolver.AssignmentFor(GroupFormationRequest.For(session)),
             new TestGroupNames(8).Names,
             new FixedRandomness(0)
         );

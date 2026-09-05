@@ -61,7 +61,9 @@ screens (all Task 18).
   incumbent returned. Capping (measured during implementation, details
   in cpsat-model.md): `max_deterministic_time = 1.5` as the primary,
   reproducible cap + 2.5 s wall safety net — total stays inside the
-  3 s budget; two redundant capacity cuts + `linearization_level = 2`
+  3 s budget (the wall net went in Task 31: it made the incumbent depend
+  on host speed; the runner now adopts the best-so-far when the window
+  closes first); two redundant capacity cuts + `linearization_level = 2`
   make dense N=30 instances prove optimality in ~1 s. Selections
   outside the top set are ignored (they can never score).
 - Edges: N < 8 → G = 1, trivial single group (still through the same
