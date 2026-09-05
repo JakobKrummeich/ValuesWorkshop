@@ -177,7 +177,10 @@ screens, against the WCAG 2.0/2.1 A and AA rule tags. Serious and critical
 violations fail the run; no rule is excluded and no violation is suppressed. The
 first run found six real defects — a moss ramp that only reached 3.5:1 on white,
 a status pill whose pulse animation sampled at 2.03:1, a tablist wrapped in list
-items, and three unnamed progress bars — and all six were fixed in the product.
+items, and three unnamed progress bars — and all six were fixed in the product. A scan waits for one-shot entrance
+animations and transitions to finish before it measures — axe otherwise samples
+a phase screen mid-fade, where a muted label at 85 % opacity reads 4.15:1 — while
+infinite animations such as the connection pulse stay under test.
 
 ### How the supply chain slice landed
 
