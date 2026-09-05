@@ -102,13 +102,14 @@ public sealed class GroupFormationRunner(
     {
         var token = Guid.NewGuid();
         var cancellation = new CancellationTokenSource();
+        var cancellationToken = cancellation.Token;
         var request = GroupFormationRequest.For(session);
 
         return new GroupFormationRun(
             token,
             timeProviderPort.GetTimestamp(),
             cancellation,
-            Task.Run(() => SolveFor(session.Identity, token, request, cancellation.Token)),
+            Task.Run(() => SolveFor(session.Identity, token, request, cancellationToken)),
             null
         );
     }
