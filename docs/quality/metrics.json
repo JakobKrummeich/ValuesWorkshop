@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-05T08:46:35.998Z",
+  "generatedAt": "2026-09-05T09:21:23.020Z",
   "commit": {
-    "sha": "a8254a76de8cc58edd7399509d36b4982e8f938e",
-    "shortSha": "a8254a7",
-    "committedAt": "2026-09-05T08:45:20+00:00",
-    "subject": "Record in the spec how the mutation testing landed and that the hotspots are a table, not a chart"
+    "sha": "4f4a87011e56b6805ba51c868e747f6f757aa6ad",
+    "shortSha": "4f4a870",
+    "committedAt": "2026-09-05T09:21:15+00:00",
+    "subject": "Say once, for both sides, which commit the mutation scores describe"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -23,9 +23,9 @@
       "git ls-files"
     ],
     "files": 1189,
-    "productionLines": 53791,
-    "testLines": 44370,
-    "totalLines": 98161,
+    "productionLines": 53846,
+    "testLines": 44423,
+    "totalLines": 98269,
     "areas": [
       {
         "area": "backend",
@@ -59,8 +59,8 @@
         "area": "e2e",
         "files": 23,
         "productionLines": 0,
-        "testLines": 3593,
-        "totalLines": 3593
+        "testLines": 3622,
+        "totalLines": 3622
       },
       {
         "area": "frontend/src",
@@ -79,9 +79,9 @@
       {
         "area": "scripts",
         "files": 140,
-        "productionLines": 7358,
-        "testLines": 4311,
-        "totalLines": 11669
+        "productionLines": 7413,
+        "testLines": 4335,
+        "totalLines": 11748
       },
       {
         "area": "tasks",
@@ -230,17 +230,17 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2383,
+    "totalTests": 2384,
     "frontend": {
       "suites": 207,
-      "tests": 1352,
-      "passed": 1352,
+      "tests": 1353,
+      "passed": 1353,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 92.45,
-      "branchCoverage": 90.03,
-      "coveredLines": 3188,
-      "coverableLines": 3448
+      "lineCoverage": 92.49,
+      "branchCoverage": 90.07,
+      "coveredLines": 3205,
+      "coverableLines": 3465
     },
     "backend": {
       "assemblies": [
@@ -293,26 +293,26 @@
       "dotnet build backend/ValuesWorkshop.All.sln"
     ],
     "frontend": {
-      "functions": 3763,
+      "functions": 3772,
       "maximum": 7,
       "mean": 1.19,
       "otherRuleFindings": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 3323
+          "functions": 3327
         },
         {
           "complexity": 2,
-          "functions": 282
+          "functions": 284
         },
         {
           "complexity": 3,
-          "functions": 87
+          "functions": 89
         },
         {
           "complexity": 4,
-          "functions": 46
+          "functions": 47
         },
         {
           "complexity": 5,
@@ -427,10 +427,10 @@
   "hotspots": {
     "commands": [
       "git ls-files",
-      "git log --numstat --no-renames --format=%H a8254a76de8cc58edd7399509d36b4982e8f938e"
+      "git log --numstat --no-renames --format=%H 4f4a87011e56b6805ba51c868e747f6f757aa6ad"
     ],
     "filesAnalysed": 425,
-    "commitsInHistory": 841,
+    "commitsInHistory": 844,
     "hotspots": [
       {
         "path": "backend/Adapters.Persistence/DomainEntityMapper.cs",
@@ -738,12 +738,12 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count a8254a76de8cc58edd7399509d36b4982e8f938e",
-      "git rev-list --count \"--grep=^Merge pull request\" a8254a76de8cc58edd7399509d36b4982e8f938e",
-      "git log --max-parents=0 --format=%cI a8254a76de8cc58edd7399509d36b4982e8f938e",
-      "git shortlog --summary --numbered a8254a76de8cc58edd7399509d36b4982e8f938e"
+      "git rev-list --count 4f4a87011e56b6805ba51c868e747f6f757aa6ad",
+      "git rev-list --count \"--grep=^Merge pull request\" 4f4a87011e56b6805ba51c868e747f6f757aa6ad",
+      "git log --max-parents=0 --format=%cI 4f4a87011e56b6805ba51c868e747f6f757aa6ad",
+      "git shortlog --summary --numbered 4f4a87011e56b6805ba51c868e747f6f757aa6ad"
     ],
-    "commits": 841,
+    "commits": 844,
     "mergedPullRequests": 67,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4
