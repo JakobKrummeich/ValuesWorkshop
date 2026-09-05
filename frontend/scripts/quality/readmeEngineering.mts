@@ -42,9 +42,8 @@ function withTables(readme: string, report: QualityReport): string {
   );
 }
 
-export function renderReadme(
+export function renderReadmeDiagrams(
   readme: string,
-  report: QualityReport,
   diagrams: readonly GeneratedDiagram[],
 ): string {
   return diagrams.reduce(
@@ -54,6 +53,14 @@ export function renderReadme(
         diagramRegionOf(diagram.path),
         mermaidFence(diagram.mermaid),
       ),
-    withTables(readme, report),
+    readme,
   );
+}
+
+export function renderReadme(
+  readme: string,
+  report: QualityReport,
+  diagrams: readonly GeneratedDiagram[],
+): string {
+  return renderReadmeDiagrams(withTables(readme, report), diagrams);
 }

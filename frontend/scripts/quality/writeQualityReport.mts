@@ -12,7 +12,11 @@ import type { RepositoryLocations } from "./collectionContext.mts";
 import { collectQualityMetrics } from "./collectQualityMetrics.mts";
 import { writeDatabaseDiagram } from "./databaseDiagram.mts";
 import { renderMetricsMarkdown } from "./metricsMarkdown.mts";
-import { readmePath, renderReadme } from "./readmeEngineering.mts";
+import {
+  readmePath,
+  renderReadme,
+  renderReadmeDiagrams,
+} from "./readmeEngineering.mts";
 import {
   renderQualityReportJson,
   resolveGeneratedAt,
@@ -41,12 +45,23 @@ function write(repositoryRoot: string, path: string, content: string): void {
   writeFileSync(file, content);
 }
 
-function writeDiagram(
-  locations: RepositoryLocations,
-  diagram: GeneratedDiagram,
-): string {
-  write(locations.repositoryRoot, diagram.path, diagram.mermaid);
-  return diagram.path;
+function readReadme(repositoryRoot: string): string {
+  return readFileSync(resolve(repositoryRoot, readmePath), "utf8");
+}
+
+function writeStructuralDiagrams(
+  repositoryRoot: string,
+  diagrams: readonly GeneratedDiagram[],
+): string[] {
+  for (const diagram of diagrams) {
+    write(repositoryRoot, diagram.path, diagram.mermaid);
+  }
+  write(
+    repositoryRoot,
+    readmePath,
+    renderReadmeDiagrams(readReadme(repositoryRoot), diagrams),
+  );
+  return diagrams.map((diagram) => diagram.path);
 }
 
 function writeReport(
@@ -56,11 +71,10 @@ function writeReport(
 ): string[] {
   write(repositoryRoot, metricsJsonPath, renderQualityReportJson(report));
   write(repositoryRoot, metricsMarkdownPath, renderMetricsMarkdown(report));
-  const readme = readFileSync(resolve(repositoryRoot, readmePath), "utf8");
   write(
     repositoryRoot,
     readmePath,
-    renderReadme(readme, report, readmeDiagrams),
+    renderReadme(readReadme(repositoryRoot), report, readmeDiagrams),
   );
   return [metricsJsonPath, metricsMarkdownPath, readmePath];
 }
@@ -96,7 +110,7 @@ export function writeQualityReport(
     };
     const structuralDiagrams = generateStructuralDiagrams(locations);
     const diagrams = [
-      ...structuralDiagrams.map((diagram) => writeDiagram(locations, diagram)),
+      ...writeStructuralDiagrams(repositoryRoot, structuralDiagrams),
       writeDatabaseDiagram(locations),
     ];
     const report = measure(locations, now);

@@ -10,6 +10,7 @@ import {
   mermaidFence,
   readmePath,
   renderReadme,
+  renderReadmeDiagrams,
 } from "../quality/readmeEngineering.mts";
 import { renderHeadlineTable } from "../quality/readmeHeadlineTable.mts";
 import { sampleQualityReport } from "../testing/sampleQualityReport.mts";
@@ -64,6 +65,22 @@ describe("mermaidFence", () => {
     expect(mermaidFence("graph LR\n    a --> b\n")).toBe(
       "```mermaid\ngraph LR\n    a --> b\n```",
     );
+  });
+});
+
+describe("renderReadmeDiagrams", () => {
+  const rendered = renderReadmeDiagrams(readme, diagrams);
+
+  it("refreshes the diagrams before any number is measured, so the drift gate inside the measurement sees the README it will be checked against", () => {
+    expect(readMarkedRegion(rendered, "diagram:backend-layers")).toBe(
+      "```mermaid\ngraph TD\n    Api --> Domain\n```",
+    );
+    expect(rendered).not.toContain("stale");
+  });
+
+  it("leaves the tables for the measurement to fill in", () => {
+    expect(readMarkedRegion(rendered, headlineRegion)).toBe("");
+    expect(readMarkedRegion(rendered, hotspotsRegion)).toBe("");
   });
 });
 
