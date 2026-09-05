@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-05T11:02:33.376Z",
+  "generatedAt": "2026-09-05T11:10:31.627Z",
   "commit": {
-    "sha": "6869a546efc284fc0b0f0716b21aeb117f3e42ea",
-    "shortSha": "6869a54",
-    "committedAt": "2026-09-05T11:02:31+00:00",
-    "subject": "The report writes the README's diagram regions before it measures, because the measurement runs the drift gate that compares them"
+    "sha": "8b64e8578c9208fa20002a96e0a099d6a02b902b",
+    "shortSha": "8b64e85",
+    "committedAt": "2026-09-05T11:10:16+00:00",
+    "subject": "Pin the two-sided Complexity table in the metrics test, and ask LINQ whether a property's accessors hold code"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -23,16 +23,16 @@
       "git ls-files"
     ],
     "files": 1195,
-    "productionLines": 54024,
-    "testLines": 44807,
-    "totalLines": 98831,
+    "productionLines": 54018,
+    "testLines": 44830,
+    "totalLines": 98848,
     "areas": [
       {
         "area": "backend",
         "files": 354,
-        "productionLines": 8876,
+        "productionLines": 8870,
         "testLines": 19807,
-        "totalLines": 28683
+        "totalLines": 28677
       },
       {
         "area": "contract",
@@ -80,8 +80,8 @@
         "area": "scripts",
         "files": 141,
         "productionLines": 7517,
-        "testLines": 4444,
-        "totalLines": 11961
+        "testLines": 4467,
+        "totalLines": 11984
       },
       {
         "area": "tasks",
@@ -234,11 +234,11 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2399,
+    "totalTests": 2401,
     "frontend": {
       "suites": 207,
-      "tests": 1356,
-      "passed": 1356,
+      "tests": 1358,
+      "passed": 1358,
       "failed": 0,
       "skipped": 0,
       "lineCoverage": 92.46,
@@ -288,10 +288,10 @@
       "passed": 950,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 98.6,
+      "lineCoverage": 98.7,
       "branchCoverage": 93.1,
-      "coveredLines": 9974,
-      "coverableLines": 10106
+      "coveredLines": 9968,
+      "coverableLines": 10099
     },
     "endToEnd": {
       "tests": 93,
@@ -304,14 +304,14 @@
       "dotnet build backend/ValuesWorkshop.All.sln --no-incremental -p:ReportCyclomaticComplexity=true"
     ],
     "frontend": {
-      "functions": 3783,
+      "functions": 3785,
       "maximum": 7,
       "mean": 1.19,
       "aboveCap": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 3335
+          "functions": 3337
         },
         {
           "complexity": 2,
@@ -505,10 +505,10 @@
   "hotspots": {
     "commands": [
       "git ls-files",
-      "git log --numstat --no-renames --format=%H 6869a546efc284fc0b0f0716b21aeb117f3e42ea"
+      "git log --numstat --no-renames --format=%H 8b64e8578c9208fa20002a96e0a099d6a02b902b"
     ],
     "filesAnalysed": 425,
-    "commitsInHistory": 849,
+    "commitsInHistory": 851,
     "hotspots": [
       {
         "path": "backend/Domain/Session.cs",
@@ -816,12 +816,12 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count 6869a546efc284fc0b0f0716b21aeb117f3e42ea",
-      "git rev-list --count \"--grep=^Merge pull request\" 6869a546efc284fc0b0f0716b21aeb117f3e42ea",
-      "git log --max-parents=0 --format=%cI 6869a546efc284fc0b0f0716b21aeb117f3e42ea",
-      "git shortlog --summary --numbered 6869a546efc284fc0b0f0716b21aeb117f3e42ea"
+      "git rev-list --count 8b64e8578c9208fa20002a96e0a099d6a02b902b",
+      "git rev-list --count \"--grep=^Merge pull request\" 8b64e8578c9208fa20002a96e0a099d6a02b902b",
+      "git log --max-parents=0 --format=%cI 8b64e8578c9208fa20002a96e0a099d6a02b902b",
+      "git shortlog --summary --numbered 8b64e8578c9208fa20002a96e0a099d6a02b902b"
     ],
-    "commits": 849,
+    "commits": 851,
     "mergedPullRequests": 67,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4

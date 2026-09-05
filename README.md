@@ -77,10 +77,10 @@ here is typed by hand.
 
 | What | Frontend | Backend | Enforced by |
 | --- | ---: | ---: | --- |
-| Production code | 15,874 lines | 8,876 lines | — |
+| Production code | 15,874 lines | 8,870 lines | — |
 | Test code | 16,934 lines | 19,807 lines | — |
-| Tests | 1,356 jest | 950 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
-| Line coverage | 92.46% (at least 80%) | 98.6% (at least 80%) | `jest --coverage` / coverlet |
+| Tests | 1,358 jest | 950 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
+| Line coverage | 92.46% (at least 80%) | 98.7% (at least 80%) | `jest --coverage` / coverlet |
 | Mutation score | 86.43% | 84.59% | Stryker, nightly and on demand |
 | Cyclomatic complexity | highest 7 (at most 7) | highest 7 (at most 7) | eslint `complexity` / analyzer VW1001 |
 | Longest production file | 290 lines (at most 300) | 262 lines (at most 300) | eslint `max-lines` / analyzer VW1002 |
