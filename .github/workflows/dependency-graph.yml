@@ -1,0 +1,40 @@
+name: Dependency graph
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: dependency-graph-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: corepack enable
+
+      - name: pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store/v10
+          key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Submit the backend bill of materials to the dependency graph
+        run: pnpm run dependency-graph:submit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
