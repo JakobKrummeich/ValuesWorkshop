@@ -31,7 +31,7 @@ export function complexityRow(report: QualityReport): string[] {
   return [
     "Cyclomatic complexity",
     `highest ${formatCount(report.complexity.frontend.maximum)} (${formatAtMost(limits.frontendComplexity)})`,
-    `${formatCount(report.complexity.backendAnalyzerDiagnostics)} functions above ${formatCount(limits.backendComplexity)}`,
+    `highest ${formatCount(report.complexity.backend.maximum)} (${formatAtMost(limits.backendComplexity)})`,
     "eslint `complexity` / analyzer VW1001",
   ];
 }

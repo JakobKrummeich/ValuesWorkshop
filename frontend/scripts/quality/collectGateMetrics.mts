@@ -6,6 +6,10 @@ import {
   parseModuleGraph,
   readableRuleName,
 } from "./architectureReports.mts";
+import {
+  backendComplexityBuildArguments,
+  parseBackendComplexityReport,
+} from "./backendComplexityScan.mts";
 import { parseTestMethodNames } from "./csharpTestMethods.mts";
 import {
   readRepositoryFile,
@@ -14,7 +18,11 @@ import {
   runInRepository,
   type CollectionContext,
 } from "./collectionContext.mts";
-import { parseEslintComplexityReport } from "./complexityScan.mts";
+import {
+  parseEslintComplexityReport,
+  summarizeComplexity,
+  type ComplexFunction,
+} from "./complexityScan.mts";
 import {
   parseBackendCoverageSummary,
   parseFrontendCoverageSummary,
@@ -23,6 +31,7 @@ import {
   parseDuplicationReport,
   type DuplicationMetrics,
 } from "./duplicationReport.mts";
+import type { EnforcedLimits } from "./enforcedLimits.mts";
 import {
   toRepositoryPath,
   type ArchitectureGroupMetrics,
@@ -49,6 +58,11 @@ import {
 export interface TestsCollection {
   group: MetricGroup<TestsMetrics>;
   jestReportJson: string;
+}
+
+export interface ComplexityCollection {
+  group: MetricGroup<ComplexityGroupMetrics>;
+  measured: ComplexFunction[];
 }
 
 const instabilityFolders = [
@@ -134,30 +148,35 @@ export function collectTests(context: CollectionContext): TestsCollection {
 export function collectComplexity(
   context: CollectionContext,
   size: SizeMetrics,
-): MetricGroup<ComplexityGroupMetrics> {
+  limits: EnforcedLimits,
+): ComplexityCollection {
   const eslint = runInFrontend(
     context,
     "npx",
     ["eslint", "--format", "json", "--rule", '{"complexity":["error",0]}'],
     [0, 1],
   );
-  const build = runInRepository(context, "dotnet", [
-    "build",
-    "backend/ValuesWorkshop.All.sln",
-  ]);
-  const frontend = parseEslintComplexityReport(eslint.stdout);
+  const build = runInRepository(
+    context,
+    "dotnet",
+    backendComplexityBuildArguments,
+  );
+  const frontend = parseEslintComplexityReport(
+    eslint.stdout,
+    context.repositoryRoot,
+  );
+  const backend = parseBackendComplexityReport(
+    build.stdout,
+    context.repositoryRoot,
+  );
   return {
-    commands: recorded(context, eslint, build),
-    frontend: {
-      ...frontend,
-      mostComplex: frontend.mostComplex.map((entry) => ({
-        ...entry,
-        path: toRepositoryPath(entry.path, context.repositoryRoot),
-      })),
+    measured: [...frontend, ...backend],
+    group: {
+      commands: recorded(context, eslint, build),
+      frontend: summarizeComplexity(frontend, limits.frontendComplexity),
+      backend: summarizeComplexity(backend, limits.backendComplexity),
+      longestFiles: size.longestFiles,
     },
-    backendAnalyzerDiagnostics: [...build.stdout.matchAll(/\bVW100\d\b/g)]
-      .length,
-    longestFiles: size.longestFiles,
   };
 }
 

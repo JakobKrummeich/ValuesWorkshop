@@ -15,11 +15,11 @@ describe("renderHotspotsTable", () => {
       renderHotspotsTable(sampleQualityReport.hotspots.hotspots, everyColumn),
     ).toBe(
       [
-        "| file | side | commits | lines changed | complexity | deepest nesting | score |",
+        "| file | side | commits | lines changed | complexity | most complex function | score |",
         "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
-        "| `backend/Domain/Session.cs` | backend | 61 | 1,480 | 412 | 5 | 25,132 |",
-        "| `frontend/src/app/facilitator/page.tsx` | frontend | 34 | 620 | 210 | 6 | 7,140 |",
-        "| `frontend/src/app/participant/page.tsx` | frontend | 30 | 512 | 190 | 6 | 5,700 |",
+        "| `backend/Domain/Session.cs` | backend | 61 | 1,480 | 412 | 6 | 25,132 |",
+        "| `frontend/src/app/facilitator/page.tsx` | frontend | 34 | 620 | 210 | 7 | 7,140 |",
+        "| `frontend/src/app/participant/page.tsx` | frontend | 30 | 512 | 190 | 5 | 5,700 |",
       ].join("\n"),
     );
   });
@@ -43,7 +43,7 @@ describe("renderHotspotsTable", () => {
       commits: 15 - index,
       linesChanged: 100,
       complexity: 10,
-      maximumDepth: 2,
+      mostComplexFunction: 2,
       score: (15 - index) * 10,
     }));
     const table = renderHotspotsTable(many, everyColumn);

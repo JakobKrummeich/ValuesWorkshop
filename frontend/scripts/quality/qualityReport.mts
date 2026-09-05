@@ -48,7 +48,7 @@ export interface TestsMetrics {
 
 export interface ComplexityGroupMetrics {
   frontend: ComplexityMetrics;
-  backendAnalyzerDiagnostics: number;
+  backend: ComplexityMetrics;
   longestFiles: LongestFile[];
 }
 

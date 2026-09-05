@@ -86,13 +86,19 @@ export const sampleQualityReport: QualityReport = {
     endToEnd: { tests: 93, files: 9 },
   },
   complexity: {
-    commands: ["npx eslint --format json"],
+    commands: [
+      "npx eslint --format json",
+      "dotnet build backend/ValuesWorkshop.All.sln --no-incremental -p:ReportCyclomaticComplexity=true",
+    ],
     frontend: {
       functions: 2906,
       maximum: 7,
       mean: 1.18,
-      otherRuleFindings: 0,
-      distribution: [{ complexity: 7, functions: 2 }],
+      aboveCap: 0,
+      distribution: [
+        { complexity: 1, functions: 2904 },
+        { complexity: 7, functions: 2 },
+      ],
       mostComplex: [
         {
           path: "frontend/src/app/facilitator/advanceGuard.ts",
@@ -102,7 +108,25 @@ export const sampleQualityReport: QualityReport = {
         },
       ],
     },
-    backendAnalyzerDiagnostics: 0,
+    backend: {
+      functions: 1795,
+      maximum: 6,
+      mean: 1.24,
+      aboveCap: 0,
+      distribution: [
+        { complexity: 1, functions: 1780 },
+        { complexity: 2, functions: 12 },
+        { complexity: 6, functions: 3 },
+      ],
+      mostComplex: [
+        {
+          path: "backend/Domain/SelectionRound.cs",
+          line: 35,
+          name: "Submit",
+          complexity: 6,
+        },
+      ],
+    },
     longestFiles: [
       {
         side: RepositorySide.Backend,
@@ -150,7 +174,7 @@ export const sampleQualityReport: QualityReport = {
         commits: 61,
         linesChanged: 1480,
         complexity: 412,
-        maximumDepth: 5,
+        mostComplexFunction: 6,
         score: 25132,
       },
       {
@@ -159,7 +183,7 @@ export const sampleQualityReport: QualityReport = {
         commits: 34,
         linesChanged: 620,
         complexity: 210,
-        maximumDepth: 6,
+        mostComplexFunction: 7,
         score: 7140,
       },
       {
@@ -168,7 +192,7 @@ export const sampleQualityReport: QualityReport = {
         commits: 30,
         linesChanged: 512,
         complexity: 190,
-        maximumDepth: 6,
+        mostComplexFunction: 5,
         score: 5700,
       },
     ],

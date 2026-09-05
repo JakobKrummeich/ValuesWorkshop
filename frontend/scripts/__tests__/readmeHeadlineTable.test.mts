@@ -13,7 +13,7 @@ describe("renderHeadlineTable", () => {
       "| Tests | 1,063 jest | 901 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |",
       "| Line coverage | 97.53% (at least 80%) | 98.7% (at least 80%) | `jest --coverage` / coverlet |",
       "| Mutation score | 81.25% | 75.41% | Stryker, nightly and on demand |",
-      "| Cyclomatic complexity | highest 7 (at most 7) | 0 functions above 7 | eslint `complexity` / analyzer VW1001 |",
+      "| Cyclomatic complexity | highest 7 (at most 7) | highest 6 (at most 7) | eslint `complexity` / analyzer VW1001 |",
       "| Longest production file | 290 lines (at most 300) | 289 lines (at most 300) | eslint `max-lines` / analyzer VW1002 |",
       "| Duplicated tokens | 0.13% (at most 2%) | 0.13% (at most 2%) | `jscpd`, one scan over both sides |",
       "| Architecture violations | 0 across 14 dependency-cruiser rules | 0 across 8 ArchUnitNET rules | dependency-cruiser fails the lint, ArchUnitNET fails the tests |",

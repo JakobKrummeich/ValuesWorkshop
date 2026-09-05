@@ -38,10 +38,10 @@ export const hotspotColumns = {
     alignment: right,
     cell: (hotspot) => formatCount(hotspot.complexity),
   },
-  deepestNesting: {
-    header: "deepest nesting",
+  mostComplexFunction: {
+    header: "most complex function",
     alignment: right,
-    cell: (hotspot) => formatCount(hotspot.maximumDepth),
+    cell: (hotspot) => formatCount(hotspot.mostComplexFunction),
   },
   score: {
     header: "score",

@@ -76,7 +76,7 @@ describe("renderReadme", () => {
     );
   });
 
-  it("writes the top hotspots into their region, deepest nesting left out", () => {
+  it("writes the top hotspots into their region, the most complex function left out", () => {
     expect(readMarkedRegion(rendered, hotspotsRegion)).toBe(
       renderHotspotsTable(sampleQualityReport.hotspots.hotspots, [
         hotspotColumns.file,

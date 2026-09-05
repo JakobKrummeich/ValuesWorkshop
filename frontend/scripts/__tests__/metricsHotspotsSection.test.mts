@@ -18,21 +18,21 @@ describe("hotspotsSection", () => {
     ]);
   });
 
-  it("says how churn and complexity were counted, limits included", () => {
+  it("says how churn and complexity were counted, tools included", () => {
     expect(section).toContain(
-      "A hotspot is a production code file that changes often and is intricate at the same time — where the next bug is most likely to be. Churn counts the commits that touched the file under its present path, over the whole history and without following renames, so a file that was moved starts over. Complexity is indentation-based, in the manner of Adam Tornhill's whitespace analysis: every non-blank line adds its nesting depth, at two spaces per level for TypeScript and four for C#. The score is the product of the two.",
+      "A hotspot is a production code file that changes often and is intricate at the same time — where the next bug is most likely to be. Churn counts the commits that touched the file under its present path, over the whole history and without following renames, so a file that was moved starts over. Complexity is cyclomatic, measured by the same tools that enforce the cap — eslint's `complexity` rule per function on the frontend, the VW1001/VW1003 analyzer per method, constructor and property on the backend — and summed over the file's functions; a file without a measured function scores zero. The score is the product of the two.",
     );
   });
 
   it("tables the top ten with everything that went into their score", () => {
     expect(section).toContain(
-      "| file | side | commits | lines changed | complexity | deepest nesting | score |",
+      "| file | side | commits | lines changed | complexity | most complex function | score |",
     );
     expect(section).toContain(
-      "| `backend/Domain/Session.cs` | backend | 61 | 1,480 | 412 | 5 | 25,132 |",
+      "| `backend/Domain/Session.cs` | backend | 61 | 1,480 | 412 | 6 | 25,132 |",
     );
     expect(section).toContain(
-      "| `frontend/src/app/participant/page.tsx` | frontend | 30 | 512 | 190 | 6 | 5,700 |",
+      "| `frontend/src/app/participant/page.tsx` | frontend | 30 | 512 | 190 | 5 | 5,700 |",
     );
   });
 
@@ -43,7 +43,7 @@ describe("hotspotsSection", () => {
       commits: 15 - index,
       linesChanged: 100,
       complexity: 10,
-      maximumDepth: 2,
+      mostComplexFunction: 2,
       score: (15 - index) * 10,
     }));
     const long = hotspotsSection({

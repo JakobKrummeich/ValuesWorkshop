@@ -3,6 +3,7 @@ import {
   formatCount,
   markdownTable,
 } from "./markdownTable.mts";
+import type { ComplexityBucket } from "./complexityScan.mts";
 import type { QualityReport } from "./qualityReport.mts";
 import { RepositorySide, SourceKind } from "./sizeScan.mts";
 
@@ -37,22 +38,44 @@ export function backendAssembliesTable(report: QualityReport): string {
   );
 }
 
+function functionsAt(
+  buckets: readonly ComplexityBucket[],
+  complexity: number,
+): string {
+  const bucket = buckets.find(
+    (candidate) => candidate.complexity === complexity,
+  );
+  return formatCount(bucket?.functions ?? 0);
+}
+
 export function complexityDistributionTable(report: QualityReport): string {
+  const { frontend, backend } = report.complexity;
+  const complexities = [
+    ...new Set(
+      [...frontend.distribution, ...backend.distribution].map(
+        (bucket) => bucket.complexity,
+      ),
+    ),
+  ].sort((left, right) => left - right);
   return markdownTable(
-    ["cyclomatic complexity", "frontend functions"],
-    [right, right],
-    report.complexity.frontend.distribution.map((bucket) => [
-      formatCount(bucket.complexity),
-      formatCount(bucket.functions),
+    ["cyclomatic complexity", "frontend functions", "backend functions"],
+    [right, right, right],
+    complexities.map((complexity) => [
+      formatCount(complexity),
+      functionsAt(frontend.distribution, complexity),
+      functionsAt(backend.distribution, complexity),
     ]),
   );
 }
 
-export function mostComplexFunctionsTable(report: QualityReport): string {
+export function mostComplexFunctionsTable(
+  report: QualityReport,
+  side: RepositorySide,
+): string {
   return markdownTable(
-    ["most complex frontend functions", "file", "complexity"],
+    [`most complex ${side} functions`, "file", "complexity"],
     [left, left, right],
-    report.complexity.frontend.mostComplex.map((entry) => [
+    report.complexity[side].mostComplex.map((entry) => [
       entry.name,
       `\`${entry.path}:${entry.line}\``,
       formatCount(entry.complexity),

@@ -1,10 +1,10 @@
 import {
-  readRepositoryFile,
   recorded,
   runInRepository,
   type CollectionContext,
   type TrackedFileListing,
 } from "../collectionContext.mts";
+import type { ComplexFunction } from "../complexityScan.mts";
 import type { CommitStamp, MetricGroup } from "../qualityReport.mts";
 import {
   areaOf,
@@ -20,11 +20,11 @@ import {
   parseChurnLog,
   type ChurnHistory,
 } from "./gitChurn.mts";
-import { indentUnitOf, measureIndentation } from "./indentationComplexity.mts";
 
-export interface AnalysedFile {
-  path: string;
-  content: string;
+export interface FileComplexity {
+  total: number;
+  maximum: number;
+  functions: number;
 }
 
 export interface Hotspot {
@@ -33,7 +33,7 @@ export interface Hotspot {
   commits: number;
   linesChanged: number;
   complexity: number;
-  maximumDepth: number;
+  mostComplexFunction: number;
   score: number;
 }
 
@@ -52,6 +52,8 @@ const sideByArea: Partial<Record<RepositoryArea, RepositorySide>> = {
 
 const analysedExtensions: ReadonlySet<string> = new Set(["cs", "ts", "tsx"]);
 
+const unmeasured: FileComplexity = { total: 0, maximum: 0, functions: 0 };
+
 export function isHotspotCandidate(path: string): boolean {
   return (
     isMeasuredPath(path) &&
@@ -59,6 +61,21 @@ export function isHotspotCandidate(path: string): boolean {
     sideByArea[areaOf(path)] !== undefined &&
     analysedExtensions.has(extensionOf(path))
   );
+}
+
+export function complexityByFile(
+  functions: readonly ComplexFunction[],
+): Map<string, FileComplexity> {
+  const byFile = new Map<string, FileComplexity>();
+  for (const entry of functions) {
+    const file = byFile.get(entry.path) ?? unmeasured;
+    byFile.set(entry.path, {
+      total: file.total + entry.complexity,
+      maximum: Math.max(file.maximum, entry.complexity),
+      functions: file.functions + 1,
+    });
+  }
+  return byFile;
 }
 
 function sideOf(path: string): RepositorySide {
@@ -71,34 +88,37 @@ function sideOf(path: string): RepositorySide {
   return side;
 }
 
-function scoreFile(file: AnalysedFile, history: ChurnHistory): Hotspot {
-  const churn = history.byPath.get(file.path) ?? {
-    commits: 0,
-    linesChanged: 0,
-  };
-  const indentation = measureIndentation(file.content, indentUnitOf(file.path));
+function scoreFile(
+  path: string,
+  history: ChurnHistory,
+  complexity: ReadonlyMap<string, FileComplexity>,
+): Hotspot {
+  const churn = history.byPath.get(path) ?? { commits: 0, linesChanged: 0 };
+  const file = complexity.get(path) ?? unmeasured;
   return {
-    path: file.path,
-    side: sideOf(file.path),
+    path,
+    side: sideOf(path),
     commits: churn.commits,
     linesChanged: churn.linesChanged,
-    complexity: indentation.total,
-    maximumDepth: indentation.maximumDepth,
-    score: churn.commits * indentation.total,
+    complexity: file.total,
+    mostComplexFunction: file.maximum,
+    score: churn.commits * file.total,
   };
 }
 
 export function rankHotspots(
-  files: readonly AnalysedFile[],
+  paths: readonly string[],
   history: ChurnHistory,
+  functions: readonly ComplexFunction[],
 ): HotspotMetrics {
-  if (files.length === 0) {
+  if (paths.length === 0) {
     throw new Error(
       "The hotspot analysis found no production code file to rank.",
     );
   }
-  const scored = files
-    .map((file) => scoreFile(file, history))
+  const complexity = complexityByFile(functions);
+  const scored = paths
+    .map((path) => scoreFile(path, history, complexity))
     .sort(
       (left, right) =>
         right.score - left.score || left.path.localeCompare(right.path),
@@ -114,14 +134,15 @@ export function collectHotspots(
   context: CollectionContext,
   tracked: TrackedFileListing,
   commit: CommitStamp,
+  functions: readonly ComplexFunction[],
 ): MetricGroup<HotspotMetrics> {
   const log = runInRepository(context, "git", churnLogArguments(commit.sha));
-  const files = tracked.paths.filter(isHotspotCandidate).map((path) => ({
-    path,
-    content: readRepositoryFile(context, path),
-  }));
   return {
     commands: recorded(context, tracked.listing, log),
-    ...rankHotspots(files, parseChurnLog(log.stdout)),
+    ...rankHotspots(
+      tracked.paths.filter(isHotspotCandidate),
+      parseChurnLog(log.stdout),
+      functions,
+    ),
   };
 }
