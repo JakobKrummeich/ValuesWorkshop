@@ -6,9 +6,20 @@ import {
   describeSubmissionResponse,
   submissionFromEnvironment,
   type DependencySnapshot,
+  type Submission,
   type SubmissionOutcome,
 } from "./dependencySnapshot.mts";
 import { billOfMaterialsDirectory } from "./writeBillsOfMaterials.mts";
+
+export interface SubmissionResponse {
+  status: number;
+  body: string;
+}
+
+export type SnapshotPost = (
+  submission: Submission,
+  snapshot: DependencySnapshot,
+) => Promise<SubmissionResponse>;
 
 // GitHub reads pnpm-lock.yaml itself, so the frontend bill would only file a
 // second copy of every npm package; the .csproj files it reads for the backend
@@ -29,8 +40,13 @@ function describeContents(snapshot: DependencySnapshot): string {
     .join(", ");
 }
 
-function submit(repositoryRoot: string): Promise<SubmissionOutcome> {
-  const submission = submissionFromEnvironment(process.env, new Date());
+export function submitDependencySnapshot(
+  repositoryRoot: string,
+  environment: Record<string, string | undefined>,
+  post: SnapshotPost,
+  scannedAt: Date,
+): Promise<SubmissionOutcome> {
+  const submission = submissionFromEnvironment(environment, scannedAt);
   const snapshot = buildDependencySnapshot(
     submission.context,
     submittedBills.map(({ path, sourceLocation }) => ({
@@ -40,9 +56,22 @@ function submit(repositoryRoot: string): Promise<SubmissionOutcome> {
       ),
     })),
   );
-  process.stdout.write(
-    `Submitting ${describeContents(snapshot)} for ${snapshot.sha} on ${snapshot.ref}\n`,
-  );
+  return post(submission, snapshot).then((response) => {
+    const outcome = describeSubmissionResponse(response);
+    return {
+      accepted: outcome.accepted,
+      report: [
+        `Submitted ${describeContents(snapshot)} for ${snapshot.sha} on ${snapshot.ref}`,
+        outcome.report,
+      ].join("\n"),
+    };
+  });
+}
+
+function postWithFetch(
+  submission: Submission,
+  snapshot: DependencySnapshot,
+): Promise<SubmissionResponse> {
   return fetch(submission.endpoint, {
     method: "POST",
     headers: {
@@ -53,11 +82,7 @@ function submit(repositoryRoot: string): Promise<SubmissionOutcome> {
     },
     body: JSON.stringify(snapshot),
   }).then((response) =>
-    response
-      .text()
-      .then((body) =>
-        describeSubmissionResponse({ status: response.status, body }),
-      ),
+    response.text().then((body) => ({ status: response.status, body })),
   );
 }
 
@@ -66,7 +91,12 @@ function isInvokedAsScript(): boolean {
 }
 
 if (isInvokedAsScript()) {
-  void submit(resolve(process.cwd(), "..")).then((outcome) => {
+  void submitDependencySnapshot(
+    resolve(process.cwd(), ".."),
+    process.env,
+    postWithFetch,
+    new Date(),
+  ).then((outcome) => {
     const stream = outcome.accepted ? process.stdout : process.stderr;
     stream.write(`${outcome.report}\n`);
     process.exit(outcome.accepted ? 0 : 1);
