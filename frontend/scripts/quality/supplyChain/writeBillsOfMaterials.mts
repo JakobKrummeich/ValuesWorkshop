@@ -11,7 +11,11 @@ import { runCommand } from "../commandRunner.mts";
 import {
   countComponents,
   normalizeBillOfMaterials,
+  parseBillOfMaterials,
+  type BillOfMaterials,
 } from "./billsOfMaterials.mts";
+import { completeDependencyGraph } from "./completeDependencyGraph.mts";
+import { parseLockfileGraph } from "./lockfileDependencyGraph.mts";
 
 export const billOfMaterialsDirectory = "docs/quality/sbom";
 
@@ -27,13 +31,19 @@ export interface WrittenBillOfMaterials extends DescribedBillOfMaterials {
 }
 
 interface BillOfMaterialsSpecification extends DescribedBillOfMaterials {
-  generate: (repositoryRoot: string, outputFile: string) => void;
+  generate: (repositoryRoot: string, generatedFile: string) => BillOfMaterials;
 }
 
+function readGeneratedBill(generatedFile: string): BillOfMaterials {
+  return parseBillOfMaterials(readFileSync(generatedFile, "utf8"));
+}
+
+// pnpm sbom leaves about a third of the production dependency edges out of its
+// graph, so the graph is rebuilt from the lockfile it was generated from.
 function generateFrontendBill(
   repositoryRoot: string,
-  outputFile: string,
-): void {
+  generatedFile: string,
+): BillOfMaterials {
   runCommand({
     command: "pnpm",
     args: [
@@ -47,22 +57,32 @@ function generateFrontendBill(
       "--filter",
       "frontend",
       "--out",
-      outputFile,
+      generatedFile,
     ],
     cwd: repositoryRoot,
   });
+  return completeDependencyGraph(
+    readGeneratedBill(generatedFile),
+    parseLockfileGraph(
+      readFileSync(resolve(repositoryRoot, "pnpm-lock.yaml"), "utf8"),
+      "frontend",
+    ),
+  );
 }
 
-function generateBackendBill(repositoryRoot: string, outputFile: string): void {
+function generateBackendBill(
+  repositoryRoot: string,
+  generatedFile: string,
+): BillOfMaterials {
   runCommand({
     command: "dotnet",
     args: [
       "dotnet-CycloneDX",
       "backend/ValuesWorkshop.sln",
       "--output",
-      dirname(outputFile),
+      dirname(generatedFile),
       "--filename",
-      basename(outputFile),
+      basename(generatedFile),
       "--output-format",
       "Json",
       "--spec-version",
@@ -72,6 +92,7 @@ function generateBackendBill(repositoryRoot: string, outputFile: string): void {
     ],
     cwd: repositoryRoot,
   });
+  return readGeneratedBill(generatedFile);
 }
 
 const specifications: readonly BillOfMaterialsSpecification[] = [
@@ -103,9 +124,8 @@ export function writeBillsOfMaterials(
         temporaryDirectory,
         basename(specification.path),
       );
-      specification.generate(repositoryRoot, generatedFile);
       const document = normalizeBillOfMaterials(
-        readFileSync(generatedFile, "utf8"),
+        specification.generate(repositoryRoot, generatedFile),
       );
       writeFileSync(resolve(repositoryRoot, specification.path), document);
       return {
