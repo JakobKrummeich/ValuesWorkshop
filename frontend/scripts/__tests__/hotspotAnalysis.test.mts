@@ -97,10 +97,6 @@ describe("rankHotspots", () => {
     expect(metrics.commitsInHistory).toBe(40);
   });
 
-  it("remembers the busiest and the most complex file so the chart can scale to them", () => {
-    expect(metrics.maxima).toEqual({ commits: 12, complexity: 5 });
-  });
-
   it("breaks a tie in score by path so the ranking is stable", () => {
     const twin: AnalysedFile = {
       path: "backend/Domain/Aardvark.cs",
@@ -119,7 +115,7 @@ describe("rankHotspots", () => {
     ]);
   });
 
-  it("reports the top fifteen and scales to the whole set", () => {
+  it("reports the top fifteen of everything it ranked", () => {
     const files = Array.from({ length: 20 }, (_, index) => ({
       path: `backend/Domain/File${String(index).padStart(2, "0")}.cs`,
       content: "    x\n",
@@ -137,7 +133,6 @@ describe("rankHotspots", () => {
     expect(many.hotspots).toHaveLength(15);
     expect(many.hotspots[0].path).toBe("backend/Domain/File19.cs");
     expect(many.filesAnalysed).toBe(20);
-    expect(many.maxima).toEqual({ commits: 20, complexity: 1 });
   });
 
   it("refuses a file outside the two production code areas", () => {

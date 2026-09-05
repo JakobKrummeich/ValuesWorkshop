@@ -37,16 +37,10 @@ export interface Hotspot {
   score: number;
 }
 
-export interface HotspotMaxima {
-  commits: number;
-  complexity: number;
-}
-
 export interface HotspotMetrics {
   filesAnalysed: number;
   commitsInHistory: number;
   hotspots: Hotspot[];
-  maxima: HotspotMaxima;
 }
 
 export const reportedHotspots = 15;
@@ -113,10 +107,6 @@ export function rankHotspots(
     filesAnalysed: scored.length,
     commitsInHistory: history.commits,
     hotspots: scored.slice(0, reportedHotspots),
-    maxima: {
-      commits: Math.max(...scored.map((hotspot) => hotspot.commits)),
-      complexity: Math.max(...scored.map((hotspot) => hotspot.complexity)),
-    },
   };
 }
 

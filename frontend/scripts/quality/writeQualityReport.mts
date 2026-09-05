@@ -11,10 +11,6 @@ import { dirname, join, resolve } from "node:path";
 import type { RepositoryLocations } from "./collectionContext.mts";
 import { collectQualityMetrics } from "./collectQualityMetrics.mts";
 import { writeDatabaseDiagram } from "./databaseDiagram.mts";
-import {
-  hotspotsDiagramPath,
-  renderHotspotsDiagram,
-} from "./hotspots/hotspotsDiagram.mts";
 import { renderMetricsMarkdown } from "./metricsMarkdown.mts";
 import { readmePath, renderReadme } from "./readmeEngineering.mts";
 import {
@@ -51,13 +47,6 @@ function writeDiagram(
 ): string {
   write(locations.repositoryRoot, diagram.path, diagram.mermaid);
   return diagram.path;
-}
-
-function hotspotsDiagram(report: QualityReport): GeneratedDiagram {
-  return {
-    path: hotspotsDiagramPath,
-    mermaid: renderHotspotsDiagram(report.hotspots),
-  };
 }
 
 function writeReport(
@@ -106,21 +95,17 @@ export function writeQualityReport(
       frontendDirectory: resolve(repositoryRoot, "frontend"),
     };
     const structuralDiagrams = generateStructuralDiagrams(locations);
-    const written = [
+    const diagrams = [
       ...structuralDiagrams.map((diagram) => writeDiagram(locations, diagram)),
       writeDatabaseDiagram(locations),
     ];
     const report = measure(locations, now);
-    const hotspots = hotspotsDiagram(report);
-    written.push(
-      writeDiagram(locations, hotspots),
-      ...writeReport(repositoryRoot, report, [...structuralDiagrams, hotspots]),
-    );
+    const written = writeReport(repositoryRoot, report, structuralDiagrams);
     return {
       exitCode: 0,
       report: [
         `Measured ${report.commit.shortSha} — ${report.commit.subject}`,
-        `Wrote ${written.join(", ")}`,
+        `Wrote ${[...written, ...diagrams].join(", ")}`,
       ].join("\n"),
     };
   } catch (error) {

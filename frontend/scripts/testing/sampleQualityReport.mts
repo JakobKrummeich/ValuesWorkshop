@@ -172,7 +172,6 @@ export const sampleQualityReport: QualityReport = {
         score: 5700,
       },
     ],
-    maxima: { commits: 61, complexity: 480 },
   },
   architecture: {
     commands: ["npx depcruise src"],
