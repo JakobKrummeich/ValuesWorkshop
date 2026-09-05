@@ -57,6 +57,7 @@ date it describes:
 | Architecture | dependency-cruiser rules, modules, dependencies, violations, cycles; ArchUnitNET rules; per-layer instability (`depcruise --metrics`) |
 | Design system | design tokens, CSS modules, stylelint token enforcement, contrast-guard assertions |
 | Contract | wire fixtures, contract assertions on both sides |
+| Hotspots | churn × indentation complexity per production file over the whole git history, top 10 tabled |
 | Security | FE advisory scan and BE vulnerable-package scan findings |
 | Process | commits, merged PRs, every one of them through the same CI |
 
@@ -76,6 +77,9 @@ date it describes:
   and relations, emitted from the EF Core model itself (`IModel`), so it is
   the schema the application actually runs against, not a drawing of it.
 
+A fifth, `hotspots.mmd`, is a `quadrantChart` of churn against complexity; it
+moves with every commit, so it is refreshed with the metrics and not gated.
+
 **Drift gate:** a test regenerates every diagram and fails when the checked-in
 file differs, with the same `CONTRACT_WRITE=1`-style refresh path the wire
 fixtures already use. In 30b/30c that landed as a jest test for the three
@@ -86,7 +90,9 @@ gated.
 **README:** a new `## Engineering` section between "Screenshots" and "Run the
 demo" — the headline numbers as a short table, the three architecture
 diagrams inline, one line each on what enforces them, and a link to
-`docs/quality/metrics.md` for the full table.
+`docs/quality/metrics.md` for the full table. The table and the diagrams sit
+in marked regions (`<!-- quality:<name>:start/end -->`) that
+`pnpm quality:report` rewrites, so the README shows only what a tool measured.
 
 ## Tooling worth adding (your call, per line)
 
@@ -104,7 +110,7 @@ new kind of evidence. Ordered by what they would prove about this repo:
 | **CodeQL** | security analysis on both languages, free on GitHub, findings as PR checks | tiny; a workflow file — landed in 30h, see below |
 | **SBOM + OSV** — CycloneDX + osv-scanner | supply chain: what is actually in the image, scanned against a real advisory database rather than pnpm audit alone | small — landed in 30h, see below |
 | **Dead-code detection** — knip (FE) | no unused exports, dependencies or files accumulate | small; likely a one-off cleanup then a gate |
-| **Hotspot analysis** — code-maat over the git history | where complexity and churn overlap, which is where the next bug will be; makes a striking README picture | small; read-only over history |
+| **Hotspot analysis** — code-maat over the git history | where complexity and churn overlap, which is where the next bug will be; makes a striking README picture | small; read-only over history — landed in 30i with plain `git` instead of code-maat, see below |
 | **Process metrics** — from git + the GitHub API | PR cycle time, CI duration, first-try pass rate, flake rate | small |
 | **Trend over time** | every metric recomputed per release so the README can show a direction, not a snapshot | medium; needs a stored series |
 
@@ -152,6 +158,44 @@ violations fail the run; no rule is excluded and no violation is suppressed. The
 first run found six real defects — a moss ramp that only reached 3.5:1 on white,
 a status pill whose pulse animation sampled at 2.03:1, a tablist wrapped in list
 items, and three unnamed progress bars — and all six were fixed in the product.
+
+### How the supply chain slice landed
+
+30h added a CodeQL workflow for both languages
+(`.github/workflows/codeql.yml`), CycloneDX bills of materials for both sides
+in `docs/quality/sbom/` (`pnpm run sbom`), and osv-scanner 2.5.1, pinned by
+checksum in `scripts/install-osv-scanner.sh`, scanning `pnpm-lock.yaml` plus
+both SBOMs from `./scripts/ci-lint.sh`. The scan fails closed: it makes four
+attempts with a 5/15/45 s backoff, and when the advisory database stays
+unreachable it exits 1 — "the dependency tree is unscanned" — rather than
+passing. That was proven end to end by running it behind a dead proxy: the
+binary's exit 127 became the gate's exit 1.
+
+### How the hotspot analysis landed
+
+30i uses nothing but `git` and file reading, in keeping with assumption 4.
+Churn is read from `git log --numstat --no-renames --format=%H <measured sha>`:
+commits and changed lines per path as it is named today, over the whole
+history, binary rows skipped. Complexity is Tornhill-style whitespace
+analysis: every non-blank line of a production `.cs`, `.ts` or `.tsx` file adds
+its nesting depth, at four spaces per level for C# and two for TypeScript, a
+tab counting as one level. The score is commits × complexity; `metrics.md`
+tables the top ten under `## Hotspots` and `hotspots.mmd` plots the top twelve
+on a quadrant chart scaled to the busiest and the most complex file, each
+point kept 10 % clear of the borders so its label stays readable. The chart is
+not drift-gated because it moves with every commit.
+
+### How the README section landed
+
+30d put badges under the title — the CI workflow badge and four shields.io
+dynamic-JSON badges reading `docs/quality/metrics.json` on `main` for frontend
+coverage, backend coverage, the complexity cap and duplication — and a
+`## Engineering` section whose headline table and four diagrams live in marked
+regions that `pnpm quality:report` rewrites from the report and the generated
+`.mmd` files. The lines inside those regions are left out of the size counts,
+so a regeneration cannot move its own numbers. The drift gate now also checks
+the README's copies of the three structural diagrams, and `design/architecture.md`
+and `design/persistence.md` point at their generated counterparts.
 
 My recommendation: **mutation testing, property-based tests, the accessibility
 gate and CodeQL** — each proves something the current gates cannot, and none of

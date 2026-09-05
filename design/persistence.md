@@ -67,7 +67,9 @@ phase, and timestamp. Per-phase state gets its own table.
 
 The SQL below states the intended shape. The migrations in
 `backend/Adapters.Persistence/Migrations/` are authoritative for the schema
-that is actually created.
+that is actually created, and `docs/quality/database.mmd` draws it as an
+`erDiagram` emitted from the EF Core model itself — generated, drift-gated,
+never edited by hand.
 
 ### Core
 

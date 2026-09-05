@@ -12,6 +12,12 @@ Dependencies point inward: outer layers depend on inner layers, never the
 reverse. Ports (abstract interfaces) live inside the domain layer and are
 implemented by adapters in the outer layer.
 
+The measured counterpart of this section is generated, not drawn:
+`docs/quality/frontend-modules.mmd` folds dependency-cruiser's report onto the
+folders below, `docs/quality/backend-layers.mmd` is parsed from the `.csproj`
+references, and `docs/quality/metrics.md` holds the rule counts and violations
+the gates report. Both diagrams are drift-gated against the code.
+
 ### 1.1 Backend Layers
 
 ```
