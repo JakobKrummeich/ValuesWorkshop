@@ -115,7 +115,7 @@ reload to exact prior state.
 **Verification:** `dotnet test backend` (persistence round-trip suite).
 **Dependencies:** 1. **Files:** `backend/Adapters.Persistence/*`. **Size:** M
 
-### Task 7b: EF Core migrations
+### Task 7b: EF Core migrations ✅
 **Spec:** `tasks/specs/07b-schema-migrations.md`.
 **Description:** Replace `EnsureCreated()` with EF Core Migrations applied at
 startup, after Checkpoint B hit `table presentation_state has no column named
@@ -205,7 +205,7 @@ not exist yet. Each lands with the phase task that introduces its intents
 (11, 13, 15, 19, 22). Playwright is still not wired into CI — tracked in
 Task 14.
 
-### Task 9b: Optimistic concurrency for session mutations
+### Task 9b: Optimistic concurrency for session mutations ✅
 **Description:** `SessionCommandHandler` writes the whole aggregate without a
 revision check, so two concurrent intents can lost-update each other (a
 roster change can be overwritten by a concurrent `AdvancePhase`). Add
@@ -479,18 +479,18 @@ inside a transaction so the split reads see one snapshot
 phases 1–5.
 **Dependencies:** 16, 17. **Size:** M
 
-### Task 19: Group work backend
+### Task 19: Group work backend ✅
 **Description:** Random scribe per group at phase entry; facilitator can
 reassign scribe anytime. Actions: 1–5 per assigned value, scribe-only
 create/edit/delete; group submit + un-submit (scribe-only).
 **Acceptance criteria:**
-- [ ] Non-scribe mutation intents rejected
-- [ ] 1–5 bound enforced; submit/un-submit toggles editability
-- [ ] Reassignment moves rights instantly (old scribe rejected)
+- [x] Non-scribe mutation intents rejected
+- [x] 1–5 bound enforced; submit/un-submit toggles editability
+- [x] Reassignment moves rights instantly (old scribe rejected)
 **Verification:** BE group-work suite.
 **Dependencies:** 18. **Size:** M
 
-### Task 19a: Participant attention screens
+### Task 19a: Participant attention screens ✅
 **Description:** Encode the attention rule (participant device never mirrors
 presenter content): shared `WaitingScreen` component (extracted from phase 4);
 quiz post-answer becomes "your answer: X" confirmation (participant view drops
@@ -498,15 +498,15 @@ quiz post-answer becomes "your answer: X" confirmation (participant view drops
 becomes "submission successful" screen; SPEC.md + `design/screens.md` updated
 for phases 2, 3, 5, 7, 8, 9. Spec: `tasks/specs/19a-participant-attention-screens.md`.
 **Acceptance criteria:**
-- [ ] Phase 4 renders shared `WaitingScreen`; component reusable for 7/9
-- [ ] Quiz: after answering only own answer shown; reveal/learning text absent
+- [x] Phase 4 renders shared `WaitingScreen`; component reusable for 7/9
+- [x] Quiz: after answering only own answer shown; reveal/learning text absent
       from participant wire and screen; next question resets
-- [ ] Selection: post-submit confirmation replaces grid
-- [ ] E2e phases 2–3 updated
+- [x] Selection: post-submit confirmation replaces grid
+- [x] E2e phases 2–3 updated
 **Verification:** FE + BE suites, e2e.
 **Dependencies:** 19. **Size:** M
 
-### Task 19b: Group formation progress bar
+### Task 19b: Group formation progress bar ✅
 **Description:** On phase-5 entry, fixed 3-second progress bar on presenter
 AND participant screens (regardless of solve time), then existing cycling
 group cards / own-group card. Facilitator still advances to phase 6 — no
@@ -520,7 +520,7 @@ auto-advance. Decision recorded in spec 19a §D1.
 **Verification:** FE tests + e2e phase-5 timing check.
 **Dependencies:** 19a. **Size:** S
 
-### Task 20: Group work frontend
+### Task 20: Group work frontend ✅
 **Description:** Scribe editor (actions per value, submit/un-submit);
 read-only live view for other members; facilitator overview with per-group
 submit status + scribe reassignment control.
@@ -534,17 +534,17 @@ submit status + scribe reassignment control.
 **Verification:** FE tests + Playwright two-participant scribe scenario.
 **Dependencies:** 19b. **Size:** M
 
-### Checkpoint D (own slice, spec 20b, branch `checkpoint-d-scale-e2e`)
+### Checkpoint D (own slice, spec 20b, branch `checkpoint-d-scale-e2e`) ✅
 > Upgraded in review 2026-08-26: 30 participants instead of 8, so the
 > presenter wall paging (6 cards per page) is exercised too.
-- [ ] Playwright: 30 participants → 7 groups, wall pages in phases 5+6,
+- [x] Playwright: 30 participants → 7 groups, wall pages in phases 5+6,
       scribe reassign swaps editors live, all groups submit, then advance
 
 ---
 
 ## Phase E: Presentation + Voting + PDF
 
-### Task 21: Phase 7 — Value presentation
+### Task 21: Phase 7 — Value presentation ✅
 **Description:** Facilitator selects which group is presenting; presenter
 shows that group's values + actions; participants see passive view.
 > Pivoted in spec review 2026-08-26: no free group selection — the walk runs
@@ -564,7 +564,7 @@ shows that group's values + actions; participants see passive view.
 **Verification:** FE tests + Playwright switch check.
 **Dependencies:** 20. **Size:** S
 
-### Task 22: Final voting backend
+### Task 22: Final voting backend ✅
 **Description:** 5 votes per participant across all presented values;
 multi-votes up to 5 on one value; storage anonymous (tallies + has-voted
 flag only — no voter↔vote rows). Tie at 5th place → tiebreak round over
@@ -589,7 +589,7 @@ tiebreak.
 **Verification:** BE voting suite incl. anonymity assertion.
 **Dependencies:** 21. **Size:** M
 
-### Task 23: Final voting frontend
+### Task 23: Final voting frontend ✅
 **Description:** Participant vote-allocation UI (distribute 5, multi-vote);
 facilitator sub-controls (close voting, start tiebreak); presenter view per
 spec (no live individual votes).
@@ -599,7 +599,7 @@ spec (no live individual votes).
 **Verification:** FE tests + Playwright vote + forced-tiebreak scenario.
 **Dependencies:** 22. **Size:** M
 
-### Task 23a: Machine-checked FE/BE wire contract
+### Task 23a: Machine-checked FE/BE wire contract ✅
 **Description:** Finish the accepted proposal in
 `docs/architecture/reviews/2026-08-30-wire-contract-fitness-function.md`
 (steps 2–7; step 1, `contract/intents.json` + its backend producer, landed
@@ -616,7 +616,7 @@ Tests and generated artifacts only — no production code changes.
 proven by hand-editing the artifacts.
 **Dependencies:** 23. **Size:** M
 
-### Task 24: Phase 9 — Final presentation + PDF
+### Task 24: Phase 9 — Final presentation + PDF ✅
 **Description:** Winners (5 values + actions) on presenter. Participant
 download button renders PDF client-side via `@react-pdf/renderer`: all
 anonymous vote tallies, all worked-out actions, winners; de+en.
@@ -627,14 +627,14 @@ anonymous vote tallies, all worked-out actions, winners; de+en.
 **Verification:** Playwright download + PDF text extraction assertions.
 **Dependencies:** 22, 23. **Size:** M
 
-### Checkpoint E
+### Checkpoint E ✅
 - [x] Playwright: phases 7–9 incl. one tiebreak; PDF verified anonymous
 
 ---
 
 ## Phase F: Hardening + Polish
 
-### Task 25: Restart-recovery + reconnect e2e
+### Task 25: Restart-recovery + reconnect e2e ✅
 **Description:** Kill backend mid-quiz, mid-group-work, mid-voting, and
 mid-reveal (phase 9, `revealed_winner_count` persisted in Task 24); restart;
 all three roles resume exactly. Tab close/reopen for facilitator and
@@ -690,7 +690,7 @@ regenerate via `pnpm demo:media`; seed data proofread found nothing.
 
 ## Phase 8 — Showcase (Task 29)
 
-### Task 29: Showcase redesign + demo video
+### Task 29: Showcase redesign + demo video ✅
 **Spec:** `tasks/specs/29-showcase-redesign.md` (approved via Lavish, two
 rounds) · design: `design/visual-system.md`.
 **Description:** Frontend-only redesign ("Lichtung": night wall + phone,
@@ -717,7 +717,7 @@ shared helpers stay the single way to drive a workshop.
 
 ## Phase 9 — Engineering showcase (Task 30)
 
-### Task 30: Measured quality + generated diagrams
+### Task 30: Measured quality + generated diagrams ✅
 **Spec:** `tasks/specs/30-quality-showcase.md` (approved via Lavish).
 **Description:** Show the repo's engineering with numbers the tools produce and
 diagrams generated from the code: a metrics report, repo/frontend/backend
@@ -742,7 +742,7 @@ all existing gates stay green.
 
 ## Phase 10 — Solver determinism (Task 31)
 
-### Task 31: Work-bounded group solve + incumbent hand-over
+### Task 31: Work-bounded group solve + incumbent hand-over ✅
 **Spec:** `tasks/specs/31-cpsat-work-bounded-solve.md` (decision + spec via
 Lavish).
 **Description:** `Selections_outside_the_top_values_never_change_the_groups`
