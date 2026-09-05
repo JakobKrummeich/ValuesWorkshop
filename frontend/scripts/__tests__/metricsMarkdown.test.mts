@@ -55,7 +55,7 @@ describe("renderMetricsMarkdown", () => {
     expect(markdown).toContain("| frontend | StrykerJS 10.0.0 | 81.25% |");
     expect(markdown).toContain("| backend | Stryker.NET 4.16.0 | 75.41% |");
     expect(markdown).toContain(
-      "The frontend score was measured at `fd3cb1b`, the commit this report describes.",
+      "Both scores were measured at `fd3cb1b`, the commit this report describes.",
     );
   });
 
@@ -71,16 +71,40 @@ describe("renderMetricsMarkdown", () => {
       },
     });
     expect(stale).toContain(
-      "The backend score was measured at `9b1c0f4`, not at `fd3cb1b` — the commit this report describes — so it does not describe the code as it stands.",
+      "The backend score was measured at `9b1c0f4`, not at `fd3cb1b` — the commit this report describes — so it describes the code as it stood then.",
+    );
+  });
+
+  it("describes two stale mutation scores in one sentence", () => {
+    const stale = renderMetricsMarkdown({
+      ...report,
+      mutation: {
+        frontend: {
+          ...report.mutation.frontend!,
+          commit: "800a926382f90dd43da834f06c1f6c3efdde9331",
+        },
+        backend: {
+          ...report.mutation.backend!,
+          commit: "9b1c0f4a2d6e8c0b4a2d6e8c0b4a2d6e8c0b4a2d",
+        },
+      },
+    });
+    expect(stale).toContain(
+      "The frontend and backend scores were measured at `800a926` and `9b1c0f4`, not at `fd3cb1b` — the commit this report describes — so they describe the code as it stood then.",
     );
   });
 
   it("says plainly that a side was never measured", () => {
     const unmeasured = renderMetricsMarkdown({ ...report, mutation: {} });
     expect(unmeasured).toContain(
-      "No frontend run is recorded, so the frontend score is absent rather than zero.",
+      "No run is recorded for either side, so both scores are absent rather than zero.",
     );
-    expect(unmeasured).toContain(
+    expect(
+      renderMetricsMarkdown({
+        ...report,
+        mutation: { frontend: report.mutation.frontend },
+      }),
+    ).toContain(
       "No backend run is recorded, so the backend score is absent rather than zero.",
     );
     expect(unmeasured).toContain("- `pnpm mutation:frontend`");

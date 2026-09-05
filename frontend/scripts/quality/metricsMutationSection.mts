@@ -37,19 +37,74 @@ function measurementRow(
   ];
 }
 
+function listOf(sidesToList: readonly MutationSide[]): string {
+  return sidesToList.join(" and ");
+}
+
+function currentSentence(
+  current: readonly MutationSide[],
+  report: QualityReport,
+): string[] {
+  if (current.length === 0) {
+    return [];
+  }
+  const subject =
+    current.length === sides.length
+      ? "Both scores were"
+      : `The ${listOf(current)} score was`;
+  return [
+    `${subject} measured at \`${report.commit.shortSha}\`, the commit this report describes.`,
+  ];
+}
+
+function staleSentence(
+  stale: readonly MutationSide[],
+  report: QualityReport,
+): string[] {
+  if (stale.length === 0) {
+    return [];
+  }
+  const measuredAt = stale
+    .flatMap((side) => report.mutation[side] ?? [])
+    .map((measurement) => `\`${shortSha(measurement.commit)}\``)
+    .join(" and ");
+  const plural = stale.length > 1;
+  return [
+    `The ${listOf(stale)} ${plural ? "scores were" : "score was"} measured at ${measuredAt}, not at \`${report.commit.shortSha}\` — the commit this report describes — so ${plural ? "they describe" : "it describes"} the code as it stood then.`,
+  ];
+}
+
+function unrecordedSentence(unrecorded: readonly MutationSide[]): string[] {
+  if (unrecorded.length === 0) {
+    return [];
+  }
+  if (unrecorded.length === sides.length) {
+    return [
+      "No run is recorded for either side, so both scores are absent rather than zero.",
+    ];
+  }
+  return [
+    `No ${listOf(unrecorded)} run is recorded, so the ${listOf(unrecorded)} score is absent rather than zero.`,
+  ];
+}
+
 function currency(report: QualityReport): string {
-  return sides
-    .map((side) => {
-      const measurement = report.mutation[side];
-      if (!measurement) {
-        return `No ${side} run is recorded, so the ${side} score is absent rather than zero.`;
-      }
-      if (measurement.commit === report.commit.sha) {
-        return `The ${side} score was measured at \`${report.commit.shortSha}\`, the commit this report describes.`;
-      }
-      return `The ${side} score was measured at \`${shortSha(measurement.commit)}\`, not at \`${report.commit.shortSha}\` — the commit this report describes — so it does not describe the code as it stands.`;
-    })
-    .join(" ");
+  const current = sides.filter(
+    (side) => report.mutation[side]?.commit === report.commit.sha,
+  );
+  const stale = sides.filter(
+    (side) =>
+      report.mutation[side] !== undefined &&
+      report.mutation[side]?.commit !== report.commit.sha,
+  );
+  const unrecorded = sides.filter(
+    (side) => report.mutation[side] === undefined,
+  );
+  return [
+    ...currentSentence(current, report),
+    ...staleSentence(stale, report),
+    ...unrecordedSentence(unrecorded),
+  ].join(" ");
 }
 
 export function mutationSection(report: QualityReport): string {
