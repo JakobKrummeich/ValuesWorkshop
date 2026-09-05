@@ -6,6 +6,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(ReportCyclomaticComplexity)' == 'true'">
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);VW1003</WarningsNotAsErrors>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference
       Include="Microsoft.CodeAnalysis.NetAnalyzers"
@@ -20,6 +23,10 @@
       Include="$(MSBuildThisFileDirectory)Analyzers/ValuesWorkshop.Analyzers.csproj"
       OutputItemType="Analyzer"
       ReferenceOutputAssembly="false"
+    />
+    <GlobalAnalyzerConfigFiles
+      Include="$(MSBuildThisFileDirectory)complexity-report.globalconfig"
+      Condition="'$(ReportCyclomaticComplexity)' == 'true'"
     />
   </ItemGroup>
 </Project>

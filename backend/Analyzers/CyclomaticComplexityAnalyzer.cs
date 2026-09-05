@@ -10,6 +10,7 @@ namespace ValuesWorkshop.Analyzers;
 public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
 {
     public const string DiagnosticId = "VW1001";
+    public const string MeasurementDiagnosticId = "VW1003";
     private const int Threshold = 7;
 
     private static readonly DiagnosticDescriptor Rule = new(
@@ -21,8 +22,17 @@ public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true
     );
 
+    private static readonly DiagnosticDescriptor MeasurementRule = new(
+        MeasurementDiagnosticId,
+        "Cyclomatic complexity measured",
+        "'{0}' has cyclomatic complexity {1}",
+        "Maintainability",
+        DiagnosticSeverity.Hidden,
+        isEnabledByDefault: true
+    );
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-        ImmutableArray.Create(Rule);
+        ImmutableArray.Create(Rule, MeasurementRule);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -50,7 +60,7 @@ public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
                 body = (SyntaxNode?)ctor.Body ?? ctor.ExpressionBody;
                 break;
             case PropertyDeclarationSyntax prop:
-                if (prop.ExpressionBody == null && prop.AccessorList == null)
+                if (prop.ExpressionBody == null && !HasAccessorCode(prop.AccessorList))
                     return;
                 name = prop.Identifier.Text;
                 body = (SyntaxNode?)prop.ExpressionBody ?? prop.AccessorList;
@@ -84,16 +94,35 @@ public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
             }
         }
 
+        ReportComplexity(context, name, complexity);
+    }
+
+    private static bool HasAccessorCode(AccessorListSyntax? accessors)
+    {
+        if (accessors == null)
+            return false;
+        foreach (var accessor in accessors.Accessors)
+        {
+            if (accessor.Body != null || accessor.ExpressionBody != null)
+                return true;
+        }
+        return false;
+    }
+
+    private static void ReportComplexity(
+        SyntaxNodeAnalysisContext context,
+        string name,
+        int complexity
+    )
+    {
+        var location = context.Node.GetLocation();
+        context.ReportDiagnostic(Diagnostic.Create(MeasurementRule, location, name, complexity));
+
         if (complexity > Threshold)
         {
-            var diagnostic = Diagnostic.Create(
-                Rule,
-                context.Node.GetLocation(),
-                name,
-                complexity,
-                Threshold
+            context.ReportDiagnostic(
+                Diagnostic.Create(Rule, location, name, complexity, Threshold)
             );
-            context.ReportDiagnostic(diagnostic);
         }
     }
 }
