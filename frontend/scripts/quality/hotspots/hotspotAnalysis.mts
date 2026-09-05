@@ -37,11 +37,16 @@ export interface Hotspot {
   score: number;
 }
 
+export interface HotspotMaxima {
+  commits: number;
+  complexity: number;
+}
+
 export interface HotspotMetrics {
   filesAnalysed: number;
   commitsInHistory: number;
   hotspots: Hotspot[];
-  maxima: { commits: number; complexity: number };
+  maxima: HotspotMaxima;
 }
 
 export const reportedHotspots = 15;

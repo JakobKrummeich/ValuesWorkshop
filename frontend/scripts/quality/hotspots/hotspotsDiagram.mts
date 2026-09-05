@@ -1,5 +1,9 @@
 import { indented, mermaidDocument } from "../mermaidDocument.mts";
-import type { Hotspot, HotspotMetrics } from "./hotspotAnalysis.mts";
+import type {
+  Hotspot,
+  HotspotMaxima,
+  HotspotMetrics,
+} from "./hotspotAnalysis.mts";
 
 export const hotspotsDiagramPath = "docs/quality/hotspots.mmd";
 export const plottedHotspots = 12;
@@ -44,11 +48,7 @@ function shortestUniqueSuffix(path: string, paths: readonly string[]): string {
   return path;
 }
 
-function point(
-  hotspot: Hotspot,
-  label: string,
-  maxima: HotspotMetrics["maxima"],
-): string {
+function point(hotspot: Hotspot, label: string, maxima: HotspotMaxima): string {
   const x = plotCoordinate(hotspot.commits, maxima.commits);
   const y = plotCoordinate(hotspot.complexity, maxima.complexity);
   return `"${label}": [${x}, ${y}]`;
