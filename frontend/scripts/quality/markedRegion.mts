@@ -42,15 +42,15 @@ export function replaceMarkedRegion(
   content: string,
 ): string {
   const bounds = boundsOf(document, name);
-  return `${document.slice(0, bounds.contentStart)}\n${content}\n${document.slice(bounds.contentEnd)}`;
+  return `${document.slice(0, bounds.contentStart)}\n\n${content}\n\n${document.slice(bounds.contentEnd)}`;
 }
 
 export function readMarkedRegion(document: string, name: string): string {
   const bounds = boundsOf(document, name);
   return document
     .slice(bounds.contentStart, bounds.contentEnd)
-    .replace(/^\n/, "")
-    .replace(/\n$/, "");
+    .replace(/^\n+/, "")
+    .replace(/\n+$/, "");
 }
 
 export function withoutMarkedRegions(document: string): string {

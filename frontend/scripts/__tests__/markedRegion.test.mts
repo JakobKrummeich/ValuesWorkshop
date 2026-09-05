@@ -19,13 +19,15 @@ const readme = [
 ].join("\n");
 
 describe("replaceMarkedRegion", () => {
-  it("swaps what lies between the markers and leaves everything else alone", () => {
+  it("swaps what lies between the markers, set off by blank lines so markdown starts a fresh block, and leaves everything else alone", () => {
     expect(replaceMarkedRegion(readme, "headline", "| new | table |")).toBe(
       [
         "# Title",
         "",
         "<!-- quality:headline:start -->",
+        "",
         "| new | table |",
+        "",
         "<!-- quality:headline:end -->",
         "",
         "Prose that stays.",
@@ -44,7 +46,7 @@ describe("replaceMarkedRegion", () => {
       "```mermaid\nquadrantChart\n```",
     );
     expect(filled).toContain(
-      "<!-- quality:diagram:hotspots:start -->\n```mermaid\nquadrantChart\n```\n<!-- quality:diagram:hotspots:end -->",
+      "<!-- quality:diagram:hotspots:start -->\n\n```mermaid\nquadrantChart\n```\n\n<!-- quality:diagram:hotspots:end -->",
     );
   });
 
