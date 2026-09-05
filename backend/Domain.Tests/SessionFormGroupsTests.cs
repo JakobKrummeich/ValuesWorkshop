@@ -185,7 +185,10 @@ public class SessionFormGroupsTests
     private static void FormGroupsWith(Session session, IGroupSolver groupSolverPort, int nameCount)
     {
         session.FormGroups(
-            groupSolverPort.Solve(GroupFormationRequest.For(session), CancellationToken.None),
+            groupSolverPort
+                .Solve(GroupFormationRequest.For(session), CancellationToken.None)
+                .ShouldBeOfType<GroupSolverOutcome.Assigned>()
+                .Assignment,
             new TestGroupNames(nameCount).Names,
             new FixedRandomness(0)
         );
@@ -233,7 +236,7 @@ public class SessionFormGroupsTests
     {
         public GroupFormationRequest? LastRequest { get; private set; }
 
-        public GroupFormationResult Solve(
+        public GroupSolverOutcome Solve(
             GroupFormationRequest request,
             CancellationToken cancellationToken
         )

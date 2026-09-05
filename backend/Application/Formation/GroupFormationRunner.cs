@@ -12,10 +12,13 @@ public sealed class GroupFormationRunner(
     ILogger<GroupFormationRunner> logger
 ) : IGroupFormationProgress
 {
+    private static readonly TimeSpan HandOverGracePeriod = TimeSpan.FromMilliseconds(250);
+
     private sealed record GroupFormationRun(
         Guid Token,
         long StartedAt,
         CancellationTokenSource Cancellation,
+        Task Solving,
         GroupFormationResult? Assignment
     );
 
@@ -29,26 +32,15 @@ public sealed class GroupFormationRunner(
             return;
         }
 
-        var run = new GroupFormationRun(
-            Guid.NewGuid(),
-            timeProviderPort.GetTimestamp(),
-            new CancellationTokenSource(),
-            null
-        );
-
         lock (gate)
         {
-            if (!runs.TryAdd(session.Identity, run))
+            if (runs.ContainsKey(session.Identity))
             {
-                run.Cancellation.Dispose();
-
                 return;
             }
+
+            runs[session.Identity] = StartRunFor(session);
         }
-
-        var request = GroupFormationRequest.For(session);
-
-        _ = Task.Run(() => SolveFor(session.Identity, run.Token, request, run.Cancellation.Token));
     }
 
     public FormationProgress ProgressOf(SessionIdentity sessionIdentity)
@@ -106,14 +98,38 @@ public sealed class GroupFormationRunner(
         }
     }
 
+    private GroupFormationRun StartRunFor(Session session)
+    {
+        var token = Guid.NewGuid();
+        var cancellation = new CancellationTokenSource();
+        var cancellationToken = cancellation.Token;
+        var request = GroupFormationRequest.For(session);
+
+        return new GroupFormationRun(
+            token,
+            timeProviderPort.GetTimestamp(),
+            cancellation,
+            Task.Run(() => SolveFor(session.Identity, token, request, cancellationToken)),
+            null
+        );
+    }
+
     private GroupFormationResult AssignmentFor(Session session)
     {
-        lock (gate)
+        if (AssignmentOf(session.Identity) is { } finished)
         {
-            if (runs.GetValueOrDefault(session.Identity)?.Assignment is { } solved)
-            {
-                return solved;
-            }
+            return finished;
+        }
+
+        StopSolvingFor(session.Identity)?.Solving.Wait(HandOverGracePeriod);
+
+        if (AssignmentOf(session.Identity) is { } handedOver)
+        {
+            logger.LogInformation(
+                "The group solver did not finish within the formation window; its best assignment so far is used."
+            );
+
+            return handedOver;
         }
 
         logger.LogInformation(
@@ -121,6 +137,25 @@ public sealed class GroupFormationRunner(
         );
 
         return RandomGroupAssignment.For(GroupFormationRequest.For(session), randomnessPort);
+    }
+
+    private GroupFormationResult? AssignmentOf(SessionIdentity sessionIdentity)
+    {
+        lock (gate)
+        {
+            return runs.GetValueOrDefault(sessionIdentity)?.Assignment;
+        }
+    }
+
+    private GroupFormationRun? StopSolvingFor(SessionIdentity sessionIdentity)
+    {
+        lock (gate)
+        {
+            var run = runs.GetValueOrDefault(sessionIdentity);
+            run?.Cancellation.Cancel();
+
+            return run;
+        }
     }
 
     private void SolveFor(
@@ -134,11 +169,13 @@ public sealed class GroupFormationRunner(
 
         try
         {
-            assignment = groupSolverPort.Solve(request, cancellationToken);
-        }
-        catch (OperationCanceledException)
-        {
-            return;
+            if (
+                groupSolverPort.Solve(request, cancellationToken)
+                is GroupSolverOutcome.Assigned assigned
+            )
+            {
+                assignment = assigned.Assignment;
+            }
         }
         catch (Exception exception)
         {

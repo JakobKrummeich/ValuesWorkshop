@@ -6,14 +6,18 @@ namespace ValuesWorkshop.Host;
 public sealed class CpSatGroupSolver : IGroupSolver
 {
     private const string SolverParameters =
-        "random_seed:42 num_search_workers:1 linearization_level:2 "
-        + "max_deterministic_time:1.5 max_time_in_seconds:2.5";
+        "random_seed:42 num_search_workers:1 linearization_level:2 max_deterministic_time:1.5";
 
-    public GroupFormationResult Solve(
+    public GroupSolverOutcome Solve(
         GroupFormationRequest request,
         CancellationToken cancellationToken
     )
     {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return new GroupSolverOutcome.StoppedWithoutAssignment();
+        }
+
         var groupCount = GroupSizing.GroupCount(request.Participants.Count);
         var memberCounts = GroupSizing.ParticipantCountsPerGroup(request.Participants.Count);
         var valueCounts = GroupSizing.ValueCountsPerGroup(request.TopValues.Count, groupCount);
@@ -43,16 +47,22 @@ public sealed class CpSatGroupSolver : IGroupSolver
         var cpSolver = new CpSolver { StringParameters = SolverParameters };
         using var stopWhenCancelled = cancellationToken.Register(cpSolver.StopSearch);
         var status = cpSolver.Solve(model);
-        cancellationToken.ThrowIfCancellationRequested();
 
-        if (status is not (CpSolverStatus.Optimal or CpSolverStatus.Feasible))
+        if (status is CpSolverStatus.Optimal or CpSolverStatus.Feasible)
         {
-            throw new InvalidOperationException(
-                $"Group formation found no assignment (solver status {status})."
+            return new GroupSolverOutcome.Assigned(
+                ExtractGroups(cpSolver, request, participantInGroup, valueInGroup, groupCount)
             );
         }
 
-        return ExtractGroups(cpSolver, request, participantInGroup, valueInGroup, groupCount);
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return new GroupSolverOutcome.StoppedWithoutAssignment();
+        }
+
+        throw new InvalidOperationException(
+            $"Group formation found no assignment (solver status {status})."
+        );
     }
 
     private static BoolVar[,] AddExactAssignments(

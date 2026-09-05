@@ -109,21 +109,30 @@ tests. Three ingredients:
   the nondeterminism of parallel portfolio search.
 - `linearization_level = 2` (deviation from the default): the LP relaxation
   carries this model; with the default level the single worker wanders.
-- `max_deterministic_time = 1.5` is the primary cap (deviation): it counts
+- `max_deterministic_time = 1.5` is the only cap (deviation): it counts
   solver work units, not wall time, so the interruption point — and with it
-  the returned incumbent — is reproducible across runs. A wall cap that
-  fires mid-search would return whatever incumbent the clock happened to
-  land on.
-- `max_time_in_seconds = 2.5` stays as the wall-clock safety net under the
-  spec's 3 s budget, for machines where 1.5 deterministic units run slower
-  than wall 2.5 s; only there can the returned incumbent vary by machine.
+  the returned incumbent — is reproducible across runs and hosts. A wall cap
+  that fires mid-search returns whatever incumbent the clock happened to
+  land on; the `max_time_in_seconds = 2.5` safety net the first version
+  carried did exactly that on a CI runner 1.5× slower than the dev box (two
+  solves of one model, objective 38 vs 39) and was dropped in Task 31. The
+  solver never reads a clock; the wall-clock policy is the formation window
+  of `GroupFormationRunner` alone (`architecture.md`).
+- Stopping is a hand-over, not an error: `Solve` returns a
+  `GroupSolverOutcome` — `Assigned` with the best assignment found so far when
+  its token is cancelled mid-search (CP-SAT `StopSearch`, status `FEASIBLE`),
+  `StoppedWithoutAssignment` when it was stopped before the first feasible
+  solution or before it started. Measured on the dev box with the single
+  worker, the first solution appears after roughly 15 % of the cyclic N=30
+  run and after 60 % of a sparse adversarial one, so a host too slow to reach
+  it inside the window still ends with a random assignment.
 - Optimality at workshop scale, measured (deviation from the original
   claim): dense structured instances (hand-worked N=8, disjoint-interest
   N=9, saturated N=30 with 6 selections in the top set) are proven
   `OPTIMAL` in well under a second. Sparse adversarial N=30 instances
   (3 selections each) exhaust the deterministic budget and return their
   best incumbent as `FEASIBLE` — a valid partition, a few points under the
-  proven optimum (39 vs 42 on the benchmark), still inside 3 s wall.
+  proven optimum (39 vs 42 on the benchmark), 1.7 s wall on the dev box.
 
 ## 7. Symmetry
 

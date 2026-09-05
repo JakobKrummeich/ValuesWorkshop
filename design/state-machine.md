@@ -146,7 +146,7 @@ stateDiagram-v2
     state "Formed" as Formed
 
     [*] --> Forming : phase entry — no groups yet, solver starts
-    Forming --> Formed : FormGroups [System] / GroupsFormed · trigger - formation window over · the solver's assignment, or a random assignment when the solver did not finish in time
+    Forming --> Formed : FormGroups [System] / GroupsFormed · trigger - formation window over · the solver's assignment — finished or its best so far — or a random assignment when the solver has none
     Formed --> [*] : groups and assignments shown · awaits AdvancePhase
 ```
 
@@ -155,8 +155,9 @@ Guards in words:
 - **FormGroups** — participants partitioned and top values dealt out per the
   sizing rule and the formation aim; the value-to-group assignment is fixed
   from then on (I8). It fires once, on the server clock, never on a person's
-  command; a random assignment stands in when the solver has produced none by
-  the deadline, so the window always ends formed.
+  command; a solver still searching hands over its best assignment so far,
+  and a random assignment stands in when it has none, so the window always
+  ends formed.
 - **AdvancePhase** out of Group formation — refused while `Forming`: only
   formed groups can be worked in (I8). The advance itself stays
   facilitator-triggered.
@@ -336,7 +337,7 @@ facilitator sub-controls are marked ◆.
 | T8 | 2 | Pose next question ◆ | Facilitator | learning text shown; questions remain | QuestionPosed |
 | T9 | 3 | Submit value selection | Participant | exactly ten distinct; not yet submitted (I6) | ValuesSelected |
 | T10 | →4 | Determine top values | System | on phase entry; widen on tenth-place tie (I7) | TopValuesDetermined |
-| T11 | 5 | Form groups | System | formation window over; sizing rule + formation aim (I8); random assignment when the solver did not finish | GroupsFormed |
+| T11 | 5 | Form groups | System | formation window over; sizing rule + formation aim (I8); the solver's best assignment so far when it did not finish, random when it has none | GroupsFormed |
 | T12 | →6 | Appoint scribes | System | on phase entry; one random member per group (I9) | ScribeAppointed |
 | T12a | →7 | Open presentation walk | System | on phase entry; first group's intro (I12) | NextValueShown |
 | T12b | →8 | Open voting round | System | on phase entry; allotment five, eligible = all presented values | — |

@@ -115,7 +115,39 @@ public class GroupFormationRunnerTests
     }
 
     [Fact]
-    public void The_groups_are_formed_at_random_when_the_solver_is_still_thinking()
+    public void The_groups_are_formed_from_what_the_solver_hands_over_when_the_window_closes_first()
+    {
+        var solver = new StoppableGroupSolver(request =>
+            new SplitInTwoGroupSolver().Solve(request, CancellationToken.None)
+        );
+        var runner = RunnerOver(solver);
+        var session = FormingSession();
+        runner.EnsureRunningFor(session);
+        solver.WaitUntilAsked();
+
+        runner.FormGroupsIn(session);
+
+        session.Formation.Groups.Select(group => group.Members.Count).ShouldBe([1, 2]);
+    }
+
+    [Fact]
+    public void The_groups_are_formed_at_random_when_the_stopped_solver_has_nothing_to_hand_over()
+    {
+        var solver = new StoppableGroupSolver(
+            _ => new GroupSolverOutcome.StoppedWithoutAssignment()
+        );
+        var runner = RunnerOver(solver);
+        var session = FormingSession();
+        runner.EnsureRunningFor(session);
+        solver.WaitUntilAsked();
+
+        runner.FormGroupsIn(session);
+
+        session.Formation.Groups.ShouldHaveSingleItem().Members.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public void The_groups_are_formed_at_random_when_the_solver_ignores_the_stop()
     {
         var solver = new BlockedGroupSolver();
         var session = FormingSession();
@@ -151,9 +183,11 @@ public class GroupFormationRunnerTests
     }
 
     [Fact]
-    public void Dropping_a_run_cancels_the_solve_it_started()
+    public void Dropping_a_run_stops_the_solve_it_started()
     {
-        var solver = new CancellationWatchingGroupSolver();
+        var solver = new StoppableGroupSolver(
+            _ => new GroupSolverOutcome.StoppedWithoutAssignment()
+        );
         var runner = RunnerOver(solver);
         var session = FormingSession();
         runner.EnsureRunningFor(session);
@@ -161,7 +195,7 @@ public class GroupFormationRunnerTests
 
         runner.Drop(session.Identity);
 
-        solver.WaitUntilCancelled();
+        solver.WaitUntilStopped();
     }
 
     [Fact]
@@ -256,7 +290,7 @@ public class GroupFormationRunnerTests
 
     private sealed class SplitInTwoGroupSolver : IGroupSolver
     {
-        public GroupFormationResult Solve(
+        public GroupSolverOutcome Solve(
             GroupFormationRequest request,
             CancellationToken cancellationToken
         )
@@ -265,30 +299,33 @@ public class GroupFormationRunnerTests
                 .Participants.Select(participant => participant.ParticipantId)
                 .ToList();
 
-            return new GroupFormationResult([
-                new FormedGroup(members.Take(1).ToList(), request.TopValues.Take(1).ToList()),
-                new FormedGroup(members.Skip(1).ToList(), request.TopValues.Skip(1).ToList()),
-            ]);
+            return new GroupSolverOutcome.Assigned(
+                new GroupFormationResult([
+                    new FormedGroup(members.Take(1).ToList(), request.TopValues.Take(1).ToList()),
+                    new FormedGroup(members.Skip(1).ToList(), request.TopValues.Skip(1).ToList()),
+                ])
+            );
         }
     }
 
-    private sealed class CancellationWatchingGroupSolver : IGroupSolver
+    private sealed class StoppableGroupSolver(
+        Func<GroupFormationRequest, GroupSolverOutcome> outcomeWhenStopped
+    ) : IGroupSolver
     {
         private readonly ManualResetEventSlim asked = new();
-        private readonly ManualResetEventSlim cancelled = new();
+        private readonly ManualResetEventSlim stopped = new();
 
-        public GroupFormationResult Solve(
+        public GroupSolverOutcome Solve(
             GroupFormationRequest request,
             CancellationToken cancellationToken
         )
         {
-            using var stopWhenCancelled = cancellationToken.Register(cancelled.Set);
+            using var stopWhenCancelled = cancellationToken.Register(stopped.Set);
 
             asked.Set();
-            cancelled.Wait(TimeSpan.FromSeconds(10));
-            cancellationToken.ThrowIfCancellationRequested();
+            stopped.Wait(TimeSpan.FromSeconds(10));
 
-            return new TestGroupSolver().Solve(request, cancellationToken);
+            return outcomeWhenStopped(request);
         }
 
         public void WaitUntilAsked()
@@ -296,9 +333,9 @@ public class GroupFormationRunnerTests
             asked.Wait(TimeSpan.FromSeconds(10)).ShouldBeTrue();
         }
 
-        public void WaitUntilCancelled()
+        public void WaitUntilStopped()
         {
-            cancelled.Wait(TimeSpan.FromSeconds(10)).ShouldBeTrue();
+            stopped.Wait(TimeSpan.FromSeconds(10)).ShouldBeTrue();
         }
     }
 
@@ -309,7 +346,7 @@ public class GroupFormationRunnerTests
         private readonly ManualResetEventSlim laterSolvesReleased = new();
         private int solves;
 
-        public GroupFormationResult Solve(
+        public GroupSolverOutcome Solve(
             GroupFormationRequest request,
             CancellationToken cancellationToken
         )
@@ -346,7 +383,7 @@ public class GroupFormationRunnerTests
     {
         private readonly ManualResetEventSlim released = new();
 
-        public GroupFormationResult Solve(
+        public GroupSolverOutcome Solve(
             GroupFormationRequest request,
             CancellationToken cancellationToken
         )
@@ -366,7 +403,7 @@ public class GroupFormationRunnerTests
     {
         private readonly ManualResetEventSlim attempted = new();
 
-        public GroupFormationResult Solve(
+        public GroupSolverOutcome Solve(
             GroupFormationRequest request,
             CancellationToken cancellationToken
         )
@@ -386,7 +423,7 @@ public class GroupFormationRunnerTests
     {
         private readonly TaskCompletionSource<GroupFormationRequest> requested = new();
 
-        public GroupFormationResult Solve(
+        public GroupSolverOutcome Solve(
             GroupFormationRequest request,
             CancellationToken cancellationToken
         )
