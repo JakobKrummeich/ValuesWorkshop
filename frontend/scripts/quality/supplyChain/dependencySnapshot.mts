@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { BillOfMaterials } from "./billsOfMaterials.mts";
 
-export type PackageRelationship = "direct" | "indirect";
+type PackageRelationship = "direct" | "indirect";
 
 export interface SnapshotJob {
   id: string;
