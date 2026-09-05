@@ -54,9 +54,9 @@ describe("hotspotsSection", () => {
     expect(long).not.toContain("| `backend/Domain/File10.cs` |");
   });
 
-  it("says how much was analysed and where the picture is", () => {
+  it("says how much was analysed", () => {
     expect(section).toContain(
-      "512 production code files were ranked over 800 commits; the twelve highest scores are drawn in [hotspots.mmd](hotspots.mmd), scaled to the busiest and the most complex file.",
+      "512 production code files were ranked over 800 commits.",
     );
   });
 });

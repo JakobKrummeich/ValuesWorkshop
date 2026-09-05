@@ -13,8 +13,8 @@ const readme = [
   "",
   "Prose that stays.",
   "",
-  "<!-- quality:diagram:hotspots:start -->",
-  "<!-- quality:diagram:hotspots:end -->",
+  "<!-- quality:diagram:backend-layers:start -->",
+  "<!-- quality:diagram:backend-layers:end -->",
   "",
 ].join("\n");
 
@@ -32,8 +32,8 @@ describe("replaceMarkedRegion", () => {
         "",
         "Prose that stays.",
         "",
-        "<!-- quality:diagram:hotspots:start -->",
-        "<!-- quality:diagram:hotspots:end -->",
+        "<!-- quality:diagram:backend-layers:start -->",
+        "<!-- quality:diagram:backend-layers:end -->",
         "",
       ].join("\n"),
     );
@@ -42,11 +42,11 @@ describe("replaceMarkedRegion", () => {
   it("fills a region that is still empty", () => {
     const filled = replaceMarkedRegion(
       readme,
-      "diagram:hotspots",
-      "```mermaid\nquadrantChart\n```",
+      "diagram:backend-layers",
+      "```mermaid\ngraph TD\n```",
     );
     expect(filled).toContain(
-      "<!-- quality:diagram:hotspots:start -->\n\n```mermaid\nquadrantChart\n```\n\n<!-- quality:diagram:hotspots:end -->",
+      "<!-- quality:diagram:backend-layers:start -->\n\n```mermaid\ngraph TD\n```\n\n<!-- quality:diagram:backend-layers:end -->",
     );
   });
 
@@ -84,15 +84,15 @@ describe("readMarkedRegion", () => {
   });
 
   it("reads an empty region as empty", () => {
-    expect(readMarkedRegion(readme, "diagram:hotspots")).toBe("");
+    expect(readMarkedRegion(readme, "diagram:backend-layers")).toBe("");
   });
 
   it("reads back exactly what was written", () => {
     const content = "```mermaid\ngraph LR\n    a --> b\n```";
     expect(
       readMarkedRegion(
-        replaceMarkedRegion(readme, "diagram:hotspots", content),
-        "diagram:hotspots",
+        replaceMarkedRegion(readme, "diagram:backend-layers", content),
+        "diagram:backend-layers",
       ),
     ).toBe(content);
   });

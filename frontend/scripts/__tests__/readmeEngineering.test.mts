@@ -1,7 +1,12 @@
+import {
+  hotspotColumns,
+  renderHotspotsTable,
+} from "../quality/hotspots/hotspotsTable.mts";
 import { readMarkedRegion } from "../quality/markedRegion.mts";
 import {
   diagramRegionOf,
   headlineRegion,
+  hotspotsRegion,
   mermaidFence,
   readmePath,
   renderReadme,
@@ -15,8 +20,8 @@ const diagrams = [
     mermaid: '---\ntitle: "frontend"\n---\ngraph LR\n    a --> b\n',
   },
   {
-    path: "docs/quality/hotspots.mmd",
-    mermaid: 'quadrantChart\n    "a.ts": [0.5, 0.5]\n',
+    path: "docs/quality/backend-layers.mmd",
+    mermaid: "graph TD\n    Api --> Domain\n",
   },
 ];
 
@@ -33,9 +38,14 @@ const readme = [
   "<!-- quality:diagram:frontend-modules:start -->",
   "<!-- quality:diagram:frontend-modules:end -->",
   "",
-  "<!-- quality:diagram:hotspots:start -->",
+  "<!-- quality:diagram:backend-layers:start -->",
   "stale",
-  "<!-- quality:diagram:hotspots:end -->",
+  "<!-- quality:diagram:backend-layers:end -->",
+  "",
+  "### Hotspots",
+  "",
+  "<!-- quality:hotspots:start -->",
+  "<!-- quality:hotspots:end -->",
   "",
   "## Run the demo",
   "",
@@ -66,12 +76,28 @@ describe("renderReadme", () => {
     );
   });
 
+  it("writes the top hotspots into their region, deepest nesting left out", () => {
+    expect(readMarkedRegion(rendered, hotspotsRegion)).toBe(
+      renderHotspotsTable(sampleQualityReport.hotspots.hotspots, [
+        hotspotColumns.file,
+        hotspotColumns.side,
+        hotspotColumns.commits,
+        hotspotColumns.linesChanged,
+        hotspotColumns.complexity,
+        hotspotColumns.score,
+      ]),
+    );
+    expect(readMarkedRegion(rendered, hotspotsRegion)).toContain(
+      "| `backend/Domain/Session.cs` | backend | 61 | 1,480 | 412 | 25,132 |",
+    );
+  });
+
   it("writes every diagram into its region, front matter included", () => {
     expect(readMarkedRegion(rendered, "diagram:frontend-modules")).toBe(
       '```mermaid\n---\ntitle: "frontend"\n---\ngraph LR\n    a --> b\n```',
     );
-    expect(readMarkedRegion(rendered, "diagram:hotspots")).toBe(
-      '```mermaid\nquadrantChart\n    "a.ts": [0.5, 0.5]\n```',
+    expect(readMarkedRegion(rendered, "diagram:backend-layers")).toBe(
+      "```mermaid\ngraph TD\n    Api --> Domain\n```",
     );
     expect(rendered).not.toContain("stale");
   });
