@@ -197,6 +197,16 @@ unreachable it exits 1 — "the dependency tree is unscanned" — rather than
 passing. That was proven end to end by running it behind a dead proxy: the
 binary's exit 127 became the gate's exit 1.
 
+A reviewer later spotted two edges missing from the frontend bill, and a
+comparison against the lockfile showed that pnpm 11.15.1's `pnpm sbom` omits
+about a third of the production dependency edges — 84 of 254 — while its
+component list was complete. The generator therefore keeps pnpm's components
+and metadata but rebuilds the `dependencies` section from `pnpm-lock.yaml`
+(`lockfileDependencyGraph.mts`, `completeDependencyGraph.mts`), and refuses to
+write the bill when the packages the lockfile reaches differ from the
+components pnpm listed — the guard that would have caught a component
+regression as well.
+
 ### How the hotspot analysis landed
 
 30i uses nothing but `git` and the gates' own complexity tools, in keeping

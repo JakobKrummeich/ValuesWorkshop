@@ -54,6 +54,7 @@
     "stylelint": "^17.14.1",
     "stylelint-config-standard": "^40.0.0",
     "stylelint-declaration-strict-value": "^1.11.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "yaml": "^2.9.0"
   }
 }
