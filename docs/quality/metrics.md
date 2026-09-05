@@ -4,9 +4,9 @@ Every number on this page is read back from a tool run, and the commands that pr
 
 | the report describes |  |
 | --- | --- |
-| commit | `bad7697` — Record how the property and accessibility slices landed and tick them off |
-| committed | 2026-09-04T18:10:30+00:00 |
-| report generated | 2026-09-04T18:10:33.844Z |
+| commit | `a8254a7` — Record in the spec how the mutation testing landed and that the hotspots are a table, not a chart |
+| committed | 2026-09-05T08:45:20+00:00 |
+| report generated | 2026-09-05T08:46:35.998Z |
 
 ## Size
 
@@ -14,35 +14,35 @@ Produced by:
 
 - `git ls-files`
 
-Line counts cover every tracked text file except binary assets and generated ones — lock files, EF Core migrations, the generated phase module and this report. A file counts as test code when it sits in `*.Tests/`, `__tests__/`, `TestSupport` or `e2e/`, or is named `*.test.*` or `*.spec.*`.
+Line counts cover every tracked text file except binary assets and generated ones — lock files, EF Core migrations, the generated phase module, this report and the regions of the README that `pnpm quality:report` writes. A file counts as test code when it sits in `*.Tests/`, `__tests__/`, `TestSupport` or `e2e/`, or is named `*.test.*` or `*.spec.*`.
 
 | area | files | production lines | test lines | total lines |
 | --- | ---: | ---: | ---: | ---: |
-| backend | 347 | 8,793 | 19,429 | 28,222 |
+| backend | 349 | 8,819 | 19,532 | 28,351 |
 | contract | 41 | 2,830 | 0 | 2,830 |
-| design | 8 | 3,222 | 0 | 3,222 |
+| design | 8 | 3,230 | 0 | 3,230 |
 | docs | 1 | 394 | 0 | 394 |
 | e2e | 23 | 0 | 3,593 | 3,593 |
-| frontend/src | 509 | 15,874 | 16,898 | 32,772 |
-| other | 55 | 4,545 | 0 | 4,545 |
-| scripts | 104 | 5,474 | 3,157 | 8,631 |
-| tasks | 59 | 10,365 | 0 | 10,365 |
-| **repository** | **1,147** | **51,497** | **43,077** | **94,574** |
+| frontend/src | 510 | 15,874 | 16,934 | 32,808 |
+| other | 58 | 4,854 | 0 | 4,854 |
+| scripts | 140 | 7,358 | 4,311 | 11,669 |
+| tasks | 59 | 10,432 | 0 | 10,432 |
+| **repository** | **1,189** | **53,791** | **44,370** | **98,161** |
 
 | extension | files |
 | --- | ---: |
-| `.cs` | 319 |
-| `.ts` | 265 |
+| `.cs` | 320 |
+| `.ts` | 266 |
 | `.tsx` | 190 |
 | `.css` | 90 |
+| `.mts` | 89 |
 | `.md` | 70 |
-| `.json` | 63 |
-| `.mts` | 55 |
+| `.json` | 65 |
 | `.html` | 19 |
 | without an extension | 19 |
-| `.txt` | 17 |
+| `.txt` | 18 |
 | `.csproj` | 11 |
-| `.sh` | 6 |
+| `.sh` | 7 |
 
 ## Tests and coverage
 
@@ -54,18 +54,18 @@ Produced by:
 
 | suite | tests | line coverage | enforced minimum | branch coverage |
 | --- | ---: | ---: | ---: | ---: |
-| jest — frontend units, hooks and components | 1,236 | 94.8% | at least 80% | 92.41% |
-| xunit — backend domain, application, adapters and host | 930 | 98.6% | at least 80% | 93.2% |
+| jest — frontend units, hooks and components | 1,352 | 92.45% | at least 80% | 90.03% |
+| xunit — backend domain, application, adapters and host | 938 | 98.7% | at least 80% | 93.3% |
 | Playwright — end to end through the browser | 93 | — | — | — |
-| **total** | **2,259** |  |  |  |
+| **total** | **2,383** |  |  |  |
 
-Coverage is measured over 2,865 of 3,022 frontend lines and 9,866 of 9,996 backend lines. The end-to-end suite is listed, never run, by this report.
+Coverage is measured over 3,188 of 3,448 frontend lines and 9,867 of 9,996 backend lines. The end-to-end suite is listed, never run, by this report.
 
 | backend test assembly | tests |
 | --- | ---: |
 | `ValuesWorkshop.Adapters.Tests.dll` | 224 |
-| `ValuesWorkshop.Application.Tests.dll` | 277 |
-| `ValuesWorkshop.Domain.Tests.dll` | 327 |
+| `ValuesWorkshop.Application.Tests.dll` | 282 |
+| `ValuesWorkshop.Domain.Tests.dll` | 330 |
 | `ValuesWorkshop.Host.Tests.dll` | 102 |
 
 ## Complexity
@@ -78,20 +78,20 @@ Produced by:
 | measure | frontend | backend |
 | --- | ---: | ---: |
 | enforced cyclomatic complexity cap | at most 7 (eslint `complexity`) | at most 7 (analyzer VW1001) |
-| functions measured | 3,467 | — |
+| functions measured | 3,763 | — |
 | highest complexity found | 7 | — |
-| mean complexity | 1.18 | — |
+| mean complexity | 1.19 | — |
 | file-length and other rule findings | 0 | 0 |
 
 The backend cap is enforced by the VW1001 analyzer at build time with warnings as errors, so a passing build is the measurement: every method is inside the cap. The frontend is measured function by function by re-running eslint with the cap lowered to zero, which turns every function into a reported finding.
 
 | cyclomatic complexity | frontend functions |
 | ---: | ---: |
-| 1 | 3,067 |
-| 2 | 258 |
-| 3 | 80 |
-| 4 | 39 |
-| 5 | 13 |
+| 1 | 3,323 |
+| 2 | 282 |
+| 3 | 87 |
+| 4 | 46 |
+| 5 | 15 |
 | 6 | 9 |
 | 7 | 1 |
 
@@ -118,19 +118,43 @@ Produced by:
 
 | measure | value | enforced limit |
 | --- | ---: | ---: |
-| duplicated lines | 28 of 24,732 |  |
+| duplicated lines | 28 of 24,757 |  |
 | duplicated line share | 0.11% | at most 2% |
-| duplicated tokens | 257 of 194,228 |  |
+| duplicated tokens | 257 of 194,355 |  |
 | duplicated token share | 0.13% |  |
 | clones found | 3 |  |
 | detection window | 50 tokens |  |
-| sources scanned | 608 |  |
+| sources scanned | 609 |  |
 
 | largest clone | tokens | lines |
 | --- | ---: | ---: |
 | `frontend/src/adapters/WorkshopRecordDocument.tsx` ↔ `frontend/src/adapters/WorkshopRecordDocument.tsx` | 87 | 8 |
 | `frontend/src/app/facilitator/AdvancePhaseButton.module.css` ↔ `frontend/src/app/facilitator/OpenSessionForm.module.css` | 86 | 10 |
 | `frontend/src/app/presenter/phases/finalPresentation/WinnerReveal.module.css` ↔ `frontend/src/app/presenter/phases/valuePresentation/PresentedValueView.module.css` | 84 | 13 |
+
+## Hotspots
+
+Produced by:
+
+- `git ls-files`
+- `git log --numstat --no-renames --format=%H a8254a76de8cc58edd7399509d36b4982e8f938e`
+
+A hotspot is a production code file that changes often and is intricate at the same time — where the next bug is most likely to be. Churn counts the commits that touched the file under its present path, over the whole history and without following renames, so a file that was moved starts over. Complexity is indentation-based, in the manner of Adam Tornhill's whitespace analysis: every non-blank line adds its nesting depth, at two spaces per level for TypeScript and four for C#. The score is the product of the two.
+
+| file | side | commits | lines changed | complexity | deepest nesting | score |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| `backend/Adapters.Persistence/DomainEntityMapper.cs` | backend | 16 | 406 | 767 | 7 | 12,272 |
+| `backend/Domain/Session.cs` | backend | 24 | 486 | 427 | 4 | 10,248 |
+| `backend/Application/State/ParticipantWorkshopStateMapper.cs` | backend | 20 | 435 | 400 | 7 | 8,000 |
+| `backend/Application/State/FacilitatorWorkshopStateMapper.cs` | backend | 19 | 439 | 383 | 7 | 7,277 |
+| `backend/Application/Intents/FacilitatorIntentHandler.cs` | backend | 16 | 271 | 429 | 6 | 6,864 |
+| `backend/Application/State/PresenterWorkshopStateMapper.cs` | backend | 17 | 355 | 354 | 7 | 6,018 |
+| `frontend/src/domain/i18n/messageKey.ts` | frontend | 34 | 190 | 162 | 1 | 5,508 |
+| `backend/Application/Intents/ParticipantIntentHandler.cs` | backend | 11 | 256 | 436 | 6 | 4,796 |
+| `backend/Host/Program.cs` | backend | 34 | 385 | 131 | 4 | 4,454 |
+| `backend/Adapters.Web/ParticipantHub.cs` | backend | 18 | 235 | 242 | 6 | 4,356 |
+
+425 production code files were ranked over 841 commits.
 
 ## Architecture
 
@@ -141,8 +165,8 @@ Produced by:
 
 | measure | value |
 | --- | ---: |
-| frontend modules cruised | 523 |
-| frontend dependencies cruised | 1,841 |
+| frontend modules cruised | 524 |
+| frontend dependencies cruised | 1,844 |
 | dependency-cruiser rules enforced | 14 |
 | dependency-cruiser violations | 0 |
 | modules on a dependency cycle | 0 |
@@ -206,6 +230,22 @@ Produced by:
 | participant | 14 |
 | presenter | 12 |
 
+## Mutation testing
+
+Produced by:
+
+- `pnpm mutation:frontend`
+- `pnpm mutation:backend`
+
+Mutation testing changes the production code and asks whether a test notices. It is far too slow for a pull request, so it runs nightly and on demand, and the scores below are read back from the last recorded run.
+
+| side | tool | mutation score | killed | survived | timed out | not covered | measured at |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| frontend | StrykerJS 10.0.0 | 86.43% | 2,136 | 296 | 4 | 40 | `800a926` on 2026-09-05 |
+| backend | Stryker.NET 4.16.0 | 84.59% | 1,223 | 198 | 1 | 25 | `ce36bb8` on 2026-09-04 |
+
+The frontend score was measured at `800a926`, not at `a8254a7` — the commit this report describes — so it does not describe the code as it stands. The backend score was measured at `ce36bb8`, not at `a8254a7` — the commit this report describes — so it does not describe the code as it stands.
+
 ## Security
 
 Produced by:
@@ -218,20 +258,38 @@ Produced by:
 | frontend dependencies | 0 | 0 | No known vulnerabilities of high severity or above |
 | backend packages | 0 | 0 | No vulnerable packages across 11 scanned projects |
 
+## Supply chain
+
+Produced by:
+
+- `pnpm run sbom`
+- `pnpm run advisories:scan`
+
+| bill of materials | describes | components |
+| --- | --- | ---: |
+| `docs/quality/sbom/frontend.cdx.json` | frontend runtime dependencies of the pnpm workspace | 180 |
+| `docs/quality/sbom/backend.cdx.json` | backend runtime packages of the .NET solution | 67 |
+
+The bills of materials are CycloneDX documents emitted by the generators and then stripped of the serial number, the run timestamp and the annotation that restates it, so regenerating them against an unchanged dependency set leaves no diff.
+
+| scan | findings | exit code | reported |
+| --- | ---: | ---: | --- |
+| osv-scanner over `pnpm-lock.yaml` and both bills of materials | 0 | 0 | No known advisories in the scanned lockfile and bills of materials |
+
 ## Process
 
 Produced by:
 
-- `git rev-list --count bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
-- `git rev-list --count "--grep=^Merge pull request" bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
-- `git log --max-parents=0 --format=%cI bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
-- `git shortlog --summary --numbered bad7697c3bcf85c0238736c1ff1fb7eaa0f9a22f`
+- `git rev-list --count a8254a76de8cc58edd7399509d36b4982e8f938e`
+- `git rev-list --count "--grep=^Merge pull request" a8254a76de8cc58edd7399509d36b4982e8f938e`
+- `git log --max-parents=0 --format=%cI a8254a76de8cc58edd7399509d36b4982e8f938e`
+- `git shortlog --summary --numbered a8254a76de8cc58edd7399509d36b4982e8f938e`
 
 The history is counted at the commit this report describes, not at the branch tip, so regenerating the report does not move its own numbers.
 
 | measure | value |
 | --- | ---: |
-| commits | 816 |
+| commits | 841 |
 | merge commits from pull requests | 67 |
 | first commit | 2026-07-19T17:25:51+00:00 |
 | contributors | 4 |

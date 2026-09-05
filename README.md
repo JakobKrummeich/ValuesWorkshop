@@ -74,6 +74,20 @@ from the tools' own output, stamped with the commit it describes — nothing
 here is typed by hand.
 
 <!-- quality:headline:start -->
+
+| What | Frontend | Backend | Enforced by |
+| --- | ---: | ---: | --- |
+| Production code | 15,874 lines | 8,819 lines | — |
+| Test code | 16,934 lines | 19,532 lines | — |
+| Tests | 1,352 jest | 938 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
+| Line coverage | 92.45% (at least 80%) | 98.7% (at least 80%) | `jest --coverage` / coverlet |
+| Mutation score | 86.43% | 84.59% | Stryker, nightly and on demand |
+| Cyclomatic complexity | highest 7 (at most 7) | 0 functions above 7 | eslint `complexity` / analyzer VW1001 |
+| Longest production file | 290 lines (at most 300) | 262 lines (at most 300) | eslint `max-lines` / analyzer VW1002 |
+| Duplicated tokens | 0.13% (at most 2%) | 0.13% (at most 2%) | `jscpd`, one scan over both sides |
+| Architecture violations | 0 across 14 dependency-cruiser rules | 0 across 8 ArchUnitNET rules | dependency-cruiser fails the lint, ArchUnitNET fails the tests |
+| Known advisories | 0 | 0 | `pnpm audit` / `dotnet list package --vulnerable`; osv-scanner over the lockfile and both SBOMs finds 0 |
+
 <!-- quality:headline:end -->
 
 ### Frontend modules
@@ -254,6 +268,20 @@ the whole history, from `git log --numstat`; complexity is indentation-based,
 so it reads C# and TypeScript alike; the score is the product of the two.
 
 <!-- quality:hotspots:start -->
+
+| file | side | commits | lines changed | complexity | score |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `backend/Adapters.Persistence/DomainEntityMapper.cs` | backend | 16 | 406 | 767 | 12,272 |
+| `backend/Domain/Session.cs` | backend | 24 | 486 | 427 | 10,248 |
+| `backend/Application/State/ParticipantWorkshopStateMapper.cs` | backend | 20 | 435 | 400 | 8,000 |
+| `backend/Application/State/FacilitatorWorkshopStateMapper.cs` | backend | 19 | 439 | 383 | 7,277 |
+| `backend/Application/Intents/FacilitatorIntentHandler.cs` | backend | 16 | 271 | 429 | 6,864 |
+| `backend/Application/State/PresenterWorkshopStateMapper.cs` | backend | 17 | 355 | 354 | 6,018 |
+| `frontend/src/domain/i18n/messageKey.ts` | frontend | 34 | 190 | 162 | 5,508 |
+| `backend/Application/Intents/ParticipantIntentHandler.cs` | backend | 11 | 256 | 436 | 4,796 |
+| `backend/Host/Program.cs` | backend | 34 | 385 | 131 | 4,454 |
+| `backend/Adapters.Web/ParticipantHub.cs` | backend | 18 | 235 | 242 | 4,356 |
+
 <!-- quality:hotspots:end -->
 
 The full table, with every command that produced a number, is
