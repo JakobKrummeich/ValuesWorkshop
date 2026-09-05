@@ -1,7 +1,16 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { z } from "zod";
-import { runCommand, runCommandStreamingOutput } from "../commandRunner.mts";
+import {
+  runCommand,
+  runCommandStreamingOutput,
+  type CommandSpecification,
+} from "../commandRunner.mts";
+import {
+  availableLaunchersOf,
+  memoryCappedCommandOf,
+  mutationMemoryLimits,
+} from "./memoryCappedCommand.mts";
 import {
   MutationSide,
   mutationCommands,
@@ -43,14 +52,27 @@ function pinnedStrykerNetVersion(repositoryRoot: string): string {
   return `Stryker.NET ${manifest.tools["dotnet-stryker"].version}`;
 }
 
-const nextJestTestEnvironment = { NODE_ENV: "test" };
+const nextJestTestEnvironment = {
+  NODE_ENV: "test",
+  NODE_OPTIONS: "--max-old-space-size=1536",
+};
+
+function runWithinMemoryCap(specification: CommandSpecification): void {
+  runCommandStreamingOutput(
+    memoryCappedCommandOf(
+      specification,
+      mutationMemoryLimits,
+      availableLaunchersOf(mutationMemoryLimits),
+    ),
+  );
+}
 
 const runners: Record<MutationSide, MutationRunner> = {
   [MutationSide.Frontend]: {
     reportPath: "reports/mutation/frontend/report.json",
     tool: installedStrykerJsVersion,
     run: (repositoryRoot) =>
-      runCommandStreamingOutput({
+      runWithinMemoryCap({
         command: "npx",
         args: ["stryker", "run"],
         cwd: resolve(repositoryRoot, "frontend"),
@@ -61,7 +83,7 @@ const runners: Record<MutationSide, MutationRunner> = {
     reportPath: "reports/mutation/backend/reports/mutation-report.json",
     tool: pinnedStrykerNetVersion,
     run: (repositoryRoot) =>
-      runCommandStreamingOutput({
+      runWithinMemoryCap({
         command: "dotnet",
         args: [
           "dotnet-stryker",

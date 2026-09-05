@@ -16,7 +16,11 @@
       "!**/obj/**"
     ],
     "reporters": ["Progress", "Html", "Json"],
-    "concurrency": 4,
-    "thresholds": { "high": 90, "low": 70, "break": 0 }
+    "concurrency": 2,
+    "thresholds": {
+      "high": 90,
+      "low": 70,
+      "break": 0
+    }
   }
 }

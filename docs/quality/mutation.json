@@ -1,0 +1,13 @@
+{
+  "backend": {
+    "tool": "Stryker.NET 4.16.0",
+    "command": "pnpm mutation:backend",
+    "commit": "ce36bb8b9276f3ea84a7e93583f19c2093af343f",
+    "measuredAt": "2026-09-04T21:34:40.759Z",
+    "score": 84.59,
+    "killed": 1223,
+    "survived": 198,
+    "timeout": 1,
+    "noCoverage": 25
+  }
+}

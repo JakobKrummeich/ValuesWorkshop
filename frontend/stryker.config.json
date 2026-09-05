@@ -6,7 +6,9 @@
   "jest": {
     "projectType": "custom",
     "configFile": "jest.config.mjs",
-    "config": { "testPathIgnorePatterns": ["<rootDir>/scripts/"] },
+    "config": {
+      "testPathIgnorePatterns": ["<rootDir>/scripts/"]
+    },
     "enableFindRelatedTests": true
   },
   "coverageAnalysis": "perTest",
@@ -28,13 +30,22 @@
     "e2e",
     "devtools"
   ],
-  "concurrency": 4,
+  "concurrency": 2,
   "timeoutMS": 60000,
   "inPlace": true,
   "tempDirName": "../reports/mutation/frontend-sandbox",
   "cleanTempDir": true,
   "reporters": ["progress", "html", "json"],
-  "htmlReporter": { "fileName": "../reports/mutation/frontend/index.html" },
-  "jsonReporter": { "fileName": "../reports/mutation/frontend/report.json" },
-  "thresholds": { "high": 90, "low": 70, "break": null }
+  "htmlReporter": {
+    "fileName": "../reports/mutation/frontend/index.html"
+  },
+  "jsonReporter": {
+    "fileName": "../reports/mutation/frontend/report.json"
+  },
+  "thresholds": {
+    "high": 90,
+    "low": 70,
+    "break": null
+  },
+  "maxTestRunnerReuse": 20
 }

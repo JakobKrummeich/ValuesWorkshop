@@ -95,14 +95,14 @@ new kind of evidence. Ordered by what they would prove about this repo:
 
 | tool | what it would prove | cost |
 | --- | --- | --- |
-| **Mutation testing** — Stryker.NET + StrykerJS | that the 38 k lines of tests actually kill bugs, not just execute lines; a mutation score is the honest version of a coverage badge | slow (tens of minutes per side); run nightly or on demand, not per PR |
+| **Mutation testing** — Stryker.NET + StrykerJS | that the 38 k lines of tests actually kill bugs, not just execute lines; a mutation score is the honest version of a coverage badge | slow (tens of minutes per side); run nightly or on demand, not per PR — landed in 30g, see below |
 | **Property-based tests** — FsCheck (BE) + fast-check (FE) | see the explainer below: the domain invariants hold for *generated* inputs, not just for the examples someone thought of | small; a handful of properties next to the example tests |
 | **Accessibility gate** — axe-core inside the Playwright e2e | the three shells are actually usable: contrast, roles, focus order, live regions — the design system already guards contrast, this guards the rest | small; one assertion per screen in the existing e2e — landed in 30f, see below |
 | **Visual regression** — Playwright screenshot diffs over all 27 screens | that a CSS change cannot silently wreck a screen; the redesign would have been caught by it twice | medium; needs stable seeds and a baseline set (~30 PNGs) |
 | **Bundle budget** — Next build stats + size-limit | the phone stays light: first-load JS per route against a budget that fails the build | small |
 | **Load smoke** — k6 or bombardier against the hub | the SignalR fan-out holds a real room: 200 participants, p95 broadcast latency, memory flat over a full workshop | medium; needs a scripted room and a machine to trust the numbers |
-| **CodeQL** | security analysis on both languages, free on GitHub, findings as PR checks | tiny; a workflow file |
-| **SBOM + OSV** — CycloneDX + osv-scanner | supply chain: what is actually in the image, scanned against a real advisory database rather than pnpm audit alone | small |
+| **CodeQL** | security analysis on both languages, free on GitHub, findings as PR checks | tiny; a workflow file — landed in 30h, see below |
+| **SBOM + OSV** — CycloneDX + osv-scanner | supply chain: what is actually in the image, scanned against a real advisory database rather than pnpm audit alone | small — landed in 30h, see below |
 | **Dead-code detection** — knip (FE) | no unused exports, dependencies or files accumulate | small; likely a one-off cleanup then a gate |
 | **Hotspot analysis** — code-maat over the git history | where complexity and churn overlap, which is where the next bug will be; makes a striking README picture | small; read-only over history |
 | **Process metrics** — from git + the GitHub API | PR cycle time, CI duration, first-try pass rate, flake rate | small |

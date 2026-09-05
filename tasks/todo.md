@@ -731,8 +731,8 @@ SBOM, and hotspot analysis over the git history.
 - [ ] 30d README `## Engineering` section + badges
 - [x] 30e Property-based tests (FsCheck + fast-check)
 - [x] 30f Accessibility gate (axe-core in the e2e)
-- [ ] 30g Mutation testing (Stryker.NET + StrykerJS)
-- [ ] 30h Supply chain: CodeQL, CycloneDX SBOM, osv-scanner
+- [x] 30g Mutation testing (Stryker.NET + StrykerJS)
+- [x] 30h Supply chain: CodeQL, CycloneDX SBOM, osv-scanner
 - [ ] 30i Hotspot analysis (churn × complexity)
 **Acceptance criteria:** `pnpm quality:report` regenerates every artifact and is
 idempotent; no number or diagram is hand-maintained; the drift gate fails when
