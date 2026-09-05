@@ -207,7 +207,7 @@ export function supplyChainSection(report: QualityReport): string {
         formatCount(bill.components),
       ]),
     ),
-    "The bills of materials are CycloneDX documents emitted by the generators and then stripped of the serial number, the run timestamp and the annotation that restates it, so regenerating them against an unchanged dependency set leaves no diff.",
+    "The bills of materials are CycloneDX documents emitted by the generators and then stripped of the serial number, the run timestamp and the annotation that restates it, so regenerating them against an unchanged dependency set leaves no diff. The frontend bill keeps pnpm's component list but takes its dependency graph from `pnpm-lock.yaml`, because `pnpm sbom` leaves about a third of the production dependency edges out; the packages the lockfile reaches are cross-checked against the components pnpm listed.",
     markdownTable(
       ["scan", "findings", "exit code", "reported"],
       [left, right, right, left],

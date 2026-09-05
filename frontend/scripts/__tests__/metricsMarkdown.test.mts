@@ -143,6 +143,12 @@ describe("renderMetricsMarkdown", () => {
     );
   });
 
+  it("says where the frontend bill's dependency graph comes from, and why", () => {
+    expect(markdown).toContain(
+      "The frontend bill keeps pnpm's component list but takes its dependency graph from `pnpm-lock.yaml`, because `pnpm sbom` leaves about a third of the production dependency edges out",
+    );
+  });
+
   it("ends in a single newline", () => {
     expect(markdown.endsWith("\n")).toBe(true);
     expect(markdown.endsWith("\n\n")).toBe(false);
