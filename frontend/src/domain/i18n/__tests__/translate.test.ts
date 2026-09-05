@@ -27,6 +27,10 @@ const catalogs = {
   finalPresentation: finalPresentationMessages,
 };
 
+function parametersOf(message: string): string[] {
+  return [...new Set(message.match(/\{\w+\}/g) ?? [])].sort();
+}
+
 describe("translation", () => {
   it("renders a message in the requested language", () => {
     expect(translate(Language.English, MessageKey.ConnectionConnected)).toBe(
@@ -94,6 +98,23 @@ describe("translation", () => {
     );
 
     expect(claimedTwice).toEqual([]);
+  });
+
+  // WHY: `translate` substitutes by name — it replaces `{count}` wherever it
+  // stands — so the two languages of one key are two independent placeholder
+  // lists that nothing forces to agree. Drop `{count}` from the English text
+  // and English silently loses the number; add `{cout}` and that language
+  // renders the braces to the user. Neither shows up elsewhere: the Playwright
+  // suite pins `locale: "en-US"` and so never reads the German half, while the
+  // German half is what `defaultLanguage` serves to this workshop's audience.
+  it("names the same parameters in both languages of a message", () => {
+    const diverging = Object.values(MessageKey).filter(
+      (key) =>
+        parametersOf(messages[key][Language.German]).join(",") !==
+        parametersOf(messages[key][Language.English]).join(","),
+    );
+
+    expect(diverging).toEqual([]);
   });
 
   it("names a message for every connection state", () => {
