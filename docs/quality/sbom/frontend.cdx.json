@@ -2,6 +2,13 @@
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
   "metadata": {
+    "component": {
+      "bom-ref": "pkg:npm/frontend@0.1.0",
+      "type": "library",
+      "name": "frontend",
+      "version": "0.1.0",
+      "purl": "pkg:npm/frontend@0.1.0"
+    },
     "lifecycles": [
       {
         "phase": "pre-build"
@@ -15,13 +22,6 @@
           "version": "11.15.1"
         }
       ]
-    },
-    "component": {
-      "type": "library",
-      "name": "frontend",
-      "version": "0.1.0",
-      "purl": "pkg:npm/frontend@0.1.0",
-      "bom-ref": "pkg:npm/frontend@0.1.0"
     }
   },
   "components": [
@@ -3511,7 +3511,9 @@
     {
       "ref": "pkg:npm/%40babel/code-frame@7.29.7",
       "dependsOn": [
-        "pkg:npm/%40babel/helper-validator-identifier@7.29.7"
+        "pkg:npm/%40babel/helper-validator-identifier@7.29.7",
+        "pkg:npm/js-tokens@4.0.0",
+        "pkg:npm/picocolors@1.1.1"
       ]
     },
     {
@@ -3541,6 +3543,8 @@
     {
       "ref": "pkg:npm/%40babel/generator@7.29.7",
       "dependsOn": [
+        "pkg:npm/%40babel/parser@7.29.7",
+        "pkg:npm/%40babel/types@7.29.7",
         "pkg:npm/%40jridgewell/gen-mapping@0.3.13",
         "pkg:npm/%40jridgewell/trace-mapping@0.3.31",
         "pkg:npm/jsesc@3.1.0"
@@ -3552,7 +3556,8 @@
         "pkg:npm/%40babel/compat-data@7.29.7",
         "pkg:npm/%40babel/helper-validator-option@7.29.7",
         "pkg:npm/browserslist@4.28.8",
-        "pkg:npm/lru-cache@5.1.1"
+        "pkg:npm/lru-cache@5.1.1",
+        "pkg:npm/semver@6.3.1"
       ]
     },
     {
@@ -3561,12 +3566,18 @@
     },
     {
       "ref": "pkg:npm/%40babel/helper-module-imports@7.29.7",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40babel/traverse@7.29.7",
+        "pkg:npm/%40babel/types@7.29.7"
+      ]
     },
     {
       "ref": "pkg:npm/%40babel/helper-module-transforms@7.29.7",
       "dependsOn": [
-        "pkg:npm/%40babel/helper-module-imports@7.29.7"
+        "pkg:npm/%40babel/core@7.29.7",
+        "pkg:npm/%40babel/helper-module-imports@7.29.7",
+        "pkg:npm/%40babel/helper-validator-identifier@7.29.7",
+        "pkg:npm/%40babel/traverse@7.29.7"
       ]
     },
     {
@@ -3583,11 +3594,16 @@
     },
     {
       "ref": "pkg:npm/%40babel/helpers@7.29.7",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40babel/template@7.29.7",
+        "pkg:npm/%40babel/types@7.29.7"
+      ]
     },
     {
       "ref": "pkg:npm/%40babel/parser@7.29.7",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40babel/types@7.29.7"
+      ]
     },
     {
       "ref": "pkg:npm/%40babel/runtime@7.29.7",
@@ -3595,23 +3611,36 @@
     },
     {
       "ref": "pkg:npm/%40babel/template@7.29.7",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40babel/code-frame@7.29.7",
+        "pkg:npm/%40babel/parser@7.29.7",
+        "pkg:npm/%40babel/types@7.29.7"
+      ]
     },
     {
       "ref": "pkg:npm/%40babel/traverse@7.29.7",
       "dependsOn": [
-        "pkg:npm/%40babel/helper-globals@7.29.7"
+        "pkg:npm/%40babel/code-frame@7.29.7",
+        "pkg:npm/%40babel/generator@7.29.7",
+        "pkg:npm/%40babel/helper-globals@7.29.7",
+        "pkg:npm/%40babel/parser@7.29.7",
+        "pkg:npm/%40babel/template@7.29.7",
+        "pkg:npm/%40babel/types@7.29.7",
+        "pkg:npm/debug@4.4.3"
       ]
     },
     {
       "ref": "pkg:npm/%40babel/types@7.29.7",
       "dependsOn": [
-        "pkg:npm/%40babel/helper-string-parser@7.29.7"
+        "pkg:npm/%40babel/helper-string-parser@7.29.7",
+        "pkg:npm/%40babel/helper-validator-identifier@7.29.7"
       ]
     },
     {
       "ref": "pkg:npm/%40emnapi/runtime@1.11.2",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/tslib@2.8.1"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/colour@1.1.0",
@@ -3619,11 +3648,15 @@
     },
     {
       "ref": "pkg:npm/%40img/sharp-darwin-arm64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-darwin-arm64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-darwin-x64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-darwin-x64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-freebsd-wasm32@0.35.3",
@@ -3673,35 +3706,51 @@
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-arm@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linux-arm@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-arm64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linux-arm64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-ppc64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linux-ppc64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-riscv64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linux-riscv64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-s390x@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linux-s390x@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linux-x64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linux-x64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linuxmusl-arm64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linuxmusl-arm64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-linuxmusl-x64@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-libvips-linuxmusl-x64@1.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-wasm32@0.35.3",
@@ -3711,7 +3760,9 @@
     },
     {
       "ref": "pkg:npm/%40img/sharp-webcontainers-wasm32@0.35.3",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40img/sharp-wasm32@0.35.3"
+      ]
     },
     {
       "ref": "pkg:npm/%40img/sharp-win32-arm64@0.35.3",
@@ -3728,12 +3779,16 @@
     {
       "ref": "pkg:npm/%40jridgewell/gen-mapping@0.3.13",
       "dependsOn": [
-        "pkg:npm/%40jridgewell/sourcemap-codec@1.5.5"
+        "pkg:npm/%40jridgewell/sourcemap-codec@1.5.5",
+        "pkg:npm/%40jridgewell/trace-mapping@0.3.31"
       ]
     },
     {
       "ref": "pkg:npm/%40jridgewell/remapping@2.3.5",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40jridgewell/gen-mapping@0.3.13",
+        "pkg:npm/%40jridgewell/trace-mapping@0.3.31"
+      ]
     },
     {
       "ref": "pkg:npm/%40jridgewell/resolve-uri@3.1.2",
@@ -3746,7 +3801,8 @@
     {
       "ref": "pkg:npm/%40jridgewell/trace-mapping@0.3.31",
       "dependsOn": [
-        "pkg:npm/%40jridgewell/resolve-uri@3.1.2"
+        "pkg:npm/%40jridgewell/resolve-uri@3.1.2",
+        "pkg:npm/%40jridgewell/sourcemap-codec@1.5.5"
       ]
     },
     {
@@ -3816,8 +3872,10 @@
     {
       "ref": "pkg:npm/%40react-pdf/font@4.1.2",
       "dependsOn": [
+        "pkg:npm/%40react-pdf/types@2.14.0",
         "pkg:npm/fontkit@2.0.4",
-        "pkg:npm/is-url@1.2.4"
+        "pkg:npm/is-url@1.2.4",
+        "pkg:npm/pdfkit@0.20.1"
       ]
     },
     {
@@ -3837,11 +3895,15 @@
     {
       "ref": "pkg:npm/%40react-pdf/layout@5.2.0",
       "dependsOn": [
+        "pkg:npm/%40react-pdf/fns@3.1.3",
         "pkg:npm/%40react-pdf/image@3.1.2",
         "pkg:npm/%40react-pdf/paginate@1.0.1",
+        "pkg:npm/%40react-pdf/primitives@4.4.0",
         "pkg:npm/%40react-pdf/stylesheet@6.3.2",
         "pkg:npm/%40react-pdf/textkit@7.0.1",
+        "pkg:npm/%40react-pdf/types@2.14.0",
         "pkg:npm/emoji-regex-xs@1.0.0",
+        "pkg:npm/queue@6.0.2",
         "pkg:npm/yoga-layout@3.2.1"
       ]
     },
@@ -3856,13 +3918,21 @@
     {
       "ref": "pkg:npm/%40react-pdf/reconciler@2.0.0",
       "dependsOn": [
+        "pkg:npm/object-assign@4.1.1",
+        "pkg:npm/react@19.2.4",
         "pkg:npm/scheduler@0.25.0-rc-603e6108-20241029"
       ]
     },
     {
       "ref": "pkg:npm/%40react-pdf/render@4.7.0",
       "dependsOn": [
+        "pkg:npm/%40babel/runtime@7.29.7",
+        "pkg:npm/%40react-pdf/fns@3.1.3",
+        "pkg:npm/%40react-pdf/primitives@4.4.0",
+        "pkg:npm/%40react-pdf/textkit@7.0.1",
+        "pkg:npm/%40react-pdf/types@2.14.0",
         "pkg:npm/abs-svg-path@0.1.1",
+        "pkg:npm/color-string@2.1.4",
         "pkg:npm/normalize-svg-path@1.1.0",
         "pkg:npm/parse-svg-path@0.1.2",
         "pkg:npm/svg-arc-to-cubic-bezier@3.2.0"
@@ -3883,12 +3953,15 @@
         "pkg:npm/object-assign@4.1.1",
         "pkg:npm/pdfkit@0.20.1",
         "pkg:npm/prop-types@15.8.1",
-        "pkg:npm/queue@6.0.2"
+        "pkg:npm/queue@6.0.2",
+        "pkg:npm/react@19.2.4"
       ]
     },
     {
       "ref": "pkg:npm/%40react-pdf/stylesheet@6.3.2",
       "dependsOn": [
+        "pkg:npm/%40react-pdf/fns@3.1.3",
+        "pkg:npm/%40react-pdf/types@2.14.0",
         "pkg:npm/color-string@2.1.4",
         "pkg:npm/hsl-to-hex@1.0.0",
         "pkg:npm/media-engine@2.0.0",
@@ -3897,18 +3970,26 @@
     },
     {
       "ref": "pkg:npm/%40react-pdf/svg@1.1.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40react-pdf/primitives@4.4.0"
+      ]
     },
     {
       "ref": "pkg:npm/%40react-pdf/textkit@7.0.1",
       "dependsOn": [
+        "pkg:npm/%40react-pdf/fns@3.1.3",
         "pkg:npm/%40react-pdf/hyphenate@0.1.0",
-        "pkg:npm/bidi-js@1.0.3"
+        "pkg:npm/bidi-js@1.0.3",
+        "pkg:npm/unicode-properties@1.4.1"
       ]
     },
     {
       "ref": "pkg:npm/%40react-pdf/types@2.14.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/%40react-pdf/font@4.1.2",
+        "pkg:npm/%40react-pdf/primitives@4.4.0",
+        "pkg:npm/%40react-pdf/stylesheet@6.3.2"
+      ]
     },
     {
       "ref": "pkg:npm/%40swc/helpers@0.5.15",
@@ -3918,7 +3999,9 @@
     },
     {
       "ref": "pkg:npm/%40swc/helpers@0.5.23",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/tslib@2.8.1"
+      ]
     },
     {
       "ref": "pkg:npm/%40types/node@20.19.43",
@@ -3963,6 +4046,8 @@
     {
       "ref": "pkg:npm/browserslist@4.28.8",
       "dependsOn": [
+        "pkg:npm/baseline-browser-mapping@2.11.20",
+        "pkg:npm/caniuse-lite@1.0.30001810",
         "pkg:npm/electron-to-chromium@1.5.417",
         "pkg:npm/node-releases@2.0.54",
         "pkg:npm/update-browserslist-db@1.3.2"
@@ -4108,7 +4193,9 @@
     },
     {
       "ref": "pkg:npm/jay-peg@1.1.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/restructure@3.0.2"
+      ]
     },
     {
       "ref": "pkg:npm/js-tokens@4.0.0",
@@ -4129,7 +4216,8 @@
     {
       "ref": "pkg:npm/linebreak@1.1.0",
       "dependsOn": [
-        "pkg:npm/base64-js@0.0.8"
+        "pkg:npm/base64-js@0.0.8",
+        "pkg:npm/unicode-trie@2.0.0"
       ]
     },
     {
@@ -4173,6 +4261,8 @@
         "pkg:npm/baseline-browser-mapping@2.11.20",
         "pkg:npm/caniuse-lite@1.0.30001810",
         "pkg:npm/postcss@8.5.26",
+        "pkg:npm/react-dom@19.2.4",
+        "pkg:npm/react@19.2.4",
         "pkg:npm/sharp@0.35.3",
         "pkg:npm/styled-jsx@5.1.6"
       ]
@@ -4189,7 +4279,9 @@
     },
     {
       "ref": "pkg:npm/normalize-svg-path@1.1.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/svg-arc-to-cubic-bezier@3.2.0"
+      ]
     },
     {
       "ref": "pkg:npm/object-assign@4.1.1",
@@ -4214,7 +4306,10 @@
       "dependsOn": [
         "pkg:npm/%40noble/ciphers@1.3.0",
         "pkg:npm/%40noble/hashes@1.8.0",
-        "pkg:npm/linebreak@1.1.0"
+        "pkg:npm/fflate@0.8.3",
+        "pkg:npm/fontkit@2.0.4",
+        "pkg:npm/linebreak@1.1.0",
+        "pkg:npm/png-js@2.0.0"
       ]
     },
     {
@@ -4254,12 +4349,15 @@
       "ref": "pkg:npm/prop-types@15.8.1",
       "dependsOn": [
         "pkg:npm/loose-envify@1.4.0",
+        "pkg:npm/object-assign@4.1.1",
         "pkg:npm/react-is@16.13.1"
       ]
     },
     {
       "ref": "pkg:npm/psl@1.15.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/punycode@2.3.1"
+      ]
     },
     {
       "ref": "pkg:npm/punycode@2.3.1",
@@ -4267,7 +4365,9 @@
     },
     {
       "ref": "pkg:npm/qrcode.react@4.2.0",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/react@19.2.4"
+      ]
     },
     {
       "ref": "pkg:npm/querystringify@2.2.0",
@@ -4282,6 +4382,7 @@
     {
       "ref": "pkg:npm/react-dom@19.2.4",
       "dependsOn": [
+        "pkg:npm/react@19.2.4",
         "pkg:npm/scheduler@0.27.0"
       ]
     },
@@ -4307,7 +4408,9 @@
     },
     {
       "ref": "pkg:npm/rxjs@7.8.2",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/tslib@2.8.1"
+      ]
     },
     {
       "ref": "pkg:npm/scheduler@0.25.0-rc-603e6108-20241029",
@@ -4371,7 +4474,8 @@
       "ref": "pkg:npm/styled-jsx@5.1.6",
       "dependsOn": [
         "pkg:npm/%40babel/core@7.29.7",
-        "pkg:npm/client-only@0.0.1"
+        "pkg:npm/client-only@0.0.1",
+        "pkg:npm/react@19.2.4"
       ]
     },
     {
@@ -4409,12 +4513,16 @@
     },
     {
       "ref": "pkg:npm/unicode-properties@1.4.1",
-      "dependsOn": []
+      "dependsOn": [
+        "pkg:npm/base64-js@1.5.1",
+        "pkg:npm/unicode-trie@2.0.0"
+      ]
     },
     {
       "ref": "pkg:npm/unicode-trie@2.0.0",
       "dependsOn": [
-        "pkg:npm/pako@0.2.9"
+        "pkg:npm/pako@0.2.9",
+        "pkg:npm/tiny-inflate@1.0.3"
       ]
     },
     {
@@ -4424,7 +4532,9 @@
     {
       "ref": "pkg:npm/update-browserslist-db@1.3.2",
       "dependsOn": [
-        "pkg:npm/escalade@3.2.0"
+        "pkg:npm/browserslist@4.28.8",
+        "pkg:npm/escalade@3.2.0",
+        "pkg:npm/picocolors@1.1.1"
       ]
     },
     {

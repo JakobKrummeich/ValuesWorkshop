@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const componentSchema = z.looseObject({
   name: z.string(),
-  "bom-ref": z.string().optional(),
+  "bom-ref": z.string(),
 });
 
 const dependencySchema = z.looseObject({
@@ -13,7 +13,10 @@ const dependencySchema = z.looseObject({
 const billOfMaterialsSchema = z.looseObject({
   bomFormat: z.literal("CycloneDX"),
   specVersion: z.string(),
-  metadata: z.looseObject({ timestamp: z.string().optional() }),
+  metadata: z.looseObject({
+    timestamp: z.string().optional(),
+    component: z.looseObject({ "bom-ref": z.string() }),
+  }),
   components: z.array(componentSchema),
   dependencies: z.array(dependencySchema).optional(),
 });
@@ -36,12 +39,10 @@ export function parseBillOfMaterials(documentJson: string): BillOfMaterials {
 }
 
 function componentOrder(left: Component, right: Component): number {
-  return (left["bom-ref"] ?? left.name).localeCompare(
-    right["bom-ref"] ?? right.name,
-  );
+  return left["bom-ref"].localeCompare(right["bom-ref"]);
 }
 
-function orderedDependencies(
+export function orderedDependencies(
   dependencies: readonly Dependency[],
 ): Dependency[] {
   return [...dependencies]
@@ -62,8 +63,7 @@ function omitting(
   );
 }
 
-export function normalizeBillOfMaterials(documentJson: string): string {
-  const document = parseBillOfMaterials(documentJson);
+export function normalizeBillOfMaterials(document: BillOfMaterials): string {
   return `${JSON.stringify(
     {
       ...omitting(document, ["serialNumber", "annotations"]),

@@ -1,6 +1,7 @@
 import {
   countComponents,
   normalizeBillOfMaterials,
+  parseBillOfMaterials,
 } from "../quality/supplyChain/billsOfMaterials.mts";
 
 const generated = {
@@ -11,6 +12,7 @@ const generated = {
   metadata: {
     timestamp: "2026-09-04T18:25:12Z",
     tools: { components: [{ name: "cdxgen", version: "12.8.4" }] },
+    component: { name: "frontend", "bom-ref": "pkg:npm/frontend@0.1.0" },
   },
   components: [
     { name: "react", version: "19.2.4", "bom-ref": "pkg:npm/react@19.2.4" },
@@ -26,8 +28,29 @@ const generated = {
   annotations: [{ text: "This document was created on Friday, September 4." }],
 };
 
+describe("parseBillOfMaterials", () => {
+  it("refuses a document that is not a CycloneDX bill of materials", () => {
+    expect(() => parseBillOfMaterials('{"components":[]}')).toThrow(
+      "did not produce a CycloneDX bill of materials",
+    );
+  });
+
+  it("refuses a component without the reference the dependency graph needs", () => {
+    expect(() =>
+      parseBillOfMaterials(
+        JSON.stringify({
+          ...generated,
+          components: [{ name: "react", version: "19.2.4" }],
+        }),
+      ),
+    ).toThrow("components.0.bom-ref");
+  });
+});
+
 describe("normalizeBillOfMaterials", () => {
-  const normalized = normalizeBillOfMaterials(JSON.stringify(generated));
+  const normalized = normalizeBillOfMaterials(
+    parseBillOfMaterials(JSON.stringify(generated)),
+  );
 
   it("drops the values that change with every run", () => {
     expect(normalized).not.toContain("serialNumber");
@@ -40,7 +63,10 @@ describe("normalizeBillOfMaterials", () => {
       bomFormat: "CycloneDX",
       specVersion: "1.6",
       version: 1,
-      metadata: { tools: generated.metadata.tools },
+      metadata: {
+        tools: generated.metadata.tools,
+        component: generated.metadata.component,
+      },
     });
   });
 
@@ -58,17 +84,13 @@ describe("normalizeBillOfMaterials", () => {
   });
 
   it("normalizes a document it already normalized to the same text", () => {
-    expect(normalizeBillOfMaterials(normalized)).toEqual(normalized);
+    expect(normalizeBillOfMaterials(parseBillOfMaterials(normalized))).toEqual(
+      normalized,
+    );
   });
 
   it("ends in a single newline", () => {
     expect(normalized.endsWith("}\n")).toBe(true);
-  });
-
-  it("refuses a document that is not a CycloneDX bill of materials", () => {
-    expect(() => normalizeBillOfMaterials('{"components":[]}')).toThrow(
-      "did not produce a CycloneDX bill of materials",
-    );
   });
 });
 

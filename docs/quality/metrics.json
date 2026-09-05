@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-05T11:10:31.627Z",
+  "generatedAt": "2026-09-05T16:51:09.030Z",
   "commit": {
-    "sha": "8b64e8578c9208fa20002a96e0a099d6a02b902b",
-    "shortSha": "8b64e85",
-    "committedAt": "2026-09-05T11:10:16+00:00",
-    "subject": "Pin the two-sided Complexity table in the metrics test, and ask LINQ whether a property's accessors hold code"
+    "sha": "385f10953ab57f77374f6938ddefa6b9ab44f39a",
+    "shortSha": "385f109",
+    "committedAt": "2026-09-05T16:50:14+00:00",
+    "subject": "Say in the Supply chain section and the task 30 notes where the frontend bill's dependency graph comes from, and why pnpm's own is not used"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -22,17 +22,17 @@
     "commands": [
       "git ls-files"
     ],
-    "files": 1195,
-    "productionLines": 54018,
-    "testLines": 44830,
-    "totalLines": 98848,
+    "files": 1202,
+    "productionLines": 54442,
+    "testLines": 45689,
+    "totalLines": 100131,
     "areas": [
       {
         "area": "backend",
         "files": 354,
-        "productionLines": 8870,
-        "testLines": 19807,
-        "totalLines": 28677
+        "productionLines": 8926,
+        "testLines": 19897,
+        "totalLines": 28823
       },
       {
         "area": "contract",
@@ -44,9 +44,9 @@
       {
         "area": "design",
         "files": 8,
-        "productionLines": 3230,
+        "productionLines": 3245,
         "testLines": 0,
-        "totalLines": 3230
+        "totalLines": 3245
       },
       {
         "area": "docs",
@@ -59,36 +59,36 @@
         "area": "e2e",
         "files": 23,
         "productionLines": 0,
-        "testLines": 3622,
-        "totalLines": 3622
+        "testLines": 3650,
+        "totalLines": 3650
       },
       {
         "area": "frontend/src",
         "files": 510,
         "productionLines": 15874,
-        "testLines": 16934,
-        "totalLines": 32808
+        "testLines": 16955,
+        "totalLines": 32829
       },
       {
         "area": "other",
         "files": 58,
-        "productionLines": 4856,
+        "productionLines": 4860,
         "testLines": 0,
-        "totalLines": 4856
+        "totalLines": 4860
       },
       {
         "area": "scripts",
-        "files": 141,
-        "productionLines": 7517,
-        "testLines": 4467,
-        "totalLines": 11984
+        "files": 147,
+        "productionLines": 7759,
+        "testLines": 5187,
+        "totalLines": 12946
       },
       {
         "area": "tasks",
-        "files": 59,
-        "productionLines": 10447,
+        "files": 60,
+        "productionLines": 10554,
         "testLines": 0,
-        "totalLines": 10447
+        "totalLines": 10554
       }
     ],
     "filesByExtension": [
@@ -105,20 +105,20 @@
         "files": 190
       },
       {
+        "extension": "mts",
+        "files": 93
+      },
+      {
         "extension": "css",
         "files": 90
       },
       {
-        "extension": "mts",
-        "files": 89
-      },
-      {
         "extension": "md",
-        "files": 70
+        "files": 71
       },
       {
         "extension": "json",
-        "files": 65
+        "files": 66
       },
       {
         "extension": "html",
@@ -149,6 +149,10 @@
         "files": 4
       },
       {
+        "extension": "yaml",
+        "files": 3
+      },
+      {
         "extension": "cjs",
         "files": 2
       },
@@ -158,10 +162,6 @@
       },
       {
         "extension": "sln",
-        "files": 2
-      },
-      {
-        "extension": "yaml",
         "files": 2
       },
       {
@@ -234,17 +234,17 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2401,
+    "totalTests": 2426,
     "frontend": {
-      "suites": 207,
-      "tests": 1358,
-      "passed": 1358,
+      "suites": 209,
+      "tests": 1379,
+      "passed": 1379,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 92.46,
-      "branchCoverage": 90.04,
-      "coveredLines": 3215,
-      "coverableLines": 3477
+      "lineCoverage": 92.56,
+      "branchCoverage": 90.18,
+      "coveredLines": 3288,
+      "coverableLines": 3552
     },
     "backend": {
       "assemblies": [
@@ -265,9 +265,9 @@
         {
           "assembly": "ValuesWorkshop.Application.Tests.dll",
           "failed": 0,
-          "passed": 282,
+          "passed": 284,
           "skipped": 0,
-          "total": 282
+          "total": 284
         },
         {
           "assembly": "ValuesWorkshop.Domain.Tests.dll",
@@ -279,19 +279,19 @@
         {
           "assembly": "ValuesWorkshop.Host.Tests.dll",
           "failed": 0,
-          "passed": 102,
+          "passed": 104,
           "skipped": 0,
-          "total": 102
+          "total": 104
         }
       ],
-      "tests": 950,
-      "passed": 950,
+      "tests": 954,
+      "passed": 954,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 98.7,
-      "branchCoverage": 93.1,
-      "coveredLines": 9968,
-      "coverableLines": 10099
+      "lineCoverage": 98.6,
+      "branchCoverage": 92.8,
+      "coveredLines": 10003,
+      "coverableLines": 10136
     },
     "endToEnd": {
       "tests": 93,
@@ -304,30 +304,30 @@
       "dotnet build backend/ValuesWorkshop.All.sln --no-incremental -p:ReportCyclomaticComplexity=true"
     ],
     "frontend": {
-      "functions": 3785,
+      "functions": 3853,
       "maximum": 7,
       "mean": 1.19,
       "aboveCap": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 3337
+          "functions": 3393
         },
         {
           "complexity": 2,
-          "functions": 283
+          "functions": 292
         },
         {
           "complexity": 3,
-          "functions": 93
+          "functions": 94
         },
         {
           "complexity": 4,
-          "functions": 47
+          "functions": 48
         },
         {
           "complexity": 5,
-          "functions": 15
+          "functions": 16
         },
         {
           "complexity": 6,
@@ -372,26 +372,26 @@
       ]
     },
     "backend": {
-      "functions": 1795,
+      "functions": 1807,
       "maximum": 7,
       "mean": 1.26,
       "aboveCap": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 1513
+          "functions": 1525
         },
         {
           "complexity": 2,
-          "functions": 174
+          "functions": 172
         },
         {
           "complexity": 3,
-          "functions": 63
+          "functions": 64
         },
         {
           "complexity": 4,
-          "functions": 21
+          "functions": 22
         },
         {
           "complexity": 5,
@@ -427,7 +427,7 @@
         },
         {
           "path": "backend/Application/Formation/GroupFormationRunner.cs",
-          "line": 126,
+          "line": 161,
           "name": "SolveFor",
           "complexity": 6
         },
@@ -471,8 +471,8 @@
       "pnpm -w jscpd --reporters json --output <tmp>/jscpd"
     ],
     "sources": 609,
-    "lines": 24757,
-    "tokens": 194355,
+    "lines": 24818,
+    "tokens": 194739,
     "clones": 3,
     "duplicatedLines": 28,
     "duplicatedTokens": 257,
@@ -505,10 +505,10 @@
   "hotspots": {
     "commands": [
       "git ls-files",
-      "git log --numstat --no-renames --format=%H 8b64e8578c9208fa20002a96e0a099d6a02b902b"
+      "git log --numstat --no-renames --format=%H 385f10953ab57f77374f6938ddefa6b9ab44f39a"
     ],
     "filesAnalysed": 425,
-    "commitsInHistory": 851,
+    "commitsInHistory": 875,
     "hotspots": [
       {
         "path": "backend/Domain/Session.cs",
@@ -574,6 +574,15 @@
         "score": 216
       },
       {
+        "path": "backend/Application/Formation/GroupFormationRunner.cs",
+        "side": "backend",
+        "commits": 8,
+        "linesChanged": 304,
+        "complexity": 26,
+        "mostComplexFunction": 6,
+        "score": 208
+      },
+      {
         "path": "backend/Application/Intents/FacilitatorIntentHandler.cs",
         "side": "backend",
         "commits": 16,
@@ -635,15 +644,6 @@
         "complexity": 17,
         "mostComplexFunction": 6,
         "score": 153
-      },
-      {
-        "path": "frontend/src/testing/designTokens.ts",
-        "side": "frontend",
-        "commits": 4,
-        "linesChanged": 202,
-        "complexity": 36,
-        "mostComplexFunction": 5,
-        "score": 144
       }
     ]
   },
@@ -776,7 +776,7 @@
       {
         "path": "docs/quality/sbom/frontend.cdx.json",
         "describes": "frontend runtime dependencies of the pnpm workspace",
-        "components": 180
+        "components": 179
       },
       {
         "path": "docs/quality/sbom/backend.cdx.json",
@@ -816,13 +816,13 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count 8b64e8578c9208fa20002a96e0a099d6a02b902b",
-      "git rev-list --count \"--grep=^Merge pull request\" 8b64e8578c9208fa20002a96e0a099d6a02b902b",
-      "git log --max-parents=0 --format=%cI 8b64e8578c9208fa20002a96e0a099d6a02b902b",
-      "git shortlog --summary --numbered 8b64e8578c9208fa20002a96e0a099d6a02b902b"
+      "git rev-list --count 385f10953ab57f77374f6938ddefa6b9ab44f39a",
+      "git rev-list --count \"--grep=^Merge pull request\" 385f10953ab57f77374f6938ddefa6b9ab44f39a",
+      "git log --max-parents=0 --format=%cI 385f10953ab57f77374f6938ddefa6b9ab44f39a",
+      "git shortlog --summary --numbered 385f10953ab57f77374f6938ddefa6b9ab44f39a"
     ],
-    "commits": 851,
-    "mergedPullRequests": 67,
+    "commits": 875,
+    "mergedPullRequests": 72,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4
   }
