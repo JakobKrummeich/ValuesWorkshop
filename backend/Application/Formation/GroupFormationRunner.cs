@@ -134,7 +134,15 @@ public sealed class GroupFormationRunner(
 
         try
         {
-            assignment = groupSolverPort.Solve(request, cancellationToken);
+            if (
+                groupSolverPort.Solve(request, cancellationToken) is GroupSolverOutcome.Assigned
+                {
+                    Assignment: var solved
+                }
+            )
+            {
+                assignment = solved;
+            }
         }
         catch (OperationCanceledException)
         {

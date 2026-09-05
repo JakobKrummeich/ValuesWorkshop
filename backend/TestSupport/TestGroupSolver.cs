@@ -4,7 +4,7 @@ namespace ValuesWorkshop.TestSupport;
 
 public sealed class TestGroupSolver : IGroupSolver
 {
-    public GroupFormationResult Solve(
+    public GroupSolverOutcome Solve(
         GroupFormationRequest request,
         CancellationToken cancellationToken
     )
@@ -37,6 +37,6 @@ public sealed class TestGroupSolver : IGroupSolver
             groups.Add(new FormedGroup(members, assignedValues));
         }
 
-        return new GroupFormationResult(groups);
+        return new GroupSolverOutcome.Assigned(new GroupFormationResult(groups));
     }
 }

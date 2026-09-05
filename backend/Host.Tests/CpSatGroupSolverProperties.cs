@@ -32,7 +32,7 @@ public class CpSatGroupSolverProperties
             FormationRequests,
             request =>
             {
-                var groups = solver.Solve(request, CancellationToken.None).Groups;
+                var groups = Solved(request).Groups;
 
                 groups
                     .SelectMany(group => group.Members)
@@ -57,7 +57,7 @@ public class CpSatGroupSolverProperties
             FormationRequests,
             request =>
             {
-                var groups = solver.Solve(request, CancellationToken.None).Groups;
+                var groups = Solved(request).Groups;
 
                 groups
                     .SelectMany(group => group.AssignedValues)
@@ -76,11 +76,7 @@ public class CpSatGroupSolverProperties
     {
         return Prop.ForAll(
             FormationRequests,
-            request =>
-                ShouldFormTheSameGroups(
-                    solver.Solve(request, CancellationToken.None),
-                    solver.Solve(request, CancellationToken.None)
-                )
+            request => ShouldFormTheSameGroups(Solved(request), Solved(request))
         );
     }
 
@@ -91,10 +87,18 @@ public class CpSatGroupSolverProperties
             FormationRequests,
             request =>
                 ShouldFormTheSameGroups(
-                    solver.Solve(request, CancellationToken.None),
-                    solver.Solve(WithSelectionsBeyondTheTopValues(request), CancellationToken.None)
+                    Solved(request),
+                    Solved(WithSelectionsBeyondTheTopValues(request))
                 )
         );
+    }
+
+    private GroupFormationResult Solved(GroupFormationRequest request)
+    {
+        return solver
+            .Solve(request, CancellationToken.None)
+            .ShouldBeOfType<GroupSolverOutcome.Assigned>()
+            .Assignment;
     }
 
     private static void ShouldFormTheSameGroups(

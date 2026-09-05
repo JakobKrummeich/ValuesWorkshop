@@ -25,6 +25,15 @@ public sealed record ParticipantSelection(
 
 public sealed record GroupFormationResult(IReadOnlyList<FormedGroup> Groups);
 
+public abstract record GroupSolverOutcome
+{
+    private protected GroupSolverOutcome() { }
+
+    public sealed record Assigned(GroupFormationResult Assignment) : GroupSolverOutcome;
+
+    public sealed record StoppedWithoutAssignment : GroupSolverOutcome;
+}
+
 public sealed record FormedGroup(
     IReadOnlyList<ParticipantId> Members,
     IReadOnlyList<ValueId> AssignedValues
