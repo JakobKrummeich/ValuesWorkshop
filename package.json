@@ -1,5 +1,6 @@
 {
   "private": true,
+  "packageManager": "pnpm@11.15.1",
   "scripts": {
     "jscpd": "jscpd",
     "quality:report": "pnpm --dir frontend quality:report",
