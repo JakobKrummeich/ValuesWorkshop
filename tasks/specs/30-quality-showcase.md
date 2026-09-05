@@ -77,8 +77,9 @@ date it describes:
   and relations, emitted from the EF Core model itself (`IModel`), so it is
   the schema the application actually runs against, not a drawing of it.
 
-A fifth, `hotspots.mmd`, is a `quadrantChart` of churn against complexity; it
-moves with every commit, so it is refreshed with the metrics and not gated.
+The hotspot ranking is not a diagram: it is a table, written into `metrics.md`
+and the README with the metrics, and like them it moves with every commit and
+is not gated.
 
 **Drift gate:** a test regenerates every diagram and fails when the checked-in
 file differs, with the same `CONTRACT_WRITE=1`-style refresh path the wire
@@ -149,6 +150,25 @@ generators live in `backend/TestSupport/WorkshopGenerators.cs`; the solver
 properties run at a lowered `MaxTest` because each case calls a real solve. The
 whole sweep adds about 11 s to the backend suite and under a second to jest.
 
+### How the mutation testing landed
+
+30g runs Stryker.NET 4.16.0 over the backend and StrykerJS 10.0.0 over the
+frontend through `pnpm mutation`, or one side at a time with
+`pnpm mutation:frontend` and `pnpm mutation:backend`. Each side takes tens of
+minutes, so it is not a PR gate: `.github/workflows/mutation.yml` runs both
+nightly and on demand. The result lands in `docs/quality/mutation.json` and is
+rendered from there into `metrics.md` and the README's headline table. The
+first full runs scored the backend at 84.59 % (1,223 killed, 198 survived, 1
+timeout, 25 without coverage) and the frontend at 86.43 % (2,136 killed, 296
+survived, 4 timeouts, 40 without coverage); the first backend run uncovered
+real gaps in the tests, closed before the score was recorded ("Close the gaps
+the first mutation run uncovered"). An uncapped run peaked at 14 GB and
+OOM-killed the whole session twice, so a run now executes inside
+`systemd-run --user --scope -p MemoryMax=8G -p MemorySwapMax=2G` under
+`choom -n 900`, with two test runners per side (`maxTestRunnerReuse: 20`,
+`NODE_OPTIONS=--max-old-space-size=1536` for jest) — a run dies before the
+machine does.
+
 ### How the accessibility gate landed
 
 30f scans all three shells in every phase of the restart-recovery walkthrough,
@@ -179,21 +199,23 @@ commits and changed lines per path as it is named today, over the whole
 history, binary rows skipped. Complexity is Tornhill-style whitespace
 analysis: every non-blank line of a production `.cs`, `.ts` or `.tsx` file adds
 its nesting depth, at four spaces per level for C# and two for TypeScript, a
-tab counting as one level. The score is commits × complexity; `metrics.md`
-tables the top ten under `## Hotspots` and `hotspots.mmd` plots the top twelve
-on a quadrant chart scaled to the busiest and the most complex file, each
-point kept 10 % clear of the borders so its label stays readable. The chart is
-not drift-gated because it moves with every commit.
+tab counting as one level. The score is commits × complexity. One table
+renders the top ten: `metrics.md` shows every column under `## Hotspots`, the
+README's `hotspots` region the same rows without the deepest nesting. A chart
+was tried and dropped: with real data a Mermaid quadrant chart clumps every
+point at half the complexity axis with colliding labels, and a bar chart
+truncates the file names, so neither said more than the table does. The table
+is not drift-gated because it moves with every commit.
 
 ### How the README section landed
 
 30d put badges under the title — the CI workflow badge and four shields.io
 dynamic-JSON badges reading `docs/quality/metrics.json` on `main` for frontend
 coverage, backend coverage, the complexity cap and duplication — and a
-`## Engineering` section whose headline table and four diagrams live in marked
-regions that `pnpm quality:report` rewrites from the report and the generated
-`.mmd` files. The lines inside those regions are left out of the size counts,
-so a regeneration cannot move its own numbers. The drift gate now also checks
+`## Engineering` section whose headline table, three diagrams and hotspots
+table live in marked regions that `pnpm quality:report` rewrites from the
+report and the generated `.mmd` files. The lines inside those regions are
+left out of the size counts, so a regeneration cannot move its own numbers. The drift gate now also checks
 the README's copies of the three structural diagrams, and `design/architecture.md`
 and `design/persistence.md` point at their generated counterparts.
 
@@ -227,7 +249,8 @@ Each slice is its own PR off `main`, merged before the next one starts.
 - The drift gate fails when a table, a project reference or a module edge
   changes without regenerating; `./scripts/ci-lint.sh` and `./scripts/ci-test.sh`
   stay green.
-- The README renders all four diagrams on GitHub without a build step.
+- The README inlines the three architecture diagrams, rendered by GitHub
+  without a build step, and links the ER diagram.
 - The collector's parsing is unit-tested against captured tool output.
 
 ## Open questions for the reviewer
