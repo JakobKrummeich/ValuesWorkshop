@@ -2,7 +2,6 @@ import { parseBillOfMaterials } from "../quality/supplyChain/billsOfMaterials.mt
 import {
   buildDependencySnapshot,
   describeSubmissionResponse,
-  PackageRelationship,
   submissionFromEnvironment,
   type SnapshotContext,
 } from "../quality/supplyChain/dependencySnapshot.mts";
@@ -78,15 +77,9 @@ describe("buildDependencySnapshot", () => {
   });
 
   it("marks the packages the root depends on as direct and the rest as indirect", () => {
-    expect(manifest.resolved[orTools].relationship).toBe(
-      PackageRelationship.Direct,
-    );
-    expect(manifest.resolved[sqlite].relationship).toBe(
-      PackageRelationship.Direct,
-    );
-    expect(manifest.resolved[relational].relationship).toBe(
-      PackageRelationship.Indirect,
-    );
+    expect(manifest.resolved[orTools].relationship).toBe("direct");
+    expect(manifest.resolved[sqlite].relationship).toBe("direct");
+    expect(manifest.resolved[relational].relationship).toBe("indirect");
   });
 
   it("carries each package's own edges and treats a package without an entry as a leaf", () => {

@@ -1,10 +1,7 @@
 import { z } from "zod";
 import type { BillOfMaterials } from "./billsOfMaterials.mts";
 
-export enum PackageRelationship {
-  Direct = "direct",
-  Indirect = "indirect",
-}
+export type PackageRelationship = "direct" | "indirect";
 
 export interface SnapshotJob {
   id: string;
@@ -92,8 +89,8 @@ function manifestFor({
         {
           package_url: component.purl,
           relationship: direct.has(component["bom-ref"])
-            ? PackageRelationship.Direct
-            : PackageRelationship.Indirect,
+            ? "direct"
+            : "indirect",
           scope: "runtime",
           dependencies: edges.get(component["bom-ref"]) ?? [],
         },
