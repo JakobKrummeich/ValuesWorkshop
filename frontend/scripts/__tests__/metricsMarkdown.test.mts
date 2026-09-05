@@ -19,6 +19,7 @@ describe("renderMetricsMarkdown", () => {
       "## Tests and coverage",
       "## Complexity",
       "## Duplication",
+      "## Hotspots",
       "## Architecture",
       "## Design system",
       "## Wire contract",
