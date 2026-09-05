@@ -248,14 +248,13 @@ graph TD
 
 ### Hotspots
 
-Where change and complexity overlap — the files most likely to hold the next
-bug. Churn is the number of commits that touched a file over the whole
-history, from `git log --numstat`; complexity is indentation-based, so it
-reads C# and TypeScript alike; each file sits at its share of the busiest and
-the most complex file in the repository.
+The ten files where change and complexity overlap most — the ones most likely
+to hold the next bug. Churn is the number of commits that touched a file over
+the whole history, from `git log --numstat`; complexity is indentation-based,
+so it reads C# and TypeScript alike; the score is the product of the two.
 
-<!-- quality:diagram:hotspots:start -->
-<!-- quality:diagram:hotspots:end -->
+<!-- quality:hotspots:start -->
+<!-- quality:hotspots:end -->
 
 The full table, with every command that produced a number, is
 [`docs/quality/metrics.md`](docs/quality/metrics.md). The database schema — an
