@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { toRepositoryPath } from "./qualityReport.mts";
 
 export interface ComplexityBucket {
   complexity: number;
@@ -16,7 +17,7 @@ export interface ComplexityMetrics {
   functions: number;
   maximum: number;
   mean: number;
-  otherRuleFindings: number;
+  aboveCap: number;
   distribution: ComplexityBucket[];
   mostComplex: ComplexFunction[];
 }
@@ -40,7 +41,8 @@ const mostComplexFunctionsReported = 5;
 
 export function parseEslintComplexityReport(
   reportJson: string,
-): ComplexityMetrics {
+  repositoryRoot: string,
+): ComplexFunction[] {
   const report = eslintReportSchema.parse(JSON.parse(reportJson));
   const measured = report.flatMap((file) =>
     file.messages
@@ -53,7 +55,7 @@ export function parseEslintComplexityReport(
           );
         }
         return {
-          path: file.filePath,
+          path: toRepositoryPath(file.filePath, repositoryRoot),
           line: message.line ?? 0,
           name: match[1],
           complexity: Number(match[2]),
@@ -65,18 +67,12 @@ export function parseEslintComplexityReport(
       "The eslint report holds no complexity findings, so no function was measured.",
     );
   }
-  const otherRuleFindings = report.reduce(
-    (total, file) =>
-      total +
-      file.messages.filter((message) => message.ruleId !== "complexity").length,
-    0,
-  );
-  return summarizeComplexity(measured, otherRuleFindings);
+  return measured;
 }
 
-function summarizeComplexity(
-  measured: ComplexFunction[],
-  otherRuleFindings: number,
+export function summarizeComplexity(
+  measured: readonly ComplexFunction[],
+  cap: number,
 ): ComplexityMetrics {
   const total = measured.reduce((sum, entry) => sum + entry.complexity, 0);
   const byComplexity = new Map<number, number>();
@@ -90,7 +86,7 @@ function summarizeComplexity(
     functions: measured.length,
     maximum: Math.max(...measured.map((entry) => entry.complexity)),
     mean: Math.round((total / measured.length) * 100) / 100,
-    otherRuleFindings,
+    aboveCap: measured.filter((entry) => entry.complexity > cap).length,
     distribution: [...byComplexity.entries()]
       .map(([complexity, functions]) => ({ complexity, functions }))
       .sort((left, right) => left.complexity - right.complexity),

@@ -7,7 +7,7 @@ export function ProgressRing({
   testId,
 }: {
   fraction: number;
-  label?: string;
+  label: string;
   testId?: string;
 }) {
   const percentage = Math.round(fraction * 100);
@@ -26,7 +26,6 @@ export function ProgressRing({
       >
         <span className={styles.percentage}>{percentage}%</span>
       </div>
-      {label !== undefined && <p className={styles.label}>{label}</p>}
     </div>
   );
 }

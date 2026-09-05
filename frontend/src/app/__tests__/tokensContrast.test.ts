@@ -18,12 +18,15 @@ const textPairings = [
     "--color-eyebrow",
     "--color-value-chip",
     "--color-member-chip",
+    "--color-success",
   ].flatMap((text) => backgrounds.map((background) => [text, background])),
   ["--color-on-primary", "--color-primary"],
   ["--color-on-accent", "--color-accent"],
   ["--color-danger", "--color-bg"],
   ["--color-danger", "--color-surface"],
   ["--color-danger", "--color-danger-soft"],
+  ["--color-accent", "--color-accent-soft"],
+  ["--color-success", "--color-success-soft"],
 ];
 
 describe.each(surfaces)("%s", (surfaceFile) => {

@@ -12,6 +12,10 @@
     "phases:check": "node scripts/generatePhasesModule.mts --check",
     "phases:generate": "node scripts/generatePhasesModule.mts --write",
     "quality:report": "node scripts/quality/writeQualityReport.mts",
+    "sbom": "node scripts/quality/supplyChain/writeBillsOfMaterials.mts",
+    "advisories:scan": "node scripts/quality/supplyChain/scanDependencyAdvisories.mts",
+    "mutation:frontend": "node scripts/quality/mutation/runMutationTesting.mts frontend",
+    "mutation:backend": "node scripts/quality/mutation/runMutationTesting.mts backend",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check .",
     "typecheck": "tsc --noEmit && tsc --noEmit --project scripts"
@@ -31,6 +35,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@stryker-mutator/core": "10.0.0",
+    "@stryker-mutator/jest-runner": "10.0.0",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@types/jest": "^30.0.0",
@@ -41,6 +47,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "fast-check": "^4.9.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "prettier": "^3.9.5",

@@ -119,6 +119,23 @@ public class SessionChooseQuizAnswerTests
         );
     }
 
+    [Fact]
+    public void Answers_stop_once_the_quiz_phase_is_left_behind()
+    {
+        var session = TestSessions.InPhase(
+            new SessionIdentity(Guid.NewGuid()),
+            Phase.ValueSelection,
+            QuizProgress.Restore(0, false, false, []),
+            roster: [TestParticipants.Named(Anna, "Anna")]
+        );
+
+        Should.Throw<WrongPhaseException>(() =>
+            session.ChooseQuizAnswer(Anna, questionIndex: 0, answerIndex: 0)
+        );
+
+        session.Quiz.CastAnswers.ShouldBeEmpty();
+    }
+
     private static Session QuizSessionWith(params ParticipantId[] participants)
     {
         var session = TestSessions.InPhase(new SessionIdentity(Guid.NewGuid()), Phase.Join);

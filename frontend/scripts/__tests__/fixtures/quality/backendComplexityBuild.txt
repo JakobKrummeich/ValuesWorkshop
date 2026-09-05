@@ -1,0 +1,35 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  ValuesWorkshop.Analyzers -> /home/dev/ValuesWorkshop/backend/Analyzers/bin/Debug/netstandard2.0/ValuesWorkshop.Analyzers.dll
+/home/dev/ValuesWorkshop/backend/Adapters.Web/SessionCreationEndpoint.cs(59,5): warning VW1003: 'ResponseFor' has cyclomatic complexity 6 [/home/dev/ValuesWorkshop/backend/Adapters.Web/ValuesWorkshop.Adapters.Web.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(15,5): warning VW1003: 'A_participant_sees_their_own_answer_to_the_current_question' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(23,5): warning VW1003: 'An_answer_to_an_earlier_question_is_not_the_own_answer_of_the_current_one' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(31,5): warning VW1003: 'A_participant_who_has_not_answered_yet_has_no_own_answer' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(9,5): warning VW1003: 'Initially_no_question_is_posed' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(107,5): warning VW1003: 'PoseNextQuestion' has cyclomatic complexity 3 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(42,5): warning VW1003: 'AnsweredCount' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(45,5): warning VW1003: 'IsQuizComplete' has cyclomatic complexity 3 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(77,5): warning VW1003: 'ChooseAnswer' has cyclomatic complexity 6 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/SelectionRound.cs(35,5): warning VW1003: 'Submit' has cyclomatic complexity 6 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/SelectionRound.cs(73,5): warning VW1003: 'DetermineTopValues' has cyclomatic complexity 3 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+  ValuesWorkshop.Domain -> /home/dev/ValuesWorkshop/backend/Domain/bin/Debug/net10.0/ValuesWorkshop.Domain.dll
+  ValuesWorkshop.Adapters.Web -> /home/dev/ValuesWorkshop/backend/Adapters.Web/bin/Debug/net10.0/ValuesWorkshop.Adapters.Web.dll
+  ValuesWorkshop.Domain.Tests -> /home/dev/ValuesWorkshop/backend/Domain.Tests/bin/Debug/net10.0/ValuesWorkshop.Domain.Tests.dll
+
+Build succeeded.
+
+/home/dev/ValuesWorkshop/backend/Adapters.Web/SessionCreationEndpoint.cs(59,5): warning VW1003: 'ResponseFor' has cyclomatic complexity 6 [/home/dev/ValuesWorkshop/backend/Adapters.Web/ValuesWorkshop.Adapters.Web.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(15,5): warning VW1003: 'A_participant_sees_their_own_answer_to_the_current_question' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(23,5): warning VW1003: 'An_answer_to_an_earlier_question_is_not_the_own_answer_of_the_current_one' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(31,5): warning VW1003: 'A_participant_who_has_not_answered_yet_has_no_own_answer' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain.Tests/QuizProgressTests.cs(9,5): warning VW1003: 'Initially_no_question_is_posed' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain.Tests/ValuesWorkshop.Domain.Tests.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(107,5): warning VW1003: 'PoseNextQuestion' has cyclomatic complexity 3 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(42,5): warning VW1003: 'AnsweredCount' has cyclomatic complexity 1 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(45,5): warning VW1003: 'IsQuizComplete' has cyclomatic complexity 3 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/QuizProgress.cs(77,5): warning VW1003: 'ChooseAnswer' has cyclomatic complexity 6 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/SelectionRound.cs(35,5): warning VW1003: 'Submit' has cyclomatic complexity 6 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+/home/dev/ValuesWorkshop/backend/Domain/SelectionRound.cs(73,5): warning VW1003: 'DetermineTopValues' has cyclomatic complexity 3 [/home/dev/ValuesWorkshop/backend/Domain/ValuesWorkshop.Domain.csproj]
+    11 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:11.42

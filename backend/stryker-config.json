@@ -1,0 +1,26 @@
+{
+  "stryker-config": {
+    "solution": "ValuesWorkshop.All.sln",
+    "test-projects": [
+      "Domain.Tests/ValuesWorkshop.Domain.Tests.csproj",
+      "Application.Tests/ValuesWorkshop.Application.Tests.csproj",
+      "Adapters.Tests/ValuesWorkshop.Adapters.Tests.csproj",
+      "Host.Tests/ValuesWorkshop.Host.Tests.csproj"
+    ],
+    "mutate": [
+      "!**/TestSupport/**",
+      "!**/Migrations/**",
+      "!**/Program.cs",
+      "!**/*.Designer.cs",
+      "!**/bin/**",
+      "!**/obj/**"
+    ],
+    "reporters": ["Progress", "Html", "Json"],
+    "concurrency": 2,
+    "thresholds": {
+      "high": 90,
+      "low": 70,
+      "break": 0
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { test, expect, type BrowserContext, type Page } from "@playwright/test";
+import { expectAccessibleScreen } from "./support/accessibility";
 import { openSessionAsFacilitator } from "./support/facilitatorSession";
 import { openSignedIn, signInThroughOidcProvider } from "./support/oidcLogin";
 import { decodeQrCode } from "./support/qrCode";
@@ -54,6 +55,7 @@ test.describe.serial("phase 1 join", () => {
     await expect(presenterPage.getByTestId("participant-count")).toHaveText(
       "Participants: 0",
     );
+    await expectAccessibleScreen(presenterPage, "wall inviting an empty room");
   });
 
   test("scanning the QR code leads into the lobby of this session", async () => {

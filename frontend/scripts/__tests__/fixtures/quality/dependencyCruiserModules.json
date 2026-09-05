@@ -1,0 +1,83 @@
+{
+  "modules": [
+    {
+      "source": "src/adapters/WorkshopRecordDocument.tsx",
+      "dependencies": [
+        {
+          "resolved": "src/domain/workshopRecordModel.ts"
+        },
+        {
+          "resolved": "../node_modules/.pnpm/@react-pdf+renderer@4.9.0_react@19.2.4/node_modules/@react-pdf/renderer/lib/react-pdf.js"
+        }
+      ]
+    },
+    {
+      "source": "src/domain/ports/facilitator/lifecyclePort.ts",
+      "dependencies": [
+        {
+          "resolved": "src/shared/reactiveTypes.ts"
+        },
+        {
+          "resolved": "src/domain/intentResult.ts"
+        }
+      ]
+    },
+    {
+      "source": "src/app/chrome/ConnectionStatus.tsx",
+      "dependencies": [
+        {
+          "resolved": "src/domain/ports/sessionStatePort.ts"
+        },
+        {
+          "resolved": "src/domain/workshopState.ts"
+        },
+        {
+          "resolved": "src/app/chrome/ConnectionStatus.module.css"
+        },
+        {
+          "resolved": "src/app/chrome/useConnectionStatus.ts"
+        }
+      ]
+    },
+    {
+      "source": "src/app/facilitator/FacilitatorSessionBoundary.tsx",
+      "dependencies": [
+        {
+          "resolved": "src/adapters/sessionCreationAdapter.ts"
+        },
+        {
+          "resolved": "src/adapters/workshopSessions.ts"
+        },
+        {
+          "resolved": "src/app/SessionBoundary.tsx"
+        },
+        {
+          "resolved": "src/app/facilitator/dependencies.tsx"
+        },
+        {
+          "resolved": "src/app/facilitator/OpenSessionForm.tsx"
+        },
+        {
+          "resolved": "../node_modules/.pnpm/react@19.2.4/node_modules/react/index.js"
+        }
+      ]
+    },
+    {
+      "source": "src/adapters/__tests__/WorkshopRecordDocument.test.tsx",
+      "dependencies": [
+        {
+          "resolved": "src/domain/workshopRecordModel.ts"
+        },
+        {
+          "resolved": "src/adapters/WorkshopRecordDocument.tsx"
+        },
+        {
+          "resolved": "../node_modules/.pnpm/@testing-library+react@16.3.2_@testing-library+dom@10.4.1_@types+react-dom@19.2.3_@type_796f041f1bf25f255ff84691b91a8ac6/node_modules/@testing-library/react/dist/index.js"
+        },
+        {
+          "resolved": "../node_modules/.pnpm/react@19.2.4/node_modules/react/index.js"
+        }
+      ]
+    }
+  ]
+}

@@ -8,3 +8,6 @@ coverage.json
 .lavish/
 **/data/*.db
 test-results/
+reports/
+.tools/
+StrykerOutput/

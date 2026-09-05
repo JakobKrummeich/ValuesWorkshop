@@ -4,13 +4,16 @@ import type { ContractMetrics } from "./contractScan.mts";
 import type { DesignSystemMetrics } from "./designSystemScan.mts";
 import type { DuplicationMetrics } from "./duplicationReport.mts";
 import type { EnforcedLimits } from "./enforcedLimits.mts";
+import type { HotspotMetrics } from "./hotspots/hotspotAnalysis.mts";
 import type {
   FolderInstability,
   ModuleGraphMetrics,
 } from "./architectureReports.mts";
+import type { MutationRecord } from "./mutation/mutationRecord.mts";
 import type { ProcessMetrics } from "./processHistory.mts";
 import type { SizeMetrics, LongestFile } from "./sizeScan.mts";
 import type { VulnerabilityScanResult } from "./securityScans.mts";
+import type { WrittenBillOfMaterials } from "./supplyChain/writeBillsOfMaterials.mts";
 import type {
   BackendAssemblyTests,
   EndToEndTestCounts,
@@ -45,7 +48,7 @@ export interface TestsMetrics {
 
 export interface ComplexityGroupMetrics {
   frontend: ComplexityMetrics;
-  backendAnalyzerDiagnostics: number;
+  backend: ComplexityMetrics;
   longestFiles: LongestFile[];
 }
 
@@ -61,6 +64,11 @@ export interface SecurityGroupMetrics {
   backend: VulnerabilityScanResult;
 }
 
+export interface SupplyChainMetrics {
+  billsOfMaterials: WrittenBillOfMaterials[];
+  advisories: VulnerabilityScanResult;
+}
+
 export type CollectedMetrics = Omit<QualityReport, "generatedAt">;
 
 export interface QualityReport {
@@ -71,10 +79,13 @@ export interface QualityReport {
   tests: MetricGroup<TestsMetrics>;
   complexity: MetricGroup<ComplexityGroupMetrics>;
   duplication: MetricGroup<DuplicationMetrics>;
+  hotspots: MetricGroup<HotspotMetrics>;
   architecture: MetricGroup<ArchitectureGroupMetrics>;
   designSystem: MetricGroup<DesignSystemMetrics>;
   contract: MetricGroup<ContractMetrics>;
   security: MetricGroup<SecurityGroupMetrics>;
+  supplyChain: MetricGroup<SupplyChainMetrics>;
+  mutation: MutationRecord;
   process: MetricGroup<ProcessMetrics>;
 }
 

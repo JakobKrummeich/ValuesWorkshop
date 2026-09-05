@@ -7,25 +7,24 @@ describe("progress ring", () => {
       <ProgressRing
         fraction={0.42}
         label="Forming groups…"
-        testId="formation-progress"
+        testId="formation-ring"
       />,
     );
 
     const ring = screen.getByRole("progressbar");
     expect(ring).toHaveAccessibleName("Forming groups…");
     expect(ring).toHaveAttribute("aria-valuenow", "42");
-    expect(screen.getByTestId("formation-progress")).toHaveTextContent(
-      "42%Forming groups…",
-    );
+    expect(screen.getByTestId("formation-ring")).toBe(ring);
+    expect(ring).toHaveTextContent("42%");
     expect(ring.firstElementChild).toHaveStyle({ "--ring-fraction": "0.42" });
   });
 
-  it("starts empty and stands without a label", () => {
-    render(<ProgressRing fraction={0} />);
+  it("starts empty and still carries its name", () => {
+    render(<ProgressRing fraction={0} label="Forming groups…" />);
 
     const ring = screen.getByRole("progressbar");
+    expect(ring).toHaveAccessibleName("Forming groups…");
     expect(ring).toHaveAttribute("aria-valuenow", "0");
     expect(ring).toHaveTextContent("0%");
-    expect(ring.querySelector("p")).not.toBeInTheDocument();
   });
 });

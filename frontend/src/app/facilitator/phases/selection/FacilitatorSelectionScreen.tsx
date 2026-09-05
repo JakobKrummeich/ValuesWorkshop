@@ -20,6 +20,10 @@ export function FacilitatorSelectionScreen({
       <div className={styles.ring}>
         <ProgressRing
           fraction={total === 0 ? 0 : submitted / total}
+          label={translate(MessageKey.SelectionSubmittedCount, {
+            submitted,
+            total,
+          })}
           testId="selection-progress"
         />
       </div>

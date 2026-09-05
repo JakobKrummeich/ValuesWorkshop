@@ -19,6 +19,7 @@ import {
   mostComplexFunctionsTable,
 } from "./metricsDetailTables.mts";
 import type { QualityReport } from "./qualityReport.mts";
+import { RepositorySide } from "./sizeScan.mts";
 
 const left = ColumnAlignment.Left;
 const right = ColumnAlignment.Right;
@@ -74,7 +75,7 @@ export function testsSection(report: QualityReport): string {
 
 export function complexitySection(report: QualityReport): string {
   const limits = report.enforcedLimits;
-  const frontend = report.complexity.frontend;
+  const { frontend, backend } = report.complexity;
   return section("Complexity", report.complexity.commands, [
     markdownTable(
       ["measure", "frontend", "backend"],
@@ -85,23 +86,28 @@ export function complexitySection(report: QualityReport): string {
           `${formatAtMost(limits.frontendComplexity)} (eslint \`complexity\`)`,
           `${formatAtMost(limits.backendComplexity)} (analyzer VW1001)`,
         ],
-        ["functions measured", formatCount(frontend.functions), notMeasured],
+        [
+          "functions measured",
+          formatCount(frontend.functions),
+          formatCount(backend.functions),
+        ],
         [
           "highest complexity found",
           formatCount(frontend.maximum),
-          notMeasured,
+          formatCount(backend.maximum),
         ],
-        ["mean complexity", frontend.mean.toFixed(2), notMeasured],
+        ["mean complexity", frontend.mean.toFixed(2), backend.mean.toFixed(2)],
         [
-          "file-length and other rule findings",
-          formatCount(frontend.otherRuleFindings),
-          formatCount(report.complexity.backendAnalyzerDiagnostics),
+          "functions above the cap",
+          formatCount(frontend.aboveCap),
+          formatCount(backend.aboveCap),
         ],
       ],
     ),
-    "The backend cap is enforced by the VW1001 analyzer at build time with warnings as errors, so a passing build is the measurement: every method is inside the cap. The frontend is measured function by function by re-running eslint with the cap lowered to zero, which turns every function into a reported finding.",
+    "Both sides are measured function by function by the tool that enforces the cap. The frontend re-runs eslint with the cap lowered to zero, which turns every function into a reported finding. The backend rebuilds every project with the analyzer's hidden VW1003 diagnostic promoted to a warning, which reports the cyclomatic complexity of every method, constructor and property with code in it; VW1001 fails the build above the cap, so a report exists only for a backend that passes it.",
     complexityDistributionTable(report),
-    mostComplexFunctionsTable(report),
+    mostComplexFunctionsTable(report, RepositorySide.Frontend),
+    mostComplexFunctionsTable(report, RepositorySide.Backend),
     longestFilesTable(report),
   ]);
 }
@@ -185,6 +191,34 @@ export function securitySection(report: QualityReport): string {
         formatCount(scan.exitCode),
         scan.summary,
       ]),
+    ),
+  ]);
+}
+
+export function supplyChainSection(report: QualityReport): string {
+  const advisories = report.supplyChain.advisories;
+  return section("Supply chain", report.supplyChain.commands, [
+    markdownTable(
+      ["bill of materials", "describes", "components"],
+      [left, left, right],
+      report.supplyChain.billsOfMaterials.map((bill) => [
+        `\`${bill.path}\``,
+        bill.describes,
+        formatCount(bill.components),
+      ]),
+    ),
+    "The bills of materials are CycloneDX documents emitted by the generators and then stripped of the serial number, the run timestamp and the annotation that restates it, so regenerating them against an unchanged dependency set leaves no diff.",
+    markdownTable(
+      ["scan", "findings", "exit code", "reported"],
+      [left, right, right, left],
+      [
+        [
+          "osv-scanner over `pnpm-lock.yaml` and both bills of materials",
+          formatCount(advisories.findings),
+          formatCount(advisories.exitCode),
+          advisories.summary,
+        ],
+      ],
     ),
   ]);
 }

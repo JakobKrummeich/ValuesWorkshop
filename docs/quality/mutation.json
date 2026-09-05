@@ -1,0 +1,24 @@
+{
+  "frontend": {
+    "tool": "StrykerJS 10.0.0",
+    "command": "pnpm mutation:frontend",
+    "commit": "800a926382f90dd43da834f06c1f6c3efdde9331",
+    "measuredAt": "2026-09-05T07:24:23.790Z",
+    "score": 86.43,
+    "killed": 2136,
+    "survived": 296,
+    "timeout": 4,
+    "noCoverage": 40
+  },
+  "backend": {
+    "tool": "Stryker.NET 4.16.0",
+    "command": "pnpm mutation:backend",
+    "commit": "ce36bb8b9276f3ea84a7e93583f19c2093af343f",
+    "measuredAt": "2026-09-04T21:34:40.759Z",
+    "score": 84.59,
+    "killed": 1223,
+    "survived": 198,
+    "timeout": 1,
+    "noCoverage": 25
+  }
+}

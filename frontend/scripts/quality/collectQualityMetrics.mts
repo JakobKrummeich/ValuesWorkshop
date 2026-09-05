@@ -7,8 +7,11 @@ import {
   collectComplexity,
   collectDuplication,
   collectSecurity,
+  collectSupplyChain,
   collectTests,
 } from "./collectGateMetrics.mts";
+import { collectHotspots } from "./hotspots/hotspotAnalysis.mts";
+import { readMutationRecord } from "./mutation/readMutationRecord.mts";
 import {
   collectCommitStamp,
   collectContract,
@@ -27,17 +30,20 @@ export function collectQualityMetrics(
   context: CollectionContext,
 ): CollectedMetrics {
   const commit = collectCommitStamp(context);
+  const enforcedLimits = collectEnforcedLimits(context);
   const tracked = collectTrackedPaths(context);
   const size = collectSize(context, tracked);
   const tests = collectTests(context);
   const jestTests = parseJestReport(tests.jestReportJson);
+  const complexity = collectComplexity(context, size, enforcedLimits);
   return {
     commit,
-    enforcedLimits: collectEnforcedLimits(context),
+    enforcedLimits,
     size,
     tests: tests.group,
-    complexity: collectComplexity(context, size),
+    complexity: complexity.group,
     duplication: collectDuplication(context),
+    hotspots: collectHotspots(context, tracked, commit, complexity.measured),
     architecture: collectArchitecture(context),
     designSystem: collectDesignSystem(
       context,
@@ -50,6 +56,8 @@ export function collectQualityMetrics(
       testsInFile(jestTests, frontendContractTest),
     ),
     security: collectSecurity(context),
+    supplyChain: collectSupplyChain(context),
+    mutation: readMutationRecord(context.repositoryRoot),
     process: collectProcess(context, commit),
   };
 }

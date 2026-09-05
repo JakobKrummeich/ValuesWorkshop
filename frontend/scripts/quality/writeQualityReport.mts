@@ -8,13 +8,24 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import type { RepositoryLocations } from "./collectionContext.mts";
 import { collectQualityMetrics } from "./collectQualityMetrics.mts";
+import { writeDatabaseDiagram } from "./databaseDiagram.mts";
 import { renderMetricsMarkdown } from "./metricsMarkdown.mts";
+import {
+  readmePath,
+  renderReadme,
+  renderReadmeDiagrams,
+} from "./readmeEngineering.mts";
 import {
   renderQualityReportJson,
   resolveGeneratedAt,
   type QualityReport,
 } from "./qualityReport.mts";
+import {
+  generateStructuralDiagrams,
+  type GeneratedDiagram,
+} from "./structuralDiagrams.mts";
 
 export const metricsJsonPath = "docs/quality/metrics.json";
 export const metricsMarkdownPath = "docs/quality/metrics.md";
@@ -28,17 +39,56 @@ function readIfPresent(path: string): string | undefined {
   return existsSync(path) ? readFileSync(path, "utf8") : undefined;
 }
 
-function measure(repositoryRoot: string, now: string): QualityReport {
+function write(repositoryRoot: string, path: string, content: string): void {
+  const file = resolve(repositoryRoot, path);
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, content);
+}
+
+function readReadme(repositoryRoot: string): string {
+  return readFileSync(resolve(repositoryRoot, readmePath), "utf8");
+}
+
+function writeStructuralDiagrams(
+  repositoryRoot: string,
+  diagrams: readonly GeneratedDiagram[],
+): string[] {
+  for (const diagram of diagrams) {
+    write(repositoryRoot, diagram.path, diagram.mermaid);
+  }
+  write(
+    repositoryRoot,
+    readmePath,
+    renderReadmeDiagrams(readReadme(repositoryRoot), diagrams),
+  );
+  return diagrams.map((diagram) => diagram.path);
+}
+
+function writeReport(
+  repositoryRoot: string,
+  report: QualityReport,
+  readmeDiagrams: readonly GeneratedDiagram[],
+): string[] {
+  write(repositoryRoot, metricsJsonPath, renderQualityReportJson(report));
+  write(repositoryRoot, metricsMarkdownPath, renderMetricsMarkdown(report));
+  write(
+    repositoryRoot,
+    readmePath,
+    renderReadme(readReadme(repositoryRoot), report, readmeDiagrams),
+  );
+  return [metricsJsonPath, metricsMarkdownPath, readmePath];
+}
+
+function measure(locations: RepositoryLocations, now: string): QualityReport {
   const temporaryDirectory = mkdtempSync(join(tmpdir(), "quality-report-"));
   try {
     const collected = collectQualityMetrics({
-      repositoryRoot,
-      frontendDirectory: resolve(repositoryRoot, "frontend"),
+      ...locations,
       temporaryDirectory,
     });
     return {
       generatedAt: resolveGeneratedAt(
-        readIfPresent(resolve(repositoryRoot, metricsJsonPath)),
+        readIfPresent(resolve(locations.repositoryRoot, metricsJsonPath)),
         collected.commit.sha,
         now,
       ),
@@ -54,19 +104,22 @@ export function writeQualityReport(
   now: string,
 ): QualityReportOutcome {
   try {
-    const report = measure(repositoryRoot, now);
-    const jsonFile = resolve(repositoryRoot, metricsJsonPath);
-    mkdirSync(dirname(jsonFile), { recursive: true });
-    writeFileSync(jsonFile, renderQualityReportJson(report));
-    writeFileSync(
-      resolve(repositoryRoot, metricsMarkdownPath),
-      renderMetricsMarkdown(report),
-    );
+    const locations = {
+      repositoryRoot,
+      frontendDirectory: resolve(repositoryRoot, "frontend"),
+    };
+    const structuralDiagrams = generateStructuralDiagrams(locations);
+    const diagrams = [
+      ...writeStructuralDiagrams(repositoryRoot, structuralDiagrams),
+      writeDatabaseDiagram(locations),
+    ];
+    const report = measure(locations, now);
+    const written = writeReport(repositoryRoot, report, structuralDiagrams);
     return {
       exitCode: 0,
       report: [
         `Measured ${report.commit.shortSha} — ${report.commit.subject}`,
-        `Wrote ${metricsJsonPath} and ${metricsMarkdownPath}`,
+        `Wrote ${[...written, ...diagrams].join(", ")}`,
       ].join("\n"),
     };
   } catch (error) {

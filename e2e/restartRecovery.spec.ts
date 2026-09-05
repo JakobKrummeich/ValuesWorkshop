@@ -6,6 +6,10 @@ import {
   type Page,
 } from "@playwright/test";
 import {
+  expectAccessibleWorkshop,
+  type WorkshopScreens,
+} from "./support/accessibility";
+import {
   RESTART_TEST_TIMEOUT_MILLISECONDS,
   restartBackendAwaitingReconnect,
 } from "./support/backendRestart";
@@ -128,6 +132,12 @@ test.describe.serial("restart recovery across the workshop", () => {
     return participantPages[scribeIndex];
   }
 
+  function workshopScreens(
+    phonePage: Page = participantPages[0],
+  ): WorkshopScreens {
+    return { laptop: facilitatorPage, phone: phonePage, wall: presenterPage };
+  }
+
   function scribeSelectedOption(): Locator {
     return facilitatorPage
       .getByTestId(`scribe-select-${groupAnimalId}`)
@@ -161,6 +171,8 @@ test.describe.serial("restart recovery across the workshop", () => {
         `Participants: ${PARTICIPANT_COUNT}`,
       );
     }
+
+    await expectAccessibleWorkshop(workshopScreens(), "phase 1, join");
   });
 
   test("one participant answers the first quiz question", async () => {
@@ -183,6 +195,11 @@ test.describe.serial("restart recovery across the workshop", () => {
         .getByTestId("own-answer-text")
         .textContent()) ?? "";
     expect(ownAnswerText).not.toBe("");
+
+    await expectAccessibleWorkshop(
+      workshopScreens(participantPages[1]),
+      "phase 2, quiz",
+    );
   });
 
   test("a mid-quiz restart preserves the posed question, the cast answer, and the tallies", async () => {
@@ -254,6 +271,11 @@ test.describe.serial("restart recovery across the workshop", () => {
       `0 of ${PARTICIPANT_COUNT} have submitted`,
     );
 
+    await expectAccessibleWorkshop(
+      workshopScreens(),
+      "phase 3, value selection",
+    );
+
     for (const participantPage of participantPages) {
       await submitValueSelection(participantPage);
     }
@@ -270,6 +292,11 @@ test.describe.serial("restart recovery across the workshop", () => {
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 4");
     await expect(facilitatorPage.getByTestId("results-heading")).toBeVisible();
 
+    await expectAccessibleWorkshop(
+      workshopScreens(),
+      "phase 4, selection results",
+    );
+
     await advancePhaseButton(facilitatorPage).click();
     await expect(facilitatorPage.getByTestId("phase")).toHaveText("Phase 5");
     await expect(
@@ -278,6 +305,11 @@ test.describe.serial("restart recovery across the workshop", () => {
     await expect(facilitatorPage.getByTestId("formation-progress")).toHaveCount(
       0,
       { timeout: 20_000 },
+    );
+
+    await expectAccessibleWorkshop(
+      workshopScreens(),
+      "phase 5, group formation",
     );
 
     const groupCards = facilitatorPage.getByTestId(/^group-card-/);
@@ -340,6 +372,11 @@ test.describe.serial("restart recovery across the workshop", () => {
         actionText,
       );
     }
+
+    await expectAccessibleWorkshop(
+      workshopScreens(scribePage()),
+      "phase 6, group work",
+    );
   });
 
   test("a mid-group-work restart preserves the actions, the texts, and the scribe", async () => {
@@ -440,6 +477,11 @@ test.describe.serial("restart recovery across the workshop", () => {
     ).toBeVisible({ timeout: 10_000 });
     await expect(nextValueButton).toBeDisabled({ timeout: 10_000 });
 
+    await expectAccessibleWorkshop(
+      workshopScreens(),
+      "phase 7, value presentation",
+    );
+
     await expect(advancePhaseButton(facilitatorPage)).toBeEnabled();
     await advancePhaseButton(facilitatorPage).click();
     for (const page of [facilitatorPage, presenterPage]) {
@@ -471,6 +513,8 @@ test.describe.serial("restart recovery across the workshop", () => {
         .locator("h3")
         .allTextContents()
     ).slice(0, WINNER_COUNT);
+
+    await expectAccessibleWorkshop(workshopScreens(), "phase 8, final voting");
 
     await castBallot(participantPages[0], ballotOf(0), MAIN_ROUND_ALLOTMENT);
     await castBallot(participantPages[1], ballotOf(1), MAIN_ROUND_ALLOTMENT);
@@ -583,6 +627,11 @@ test.describe.serial("restart recovery across the workshop", () => {
     await expect(
       participantPages[0].getByTestId("waiting-screen"),
     ).toBeVisible();
+
+    await expectAccessibleWorkshop(
+      workshopScreens(),
+      "phase 9, final presentation",
+    );
   });
 
   test("a mid-reveal restart resumes at the same winner screen", async () => {
@@ -651,6 +700,11 @@ test.describe.serial("restart recovery across the workshop", () => {
     await expect(
       participantPages[0].getByTestId("workshop-concluded"),
     ).toBeVisible({ timeout: 15_000 });
+
+    await expectAccessibleWorkshop(
+      workshopScreens(),
+      "phase 9, the concluded workshop",
+    );
   });
 
   test("a participant reopens the tab after the conclusion and downloads the record", async () => {

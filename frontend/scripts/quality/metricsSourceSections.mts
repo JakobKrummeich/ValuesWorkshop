@@ -40,7 +40,7 @@ export function sizeSection(report: QualityReport): string {
     formatCount(area.totalLines),
   ]);
   return section("Size", report.size.commands, [
-    "Line counts cover every tracked text file except binary assets and generated ones — lock files, EF Core migrations, the generated phase module and this report. A file counts as test code when it sits in `*.Tests/`, `__tests__/`, `TestSupport` or `e2e/`, or is named `*.test.*` or `*.spec.*`.",
+    "Line counts cover every tracked text file except binary assets and generated ones — lock files, EF Core migrations, the generated phase module, this report and the regions of the README that `pnpm quality:report` writes. A file counts as test code when it sits in `*.Tests/`, `__tests__/`, `TestSupport` or `e2e/`, or is named `*.test.*` or `*.spec.*`.",
     markdownTable(
       ["area", "files", "production lines", "test lines", "total lines"],
       [left, right, right, right, right],

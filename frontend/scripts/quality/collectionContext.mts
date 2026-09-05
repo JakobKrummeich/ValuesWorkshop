@@ -8,9 +8,12 @@ import {
 } from "./commandRunner.mts";
 import { parseTrackedFilePaths } from "./sizeScan.mts";
 
-export interface CollectionContext {
+export interface RepositoryLocations {
   repositoryRoot: string;
   frontendDirectory: string;
+}
+
+export interface CollectionContext extends RepositoryLocations {
   temporaryDirectory: string;
 }
 
@@ -20,28 +23,28 @@ export interface TrackedFileListing {
 }
 
 export function readRepositoryFile(
-  context: CollectionContext,
+  locations: RepositoryLocations,
   path: string,
 ): string {
-  return readFileSync(resolve(context.repositoryRoot, path), "utf8");
+  return readFileSync(resolve(locations.repositoryRoot, path), "utf8");
 }
 
 export function runInRepository(
-  context: CollectionContext,
+  locations: RepositoryLocations,
   command: string,
   args: readonly string[],
 ): CommandResult {
-  return runCommand({ command, args, cwd: context.repositoryRoot });
+  return runCommand({ command, args, cwd: locations.repositoryRoot });
 }
 
 export function runInFrontend(
-  context: CollectionContext,
+  locations: RepositoryLocations,
   command: string,
   args: readonly string[],
   acceptedExitCodes: readonly number[],
 ): CommandResult {
   return runCommandExpecting(
-    { command, args, cwd: context.frontendDirectory },
+    { command, args, cwd: locations.frontendDirectory },
     acceptedExitCodes,
   );
 }
@@ -56,8 +59,8 @@ export function recorded(
 }
 
 export function collectTrackedPaths(
-  context: CollectionContext,
+  locations: RepositoryLocations,
 ): TrackedFileListing {
-  const listing = runInRepository(context, "git", ["ls-files"]);
+  const listing = runInRepository(locations, "git", ["ls-files"]);
   return { paths: parseTrackedFilePaths(listing.stdout), listing };
 }

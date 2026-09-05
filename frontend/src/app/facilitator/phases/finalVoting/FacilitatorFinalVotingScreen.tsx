@@ -49,6 +49,11 @@ export function FacilitatorFinalVotingScreen({
         <div
           className={styles.track}
           role="progressbar"
+          aria-label={translate(MessageKey.FinalVotingRoundVoted, {
+            round: roundNumber,
+            voted: votedCount,
+            total: participantCount,
+          })}
           aria-valuenow={Math.round(votedFraction * 100)}
           aria-valuemin={0}
           aria-valuemax={100}

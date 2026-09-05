@@ -21,13 +21,13 @@
 }
 
 .submitted {
-  background: color-mix(in srgb, var(--color-success) 18%, transparent);
+  background: var(--color-success-soft);
   color: var(--color-success);
 }
 
 @keyframes pulse {
   50% {
-    opacity: 0.45;
+    background: transparent;
   }
 }
 

@@ -1,4 +1,5 @@
 import { test, expect, type BrowserContext, type Page } from "@playwright/test";
+import { expectAccessibleScreen } from "./support/accessibility";
 import {
   RECONNECT_TIMEOUT_MILLISECONDS,
   RESTART_TEST_TIMEOUT_MILLISECONDS,
@@ -66,6 +67,10 @@ test.describe.serial("session lifecycle and reconnect", () => {
     await expect(
       facilitatorPage.getByLabel("Facilitator passphrase"),
     ).toBeVisible();
+    await expectAccessibleScreen(
+      facilitatorPage,
+      "laptop on a refused passphrase",
+    );
   });
 
   test("the correct passphrase opens a session and lands on the facilitator screen", async () => {
@@ -153,6 +158,10 @@ test.describe.serial("session lifecycle and reconnect", () => {
       );
       await expect(intruderPage.getByTestId("phase")).toHaveText(
         "Waiting for the workshop\u2026",
+      );
+      await expectAccessibleScreen(
+        intruderPage,
+        "laptop of a caller who facilitates nothing",
       );
     } finally {
       await intruderContext.close();

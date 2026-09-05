@@ -54,6 +54,9 @@ describe("facilitator final voting screen", () => {
       "aria-valuenow",
       "80",
     );
+    expect(screen.getByRole("progressbar")).toHaveAccessibleName(
+      "Round 1 · voted: 24/30",
+    );
     expect(screen.getByTestId("close-voting-button")).toBeEnabled();
     expect(
       screen.queryByTestId("closed-round-tallies"),

@@ -1,7 +1,11 @@
-import { Language } from "../../domain/i18n/language";
+import { Language, languageCookieName } from "../../domain/i18n/language";
 import { readLanguageCookie, writeLanguageCookie } from "../languageCookie";
 
 describe("the language cookie", () => {
+  beforeAll(() => {
+    document.cookie = "theme=dark; path=/";
+  });
+
   beforeEach(() => {
     document.cookie = "language=; path=/; max-age=0";
   });
@@ -16,10 +20,10 @@ describe("the language cookie", () => {
     expect(readLanguageCookie()).toBe(Language.English);
   });
 
-  it("finds the language among other cookies", () => {
-    document.cookie = "theme=dark; path=/";
+  it("finds the language behind another cookie, separated by a space", () => {
     writeLanguageCookie(Language.German);
 
+    expect(document.cookie).toBe(`theme=dark; ${languageCookieName}=de`);
     expect(readLanguageCookie()).toBe(Language.German);
   });
 

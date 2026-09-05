@@ -1,0 +1,32 @@
+d6aadb117679750af67e07cbaa972d7cf2d7c917
+388ab498f1d811c3f923bc26f0b67504e08302e9
+
+6	0	scripts/demoVideo/dockerFfmpeg.ts
+d71ed5afbc2013cba054a6485fc59dc8d0d47d8e
+
+5	0	tasks/specs/29-showcase-redesign.md
+9	6	tasks/todo.md
+06a3bdbfa0ccbbe3eef05f7da122bc4c77fd413a
+
+21	3	README.md
+4f648009fb30854e6d0b3dfb4d984b14ff976162
+
+-	-	docs/media/demo.gif
+-	-	docs/media/demo.mp4
+-	-	docs/media/facilitator-group-work.png
+-	-	docs/media/participant-final-voting.png
+-	-	docs/media/presenter-final-presentation.png
+33	5	scripts/demoMedia/captureDemoMedia.spec.ts
+6	0	scripts/demoWorkshop/demoWorkshopContent.ts
+600ab0cd10aa944aa9a951d77275bce3165a4b4e
+
+-	-	docs/media/demo.gif
+-	-	docs/media/demo.mp4
+0	3	scripts/demoVideo/composeFilmFrames.ts
+20	5	scripts/demoVideo/dockerFfmpeg.ts
+17	2	scripts/demoVideo/encodeFilm.ts
+53	40	scripts/demoVideo/planFilmFrames.ts
+8	6	scripts/demoVideo/renderDemoVideo.spec.ts
+8	10	scripts/demoVideo/stage/stage.css
+1	16	scripts/demoVideo/storyboard.ts
+22	15	scripts/demoWorkshop/driveDemoWorkshop.ts

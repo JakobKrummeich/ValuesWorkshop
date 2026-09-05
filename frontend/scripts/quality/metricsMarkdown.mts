@@ -3,8 +3,11 @@ import {
   complexitySection,
   duplicationSection,
   securitySection,
+  supplyChainSection,
   testsSection,
 } from "./metricsGateSections.mts";
+import { hotspotsSection } from "./metricsHotspotsSection.mts";
+import { mutationSection } from "./metricsMutationSection.mts";
 import {
   contractSection,
   designSystemSection,
@@ -21,10 +24,13 @@ export function renderMetricsMarkdown(report: QualityReport): string {
     testsSection(report),
     complexitySection(report),
     duplicationSection(report),
+    hotspotsSection(report),
     architectureSection(report),
     designSystemSection(report),
     contractSection(report),
+    mutationSection(report),
     securitySection(report),
+    supplyChainSection(report),
     processSection(report),
   ].join("\n\n")}\n`;
 }

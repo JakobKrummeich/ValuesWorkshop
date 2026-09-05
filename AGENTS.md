@@ -66,12 +66,16 @@ against learnings; update `SPEC.md` in the same PR if a decision changed.
 Run all quality gates locally using the same commands CI uses:
 
 - `./scripts/ci-lint.sh` — all lint gates (FE lint, FE build, BE build/analyzers,
-  CSharpier, FE+BE vulnerability scans, jscpd duplication)
+  CSharpier, FE+BE vulnerability scans, osv-scanner advisory scan, jscpd duplication)
 - `./scripts/ci-test.sh` — all test gates (FE jest + coverage, BE dotnet
   test + coverage, e2e)
 - `./scripts/test-backend-with-coverage.sh` — BE test + coverage gate standalone
 - `pnpm --dir frontend audit:check` — FE vulnerability scan standalone
 - `./scripts/check-backend-vulnerabilities.sh` — BE vulnerability scan standalone
+- `pnpm run advisories:scan` — osv-scanner over the lockfile and the SBOMs
+- `pnpm run sbom` — regenerate `docs/quality/sbom/`
+- `pnpm mutation` — mutation testing on both sides; far too slow for CI, runs
+  nightly and on demand
 
 ## User review — always Lavish
 

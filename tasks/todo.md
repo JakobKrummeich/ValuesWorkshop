@@ -725,15 +725,15 @@ architecture graphs, an ER diagram emitted from the EF Core model, a README
 `## Engineering` section with badges, plus the tooling the user picked —
 property-based tests, an accessibility gate, mutation testing, CodeQL and an
 SBOM, and hotspot analysis over the git history.
-- [ ] 30a Metrics collector + `docs/quality/metrics.md`
-- [ ] 30b Repo, frontend and backend diagrams + drift gate
-- [ ] 30c Database ER diagram from the EF model + drift gate
-- [ ] 30d README `## Engineering` section + badges
-- [ ] 30e Property-based tests (FsCheck + fast-check)
-- [ ] 30f Accessibility gate (axe-core in the e2e)
-- [ ] 30g Mutation testing (Stryker.NET + StrykerJS)
-- [ ] 30h Supply chain: CodeQL, CycloneDX SBOM, osv-scanner
-- [ ] 30i Hotspot analysis (churn × complexity)
+- [x] 30a Metrics collector + `docs/quality/metrics.md`
+- [x] 30b Repo, frontend and backend diagrams + drift gate
+- [x] 30c Database ER diagram from the EF model + drift gate
+- [x] 30d README `## Engineering` section + badges
+- [x] 30e Property-based tests (FsCheck + fast-check)
+- [x] 30f Accessibility gate (axe-core in the e2e)
+- [x] 30g Mutation testing (Stryker.NET + StrykerJS)
+- [x] 30h Supply chain: CodeQL, CycloneDX SBOM, osv-scanner
+- [x] 30i Hotspot analysis (churn × complexity)
 **Acceptance criteria:** `pnpm quality:report` regenerates every artifact and is
 idempotent; no number or diagram is hand-maintained; the drift gate fails when
 the schema, a project reference or a module edge changes without regeneration;
