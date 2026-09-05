@@ -739,3 +739,28 @@ idempotent; no number or diagram is hand-maintained; the drift gate fails when
 the schema, a project reference or a module edge changes without regeneration;
 all existing gates stay green.
 **Dependencies:** 29. **Size:** L
+
+## Phase 10 — Fallout (Task 31)
+
+### Task 31: Work-bounded group solve + incumbent hand-over
+**Spec:** `tasks/specs/31-cpsat-work-bounded-solve.md` (decision + spec via
+Lavish).
+**Description:** `Selections_outside_the_top_values_never_change_the_groups`
+falsified in CI on PR #80: the solver's `max_time_in_seconds` wall cap made
+the returned incumbent depend on host speed. The solver is now bounded by
+deterministic work only, a cancelled solve hands over its best assignment as
+a `GroupSolverOutcome` instead of throwing, and `GroupFormationRunner` stops a
+solve still running when the window closes and forms the groups from what it
+hands over — random only when it has nothing.
+**Acceptance criteria:**
+- [x] Solver parameters carry no wall-clock limit; the determinism
+      properties pass with the CI replay seed under full CPU load
+- [x] A solve stopped mid-search hands over a valid partition; stopped before
+      it started → `StoppedWithoutAssignment`
+- [x] Runner: window closing on a still-searching solver → its hand-over;
+      nothing handed over or the stop ignored → random after the grace period
+- [x] `design/cpsat-model.md` § 6, `architecture.md`, `domain-model.md`,
+      `state-machine.md` say so
+**Verification:** BE test + coverage gate, `./scripts/ci-lint.sh`,
+`./scripts/ci-test.sh`; #80's CI green after merge.
+**Dependencies:** 30. **Size:** M

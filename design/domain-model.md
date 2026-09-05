@@ -222,7 +222,7 @@ when a phase begins or a condition is met — no person issues them.
 | **ShowLearningText** | Facilitator | Show the current question's learning text. → LearningTextShown |
 | **SubmitValueSelection** | Participant | Hand in exactly ten distinct values; fewer, more, or duplicates are refused; resubmission is refused. → ValuesSelected |
 | **DetermineTopValues** | System (entering Selection results) | Fix the top values from the selection tally, widening on a tenth-place tie. → TopValuesDetermined |
-| **FormGroups** | System (formation window over) | Partition participants and deal out top values per the sizing rule and the formation aim; a random assignment stands in when the solver has produced none by the deadline. → GroupsFormed |
+| **FormGroups** | System (formation window over) | Partition participants and deal out top values per the sizing rule and the formation aim, from the solver's assignment — finished, or its best so far when the window closes first; a random assignment stands in only when the solver has none. → GroupsFormed |
 | **AddParticipantToGroup** | System (a participant joins while groups exist) | Place the joiner into a group with the fewest members; ties are broken at random. No top value is re-dealt. → ParticipantAddedToGroup |
 | **AppointScribes** | System (entering Group work) | Pick one member per group at random. → ScribeAppointed (per group) |
 | **ReassignScribe** | Facilitator | Hand a group's scribe role to another of its members. → ScribeReassigned |

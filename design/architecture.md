@@ -123,11 +123,16 @@ Application services:
 | `GroupFormationRunner` | `Application/Formation/GroupFormationRunner.cs` | `IGroupSolver`, `IGroupNames`, `IRandomness`, `TimeProvider`, `GroupFormationWindow` (the Domain value object, tunable through `GROUP_FORMATION_WINDOW_MS`) | singleton | `GroupFormationService` (Adapters.Web hosted service, sibling of `StateResendService`) alone, on two beats: every 50 ms it pushes the progress of each session that has a run and applies the assignment once the window is over, and every 250 ms it scans for a connected session with no run that it finds unformed in phase 5. Only the slower scan reads the repository, so a room where nothing is forming costs no per-tick load. `WorkshopStateCache` is a cache and starts nothing |
 
 `GroupFormationRunner` holds the one thing the domain must not hold: work in
-flight. The solver call runs off-thread under a cancellation token the run
-cancels when it is dropped, the elapsed time comes from `TimeProvider` and
-goes straight to `GroupFormationWindow` to be read as progress, and the
-window ends with the solver's assignment or, when it did not finish,
-`RandomGroupAssignment` — pure domain either way
+flight. The solver call runs off-thread under a cancellation token that means
+"stop searching and hand over what you have" (`IGroupSolver` returns a
+`GroupSolverOutcome`, never throws for a stop): the run cancels it when it is
+dropped, and when the window closes on a solve still running, so the best
+assignment found so far can be adopted after a bounded hand-over grace
+period (250 ms; CP-SAT stops within milliseconds, the bound only guards a
+solver that ignores the stop). The elapsed time comes from `TimeProvider`
+and goes straight to `GroupFormationWindow` to be read as progress, and the
+window ends with the solver's assignment — finished or handed over — or,
+when it has none, `RandomGroupAssignment` — pure domain either way
 (`Domain/RandomGroupAssignment.cs`). A solve that returns after its run is
 gone is discarded: each run carries a token its solve must still match.
 Nothing about a run is persisted, so a restart mid-window just starts a new
@@ -207,7 +212,7 @@ Future DTOs, commands, and events → records.
 | `PresentationWalk` | `sealed class` | Mutable presenting-group cursor. |
 | `VotingRounds` | `sealed class` | Mutable vote tallies, tiebreak rounds. Anonymity invariant. |
 | `Group` | `sealed class` | Mutable scribe assignment, submission state, actions collection. |
-| `GroupFormationRunner` | `sealed class` | Not an aggregate — an application service running the group formations currently in flight: per run a token, a start timestamp, a `CancellationTokenSource` for its solve and, once the solver returns, its assignment. The mutation is inherently concurrent (a background solve writing while state mappers read), guarded by a single `Lock`; a record would have to be swapped atomically for no benefit. The state is memory-only and never persisted. |
+| `GroupFormationRunner` | `sealed class` | Not an aggregate — an application service running the group formations currently in flight: per run a token, a start timestamp, a `CancellationTokenSource` and the `Task` of its solve and, once the solver returns, its assignment. The mutation is inherently concurrent (a background solve writing while state mappers read), guarded by a single `Lock`; a record would have to be swapped atomically for no benefit. The state is memory-only and never persisted. |
 
 **Common justification** (every row but the last): these types hold mutable
 internal collections, enforce invariants through methods, and are composed
