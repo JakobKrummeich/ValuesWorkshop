@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -97,17 +98,10 @@ public sealed class CyclomaticComplexityAnalyzer : DiagnosticAnalyzer
         ReportComplexity(context, name, complexity);
     }
 
-    private static bool HasAccessorCode(AccessorListSyntax? accessors)
-    {
-        if (accessors == null)
-            return false;
-        foreach (var accessor in accessors.Accessors)
-        {
-            if (accessor.Body != null || accessor.ExpressionBody != null)
-                return true;
-        }
-        return false;
-    }
+    private static bool HasAccessorCode(AccessorListSyntax? accessors) =>
+        accessors?.Accessors.Any(accessor =>
+            accessor.Body != null || accessor.ExpressionBody != null
+        ) == true;
 
     private static void ReportComplexity(
         SyntaxNodeAnalysisContext context,

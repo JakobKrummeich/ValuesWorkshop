@@ -37,6 +37,29 @@ describe("renderMetricsMarkdown", () => {
     expect(markdown).toContain("at most 2%");
   });
 
+  it("measures cyclomatic complexity on both sides, functions above the cap included", () => {
+    expect(markdown).toContain("| functions measured | 2,906 | 1,795 |");
+    expect(markdown).toContain("| highest complexity found | 7 | 6 |");
+    expect(markdown).toContain("| mean complexity | 1.18 | 1.24 |");
+    expect(markdown).toContain("| functions above the cap | 0 | 0 |");
+    expect(markdown).toContain(
+      "| Submit | `backend/Domain/SelectionRound.cs:35` | 6 |",
+    );
+  });
+
+  it("tables both distributions on one complexity axis, an absent bucket as zero", () => {
+    expect(markdown).toContain(
+      [
+        "| cyclomatic complexity | frontend functions | backend functions |",
+        "| ---: | ---: | ---: |",
+        "| 1 | 2,904 | 1,780 |",
+        "| 2 | 0 | 12 |",
+        "| 6 | 0 | 3 |",
+        "| 7 | 2 | 0 |",
+      ].join("\n"),
+    );
+  });
+
   it("names the longest file on each side against the cap it lives under", () => {
     expect(markdown).toContain(
       "`backend/Domain/Session.cs` | 289 | at most 300",
