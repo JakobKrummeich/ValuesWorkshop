@@ -9,6 +9,11 @@ public sealed class TestGroupSolver : IGroupSolver
         CancellationToken cancellationToken
     )
     {
+        return new GroupSolverOutcome.Assigned(AssignmentFor(request));
+    }
+
+    public static GroupFormationResult AssignmentFor(GroupFormationRequest request)
+    {
         var memberCounts = GroupSizing.ParticipantCountsPerGroup(request.Participants.Count);
         var valueCounts = GroupSizing.ValueCountsPerGroup(
             request.TopValues.Count,
@@ -37,6 +42,6 @@ public sealed class TestGroupSolver : IGroupSolver
             groups.Add(new FormedGroup(members, assignedValues));
         }
 
-        return new GroupSolverOutcome.Assigned(new GroupFormationResult(groups));
+        return new GroupFormationResult(groups);
     }
 }
