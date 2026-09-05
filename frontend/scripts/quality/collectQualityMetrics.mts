@@ -10,6 +10,7 @@ import {
   collectSupplyChain,
   collectTests,
 } from "./collectGateMetrics.mts";
+import { collectHotspots } from "./hotspots/hotspotAnalysis.mts";
 import { readMutationRecord } from "./mutation/readMutationRecord.mts";
 import {
   collectCommitStamp,
@@ -40,6 +41,7 @@ export function collectQualityMetrics(
     tests: tests.group,
     complexity: collectComplexity(context, size),
     duplication: collectDuplication(context),
+    hotspots: collectHotspots(context, tracked, commit),
     architecture: collectArchitecture(context),
     designSystem: collectDesignSystem(
       context,

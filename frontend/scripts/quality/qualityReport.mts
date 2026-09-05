@@ -4,6 +4,7 @@ import type { ContractMetrics } from "./contractScan.mts";
 import type { DesignSystemMetrics } from "./designSystemScan.mts";
 import type { DuplicationMetrics } from "./duplicationReport.mts";
 import type { EnforcedLimits } from "./enforcedLimits.mts";
+import type { HotspotMetrics } from "./hotspots/hotspotAnalysis.mts";
 import type {
   FolderInstability,
   ModuleGraphMetrics,
@@ -78,6 +79,7 @@ export interface QualityReport {
   tests: MetricGroup<TestsMetrics>;
   complexity: MetricGroup<ComplexityGroupMetrics>;
   duplication: MetricGroup<DuplicationMetrics>;
+  hotspots: MetricGroup<HotspotMetrics>;
   architecture: MetricGroup<ArchitectureGroupMetrics>;
   designSystem: MetricGroup<DesignSystemMetrics>;
   contract: MetricGroup<ContractMetrics>;
