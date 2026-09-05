@@ -77,12 +77,12 @@ here is typed by hand.
 
 | What | Frontend | Backend | Enforced by |
 | --- | ---: | ---: | --- |
-| Production code | 15,874 lines | 8,819 lines | — |
-| Test code | 16,934 lines | 19,532 lines | — |
-| Tests | 1,353 jest | 938 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
-| Line coverage | 92.49% (at least 80%) | 98.7% (at least 80%) | `jest --coverage` / coverlet |
+| Production code | 15,874 lines | 8,876 lines | — |
+| Test code | 16,934 lines | 19,807 lines | — |
+| Tests | 1,356 jest | 950 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
+| Line coverage | 92.46% (at least 80%) | 98.6% (at least 80%) | `jest --coverage` / coverlet |
 | Mutation score | 86.43% | 84.59% | Stryker, nightly and on demand |
-| Cyclomatic complexity | highest 7 (at most 7) | 0 functions above 7 | eslint `complexity` / analyzer VW1001 |
+| Cyclomatic complexity | highest 7 (at most 7) | highest 7 (at most 7) | eslint `complexity` / analyzer VW1001 |
 | Longest production file | 290 lines (at most 300) | 262 lines (at most 300) | eslint `max-lines` / analyzer VW1002 |
 | Duplicated tokens | 0.13% (at most 2%) | 0.13% (at most 2%) | `jscpd`, one scan over both sides |
 | Architecture violations | 0 across 14 dependency-cruiser rules | 0 across 8 ArchUnitNET rules | dependency-cruiser fails the lint, ArchUnitNET fails the tests |
@@ -176,6 +176,7 @@ graph LR
         applicationTests["Application.Tests"]
         domainTests["Domain.Tests"]
         hostTests["Host.Tests"]
+        analyzersTests["Analyzers.Tests"]
         testSupport["TestSupport"]
     end
     analyzers["Analyzers<br/>VW1001 complexity, VW1002 file length"]
@@ -200,6 +201,7 @@ graph LR
     testSupport --> application
     testSupport --> domain
     application --> domain
+    analyzersTests --> analyzers
 
     analyzers -. "Directory.Build.props wires it into every project" .-> productionProjects
     analyzers -.-> testProjects
@@ -207,7 +209,7 @@ graph LR
     classDef shipped stroke:#2e7d32,stroke-width:3px;
     classDef testing stroke-dasharray:5 4;
     class host,adaptersPersistence,adaptersWeb,application,domain shipped;
-    class adaptersTests,applicationTests,domainTests,hostTests,testSupport testing;
+    class adaptersTests,applicationTests,domainTests,hostTests,analyzersTests,testSupport testing;
 ```
 
 <!-- quality:diagram:backend-layers:end -->
@@ -264,23 +266,25 @@ graph TD
 
 The ten files where change and complexity overlap most — the ones most likely
 to hold the next bug. Churn is the number of commits that touched a file over
-the whole history, from `git log --numstat`; complexity is indentation-based,
-so it reads C# and TypeScript alike; the score is the product of the two.
+the whole history, from `git log --numstat`; complexity is cyclomatic, from
+the same tools that enforce the cap — eslint's `complexity` rule on the
+frontend, the VW1001 analyzer on the backend — summed over a file's functions;
+the score is the product of the two.
 
 <!-- quality:hotspots:start -->
 
 | file | side | commits | lines changed | complexity | score |
 | --- | --- | ---: | ---: | ---: | ---: |
-| `backend/Adapters.Persistence/DomainEntityMapper.cs` | backend | 16 | 406 | 767 | 12,272 |
-| `backend/Domain/Session.cs` | backend | 24 | 486 | 427 | 10,248 |
-| `backend/Application/State/ParticipantWorkshopStateMapper.cs` | backend | 20 | 435 | 400 | 8,000 |
-| `backend/Application/State/FacilitatorWorkshopStateMapper.cs` | backend | 19 | 439 | 383 | 7,277 |
-| `backend/Application/Intents/FacilitatorIntentHandler.cs` | backend | 16 | 271 | 429 | 6,864 |
-| `backend/Application/State/PresenterWorkshopStateMapper.cs` | backend | 17 | 355 | 354 | 6,018 |
-| `frontend/src/domain/i18n/messageKey.ts` | frontend | 34 | 190 | 162 | 5,508 |
-| `backend/Application/Intents/ParticipantIntentHandler.cs` | backend | 11 | 256 | 436 | 4,796 |
-| `backend/Host/Program.cs` | backend | 34 | 385 | 131 | 4,454 |
-| `backend/Adapters.Web/ParticipantHub.cs` | backend | 18 | 235 | 242 | 4,356 |
+| `backend/Domain/Session.cs` | backend | 24 | 486 | 32 | 768 |
+| `backend/Domain/VotingRounds.cs` | backend | 8 | 264 | 48 | 384 |
+| `backend/Domain/Group.cs` | backend | 11 | 257 | 30 | 330 |
+| `frontend/src/app/participant/phases/groupWork/useGroupWorkCard.ts` | frontend | 12 | 471 | 27 | 324 |
+| `backend/Domain/QuizProgress.cs` | backend | 11 | 199 | 25 | 275 |
+| `backend/Adapters.Persistence/SqliteSessionRepository.cs` | backend | 11 | 348 | 23 | 253 |
+| `backend/Adapters.Web/ParticipantHub.cs` | backend | 18 | 235 | 12 | 216 |
+| `backend/Application/Intents/FacilitatorIntentHandler.cs` | backend | 16 | 271 | 13 | 208 |
+| `frontend/src/adapters/authAdapter.ts` | frontend | 9 | 272 | 22 | 198 |
+| `backend/Adapters.Web/FacilitatorHub.cs` | backend | 12 | 184 | 16 | 192 |
 
 <!-- quality:hotspots:end -->
 

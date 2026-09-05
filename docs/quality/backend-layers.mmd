@@ -15,6 +15,7 @@ graph LR
         applicationTests["Application.Tests"]
         domainTests["Domain.Tests"]
         hostTests["Host.Tests"]
+        analyzersTests["Analyzers.Tests"]
         testSupport["TestSupport"]
     end
     analyzers["Analyzers<br/>VW1001 complexity, VW1002 file length"]
@@ -39,6 +40,7 @@ graph LR
     testSupport --> application
     testSupport --> domain
     application --> domain
+    analyzersTests --> analyzers
 
     analyzers -. "Directory.Build.props wires it into every project" .-> productionProjects
     analyzers -.-> testProjects
@@ -46,4 +48,4 @@ graph LR
     classDef shipped stroke:#2e7d32,stroke-width:3px;
     classDef testing stroke-dasharray:5 4;
     class host,adaptersPersistence,adaptersWeb,application,domain shipped;
-    class adaptersTests,applicationTests,domainTests,hostTests,testSupport testing;
+    class adaptersTests,applicationTests,domainTests,hostTests,analyzersTests,testSupport testing;

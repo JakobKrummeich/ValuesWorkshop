@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-05T09:21:23.020Z",
+  "generatedAt": "2026-09-05T11:02:33.376Z",
   "commit": {
-    "sha": "4f4a87011e56b6805ba51c868e747f6f757aa6ad",
-    "shortSha": "4f4a870",
-    "committedAt": "2026-09-05T09:21:15+00:00",
-    "subject": "Say once, for both sides, which commit the mutation scores describe"
+    "sha": "6869a546efc284fc0b0f0716b21aeb117f3e42ea",
+    "shortSha": "6869a54",
+    "committedAt": "2026-09-05T11:02:31+00:00",
+    "subject": "The report writes the README's diagram regions before it measures, because the measurement runs the drift gate that compares them"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -22,17 +22,17 @@
     "commands": [
       "git ls-files"
     ],
-    "files": 1189,
-    "productionLines": 53846,
-    "testLines": 44423,
-    "totalLines": 98269,
+    "files": 1195,
+    "productionLines": 54024,
+    "testLines": 44807,
+    "totalLines": 98831,
     "areas": [
       {
         "area": "backend",
-        "files": 349,
-        "productionLines": 8819,
-        "testLines": 19532,
-        "totalLines": 28351
+        "files": 354,
+        "productionLines": 8876,
+        "testLines": 19807,
+        "totalLines": 28683
       },
       {
         "area": "contract",
@@ -72,29 +72,29 @@
       {
         "area": "other",
         "files": 58,
-        "productionLines": 4854,
+        "productionLines": 4856,
         "testLines": 0,
-        "totalLines": 4854
+        "totalLines": 4856
       },
       {
         "area": "scripts",
-        "files": 140,
-        "productionLines": 7413,
-        "testLines": 4335,
-        "totalLines": 11748
+        "files": 141,
+        "productionLines": 7517,
+        "testLines": 4444,
+        "totalLines": 11961
       },
       {
         "area": "tasks",
         "files": 59,
-        "productionLines": 10432,
+        "productionLines": 10447,
         "testLines": 0,
-        "totalLines": 10432
+        "totalLines": 10447
       }
     ],
     "filesByExtension": [
       {
         "extension": "cs",
-        "files": 320
+        "files": 323
       },
       {
         "extension": "ts",
@@ -130,11 +130,11 @@
       },
       {
         "extension": "txt",
-        "files": 18
+        "files": 19
       },
       {
         "extension": "csproj",
-        "files": 11
+        "files": 12
       },
       {
         "extension": "sh",
@@ -166,6 +166,10 @@
       },
       {
         "extension": "development",
+        "files": 1
+      },
+      {
+        "extension": "globalconfig",
         "files": 1
       },
       {
@@ -230,17 +234,17 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2384,
+    "totalTests": 2399,
     "frontend": {
       "suites": 207,
-      "tests": 1353,
-      "passed": 1353,
+      "tests": 1356,
+      "passed": 1356,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 92.49,
-      "branchCoverage": 90.07,
-      "coveredLines": 3205,
-      "coverableLines": 3465
+      "lineCoverage": 92.46,
+      "branchCoverage": 90.04,
+      "coveredLines": 3215,
+      "coverableLines": 3477
     },
     "backend": {
       "assemblies": [
@@ -250,6 +254,13 @@
           "passed": 224,
           "skipped": 0,
           "total": 224
+        },
+        {
+          "assembly": "ValuesWorkshop.Analyzers.Tests.dll",
+          "failed": 0,
+          "passed": 12,
+          "skipped": 0,
+          "total": 12
         },
         {
           "assembly": "ValuesWorkshop.Application.Tests.dll",
@@ -273,14 +284,14 @@
           "total": 102
         }
       ],
-      "tests": 938,
-      "passed": 938,
+      "tests": 950,
+      "passed": 950,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 98.7,
-      "branchCoverage": 93.3,
-      "coveredLines": 9867,
-      "coverableLines": 9996
+      "lineCoverage": 98.6,
+      "branchCoverage": 93.1,
+      "coveredLines": 9974,
+      "coverableLines": 10106
     },
     "endToEnd": {
       "tests": 93,
@@ -290,25 +301,25 @@
   "complexity": {
     "commands": [
       "npx eslint --format json --rule \"{\\\"complexity\\\":[\\\"error\\\",0]}\"",
-      "dotnet build backend/ValuesWorkshop.All.sln"
+      "dotnet build backend/ValuesWorkshop.All.sln --no-incremental -p:ReportCyclomaticComplexity=true"
     ],
     "frontend": {
-      "functions": 3772,
+      "functions": 3783,
       "maximum": 7,
       "mean": 1.19,
-      "otherRuleFindings": 0,
+      "aboveCap": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 3327
+          "functions": 3335
         },
         {
           "complexity": 2,
-          "functions": 284
+          "functions": 283
         },
         {
           "complexity": 3,
-          "functions": 89
+          "functions": 93
         },
         {
           "complexity": 4,
@@ -360,7 +371,74 @@
         }
       ]
     },
-    "backendAnalyzerDiagnostics": 0,
+    "backend": {
+      "functions": 1795,
+      "maximum": 7,
+      "mean": 1.26,
+      "aboveCap": 0,
+      "distribution": [
+        {
+          "complexity": 1,
+          "functions": 1513
+        },
+        {
+          "complexity": 2,
+          "functions": 174
+        },
+        {
+          "complexity": 3,
+          "functions": 63
+        },
+        {
+          "complexity": 4,
+          "functions": 21
+        },
+        {
+          "complexity": 5,
+          "functions": 14
+        },
+        {
+          "complexity": 6,
+          "functions": 8
+        },
+        {
+          "complexity": 7,
+          "functions": 2
+        }
+      ],
+      "mostComplex": [
+        {
+          "path": "backend/Application.Tests/WorkshopStateAnonymityTests.cs",
+          "line": 122,
+          "name": "CollectIdentifyingPaths",
+          "complexity": 7
+        },
+        {
+          "path": "backend/TestSupport/TestSessions.cs",
+          "line": 21,
+          "name": "InPhase",
+          "complexity": 7
+        },
+        {
+          "path": "backend/Adapters.Web/SessionCreationEndpoint.cs",
+          "line": 59,
+          "name": "ResponseFor",
+          "complexity": 6
+        },
+        {
+          "path": "backend/Application/Formation/GroupFormationRunner.cs",
+          "line": 126,
+          "name": "SolveFor",
+          "complexity": 6
+        },
+        {
+          "path": "backend/Application/Intents/IntentPayloadValidator.cs",
+          "line": 48,
+          "name": "RequiredVotes",
+          "complexity": 6
+        }
+      ]
+    },
     "longestFiles": [
       {
         "side": "backend",
@@ -427,145 +505,145 @@
   "hotspots": {
     "commands": [
       "git ls-files",
-      "git log --numstat --no-renames --format=%H 4f4a87011e56b6805ba51c868e747f6f757aa6ad"
+      "git log --numstat --no-renames --format=%H 6869a546efc284fc0b0f0716b21aeb117f3e42ea"
     ],
     "filesAnalysed": 425,
-    "commitsInHistory": 844,
+    "commitsInHistory": 849,
     "hotspots": [
-      {
-        "path": "backend/Adapters.Persistence/DomainEntityMapper.cs",
-        "side": "backend",
-        "commits": 16,
-        "linesChanged": 406,
-        "complexity": 767,
-        "maximumDepth": 7,
-        "score": 12272
-      },
       {
         "path": "backend/Domain/Session.cs",
         "side": "backend",
         "commits": 24,
         "linesChanged": 486,
-        "complexity": 427,
-        "maximumDepth": 4,
-        "score": 10248
+        "complexity": 32,
+        "mostComplexFunction": 4,
+        "score": 768
       },
       {
-        "path": "backend/Application/State/ParticipantWorkshopStateMapper.cs",
+        "path": "backend/Domain/VotingRounds.cs",
         "side": "backend",
-        "commits": 20,
-        "linesChanged": 435,
-        "complexity": 400,
-        "maximumDepth": 7,
-        "score": 8000
-      },
-      {
-        "path": "backend/Application/State/FacilitatorWorkshopStateMapper.cs",
-        "side": "backend",
-        "commits": 19,
-        "linesChanged": 439,
-        "complexity": 383,
-        "maximumDepth": 7,
-        "score": 7277
-      },
-      {
-        "path": "backend/Application/Intents/FacilitatorIntentHandler.cs",
-        "side": "backend",
-        "commits": 16,
-        "linesChanged": 271,
-        "complexity": 429,
-        "maximumDepth": 6,
-        "score": 6864
-      },
-      {
-        "path": "backend/Application/State/PresenterWorkshopStateMapper.cs",
-        "side": "backend",
-        "commits": 17,
-        "linesChanged": 355,
-        "complexity": 354,
-        "maximumDepth": 7,
-        "score": 6018
-      },
-      {
-        "path": "frontend/src/domain/i18n/messageKey.ts",
-        "side": "frontend",
-        "commits": 34,
-        "linesChanged": 190,
-        "complexity": 162,
-        "maximumDepth": 1,
-        "score": 5508
-      },
-      {
-        "path": "backend/Application/Intents/ParticipantIntentHandler.cs",
-        "side": "backend",
-        "commits": 11,
-        "linesChanged": 256,
-        "complexity": 436,
-        "maximumDepth": 6,
-        "score": 4796
-      },
-      {
-        "path": "backend/Host/Program.cs",
-        "side": "backend",
-        "commits": 34,
-        "linesChanged": 385,
-        "complexity": 131,
-        "maximumDepth": 4,
-        "score": 4454
-      },
-      {
-        "path": "backend/Adapters.Web/ParticipantHub.cs",
-        "side": "backend",
-        "commits": 18,
-        "linesChanged": 235,
-        "complexity": 242,
-        "maximumDepth": 6,
-        "score": 4356
-      },
-      {
-        "path": "backend/Adapters.Persistence/SqliteSessionRepository.cs",
-        "side": "backend",
-        "commits": 11,
-        "linesChanged": 348,
-        "complexity": 395,
-        "maximumDepth": 4,
-        "score": 4345
-      },
-      {
-        "path": "frontend/src/domain/i18n/generalMessages.ts",
-        "side": "frontend",
-        "commits": 10,
-        "linesChanged": 311,
-        "complexity": 423,
-        "maximumDepth": 3,
-        "score": 4230
+        "commits": 8,
+        "linesChanged": 264,
+        "complexity": 48,
+        "mostComplexFunction": 6,
+        "score": 384
       },
       {
         "path": "backend/Domain/Group.cs",
         "side": "backend",
         "commits": 11,
         "linesChanged": 257,
-        "complexity": 319,
-        "maximumDepth": 4,
-        "score": 3509
+        "complexity": 30,
+        "mostComplexFunction": 4,
+        "score": 330
       },
       {
-        "path": "backend/Host/CpSatGroupSolver.cs",
-        "side": "backend",
-        "commits": 5,
-        "linesChanged": 258,
-        "complexity": 549,
-        "maximumDepth": 6,
-        "score": 2745
+        "path": "frontend/src/app/participant/phases/groupWork/useGroupWorkCard.ts",
+        "side": "frontend",
+        "commits": 12,
+        "linesChanged": 471,
+        "complexity": 27,
+        "mostComplexFunction": 6,
+        "score": 324
       },
       {
         "path": "backend/Domain/QuizProgress.cs",
         "side": "backend",
         "commits": 11,
         "linesChanged": 199,
-        "complexity": 246,
-        "maximumDepth": 5,
-        "score": 2706
+        "complexity": 25,
+        "mostComplexFunction": 6,
+        "score": 275
+      },
+      {
+        "path": "backend/Adapters.Persistence/SqliteSessionRepository.cs",
+        "side": "backend",
+        "commits": 11,
+        "linesChanged": 348,
+        "complexity": 23,
+        "mostComplexFunction": 5,
+        "score": 253
+      },
+      {
+        "path": "backend/Adapters.Web/ParticipantHub.cs",
+        "side": "backend",
+        "commits": 18,
+        "linesChanged": 235,
+        "complexity": 12,
+        "mostComplexFunction": 3,
+        "score": 216
+      },
+      {
+        "path": "backend/Application/Intents/FacilitatorIntentHandler.cs",
+        "side": "backend",
+        "commits": 16,
+        "linesChanged": 271,
+        "complexity": 13,
+        "mostComplexFunction": 2,
+        "score": 208
+      },
+      {
+        "path": "frontend/src/adapters/authAdapter.ts",
+        "side": "frontend",
+        "commits": 9,
+        "linesChanged": 272,
+        "complexity": 22,
+        "mostComplexFunction": 3,
+        "score": 198
+      },
+      {
+        "path": "backend/Adapters.Web/FacilitatorHub.cs",
+        "side": "backend",
+        "commits": 12,
+        "linesChanged": 184,
+        "complexity": 16,
+        "mostComplexFunction": 2,
+        "score": 192
+      },
+      {
+        "path": "backend/Application/State/FacilitatorEnabledIntents.cs",
+        "side": "backend",
+        "commits": 8,
+        "linesChanged": 170,
+        "complexity": 21,
+        "mostComplexFunction": 6,
+        "score": 168
+      },
+      {
+        "path": "backend/Application/Intents/ParticipantIntentHandler.cs",
+        "side": "backend",
+        "commits": 11,
+        "linesChanged": 256,
+        "complexity": 15,
+        "mostComplexFunction": 3,
+        "score": 165
+      },
+      {
+        "path": "backend/Application/State/ParticipantWorkshopStateMapper.cs",
+        "side": "backend",
+        "commits": 20,
+        "linesChanged": 435,
+        "complexity": 8,
+        "mostComplexFunction": 2,
+        "score": 160
+      },
+      {
+        "path": "backend/Domain/SelectionRound.cs",
+        "side": "backend",
+        "commits": 9,
+        "linesChanged": 143,
+        "complexity": 17,
+        "mostComplexFunction": 6,
+        "score": 153
+      },
+      {
+        "path": "frontend/src/testing/designTokens.ts",
+        "side": "frontend",
+        "commits": 4,
+        "linesChanged": 202,
+        "complexity": 36,
+        "mostComplexFunction": 5,
+        "score": 144
       }
     ]
   },
@@ -686,7 +764,7 @@
     "backend": {
       "exitCode": 0,
       "findings": 0,
-      "summary": "No vulnerable packages across 11 scanned projects"
+      "summary": "No vulnerable packages across 12 scanned projects"
     }
   },
   "supplyChain": {
@@ -738,12 +816,12 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count 4f4a87011e56b6805ba51c868e747f6f757aa6ad",
-      "git rev-list --count \"--grep=^Merge pull request\" 4f4a87011e56b6805ba51c868e747f6f757aa6ad",
-      "git log --max-parents=0 --format=%cI 4f4a87011e56b6805ba51c868e747f6f757aa6ad",
-      "git shortlog --summary --numbered 4f4a87011e56b6805ba51c868e747f6f757aa6ad"
+      "git rev-list --count 6869a546efc284fc0b0f0716b21aeb117f3e42ea",
+      "git rev-list --count \"--grep=^Merge pull request\" 6869a546efc284fc0b0f0716b21aeb117f3e42ea",
+      "git log --max-parents=0 --format=%cI 6869a546efc284fc0b0f0716b21aeb117f3e42ea",
+      "git shortlog --summary --numbered 6869a546efc284fc0b0f0716b21aeb117f3e42ea"
     ],
-    "commits": 844,
+    "commits": 849,
     "mergedPullRequests": 67,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4

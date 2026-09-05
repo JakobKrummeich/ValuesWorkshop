@@ -52,12 +52,12 @@ date it describes:
 | --- | --- |
 | Size | production vs test lines per area, file counts by language |
 | Tests | jest / xunit / Playwright test counts, FE + BE line coverage |
-| Complexity | max and mean cyclomatic complexity per side against the cap of 7, longest file against the 300/600-line cap |
+| Complexity | functions measured, max and mean cyclomatic complexity and the distribution per side against the cap of 7 — eslint's `complexity` rule on the frontend, the VW1001/VW1003 analyzer on the backend — longest file against the 300/600-line cap |
 | Duplication | jscpd duplicated-token share against the 2 % cap |
 | Architecture | dependency-cruiser rules, modules, dependencies, violations, cycles; ArchUnitNET rules; per-layer instability (`depcruise --metrics`) |
 | Design system | design tokens, CSS modules, stylelint token enforcement, contrast-guard assertions |
 | Contract | wire fixtures, contract assertions on both sides |
-| Hotspots | churn × indentation complexity per production file over the whole git history, top 10 tabled |
+| Hotspots | churn × cyclomatic complexity per production file over the whole git history, top 10 tabled |
 | Security | FE advisory scan and BE vulnerable-package scan findings |
 | Process | commits, merged PRs, every one of them through the same CI |
 
@@ -196,15 +196,27 @@ binary's exit 127 became the gate's exit 1.
 
 ### How the hotspot analysis landed
 
-30i uses nothing but `git` and file reading, in keeping with assumption 4.
-Churn is read from `git log --numstat --no-renames --format=%H <measured sha>`:
-commits and changed lines per path as it is named today, over the whole
-history, binary rows skipped. Complexity is Tornhill-style whitespace
-analysis: every non-blank line of a production `.cs`, `.ts` or `.tsx` file adds
-its nesting depth, at four spaces per level for C# and two for TypeScript, a
-tab counting as one level. The score is commits × complexity. One table
-renders the top ten: `metrics.md` shows every column under `## Hotspots`, the
-README's `hotspots` region the same rows without the deepest nesting. A chart
+30i uses nothing but `git` and the gates' own complexity tools, in keeping
+with assumption 4. Churn is read from
+`git log --numstat --no-renames --format=%H <measured sha>`: commits and
+changed lines per path as it is named today, over the whole history, binary
+rows skipped. Complexity is cyclomatic, per function, from the same
+measurement the Complexity table reports: eslint's `complexity` rule re-run at
+zero on the frontend, and on the backend the VW1001 analyzer's new companion
+VW1003 — a hidden, enabled-by-default diagnostic that states every method's,
+constructor's and property's complexity, promoted to a warning by
+`dotnet build -p:ReportCyclomaticComplexity=true` through
+`backend/complexity-report.globalconfig`, so the backend has a measured
+distribution too instead of a passing build as its only evidence. A file's
+complexity is the sum over its measured functions, with its most complex one
+shown; a production `.cs`, `.ts` or `.tsx` file without a measured function
+scores zero. The first cut measured indentation instead, Tornhill-style; review
+pointed out that the gates already compute the real number on both sides and
+that counting whitespace is shaky next to it, so the indentation code was
+deleted rather than kept as a fallback. The score is commits × complexity. One
+table renders the top ten: `metrics.md` shows every column under
+`## Hotspots`, the README's `hotspots` region the same rows without the most
+complex function. A chart
 was tried and dropped: with real data a Mermaid quadrant chart clumps every
 point at half the complexity axis with colliding labels, and a bar chart
 truncates the file names, so neither said more than the table does. The table
