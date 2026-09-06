@@ -126,7 +126,9 @@ danger clay-600, danger-soft clay-100, member chip pine, value chip ember-700.
 
 Contrast guard: a jest test parses the token files and asserts WCAG AA (4.5:1)
 for text/muted on bg/surface and on-primary on primary, 3:1 for accent and
-highlight on bg, on both skins.
+highlight on bg, on both skins. Surface-parity guard: a sibling test asserts
+that the three surface layers define the same set of semantic tokens, so a
+missing token fails a gate instead of silently inheriting the :root fallback.
 
 ## 3. Type scale
 
@@ -308,7 +310,7 @@ toast, `WorkshopConcluded` exists. German for all.
 
 Every `data-testid` stays. Stylelint token rules stay. New hooks are TDD'd
 (`useCountUp`, `usePhaseStepper`, `useConfetti`, `useRevealChoreography`,
-`useWallLanguage`). Contrast test over the token files. Focus-visible rings
+`useWallLanguage`). Contrast and surface-parity tests over the token files. Focus-visible rings
 (2px highlight, offset 2px) on every control; touch targets ≥ 44 px;
 reduced-motion fallbacks in every module that animates. Nothing overflows:
 wall screens are laid out for 1920×1080 and 1280×720; phone for 360×640 up
