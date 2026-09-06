@@ -72,7 +72,7 @@ function mutationRow(report: QualityReport): string[] {
     "Mutation score",
     mutationScore(report, MutationSide.Frontend),
     mutationScore(report, MutationSide.Backend),
-    "Stryker, nightly and on demand",
+    "Stryker, on demand",
   ];
 }
 

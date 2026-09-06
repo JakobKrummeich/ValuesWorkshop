@@ -155,9 +155,12 @@ whole sweep adds about 11 s to the backend suite and under a second to jest.
 30g runs Stryker.NET 4.16.0 over the backend and StrykerJS 10.0.0 over the
 frontend through `pnpm mutation`, or one side at a time with
 `pnpm mutation:frontend` and `pnpm mutation:backend`. Each side takes tens of
-minutes, so it is not a PR gate: `.github/workflows/mutation.yml` runs both
-nightly and on demand. The result lands in `docs/quality/mutation.json` and is
-rendered from there into `metrics.md` and the README's headline table. The
+minutes, so it is not a PR gate: `.github/workflows/mutation.yml` runs both.
+It fired nightly until 2026-09-06, when the project reached its finished,
+showcase state and the schedule came off; the workflow now runs on manual
+dispatch only, so the recorded scores stay the ones the last run measured.
+The result lands in `docs/quality/mutation.json` and is rendered from there
+into `metrics.md` and the README's headline table. The
 first full runs scored the backend at 84.59 % (1,223 killed, 198 survived, 1
 timeout, 25 without coverage) and the frontend at 86.43 % (2,136 killed, 296
 survived, 4 timeouts, 40 without coverage); the first backend run uncovered
