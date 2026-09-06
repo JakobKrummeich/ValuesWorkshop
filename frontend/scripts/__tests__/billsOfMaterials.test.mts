@@ -15,8 +15,18 @@ const generated = {
     component: { name: "frontend", "bom-ref": "pkg:npm/frontend@0.1.0" },
   },
   components: [
-    { name: "react", version: "19.2.4", "bom-ref": "pkg:npm/react@19.2.4" },
-    { name: "next", version: "16.2.11", "bom-ref": "pkg:npm/next@16.2.11" },
+    {
+      name: "react",
+      version: "19.2.4",
+      "bom-ref": "pkg:npm/react@19.2.4",
+      purl: "pkg:npm/react@19.2.4",
+    },
+    {
+      name: "next",
+      version: "16.2.11",
+      "bom-ref": "pkg:npm/next@16.2.11",
+      purl: "pkg:npm/next@16.2.11",
+    },
   ],
   dependencies: [
     {
@@ -44,6 +54,23 @@ describe("parseBillOfMaterials", () => {
         }),
       ),
     ).toThrow("components.0.bom-ref");
+  });
+
+  it("refuses a component without the package URL the dependency graph submission needs", () => {
+    expect(() =>
+      parseBillOfMaterials(
+        JSON.stringify({
+          ...generated,
+          components: [
+            {
+              name: "react",
+              version: "19.2.4",
+              "bom-ref": "pkg:npm/react@19.2.4",
+            },
+          ],
+        }),
+      ),
+    ).toThrow("components.0.purl");
   });
 });
 

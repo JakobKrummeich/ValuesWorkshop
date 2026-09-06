@@ -4,9 +4,9 @@ Every number on this page is read back from a tool run, and the commands that pr
 
 | the report describes |  |
 | --- | --- |
-| commit | `385f109` — Say in the Supply chain section and the task 30 notes where the frontend bill's dependency graph comes from, and why pnpm's own is not used |
-| committed | 2026-09-05T16:50:14+00:00 |
-| report generated | 2026-09-05T16:51:09.030Z |
+| commit | `d967c7a` — Let the submission runner take the HTTP post as a parameter so a test can drive the whole wiring — bill read from the repository root, snapshot built from the workflow environment, receipt turned into the report — with fetch left as the only untested line |
+| committed | 2026-09-05T21:48:02+00:00 |
+| report generated | 2026-09-05T21:48:04.736Z |
 
 ## Size
 
@@ -24,17 +24,17 @@ Line counts cover every tracked text file except binary assets and generated one
 | docs | 1 | 394 | 0 | 394 |
 | e2e | 23 | 0 | 3,650 | 3,650 |
 | frontend/src | 510 | 15,874 | 16,955 | 32,829 |
-| other | 58 | 4,860 | 0 | 4,860 |
-| scripts | 147 | 7,759 | 5,187 | 12,946 |
-| tasks | 60 | 10,554 | 0 | 10,554 |
-| **repository** | **1,202** | **54,442** | **45,689** | **100,131** |
+| other | 59 | 4,905 | 0 | 4,905 |
+| scripts | 151 | 8,065 | 5,584 | 13,649 |
+| tasks | 60 | 10,570 | 0 | 10,570 |
+| **repository** | **1,207** | **54,809** | **46,086** | **100,895** |
 
 | extension | files |
 | --- | ---: |
 | `.cs` | 323 |
 | `.ts` | 266 |
 | `.tsx` | 190 |
-| `.mts` | 93 |
+| `.mts` | 97 |
 | `.css` | 90 |
 | `.md` | 71 |
 | `.json` | 66 |
@@ -54,12 +54,12 @@ Produced by:
 
 | suite | tests | line coverage | enforced minimum | branch coverage |
 | --- | ---: | ---: | ---: | ---: |
-| jest — frontend units, hooks and components | 1,379 | 92.56% | at least 80% | 90.18% |
+| jest — frontend units, hooks and components | 1,395 | 92.51% | at least 80% | 89.61% |
 | xunit — backend domain, application, adapters and host | 954 | 98.6% | at least 80% | 92.8% |
 | Playwright — end to end through the browser | 93 | — | — | — |
-| **total** | **2,426** |  |  |  |
+| **total** | **2,442** |  |  |  |
 
-Coverage is measured over 3,288 of 3,552 frontend lines and 10,003 of 10,136 backend lines. The end-to-end suite is listed, never run, by this report.
+Coverage is measured over 3,338 of 3,608 frontend lines and 10,003 of 10,136 backend lines. The end-to-end suite is listed, never run, by this report.
 
 | backend test assembly | tests |
 | --- | ---: |
@@ -79,7 +79,7 @@ Produced by:
 | measure | frontend | backend |
 | --- | ---: | ---: |
 | enforced cyclomatic complexity cap | at most 7 (eslint `complexity`) | at most 7 (analyzer VW1001) |
-| functions measured | 3,853 | 1,807 |
+| functions measured | 3,904 | 1,807 |
 | highest complexity found | 7 | 7 |
 | mean complexity | 1.19 | 1.26 |
 | functions above the cap | 0 | 0 |
@@ -88,10 +88,10 @@ Both sides are measured function by function by the tool that enforces the cap. 
 
 | cyclomatic complexity | frontend functions | backend functions |
 | ---: | ---: | ---: |
-| 1 | 3,393 | 1,525 |
-| 2 | 292 | 172 |
-| 3 | 94 | 64 |
-| 4 | 48 | 22 |
+| 1 | 3,435 | 1,525 |
+| 2 | 296 | 172 |
+| 3 | 97 | 64 |
+| 4 | 50 | 22 |
 | 5 | 16 | 14 |
 | 6 | 9 | 8 |
 | 7 | 1 | 2 |
@@ -146,7 +146,7 @@ Produced by:
 Produced by:
 
 - `git ls-files`
-- `git log --numstat --no-renames --format=%H 385f10953ab57f77374f6938ddefa6b9ab44f39a`
+- `git log --numstat --no-renames --format=%H d967c7aa78fe134790f3eb06a908e786ad1f067b`
 
 A hotspot is a production code file that changes often and is intricate at the same time — where the next bug is most likely to be. Churn counts the commits that touched the file under its present path, over the whole history and without following renames, so a file that was moved starts over. Complexity is cyclomatic, measured by the same tools that enforce the cap — eslint's `complexity` rule per function on the frontend, the VW1001/VW1003 analyzer per method, constructor and property on the backend — and summed over the file's functions; a file without a measured function scores zero. The score is the product of the two.
 
@@ -163,7 +163,7 @@ A hotspot is a production code file that changes often and is intricate at the s
 | `backend/Application/Intents/FacilitatorIntentHandler.cs` | backend | 16 | 271 | 13 | 2 | 208 |
 | `frontend/src/adapters/authAdapter.ts` | frontend | 9 | 272 | 22 | 3 | 198 |
 
-425 production code files were ranked over 875 commits.
+425 production code files were ranked over 884 commits.
 
 ## Architecture
 
@@ -253,7 +253,7 @@ Mutation testing changes the production code and asks whether a test notices. It
 | frontend | StrykerJS 10.0.0 | 86.43% | 2,136 | 296 | 4 | 40 | `800a926` on 2026-09-05 |
 | backend | Stryker.NET 4.16.0 | 84.59% | 1,223 | 198 | 1 | 25 | `ce36bb8` on 2026-09-04 |
 
-The frontend and backend scores were measured at `800a926` and `ce36bb8`, not at `385f109` — the commit this report describes — so they describe the code as it stood then.
+The frontend and backend scores were measured at `800a926` and `ce36bb8`, not at `d967c7a` — the commit this report describes — so they describe the code as it stood then.
 
 ## Security
 
@@ -279,7 +279,7 @@ Produced by:
 | `docs/quality/sbom/frontend.cdx.json` | frontend runtime dependencies of the pnpm workspace | 179 |
 | `docs/quality/sbom/backend.cdx.json` | backend runtime packages of the .NET solution | 67 |
 
-The bills of materials are CycloneDX documents emitted by the generators and then stripped of the serial number, the run timestamp and the annotation that restates it, so regenerating them against an unchanged dependency set leaves no diff. The frontend bill keeps pnpm's component list but takes its dependency graph from `pnpm-lock.yaml`, because `pnpm sbom` leaves about a third of the production dependency edges out; the packages the lockfile reaches are cross-checked against the components pnpm listed.
+The bills of materials are CycloneDX documents emitted by the generators and then stripped of the serial number, the run timestamp and the annotation that restates it, so regenerating them against an unchanged dependency set leaves no diff. The frontend bill keeps pnpm's component list but takes its dependency graph from `pnpm-lock.yaml`, because `pnpm sbom` leaves about a third of the production dependency edges out; the packages the lockfile reaches are cross-checked against the components pnpm listed. The backend bill is also submitted to GitHub's dependency graph on every push to `main` (`.github/workflows/dependency-graph.yml`), so Dependabot alerts cover its transitive packages, which GitHub's own reading of the `.csproj` files leaves out; the frontend needs no submission because GitHub reads `pnpm-lock.yaml` in full.
 
 | scan | findings | exit code | reported |
 | --- | ---: | ---: | --- |
@@ -289,16 +289,16 @@ The bills of materials are CycloneDX documents emitted by the generators and the
 
 Produced by:
 
-- `git rev-list --count 385f10953ab57f77374f6938ddefa6b9ab44f39a`
-- `git rev-list --count "--grep=^Merge pull request" 385f10953ab57f77374f6938ddefa6b9ab44f39a`
-- `git log --max-parents=0 --format=%cI 385f10953ab57f77374f6938ddefa6b9ab44f39a`
-- `git shortlog --summary --numbered 385f10953ab57f77374f6938ddefa6b9ab44f39a`
+- `git rev-list --count d967c7aa78fe134790f3eb06a908e786ad1f067b`
+- `git rev-list --count "--grep=^Merge pull request" d967c7aa78fe134790f3eb06a908e786ad1f067b`
+- `git log --max-parents=0 --format=%cI d967c7aa78fe134790f3eb06a908e786ad1f067b`
+- `git shortlog --summary --numbered d967c7aa78fe134790f3eb06a908e786ad1f067b`
 
 The history is counted at the commit this report describes, not at the branch tip, so regenerating the report does not move its own numbers.
 
 | measure | value |
 | --- | ---: |
-| commits | 875 |
-| merge commits from pull requests | 72 |
+| commits | 884 |
+| merge commits from pull requests | 74 |
 | first commit | 2026-07-19T17:25:51+00:00 |
 | contributors | 4 |

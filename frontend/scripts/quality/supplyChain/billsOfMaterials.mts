@@ -3,6 +3,7 @@ import { z } from "zod";
 const componentSchema = z.looseObject({
   name: z.string(),
   "bom-ref": z.string(),
+  purl: z.string(),
 });
 
 const dependencySchema = z.looseObject({

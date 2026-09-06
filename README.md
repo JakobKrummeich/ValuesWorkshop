@@ -79,8 +79,8 @@ here is typed by hand.
 | --- | ---: | ---: | --- |
 | Production code | 15,874 lines | 8,926 lines | — |
 | Test code | 16,955 lines | 19,897 lines | — |
-| Tests | 1,379 jest | 954 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
-| Line coverage | 92.56% (at least 80%) | 98.6% (at least 80%) | `jest --coverage` / coverlet |
+| Tests | 1,395 jest | 954 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
+| Line coverage | 92.51% (at least 80%) | 98.6% (at least 80%) | `jest --coverage` / coverlet |
 | Mutation score | 86.43% | 84.59% | Stryker, nightly and on demand |
 | Cyclomatic complexity | highest 7 (at most 7) | highest 7 (at most 7) | eslint `complexity` / analyzer VW1001 |
 | Longest production file | 290 lines (at most 300) | 262 lines (at most 300) | eslint `max-lines` / analyzer VW1002 |
@@ -293,7 +293,10 @@ The full table, with every command that produced a number, is
 `erDiagram` emitted from the EF Core model itself — is
 [`docs/quality/database.mmd`](docs/quality/database.mmd), the last mutation
 run is [`docs/quality/mutation.json`](docs/quality/mutation.json), and the
-CycloneDX bills of materials are in [`docs/quality/sbom/`](docs/quality/sbom/).
+CycloneDX bills of materials are in [`docs/quality/sbom/`](docs/quality/sbom/) —
+the backend one is also submitted to GitHub's dependency graph on every push to
+`main`, so Dependabot alerts cover the transitive NuGet packages GitHub does not
+read out of the `.csproj` files itself.
 The four structural diagrams are drift-gated: a test regenerates each one and
 fails when the checked-in file differs — and, for the three shown here, when
 this README's copy differs. `pnpm quality:report` regenerates all of it.

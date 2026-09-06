@@ -98,6 +98,7 @@ describe("completeDependencyGraph", () => {
           group: "@types",
           version: "20.19.43",
           "bom-ref": "pkg:npm/%40types/node@20.19.43",
+          purl: "pkg:npm/%40types/node@20.19.43",
         },
       ],
     };
@@ -123,7 +124,12 @@ describe("completeDependencyGraph", () => {
       ...bill,
       components: [
         ...bill.components.filter((component) => component.name !== "tslib"),
-        { name: "tslib", version: "2.8.0", "bom-ref": "pkg:npm/tslib@2.8.0" },
+        {
+          name: "tslib",
+          version: "2.8.0",
+          "bom-ref": "pkg:npm/tslib@2.8.0",
+          purl: "pkg:npm/tslib@2.8.0",
+        },
       ],
     };
     expect(() => completeDependencyGraph(disagreeing, graph)).toThrow(
@@ -136,7 +142,12 @@ describe("completeDependencyGraph", () => {
       ...bill,
       components: [
         ...bill.components,
-        { name: "Zod", version: "1.0.0", "bom-ref": "pkg:nuget/Zod@1.0.0" },
+        {
+          name: "Zod",
+          version: "1.0.0",
+          "bom-ref": "pkg:nuget/Zod@1.0.0",
+          purl: "pkg:nuget/Zod@1.0.0",
+        },
       ],
     };
     expect(() => completeDependencyGraph(withNugetReference, graph)).toThrow(
