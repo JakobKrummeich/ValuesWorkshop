@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-05T21:48:04.736Z",
+  "generatedAt": "2026-09-06T07:27:09.057Z",
   "commit": {
-    "sha": "d967c7aa78fe134790f3eb06a908e786ad1f067b",
-    "shortSha": "d967c7a",
-    "committedAt": "2026-09-05T21:48:02+00:00",
-    "subject": "Let the submission runner take the HTTP post as a parameter so a test can drive the whole wiring — bill read from the repository root, snapshot built from the workflow environment, receipt turned into the report — with fetch left as the only untested line"
+    "sha": "ab55c9d9903bb45a6d8881f958df8001114c46c6",
+    "shortSha": "ab55c9d",
+    "committedAt": "2026-09-06T09:14:16+02:00",
+    "subject": "Merge branch 'main' into maintenance/2026-09-06-token-surface-parity"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -22,10 +22,10 @@
     "commands": [
       "git ls-files"
     ],
-    "files": 1207,
-    "productionLines": 54809,
-    "testLines": 46086,
-    "totalLines": 100895,
+    "files": 1208,
+    "productionLines": 54814,
+    "testLines": 46111,
+    "totalLines": 100925,
     "areas": [
       {
         "area": "backend",
@@ -44,9 +44,9 @@
       {
         "area": "design",
         "files": 8,
-        "productionLines": 3245,
+        "productionLines": 3247,
         "testLines": 0,
-        "totalLines": 3245
+        "totalLines": 3247
       },
       {
         "area": "docs",
@@ -64,17 +64,17 @@
       },
       {
         "area": "frontend/src",
-        "files": 510,
-        "productionLines": 15874,
-        "testLines": 16955,
-        "totalLines": 32829
+        "files": 511,
+        "productionLines": 15878,
+        "testLines": 16980,
+        "totalLines": 32858
       },
       {
         "area": "other",
         "files": 59,
-        "productionLines": 4905,
+        "productionLines": 4904,
         "testLines": 0,
-        "totalLines": 4905
+        "totalLines": 4904
       },
       {
         "area": "scripts",
@@ -98,7 +98,7 @@
       },
       {
         "extension": "ts",
-        "files": 266
+        "files": 267
       },
       {
         "extension": "tsx",
@@ -234,17 +234,17 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2442,
+    "totalTests": 2445,
     "frontend": {
-      "suites": 211,
-      "tests": 1395,
-      "passed": 1395,
+      "suites": 212,
+      "tests": 1398,
+      "passed": 1398,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 92.51,
+      "lineCoverage": 92.52,
       "branchCoverage": 89.61,
-      "coveredLines": 3338,
-      "coverableLines": 3608
+      "coveredLines": 3340,
+      "coverableLines": 3610
     },
     "backend": {
       "assemblies": [
@@ -304,14 +304,14 @@
       "dotnet build backend/ValuesWorkshop.All.sln --no-incremental -p:ReportCyclomaticComplexity=true"
     ],
     "frontend": {
-      "functions": 3904,
+      "functions": 3908,
       "maximum": 7,
       "mean": 1.19,
       "aboveCap": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 3435
+          "functions": 3439
         },
         {
           "complexity": 2,
@@ -471,8 +471,8 @@
       "pnpm -w jscpd --reporters json --output <tmp>/jscpd"
     ],
     "sources": 609,
-    "lines": 24818,
-    "tokens": 194739,
+    "lines": 24822,
+    "tokens": 194781,
     "clones": 3,
     "duplicatedLines": 28,
     "duplicatedTokens": 257,
@@ -505,10 +505,10 @@
   "hotspots": {
     "commands": [
       "git ls-files",
-      "git log --numstat --no-renames --format=%H d967c7aa78fe134790f3eb06a908e786ad1f067b"
+      "git log --numstat --no-renames --format=%H ab55c9d9903bb45a6d8881f958df8001114c46c6"
     ],
     "filesAnalysed": 425,
-    "commitsInHistory": 884,
+    "commitsInHistory": 891,
     "hotspots": [
       {
         "path": "backend/Domain/Session.cs",
@@ -610,6 +610,15 @@
         "score": 192
       },
       {
+        "path": "frontend/src/testing/designTokens.ts",
+        "side": "frontend",
+        "commits": 5,
+        "linesChanged": 206,
+        "complexity": 37,
+        "mostComplexFunction": 5,
+        "score": 185
+      },
+      {
         "path": "backend/Application/State/FacilitatorEnabledIntents.cs",
         "side": "backend",
         "commits": 8,
@@ -635,15 +644,6 @@
         "complexity": 8,
         "mostComplexFunction": 2,
         "score": 160
-      },
-      {
-        "path": "backend/Domain/SelectionRound.cs",
-        "side": "backend",
-        "commits": 9,
-        "linesChanged": 143,
-        "complexity": 17,
-        "mostComplexFunction": 6,
-        "score": 153
       }
     ]
   },
@@ -653,8 +653,8 @@
       "npx depcruise src --config .dependency-cruiser.cjs --output-type json --metrics"
     ],
     "frontend": {
-      "modules": 524,
-      "dependencies": 1844,
+      "modules": 525,
+      "dependencies": 1845,
       "rules": 14,
       "violations": 0,
       "circularDependencies": 0
@@ -687,7 +687,7 @@
       {
         "folder": "src/app",
         "afferentCouplings": 1,
-        "efferentCouplings": 821,
+        "efferentCouplings": 822,
         "instability": 1
       }
     ],
@@ -816,13 +816,13 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count d967c7aa78fe134790f3eb06a908e786ad1f067b",
-      "git rev-list --count \"--grep=^Merge pull request\" d967c7aa78fe134790f3eb06a908e786ad1f067b",
-      "git log --max-parents=0 --format=%cI d967c7aa78fe134790f3eb06a908e786ad1f067b",
-      "git shortlog --summary --numbered d967c7aa78fe134790f3eb06a908e786ad1f067b"
+      "git rev-list --count ab55c9d9903bb45a6d8881f958df8001114c46c6",
+      "git rev-list --count \"--grep=^Merge pull request\" ab55c9d9903bb45a6d8881f958df8001114c46c6",
+      "git log --max-parents=0 --format=%cI ab55c9d9903bb45a6d8881f958df8001114c46c6",
+      "git shortlog --summary --numbered ab55c9d9903bb45a6d8881f958df8001114c46c6"
     ],
-    "commits": 884,
-    "mergedPullRequests": 74,
+    "commits": 891,
+    "mergedPullRequests": 75,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4
   }
