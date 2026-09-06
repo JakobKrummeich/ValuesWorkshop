@@ -4,9 +4,9 @@ Every number on this page is read back from a tool run, and the commands that pr
 
 | the report describes |  |
 | --- | --- |
-| commit | `d967c7a` — Let the submission runner take the HTTP post as a parameter so a test can drive the whole wiring — bill read from the repository root, snapshot built from the workflow environment, receipt turned into the report — with fetch left as the only untested line |
-| committed | 2026-09-05T21:48:02+00:00 |
-| report generated | 2026-09-05T21:48:04.736Z |
+| commit | `ab55c9d` — Merge branch 'main' into maintenance/2026-09-06-token-surface-parity |
+| committed | 2026-09-06T09:14:16+02:00 |
+| report generated | 2026-09-06T07:27:09.057Z |
 
 ## Size
 
@@ -20,19 +20,19 @@ Line counts cover every tracked text file except binary assets and generated one
 | --- | ---: | ---: | ---: | ---: |
 | backend | 354 | 8,926 | 19,897 | 28,823 |
 | contract | 41 | 2,830 | 0 | 2,830 |
-| design | 8 | 3,245 | 0 | 3,245 |
+| design | 8 | 3,247 | 0 | 3,247 |
 | docs | 1 | 394 | 0 | 394 |
 | e2e | 23 | 0 | 3,650 | 3,650 |
-| frontend/src | 510 | 15,874 | 16,955 | 32,829 |
-| other | 59 | 4,905 | 0 | 4,905 |
+| frontend/src | 511 | 15,878 | 16,980 | 32,858 |
+| other | 59 | 4,904 | 0 | 4,904 |
 | scripts | 151 | 8,065 | 5,584 | 13,649 |
 | tasks | 60 | 10,570 | 0 | 10,570 |
-| **repository** | **1,207** | **54,809** | **46,086** | **100,895** |
+| **repository** | **1,208** | **54,814** | **46,111** | **100,925** |
 
 | extension | files |
 | --- | ---: |
 | `.cs` | 323 |
-| `.ts` | 266 |
+| `.ts` | 267 |
 | `.tsx` | 190 |
 | `.mts` | 97 |
 | `.css` | 90 |
@@ -54,12 +54,12 @@ Produced by:
 
 | suite | tests | line coverage | enforced minimum | branch coverage |
 | --- | ---: | ---: | ---: | ---: |
-| jest — frontend units, hooks and components | 1,395 | 92.51% | at least 80% | 89.61% |
+| jest — frontend units, hooks and components | 1,398 | 92.52% | at least 80% | 89.61% |
 | xunit — backend domain, application, adapters and host | 954 | 98.6% | at least 80% | 92.8% |
 | Playwright — end to end through the browser | 93 | — | — | — |
-| **total** | **2,442** |  |  |  |
+| **total** | **2,445** |  |  |  |
 
-Coverage is measured over 3,338 of 3,608 frontend lines and 10,003 of 10,136 backend lines. The end-to-end suite is listed, never run, by this report.
+Coverage is measured over 3,340 of 3,610 frontend lines and 10,003 of 10,136 backend lines. The end-to-end suite is listed, never run, by this report.
 
 | backend test assembly | tests |
 | --- | ---: |
@@ -79,7 +79,7 @@ Produced by:
 | measure | frontend | backend |
 | --- | ---: | ---: |
 | enforced cyclomatic complexity cap | at most 7 (eslint `complexity`) | at most 7 (analyzer VW1001) |
-| functions measured | 3,904 | 1,807 |
+| functions measured | 3,908 | 1,807 |
 | highest complexity found | 7 | 7 |
 | mean complexity | 1.19 | 1.26 |
 | functions above the cap | 0 | 0 |
@@ -88,7 +88,7 @@ Both sides are measured function by function by the tool that enforces the cap. 
 
 | cyclomatic complexity | frontend functions | backend functions |
 | ---: | ---: | ---: |
-| 1 | 3,435 | 1,525 |
+| 1 | 3,439 | 1,525 |
 | 2 | 296 | 172 |
 | 3 | 97 | 64 |
 | 4 | 50 | 22 |
@@ -127,9 +127,9 @@ Produced by:
 
 | measure | value | enforced limit |
 | --- | ---: | ---: |
-| duplicated lines | 28 of 24,818 |  |
+| duplicated lines | 28 of 24,822 |  |
 | duplicated line share | 0.11% | at most 2% |
-| duplicated tokens | 257 of 194,739 |  |
+| duplicated tokens | 257 of 194,781 |  |
 | duplicated token share | 0.13% |  |
 | clones found | 3 |  |
 | detection window | 50 tokens |  |
@@ -146,7 +146,7 @@ Produced by:
 Produced by:
 
 - `git ls-files`
-- `git log --numstat --no-renames --format=%H d967c7aa78fe134790f3eb06a908e786ad1f067b`
+- `git log --numstat --no-renames --format=%H ab55c9d9903bb45a6d8881f958df8001114c46c6`
 
 A hotspot is a production code file that changes often and is intricate at the same time — where the next bug is most likely to be. Churn counts the commits that touched the file under its present path, over the whole history and without following renames, so a file that was moved starts over. Complexity is cyclomatic, measured by the same tools that enforce the cap — eslint's `complexity` rule per function on the frontend, the VW1001/VW1003 analyzer per method, constructor and property on the backend — and summed over the file's functions; a file without a measured function scores zero. The score is the product of the two.
 
@@ -163,7 +163,7 @@ A hotspot is a production code file that changes often and is intricate at the s
 | `backend/Application/Intents/FacilitatorIntentHandler.cs` | backend | 16 | 271 | 13 | 2 | 208 |
 | `frontend/src/adapters/authAdapter.ts` | frontend | 9 | 272 | 22 | 3 | 198 |
 
-425 production code files were ranked over 884 commits.
+425 production code files were ranked over 891 commits.
 
 ## Architecture
 
@@ -174,8 +174,8 @@ Produced by:
 
 | measure | value |
 | --- | ---: |
-| frontend modules cruised | 524 |
-| frontend dependencies cruised | 1,844 |
+| frontend modules cruised | 525 |
+| frontend dependencies cruised | 1,845 |
 | dependency-cruiser rules enforced | 14 |
 | dependency-cruiser violations | 0 |
 | modules on a dependency cycle | 0 |
@@ -189,7 +189,7 @@ Instability is dependency-cruiser's own measure: outgoing dependencies over all 
 | `src/domain/ports` | 56 | 27 | 0.33 |
 | `src/adapters` | 43 | 122 | 0.74 |
 | `src/shared` | 48 | 3 | 0.06 |
-| `src/app` | 1 | 821 | 1.00 |
+| `src/app` | 1 | 822 | 1.00 |
 
 | ArchUnitNET rule asserted on the backend |
 | --- |
@@ -246,14 +246,14 @@ Produced by:
 - `pnpm mutation:frontend`
 - `pnpm mutation:backend`
 
-Mutation testing changes the production code and asks whether a test notices. It is far too slow for a pull request, so it runs nightly and on demand, and the scores below are read back from the last recorded run.
+Mutation testing changes the production code and asks whether a test notices. It is far too slow for a pull request, so it runs on demand — locally with `pnpm mutation`, or as the Mutation testing workflow — and the scores below are read back from the last recorded run.
 
 | side | tool | mutation score | killed | survived | timed out | not covered | measured at |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | frontend | StrykerJS 10.0.0 | 86.43% | 2,136 | 296 | 4 | 40 | `800a926` on 2026-09-05 |
 | backend | Stryker.NET 4.16.0 | 84.59% | 1,223 | 198 | 1 | 25 | `ce36bb8` on 2026-09-04 |
 
-The frontend and backend scores were measured at `800a926` and `ce36bb8`, not at `d967c7a` — the commit this report describes — so they describe the code as it stood then.
+The frontend and backend scores were measured at `800a926` and `ce36bb8`, not at `ab55c9d` — the commit this report describes — so they describe the code as it stood then.
 
 ## Security
 
@@ -289,16 +289,16 @@ The bills of materials are CycloneDX documents emitted by the generators and the
 
 Produced by:
 
-- `git rev-list --count d967c7aa78fe134790f3eb06a908e786ad1f067b`
-- `git rev-list --count "--grep=^Merge pull request" d967c7aa78fe134790f3eb06a908e786ad1f067b`
-- `git log --max-parents=0 --format=%cI d967c7aa78fe134790f3eb06a908e786ad1f067b`
-- `git shortlog --summary --numbered d967c7aa78fe134790f3eb06a908e786ad1f067b`
+- `git rev-list --count ab55c9d9903bb45a6d8881f958df8001114c46c6`
+- `git rev-list --count "--grep=^Merge pull request" ab55c9d9903bb45a6d8881f958df8001114c46c6`
+- `git log --max-parents=0 --format=%cI ab55c9d9903bb45a6d8881f958df8001114c46c6`
+- `git shortlog --summary --numbered ab55c9d9903bb45a6d8881f958df8001114c46c6`
 
 The history is counted at the commit this report describes, not at the branch tip, so regenerating the report does not move its own numbers.
 
 | measure | value |
 | --- | ---: |
-| commits | 884 |
-| merge commits from pull requests | 74 |
+| commits | 891 |
+| merge commits from pull requests | 75 |
 | first commit | 2026-07-19T17:25:51+00:00 |
 | contributors | 4 |

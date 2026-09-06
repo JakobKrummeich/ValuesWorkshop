@@ -66,7 +66,7 @@ machine-checked, by dependency-cruiser on the frontend and ArchUnitNET on the
 backend. The wire contract between them cannot drift, because both sides
 assert against the same checked-in fixtures. A function above cyclomatic
 complexity 7, a production file beyond 300 lines or duplication beyond 2 %
-fails the build; the tests are mutation-tested nightly, and every screen
+fails the build; the tests are mutation-tested on demand, and every screen
 passes an axe-core accessibility gate inside the end-to-end suite.
 
 Every number and diagram in this section is written by `pnpm quality:report`
@@ -77,11 +77,11 @@ here is typed by hand.
 
 | What | Frontend | Backend | Enforced by |
 | --- | ---: | ---: | --- |
-| Production code | 15,874 lines | 8,926 lines | — |
-| Test code | 16,955 lines | 19,897 lines | — |
-| Tests | 1,395 jest | 954 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
-| Line coverage | 92.51% (at least 80%) | 98.6% (at least 80%) | `jest --coverage` / coverlet |
-| Mutation score | 86.43% | 84.59% | Stryker, nightly and on demand |
+| Production code | 15,878 lines | 8,926 lines | — |
+| Test code | 16,980 lines | 19,897 lines | — |
+| Tests | 1,398 jest | 954 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |
+| Line coverage | 92.52% (at least 80%) | 98.6% (at least 80%) | `jest --coverage` / coverlet |
+| Mutation score | 86.43% | 84.59% | Stryker, on demand |
 | Cyclomatic complexity | highest 7 (at most 7) | highest 7 (at most 7) | eslint `complexity` / analyzer VW1001 |
 | Longest production file | 290 lines (at most 300) | 262 lines (at most 300) | eslint `max-lines` / analyzer VW1002 |
 | Duplicated tokens | 0.13% (at most 2%) | 0.13% (at most 2%) | `jscpd`, one scan over both sides |

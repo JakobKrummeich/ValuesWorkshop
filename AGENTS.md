@@ -75,7 +75,8 @@ Run all quality gates locally using the same commands CI uses:
 - `pnpm run advisories:scan` — osv-scanner over the lockfile and the SBOMs
 - `pnpm run sbom` — regenerate `docs/quality/sbom/`
 - `pnpm mutation` — mutation testing on both sides; far too slow for CI, runs
-  nightly and on demand
+  on demand only: locally, or through the Mutation testing workflow's manual
+  dispatch
 
 ## User review — always Lavish
 

@@ -15,7 +15,7 @@ import type { QualityReport } from "./qualityReport.mts";
 const sides = Object.values(MutationSide);
 
 const explanation =
-  "Mutation testing changes the production code and asks whether a test notices. It is far too slow for a pull request, so it runs nightly and on demand, and the scores below are read back from the last recorded run.";
+  "Mutation testing changes the production code and asks whether a test notices. It is far too slow for a pull request, so it runs on demand — locally with `pnpm mutation`, or as the Mutation testing workflow — and the scores below are read back from the last recorded run.";
 
 function shortSha(sha: string): string {
   return sha.slice(0, 7);

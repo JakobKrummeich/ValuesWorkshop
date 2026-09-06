@@ -12,7 +12,7 @@ describe("renderHeadlineTable", () => {
       "| Test code | 16,898 lines | 14,000 lines | — |",
       "| Tests | 1,063 jest | 901 xunit | `scripts/ci-test.sh` on every push, plus 93 Playwright journeys through a real browser |",
       "| Line coverage | 97.53% (at least 80%) | 98.7% (at least 80%) | `jest --coverage` / coverlet |",
-      "| Mutation score | 81.25% | 75.41% | Stryker, nightly and on demand |",
+      "| Mutation score | 81.25% | 75.41% | Stryker, on demand |",
       "| Cyclomatic complexity | highest 7 (at most 7) | highest 6 (at most 7) | eslint `complexity` / analyzer VW1001 |",
       "| Longest production file | 290 lines (at most 300) | 289 lines (at most 300) | eslint `max-lines` / analyzer VW1002 |",
       "| Duplicated tokens | 0.13% (at most 2%) | 0.13% (at most 2%) | `jscpd`, one scan over both sides |",
@@ -27,7 +27,7 @@ describe("renderHeadlineTable", () => {
       mutation: { backend: sampleQualityReport.mutation.backend },
     });
     expect(table).toContain(
-      "| Mutation score | not yet measured | 75.41% | Stryker, nightly and on demand |",
+      "| Mutation score | not yet measured | 75.41% | Stryker, on demand |",
     );
   });
 
