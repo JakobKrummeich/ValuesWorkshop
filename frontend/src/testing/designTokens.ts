@@ -135,6 +135,10 @@ export function baseTokenValue(token: string): string {
   return value;
 }
 
+export function surfaceTokenNames(surfaceFileName: string): string[] {
+  return [...declarationsOf(surfaceFileName).keys()].sort();
+}
+
 export function surfaceColors(
   surfaceFileName: string,
 ): (token: string) => Rgba {
