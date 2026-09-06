@@ -207,6 +207,22 @@ write the bill when the packages the lockfile reaches differ from the
 components pnpm listed — the guard that would have caught a component
 regression as well.
 
+The scans then missed the two Next.js remote-code-execution advisories for
+eleven days: GitHub's advisory database carried them while the feeds behind
+`pnpm audit` and osv-scanner lagged. Dependabot alerts were already on, but
+GitHub's dependency graph knew only the 17 NuGet packages named directly in
+the `.csproj` files against the 67 in the backend bill, because it reads no
+transitive NuGet packages without a `packages.lock.json`. Since then the
+workflow `.github/workflows/dependency-graph.yml` submits the backend bill to
+GitHub's dependency submission API on every push to `main`
+(`dependencySnapshot.mts`, `submitDependencySnapshot.mts`; `contents: write`
+is the only permission it holds), so Dependabot alerts cover the transitive
+packages too. The frontend bill is not submitted: GitHub reads
+`pnpm-lock.yaml` in full, so a submission would only file a second copy of
+every npm package and double its alerts. The submission was proven against a
+feature branch before merging — GitHub answered `ACCEPTED` for 67 packages —
+and a bad token ends the step with exit 1 and GitHub's `401` body.
+
 ### How the hotspot analysis landed
 
 30i uses nothing but `git` and the gates' own complexity tools, in keeping
