@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-05T16:51:09.030Z",
+  "generatedAt": "2026-09-05T21:48:04.736Z",
   "commit": {
-    "sha": "385f10953ab57f77374f6938ddefa6b9ab44f39a",
-    "shortSha": "385f109",
-    "committedAt": "2026-09-05T16:50:14+00:00",
-    "subject": "Say in the Supply chain section and the task 30 notes where the frontend bill's dependency graph comes from, and why pnpm's own is not used"
+    "sha": "d967c7aa78fe134790f3eb06a908e786ad1f067b",
+    "shortSha": "d967c7a",
+    "committedAt": "2026-09-05T21:48:02+00:00",
+    "subject": "Let the submission runner take the HTTP post as a parameter so a test can drive the whole wiring — bill read from the repository root, snapshot built from the workflow environment, receipt turned into the report — with fetch left as the only untested line"
   },
   "enforcedLimits": {
     "frontendComplexity": 7,
@@ -22,10 +22,10 @@
     "commands": [
       "git ls-files"
     ],
-    "files": 1202,
-    "productionLines": 54442,
-    "testLines": 45689,
-    "totalLines": 100131,
+    "files": 1207,
+    "productionLines": 54809,
+    "testLines": 46086,
+    "totalLines": 100895,
     "areas": [
       {
         "area": "backend",
@@ -71,24 +71,24 @@
       },
       {
         "area": "other",
-        "files": 58,
-        "productionLines": 4860,
+        "files": 59,
+        "productionLines": 4905,
         "testLines": 0,
-        "totalLines": 4860
+        "totalLines": 4905
       },
       {
         "area": "scripts",
-        "files": 147,
-        "productionLines": 7759,
-        "testLines": 5187,
-        "totalLines": 12946
+        "files": 151,
+        "productionLines": 8065,
+        "testLines": 5584,
+        "totalLines": 13649
       },
       {
         "area": "tasks",
         "files": 60,
-        "productionLines": 10554,
+        "productionLines": 10570,
         "testLines": 0,
-        "totalLines": 10554
+        "totalLines": 10570
       }
     ],
     "filesByExtension": [
@@ -106,7 +106,7 @@
       },
       {
         "extension": "mts",
-        "files": 93
+        "files": 97
       },
       {
         "extension": "css",
@@ -142,7 +142,7 @@
       },
       {
         "extension": "yml",
-        "files": 5
+        "files": 6
       },
       {
         "extension": "mjs",
@@ -234,17 +234,17 @@
       "scripts/test-backend-with-coverage.sh",
       "npx playwright test --list --config playwright.config.ts"
     ],
-    "totalTests": 2426,
+    "totalTests": 2442,
     "frontend": {
-      "suites": 209,
-      "tests": 1379,
-      "passed": 1379,
+      "suites": 211,
+      "tests": 1395,
+      "passed": 1395,
       "failed": 0,
       "skipped": 0,
-      "lineCoverage": 92.56,
-      "branchCoverage": 90.18,
-      "coveredLines": 3288,
-      "coverableLines": 3552
+      "lineCoverage": 92.51,
+      "branchCoverage": 89.61,
+      "coveredLines": 3338,
+      "coverableLines": 3608
     },
     "backend": {
       "assemblies": [
@@ -304,26 +304,26 @@
       "dotnet build backend/ValuesWorkshop.All.sln --no-incremental -p:ReportCyclomaticComplexity=true"
     ],
     "frontend": {
-      "functions": 3853,
+      "functions": 3904,
       "maximum": 7,
       "mean": 1.19,
       "aboveCap": 0,
       "distribution": [
         {
           "complexity": 1,
-          "functions": 3393
+          "functions": 3435
         },
         {
           "complexity": 2,
-          "functions": 292
+          "functions": 296
         },
         {
           "complexity": 3,
-          "functions": 94
+          "functions": 97
         },
         {
           "complexity": 4,
-          "functions": 48
+          "functions": 50
         },
         {
           "complexity": 5,
@@ -505,10 +505,10 @@
   "hotspots": {
     "commands": [
       "git ls-files",
-      "git log --numstat --no-renames --format=%H 385f10953ab57f77374f6938ddefa6b9ab44f39a"
+      "git log --numstat --no-renames --format=%H d967c7aa78fe134790f3eb06a908e786ad1f067b"
     ],
     "filesAnalysed": 425,
-    "commitsInHistory": 875,
+    "commitsInHistory": 884,
     "hotspots": [
       {
         "path": "backend/Domain/Session.cs",
@@ -816,13 +816,13 @@
   },
   "process": {
     "commands": [
-      "git rev-list --count 385f10953ab57f77374f6938ddefa6b9ab44f39a",
-      "git rev-list --count \"--grep=^Merge pull request\" 385f10953ab57f77374f6938ddefa6b9ab44f39a",
-      "git log --max-parents=0 --format=%cI 385f10953ab57f77374f6938ddefa6b9ab44f39a",
-      "git shortlog --summary --numbered 385f10953ab57f77374f6938ddefa6b9ab44f39a"
+      "git rev-list --count d967c7aa78fe134790f3eb06a908e786ad1f067b",
+      "git rev-list --count \"--grep=^Merge pull request\" d967c7aa78fe134790f3eb06a908e786ad1f067b",
+      "git log --max-parents=0 --format=%cI d967c7aa78fe134790f3eb06a908e786ad1f067b",
+      "git shortlog --summary --numbered d967c7aa78fe134790f3eb06a908e786ad1f067b"
     ],
-    "commits": 875,
-    "mergedPullRequests": 72,
+    "commits": 884,
+    "mergedPullRequests": 74,
     "firstCommitDate": "2026-07-19T17:25:51+00:00",
     "contributors": 4
   }

@@ -33,6 +33,7 @@
     {
       "name": "Google.OrTools.runtime.linux-arm64",
       "bom-ref": "pkg:nuget/Google.OrTools.runtime.linux-arm64@9.15.6755",
+      "purl": "pkg:nuget/Google.OrTools.runtime.linux-arm64@9.15.6755",
       "type": "library",
       "authors": [
         {
@@ -56,7 +57,6 @@
         }
       ],
       "copyright": "Copyright 2019-2021 Google LLC",
-      "purl": "pkg:nuget/Google.OrTools.runtime.linux-arm64@9.15.6755",
       "externalReferences": [
         {
           "url": "https://developers.google.com/optimization",
@@ -71,6 +71,7 @@
     {
       "name": "Google.OrTools.runtime.linux-x64",
       "bom-ref": "pkg:nuget/Google.OrTools.runtime.linux-x64@9.15.6755",
+      "purl": "pkg:nuget/Google.OrTools.runtime.linux-x64@9.15.6755",
       "type": "library",
       "authors": [
         {
@@ -94,7 +95,6 @@
         }
       ],
       "copyright": "Copyright 2019-2021 Google LLC",
-      "purl": "pkg:nuget/Google.OrTools.runtime.linux-x64@9.15.6755",
       "externalReferences": [
         {
           "url": "https://developers.google.com/optimization",
@@ -109,6 +109,7 @@
     {
       "name": "Google.OrTools.runtime.osx-arm64",
       "bom-ref": "pkg:nuget/Google.OrTools.runtime.osx-arm64@9.15.6755",
+      "purl": "pkg:nuget/Google.OrTools.runtime.osx-arm64@9.15.6755",
       "type": "library",
       "authors": [
         {
@@ -132,7 +133,6 @@
         }
       ],
       "copyright": "Copyright 2019-2021 Google LLC",
-      "purl": "pkg:nuget/Google.OrTools.runtime.osx-arm64@9.15.6755",
       "externalReferences": [
         {
           "url": "https://developers.google.com/optimization",
@@ -147,6 +147,7 @@
     {
       "name": "Google.OrTools.runtime.osx-x64",
       "bom-ref": "pkg:nuget/Google.OrTools.runtime.osx-x64@9.15.6755",
+      "purl": "pkg:nuget/Google.OrTools.runtime.osx-x64@9.15.6755",
       "type": "library",
       "authors": [
         {
@@ -170,7 +171,6 @@
         }
       ],
       "copyright": "Copyright 2019-2021 Google LLC",
-      "purl": "pkg:nuget/Google.OrTools.runtime.osx-x64@9.15.6755",
       "externalReferences": [
         {
           "url": "https://developers.google.com/optimization",
@@ -185,6 +185,7 @@
     {
       "name": "Google.OrTools.runtime.win-x64",
       "bom-ref": "pkg:nuget/Google.OrTools.runtime.win-x64@9.15.6755",
+      "purl": "pkg:nuget/Google.OrTools.runtime.win-x64@9.15.6755",
       "type": "library",
       "authors": [
         {
@@ -208,7 +209,6 @@
         }
       ],
       "copyright": "Copyright 2019-2021 Google LLC",
-      "purl": "pkg:nuget/Google.OrTools.runtime.win-x64@9.15.6755",
       "externalReferences": [
         {
           "url": "https://developers.google.com/optimization",
@@ -223,6 +223,7 @@
     {
       "name": "Google.OrTools",
       "bom-ref": "pkg:nuget/Google.OrTools@9.15.6755",
+      "purl": "pkg:nuget/Google.OrTools@9.15.6755",
       "type": "library",
       "authors": [
         {
@@ -246,7 +247,6 @@
         }
       ],
       "copyright": "Copyright 2019-2021 Google LLC",
-      "purl": "pkg:nuget/Google.OrTools@9.15.6755",
       "externalReferences": [
         {
           "url": "https://developers.google.com/optimization",
@@ -261,6 +261,7 @@
     {
       "name": "Google.Protobuf",
       "bom-ref": "pkg:nuget/Google.Protobuf@3.33.1",
+      "purl": "pkg:nuget/Google.Protobuf@3.33.1",
       "type": "library",
       "authors": [
         {
@@ -284,7 +285,6 @@
         }
       ],
       "copyright": "Copyright 2015, Google Inc.",
-      "purl": "pkg:nuget/Google.Protobuf@3.33.1",
       "externalReferences": [
         {
           "url": "https://github.com/protocolbuffers/protobuf",
@@ -299,6 +299,7 @@
     {
       "name": "Humanizer.Core",
       "bom-ref": "pkg:nuget/Humanizer.Core@2.14.1",
+      "purl": "pkg:nuget/Humanizer.Core@2.14.1",
       "type": "library",
       "authors": [
         {
@@ -322,7 +323,6 @@
         }
       ],
       "copyright": "Copyright (c) .NET Foundation and Contributors",
-      "purl": "pkg:nuget/Humanizer.Core@2.14.1",
       "externalReferences": [
         {
           "url": "https://github.com/Humanizr/Humanizer",
@@ -337,6 +337,7 @@
     {
       "name": "Microsoft.AspNetCore.Authentication.JwtBearer",
       "bom-ref": "pkg:nuget/Microsoft.AspNetCore.Authentication.JwtBearer@10.0.0",
+      "purl": "pkg:nuget/Microsoft.AspNetCore.Authentication.JwtBearer@10.0.0",
       "type": "library",
       "authors": [
         {
@@ -360,7 +361,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.AspNetCore.Authentication.JwtBearer@10.0.0",
       "externalReferences": [
         {
           "url": "https://asp.net/",
@@ -375,6 +375,7 @@
     {
       "name": "Microsoft.Build.Framework",
       "bom-ref": "pkg:nuget/Microsoft.Build.Framework@18.0.2",
+      "purl": "pkg:nuget/Microsoft.Build.Framework@18.0.2",
       "type": "library",
       "authors": [
         {
@@ -398,7 +399,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Build.Framework@18.0.2",
       "externalReferences": [
         {
           "url": "http://go.microsoft.com/fwlink/?LinkId=624683",
@@ -413,6 +413,7 @@
     {
       "name": "Microsoft.CodeAnalysis.Analyzers",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.Analyzers@3.11.0",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Analyzers@3.11.0",
       "type": "library",
       "authors": [
         {
@@ -436,7 +437,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Analyzers@3.11.0",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn-analyzers",
@@ -451,6 +451,7 @@
     {
       "name": "Microsoft.CodeAnalysis.Analyzers",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.Analyzers@3.3.4",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Analyzers@3.3.4",
       "type": "library",
       "authors": [
         {
@@ -474,7 +475,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Analyzers@3.3.4",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn-analyzers",
@@ -489,6 +489,7 @@
     {
       "name": "Microsoft.CodeAnalysis.Common",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.Common@4.12.0",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Common@4.12.0",
       "type": "library",
       "authors": [
         {
@@ -512,7 +513,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Common@4.12.0",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn",
@@ -527,6 +527,7 @@
     {
       "name": "Microsoft.CodeAnalysis.Common",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.Common@5.0.0",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Common@5.0.0",
       "type": "library",
       "authors": [
         {
@@ -550,7 +551,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Common@5.0.0",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn",
@@ -565,6 +565,7 @@
     {
       "name": "Microsoft.CodeAnalysis.CSharp.Workspaces",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.CSharp.Workspaces@5.0.0",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp.Workspaces@5.0.0",
       "type": "library",
       "authors": [
         {
@@ -588,7 +589,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp.Workspaces@5.0.0",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn",
@@ -603,6 +603,7 @@
     {
       "name": "Microsoft.CodeAnalysis.CSharp",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@5.0.0",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@5.0.0",
       "type": "library",
       "authors": [
         {
@@ -626,7 +627,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.CSharp@5.0.0",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn",
@@ -641,6 +641,7 @@
     {
       "name": "Microsoft.CodeAnalysis.Workspaces.Common",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.Workspaces.Common@5.0.0",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Workspaces.Common@5.0.0",
       "type": "library",
       "authors": [
         {
@@ -664,7 +665,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Workspaces.Common@5.0.0",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn",
@@ -679,6 +679,7 @@
     {
       "name": "Microsoft.CodeAnalysis.Workspaces.MSBuild",
       "bom-ref": "pkg:nuget/Microsoft.CodeAnalysis.Workspaces.MSBuild@5.0.0",
+      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Workspaces.MSBuild@5.0.0",
       "type": "library",
       "authors": [
         {
@@ -702,7 +703,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.CodeAnalysis.Workspaces.MSBuild@5.0.0",
       "externalReferences": [
         {
           "url": "https://github.com/dotnet/roslyn",
@@ -717,6 +717,7 @@
     {
       "name": "Microsoft.Data.Sqlite.Core",
       "bom-ref": "pkg:nuget/Microsoft.Data.Sqlite.Core@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Data.Sqlite.Core@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -740,7 +741,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Data.Sqlite.Core@10.0.10",
       "externalReferences": [
         {
           "url": "https://docs.microsoft.com/dotnet/standard/data/sqlite/",
@@ -755,6 +755,7 @@
     {
       "name": "Microsoft.EntityFrameworkCore.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.EntityFrameworkCore.Abstractions@10.0.10",
+      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Abstractions@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -778,7 +779,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Abstractions@10.0.10",
       "externalReferences": [
         {
           "url": "https://docs.microsoft.com/ef/core/",
@@ -793,6 +793,7 @@
     {
       "name": "Microsoft.EntityFrameworkCore.Analyzers",
       "bom-ref": "pkg:nuget/Microsoft.EntityFrameworkCore.Analyzers@10.0.10",
+      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Analyzers@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -816,7 +817,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Analyzers@10.0.10",
       "externalReferences": [
         {
           "url": "https://docs.microsoft.com/ef/core/",
@@ -831,6 +831,7 @@
     {
       "name": "Microsoft.EntityFrameworkCore.Relational",
       "bom-ref": "pkg:nuget/Microsoft.EntityFrameworkCore.Relational@10.0.10",
+      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Relational@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -854,7 +855,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Relational@10.0.10",
       "externalReferences": [
         {
           "url": "https://docs.microsoft.com/ef/core/",
@@ -869,6 +869,7 @@
     {
       "name": "Microsoft.EntityFrameworkCore.Sqlite.Core",
       "bom-ref": "pkg:nuget/Microsoft.EntityFrameworkCore.Sqlite.Core@10.0.10",
+      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Sqlite.Core@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -892,7 +893,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Sqlite.Core@10.0.10",
       "externalReferences": [
         {
           "url": "https://docs.microsoft.com/ef/core/",
@@ -907,6 +907,7 @@
     {
       "name": "Microsoft.EntityFrameworkCore.Sqlite",
       "bom-ref": "pkg:nuget/Microsoft.EntityFrameworkCore.Sqlite@10.0.10",
+      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Sqlite@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -930,7 +931,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore.Sqlite@10.0.10",
       "externalReferences": [
         {
           "url": "https://docs.microsoft.com/ef/core/",
@@ -945,6 +945,7 @@
     {
       "name": "Microsoft.EntityFrameworkCore",
       "bom-ref": "pkg:nuget/Microsoft.EntityFrameworkCore@10.0.10",
+      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -968,7 +969,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.EntityFrameworkCore@10.0.10",
       "externalReferences": [
         {
           "url": "https://docs.microsoft.com/ef/core/",
@@ -983,6 +983,7 @@
     {
       "name": "Microsoft.Extensions.Caching.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Caching.Abstractions@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.Caching.Abstractions@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1006,7 +1007,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Caching.Abstractions@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1021,6 +1021,7 @@
     {
       "name": "Microsoft.Extensions.Caching.Memory",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Caching.Memory@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.Caching.Memory@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1044,7 +1045,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Caching.Memory@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1059,6 +1059,7 @@
     {
       "name": "Microsoft.Extensions.Configuration.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1082,7 +1083,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Configuration.Abstractions@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1097,6 +1097,7 @@
     {
       "name": "Microsoft.Extensions.DependencyInjection.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@10.0.0",
+      "purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@10.0.0",
       "type": "library",
       "authors": [
         {
@@ -1120,7 +1121,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@10.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1135,6 +1135,7 @@
     {
       "name": "Microsoft.Extensions.DependencyInjection.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1158,7 +1159,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection.Abstractions@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1173,6 +1173,7 @@
     {
       "name": "Microsoft.Extensions.DependencyInjection",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.DependencyInjection@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1196,7 +1197,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.DependencyInjection@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1211,6 +1211,7 @@
     {
       "name": "Microsoft.Extensions.DependencyModel",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.DependencyModel@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.DependencyModel@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1234,7 +1235,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.DependencyModel@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1249,6 +1249,7 @@
     {
       "name": "Microsoft.Extensions.Logging.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@10.0.0",
+      "purl": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@10.0.0",
       "type": "library",
       "authors": [
         {
@@ -1272,7 +1273,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@10.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1287,6 +1287,7 @@
     {
       "name": "Microsoft.Extensions.Logging.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1310,7 +1311,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Logging.Abstractions@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1325,6 +1325,7 @@
     {
       "name": "Microsoft.Extensions.Logging",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Logging@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.Logging@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1348,7 +1349,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Logging@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1363,6 +1363,7 @@
     {
       "name": "Microsoft.Extensions.Options",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Options@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.Options@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1386,7 +1387,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Options@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1401,6 +1401,7 @@
     {
       "name": "Microsoft.Extensions.Primitives",
       "bom-ref": "pkg:nuget/Microsoft.Extensions.Primitives@10.0.10",
+      "purl": "pkg:nuget/Microsoft.Extensions.Primitives@10.0.10",
       "type": "library",
       "authors": [
         {
@@ -1424,7 +1425,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.Extensions.Primitives@10.0.10",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1439,6 +1439,7 @@
     {
       "name": "Microsoft.IdentityModel.Abstractions",
       "bom-ref": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.1",
+      "purl": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.1",
       "type": "library",
       "authors": [
         {
@@ -1462,7 +1463,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.IdentityModel.Abstractions@8.0.1",
       "externalReferences": [
         {
           "url": "https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet",
@@ -1477,6 +1477,7 @@
     {
       "name": "Microsoft.IdentityModel.JsonWebTokens",
       "bom-ref": "pkg:nuget/Microsoft.IdentityModel.JsonWebTokens@8.0.1",
+      "purl": "pkg:nuget/Microsoft.IdentityModel.JsonWebTokens@8.0.1",
       "type": "library",
       "authors": [
         {
@@ -1500,7 +1501,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.IdentityModel.JsonWebTokens@8.0.1",
       "externalReferences": [
         {
           "url": "https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet",
@@ -1515,6 +1515,7 @@
     {
       "name": "Microsoft.IdentityModel.Logging",
       "bom-ref": "pkg:nuget/Microsoft.IdentityModel.Logging@8.0.1",
+      "purl": "pkg:nuget/Microsoft.IdentityModel.Logging@8.0.1",
       "type": "library",
       "authors": [
         {
@@ -1538,7 +1539,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.IdentityModel.Logging@8.0.1",
       "externalReferences": [
         {
           "url": "https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet",
@@ -1553,6 +1553,7 @@
     {
       "name": "Microsoft.IdentityModel.Protocols.OpenIdConnect",
       "bom-ref": "pkg:nuget/Microsoft.IdentityModel.Protocols.OpenIdConnect@8.0.1",
+      "purl": "pkg:nuget/Microsoft.IdentityModel.Protocols.OpenIdConnect@8.0.1",
       "type": "library",
       "authors": [
         {
@@ -1576,7 +1577,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.IdentityModel.Protocols.OpenIdConnect@8.0.1",
       "externalReferences": [
         {
           "url": "https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet",
@@ -1591,6 +1591,7 @@
     {
       "name": "Microsoft.IdentityModel.Protocols",
       "bom-ref": "pkg:nuget/Microsoft.IdentityModel.Protocols@8.0.1",
+      "purl": "pkg:nuget/Microsoft.IdentityModel.Protocols@8.0.1",
       "type": "library",
       "authors": [
         {
@@ -1614,7 +1615,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.IdentityModel.Protocols@8.0.1",
       "externalReferences": [
         {
           "url": "https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet",
@@ -1629,6 +1629,7 @@
     {
       "name": "Microsoft.IdentityModel.Tokens",
       "bom-ref": "pkg:nuget/Microsoft.IdentityModel.Tokens@8.0.1",
+      "purl": "pkg:nuget/Microsoft.IdentityModel.Tokens@8.0.1",
       "type": "library",
       "authors": [
         {
@@ -1652,7 +1653,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.IdentityModel.Tokens@8.0.1",
       "externalReferences": [
         {
           "url": "https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet",
@@ -1667,6 +1667,7 @@
     {
       "name": "Microsoft.NETCore.Platforms",
       "bom-ref": "pkg:nuget/Microsoft.NETCore.Platforms@1.1.0",
+      "purl": "pkg:nuget/Microsoft.NETCore.Platforms@1.1.0",
       "type": "library",
       "authors": [
         {
@@ -1691,7 +1692,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation.  All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.NETCore.Platforms@1.1.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1702,6 +1702,7 @@
     {
       "name": "Microsoft.VisualStudio.SolutionPersistence",
       "bom-ref": "pkg:nuget/Microsoft.VisualStudio.SolutionPersistence@1.0.52",
+      "purl": "pkg:nuget/Microsoft.VisualStudio.SolutionPersistence@1.0.52",
       "type": "library",
       "authors": [
         {
@@ -1725,7 +1726,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/Microsoft.VisualStudio.SolutionPersistence@1.0.52",
       "externalReferences": [
         {
           "url": "https://github.com/microsoft/vs-solutionpersistence",
@@ -1740,6 +1740,7 @@
     {
       "name": "Mono.TextTemplating",
       "bom-ref": "pkg:nuget/Mono.TextTemplating@3.0.0",
+      "purl": "pkg:nuget/Mono.TextTemplating@3.0.0",
       "type": "library",
       "authors": [
         {
@@ -1762,7 +1763,6 @@
           }
         }
       ],
-      "purl": "pkg:nuget/Mono.TextTemplating@3.0.0",
       "externalReferences": [
         {
           "url": "https://github.com/mono/t4",
@@ -1777,6 +1777,7 @@
     {
       "name": "Newtonsoft.Json",
       "bom-ref": "pkg:nuget/Newtonsoft.Json@13.0.3",
+      "purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
       "type": "library",
       "authors": [
         {
@@ -1800,7 +1801,6 @@
         }
       ],
       "copyright": "Copyright © James Newton-King 2008",
-      "purl": "pkg:nuget/Newtonsoft.Json@13.0.3",
       "externalReferences": [
         {
           "url": "https://www.newtonsoft.com/json",
@@ -1815,6 +1815,7 @@
     {
       "name": "SQLitePCLRaw.bundle_e_sqlite3",
       "bom-ref": "pkg:nuget/SQLitePCLRaw.bundle_e_sqlite3@2.1.11",
+      "purl": "pkg:nuget/SQLitePCLRaw.bundle_e_sqlite3@2.1.11",
       "type": "library",
       "authors": [
         {
@@ -1838,7 +1839,6 @@
         }
       ],
       "copyright": "Copyright 2014-2024 SourceGear, LLC",
-      "purl": "pkg:nuget/SQLitePCLRaw.bundle_e_sqlite3@2.1.11",
       "externalReferences": [
         {
           "url": "https://github.com/ericsink/SQLitePCL.raw",
@@ -1849,6 +1849,7 @@
     {
       "name": "SQLitePCLRaw.core",
       "bom-ref": "pkg:nuget/SQLitePCLRaw.core@2.1.11",
+      "purl": "pkg:nuget/SQLitePCLRaw.core@2.1.11",
       "type": "library",
       "authors": [
         {
@@ -1872,7 +1873,6 @@
         }
       ],
       "copyright": "Copyright 2014-2024 SourceGear, LLC",
-      "purl": "pkg:nuget/SQLitePCLRaw.core@2.1.11",
       "externalReferences": [
         {
           "url": "https://github.com/ericsink/SQLitePCL.raw",
@@ -1883,6 +1883,7 @@
     {
       "name": "SQLitePCLRaw.lib.e_sqlite3",
       "bom-ref": "pkg:nuget/SQLitePCLRaw.lib.e_sqlite3@2.1.12",
+      "purl": "pkg:nuget/SQLitePCLRaw.lib.e_sqlite3@2.1.12",
       "type": "library",
       "authors": [
         {
@@ -1906,7 +1907,6 @@
         }
       ],
       "copyright": "Copyright 2014-2024 SourceGear, LLC",
-      "purl": "pkg:nuget/SQLitePCLRaw.lib.e_sqlite3@2.1.12",
       "externalReferences": [
         {
           "url": "https://github.com/ericsink/SQLitePCL.raw",
@@ -1917,6 +1917,7 @@
     {
       "name": "SQLitePCLRaw.provider.e_sqlite3",
       "bom-ref": "pkg:nuget/SQLitePCLRaw.provider.e_sqlite3@2.1.11",
+      "purl": "pkg:nuget/SQLitePCLRaw.provider.e_sqlite3@2.1.11",
       "type": "library",
       "authors": [
         {
@@ -1940,7 +1941,6 @@
         }
       ],
       "copyright": "Copyright 2014-2024 SourceGear, LLC",
-      "purl": "pkg:nuget/SQLitePCLRaw.provider.e_sqlite3@2.1.11",
       "externalReferences": [
         {
           "url": "https://github.com/ericsink/SQLitePCL.raw",
@@ -1951,6 +1951,7 @@
     {
       "name": "System.Buffers",
       "bom-ref": "pkg:nuget/System.Buffers@4.5.1",
+      "purl": "pkg:nuget/System.Buffers@4.5.1",
       "type": "library",
       "authors": [
         {
@@ -1975,7 +1976,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Buffers@4.5.1",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -1986,6 +1986,7 @@
     {
       "name": "System.CodeDom",
       "bom-ref": "pkg:nuget/System.CodeDom@6.0.0",
+      "purl": "pkg:nuget/System.CodeDom@6.0.0",
       "type": "library",
       "authors": [
         {
@@ -2009,7 +2010,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.CodeDom@6.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2024,6 +2024,7 @@
     {
       "name": "System.Collections.Immutable",
       "bom-ref": "pkg:nuget/System.Collections.Immutable@8.0.0",
+      "purl": "pkg:nuget/System.Collections.Immutable@8.0.0",
       "type": "library",
       "authors": [
         {
@@ -2047,7 +2048,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Collections.Immutable@8.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2062,6 +2062,7 @@
     {
       "name": "System.Composition.AttributedModel",
       "bom-ref": "pkg:nuget/System.Composition.AttributedModel@9.0.0",
+      "purl": "pkg:nuget/System.Composition.AttributedModel@9.0.0",
       "type": "library",
       "authors": [
         {
@@ -2085,7 +2086,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Composition.AttributedModel@9.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2100,6 +2100,7 @@
     {
       "name": "System.Composition.Convention",
       "bom-ref": "pkg:nuget/System.Composition.Convention@9.0.0",
+      "purl": "pkg:nuget/System.Composition.Convention@9.0.0",
       "type": "library",
       "authors": [
         {
@@ -2123,7 +2124,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Composition.Convention@9.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2138,6 +2138,7 @@
     {
       "name": "System.Composition.Hosting",
       "bom-ref": "pkg:nuget/System.Composition.Hosting@9.0.0",
+      "purl": "pkg:nuget/System.Composition.Hosting@9.0.0",
       "type": "library",
       "authors": [
         {
@@ -2161,7 +2162,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Composition.Hosting@9.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2176,6 +2176,7 @@
     {
       "name": "System.Composition.Runtime",
       "bom-ref": "pkg:nuget/System.Composition.Runtime@9.0.0",
+      "purl": "pkg:nuget/System.Composition.Runtime@9.0.0",
       "type": "library",
       "authors": [
         {
@@ -2199,7 +2200,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Composition.Runtime@9.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2214,6 +2214,7 @@
     {
       "name": "System.Composition.TypedParts",
       "bom-ref": "pkg:nuget/System.Composition.TypedParts@9.0.0",
+      "purl": "pkg:nuget/System.Composition.TypedParts@9.0.0",
       "type": "library",
       "authors": [
         {
@@ -2237,7 +2238,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Composition.TypedParts@9.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2252,6 +2252,7 @@
     {
       "name": "System.Composition",
       "bom-ref": "pkg:nuget/System.Composition@9.0.0",
+      "purl": "pkg:nuget/System.Composition@9.0.0",
       "type": "library",
       "authors": [
         {
@@ -2275,7 +2276,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Composition@9.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2290,6 +2290,7 @@
     {
       "name": "System.IdentityModel.Tokens.Jwt",
       "bom-ref": "pkg:nuget/System.IdentityModel.Tokens.Jwt@8.0.1",
+      "purl": "pkg:nuget/System.IdentityModel.Tokens.Jwt@8.0.1",
       "type": "library",
       "authors": [
         {
@@ -2313,7 +2314,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.IdentityModel.Tokens.Jwt@8.0.1",
       "externalReferences": [
         {
           "url": "https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet",
@@ -2328,6 +2328,7 @@
     {
       "name": "System.Memory",
       "bom-ref": "pkg:nuget/System.Memory@4.5.5",
+      "purl": "pkg:nuget/System.Memory@4.5.5",
       "type": "library",
       "authors": [
         {
@@ -2352,7 +2353,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Memory@4.5.5",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2363,6 +2363,7 @@
     {
       "name": "System.Numerics.Vectors",
       "bom-ref": "pkg:nuget/System.Numerics.Vectors@4.5.0",
+      "purl": "pkg:nuget/System.Numerics.Vectors@4.5.0",
       "type": "library",
       "authors": [
         {
@@ -2387,7 +2388,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation.  All rights reserved.",
-      "purl": "pkg:nuget/System.Numerics.Vectors@4.5.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2398,6 +2398,7 @@
     {
       "name": "System.Reflection.Metadata",
       "bom-ref": "pkg:nuget/System.Reflection.Metadata@8.0.0",
+      "purl": "pkg:nuget/System.Reflection.Metadata@8.0.0",
       "type": "library",
       "authors": [
         {
@@ -2421,7 +2422,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Reflection.Metadata@8.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2436,6 +2436,7 @@
     {
       "name": "System.Runtime.CompilerServices.Unsafe",
       "bom-ref": "pkg:nuget/System.Runtime.CompilerServices.Unsafe@6.0.0",
+      "purl": "pkg:nuget/System.Runtime.CompilerServices.Unsafe@6.0.0",
       "type": "library",
       "authors": [
         {
@@ -2459,7 +2460,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Runtime.CompilerServices.Unsafe@6.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2474,6 +2474,7 @@
     {
       "name": "System.Text.Encoding.CodePages",
       "bom-ref": "pkg:nuget/System.Text.Encoding.CodePages@7.0.0",
+      "purl": "pkg:nuget/System.Text.Encoding.CodePages@7.0.0",
       "type": "library",
       "authors": [
         {
@@ -2497,7 +2498,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Text.Encoding.CodePages@7.0.0",
       "externalReferences": [
         {
           "url": "https://dot.net/",
@@ -2512,6 +2512,7 @@
     {
       "name": "System.Threading.Tasks.Extensions",
       "bom-ref": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
+      "purl": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
       "type": "library",
       "authors": [
         {
@@ -2536,7 +2537,6 @@
         }
       ],
       "copyright": "© Microsoft Corporation. All rights reserved.",
-      "purl": "pkg:nuget/System.Threading.Tasks.Extensions@4.5.4",
       "externalReferences": [
         {
           "url": "https://dot.net/",

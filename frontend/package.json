@@ -14,6 +14,7 @@
     "quality:report": "node scripts/quality/writeQualityReport.mts",
     "sbom": "node scripts/quality/supplyChain/writeBillsOfMaterials.mts",
     "advisories:scan": "node scripts/quality/supplyChain/scanDependencyAdvisories.mts",
+    "dependency-graph:submit": "node scripts/quality/supplyChain/submitDependencySnapshot.mts",
     "mutation:frontend": "node scripts/quality/mutation/runMutationTesting.mts frontend",
     "mutation:backend": "node scripts/quality/mutation/runMutationTesting.mts backend",
     "fmt": "prettier --write .",
