@@ -1,5 +1,5 @@
 {
   "model": "anthropic/claude-sonnet-5-5",
-  "thinking": "off",
+  "thinking": "medium",
   "port": 4388
 }
